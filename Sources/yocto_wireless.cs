@@ -1,39 +1,39 @@
 /*********************************************************************
  *
- * $Id: yocto_wireless.cs 9921 2013-02-20 09:39:16Z seb $
+ * $Id: yocto_wireless.cs 12337 2013-08-14 15:22:22Z mvuilleu $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
- * - - - - - - - - - License information: - - - - - - - - - 
+ * - - - - - - - - - License information: - - - - - - - - -
  *
- * Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
- * 1) If you have obtained this file from www.yoctopuce.com,
- *    Yoctopuce Sarl licenses to you (hereafter Licensee) the
- *    right to use, modify, copy, and integrate this source file
- *    into your own solution for the sole purpose of interfacing
- *    a Yoctopuce product with Licensee's solution.
+ *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ *  non-exclusive license to use, modify, copy and integrate this
+ *  file into your software for the sole purpose of interfacing 
+ *  with Yoctopuce products. 
  *
- *    The use of this file and all relationship between Yoctopuce 
- *    and Licensee are governed by Yoctopuce General Terms and 
- *    Conditions.
+ *  You may reproduce and distribute copies of this file in 
+ *  source or object form, as long as the sole purpose of this
+ *  code is to interface with Yoctopuce products. You must retain 
+ *  this notice in the distributed source file.
  *
- *    THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *    WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *    WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
- *    FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
- *    EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *    INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *    COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *    SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
- *    LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
- *    CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
- *    BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
- *    WARRANTY, OR OTHERWISE.
+ *  You should refer to Yoctopuce General Terms and Conditions
+ *  for additional information regarding your rights and 
+ *  obligations.
  *
- * 2) If your intent is not to interface with Yoctopuce products,
- *    you are not entitled to use, read or create any derived
- *    material from this source file.
+ *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED "AS IS" WITHOUT
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
+ *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
+ *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
+ *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
+ *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
+ *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ *  WARRANTY, OR OTHERWISE.
  *
  *********************************************************************/
 
@@ -47,14 +47,70 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+
+public class YWlanRecord
+{
+  string _ssid;
+  int    _channel;
+  string _sec;
+  int    _rssi;
+
+  public YWlanRecord(string data)
+  {
+    YAPI.TJsonParser p;
+    Nullable<YAPI.TJSONRECORD> node;
+
+    p = new YAPI.TJsonParser(data, false);
+    node = p.GetChildNode(null, "ssid");
+    this._ssid = node.Value.svalue;
+    node = p.GetChildNode(null, "sec");
+    this._sec = node.Value.svalue;
+    node = p.GetChildNode(null, "rssi");
+    this._rssi = (int)node.Value.ivalue;
+    node = p.GetChildNode(null, "channel");
+    this._channel = (int)node.Value.ivalue;
+
+  }
+
+  //--- (generated code: YWlanRecord implementation)
+
+
+
+
+  public string get_ssid()
+  {
+    return this._ssid;
+  }
+
+  public int get_channel()
+  {
+    return this._channel;
+  }
+
+  public string get_security()
+  {
+    return this._sec;
+  }
+
+  public int get_linkQuality()
+  {
+    return this._rssi;
+  }
+
+  //--- (end of generated code: YWlanRecord implementation)
+
+}
+
+
+
 public class YWireless : YFunction
 {
-  //--- (globals)
+  //--- (generated code: globals)
 
 
-  //--- (end of globals)
+  //--- (end of generated code: globals)
 
-  //--- (YWireless definitions)
+  //--- (generated code: YWireless definitions)
 
   public delegate void UpdateCallback(YWireless func, string value);
 
@@ -75,9 +131,9 @@ public class YWireless : YFunction
   public const string WLANCONFIG_INVALID = YAPI.INVALID_STRING;
 
 
-  //--- (end of YWireless definitions)
+  //--- (end of generated code: YWireless definitions)
 
-  //--- (YWireless implementation)
+  //--- (generated code: YWireless implementation)
 
   private static Hashtable _WirelessCache = new Hashtable();
   private UpdateCallback _callback;
@@ -415,7 +471,7 @@ public class YWireless : YFunction
    *   wireless network, without using an access point.
    * <para>
    *   If a security key is specified,
-   *   the network will be protected by WEP128, since WPA is not standardized for
+   *   the network is protected by WEP128, since WPA is not standardized for
    *   ad-hoc networks.
    *   Remember to call the <c>saveToFlash()</c> method and then to reboot the module to apply this setting.
    * </para>
@@ -442,6 +498,37 @@ public class YWireless : YFunction
     string rest_val;
     rest_val = "ADHOC:"+ssid+"\\"+securityKey;
     return _setAttr("wlanConfig", rest_val);
+  }
+
+  /**
+   * <summary>
+   *   Returns a list of YWlanRecord objects which describe detected Wireless networks.
+   * <para>
+   *   This list is not updated when the module is already connected to an acces point (infrastructure mode).
+   *   To force an update of this list, <c>adhocNetwork()</c> must be called to disconnect
+   *   the module from the current network. The returned list must be unallocated by caller,
+   * </para>
+   * <para>
+   * </para>
+   * </summary>
+   * <returns>
+   *   a list of <c>YWlanRecord</c> objects, containing the SSID, channel,
+   *   link quality and the type of security of the wireless network.
+   * </returns>
+   * <para>
+   *   On failure, throws an exception or returns an empty list.
+   * </para>
+   */
+  public List<YWlanRecord> get_detectedWlans()
+  {
+    byte[] json;
+    string[] list;
+    List<YWlanRecord> res = new List<YWlanRecord>();
+    json = this._download("wlan.json?by=name");
+    list = this._json_get_array(json);
+    for ( int i_i=0 ;i_i< list.Length;i_i++)  { res.Add(new YWlanRecord(list[i_i]));};
+    return res;
+    
   }
 
   /**
@@ -511,9 +598,9 @@ public class YWireless : YFunction
     }
   }
 
-  //--- (end of YWireless implementation)
+  //--- (end of generated code: YWireless implementation)
 
-  //--- (Wireless functions)
+  //--- (generated code: Wireless functions)
 
   /**
    * <summary>
@@ -613,5 +700,5 @@ public class YWireless : YFunction
   { }
 
 
-  //--- (end of Wireless functions)
+  //--- (end of generated code: Wireless functions)
 }

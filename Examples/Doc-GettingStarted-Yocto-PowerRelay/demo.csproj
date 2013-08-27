@@ -43,11 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Sources\yocto_api.cs">
+      <Link>yocto_api\yocto_api.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_anbutton.cs">
       <Link>yocto_api\yocto_anbutton.cs</Link>
-    </Compile>
-    <Compile Include="..\..\sources\yocto_api.cs">
-      <Link>yocto_api\yocto_api.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_carbondioxide.cs">
       <Link>yocto_api\yocto_carbondioxide.cs</Link>
@@ -61,6 +61,9 @@
     <Compile Include="..\..\Sources\yocto_datalogger.cs">
       <Link>yocto_api\yocto_datalogger.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\yocto_digitalio.cs">
+      <Link>yocto_api\yocto_digitalio.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_display.cs">
       <Link>yocto_api\yocto_display.cs</Link>
     </Compile>
@@ -69,6 +72,9 @@
     </Compile>
     <Compile Include="..\..\Sources\yocto_files.cs">
       <Link>yocto_api\yocto_files.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_genericsensor.cs">
+      <Link>yocto_api\yocto_genericsensor.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_hubport.cs">
       <Link>yocto_api\yocto_hubport.cs</Link>
@@ -85,11 +91,17 @@
     <Compile Include="..\..\Sources\yocto_network.cs">
       <Link>yocto_api\yocto_network.cs</Link>
     </Compile>
-    <Compile Include="..\..\Sources\yocto_pressure.cs">
-      <Link>yocto_api\yocto_pressure.cs</Link>
+    <Compile Include="..\..\Sources\yocto_oscontrol.cs">
+      <Link>yocto_api\yocto_oscontrol.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_power.cs">
       <Link>yocto_api\yocto_power.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_pressure.cs">
+      <Link>yocto_api\yocto_pressure.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_realtimeclock.cs">
+      <Link>yocto_api\yocto_realtimeclock.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_relay.cs">
       <Link>yocto_api\yocto_relay.cs</Link>
@@ -105,6 +117,12 @@
     </Compile>
     <Compile Include="..\..\Sources\yocto_voltage.cs">
       <Link>yocto_api\yocto_voltage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_wakeupmonitor.cs">
+      <Link>yocto_api\yocto_wakeupmonitor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_wakeupschedule.cs">
+      <Link>yocto_api\yocto_wakeupschedule.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_watchdog.cs">
       <Link>yocto_api\yocto_watchdog.cs</Link>

@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: yocto_current.cs 12324 2013-08-13 15:10:31Z mvuilleu $
+ * $Id: yocto_genericsensor.cs 12324 2013-08-13 15:10:31Z mvuilleu $
  *
- * Implements yFindCurrent(), the high-level API for Current functions
+ * Implements yFindGenericSensor(), the high-level API for GenericSensor functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -57,16 +57,16 @@ using YFUN_DESCR = System.Int32;
  * </para>
  * </summary>
  */
-public class YCurrent : YFunction
+public class YGenericSensor : YFunction
 {
   //--- (globals)
 
 
   //--- (end of globals)
 
-  //--- (YCurrent definitions)
+  //--- (YGenericSensor definitions)
 
-  public delegate void UpdateCallback(YCurrent func, string value);
+  public delegate void UpdateCallback(YGenericSensor func, string value);
 
 
   public const string LOGICALNAME_INVALID = YAPI.INVALID_STRING;
@@ -77,14 +77,18 @@ public class YCurrent : YFunction
   public const double HIGHESTVALUE_INVALID = YAPI.INVALID_DOUBLE;
   public const double CURRENTRAWVALUE_INVALID = YAPI.INVALID_DOUBLE;
   public const string CALIBRATIONPARAM_INVALID = YAPI.INVALID_STRING;
+  public const double SIGNALVALUE_INVALID = YAPI.INVALID_DOUBLE;
+  public const string SIGNALUNIT_INVALID = YAPI.INVALID_STRING;
+  public const string SIGNALRANGE_INVALID = YAPI.INVALID_STRING;
+  public const string VALUERANGE_INVALID = YAPI.INVALID_STRING;
   public const double RESOLUTION_INVALID = YAPI.INVALID_DOUBLE;
 
 
-  //--- (end of YCurrent definitions)
+  //--- (end of YGenericSensor definitions)
 
-  //--- (YCurrent implementation)
+  //--- (YGenericSensor implementation)
 
-  private static Hashtable _CurrentCache = new Hashtable();
+  private static Hashtable _GenericSensorCache = new Hashtable();
   private UpdateCallback _callback;
 
   protected string _logicalName;
@@ -95,23 +99,31 @@ public class YCurrent : YFunction
   protected double _highestValue;
   protected double _currentRawValue;
   protected string _calibrationParam;
+  protected double _signalValue;
+  protected string _signalUnit;
+  protected string _signalRange;
+  protected string _valueRange;
   protected double _resolution;
   protected long _calibrationOffset;
 
 
-  public YCurrent(string func)
-    : base("Current", func)
+  public YGenericSensor(string func)
+    : base("GenericSensor", func)
   {
-    _logicalName = YCurrent.LOGICALNAME_INVALID;
-    _advertisedValue = YCurrent.ADVERTISEDVALUE_INVALID;
-    _unit = YCurrent.UNIT_INVALID;
-    _currentValue = YCurrent.CURRENTVALUE_INVALID;
-    _lowestValue = YCurrent.LOWESTVALUE_INVALID;
-    _highestValue = YCurrent.HIGHESTVALUE_INVALID;
-    _currentRawValue = YCurrent.CURRENTRAWVALUE_INVALID;
-    _calibrationParam = YCurrent.CALIBRATIONPARAM_INVALID;
-    _resolution = YCurrent.RESOLUTION_INVALID;
-    _calibrationOffset = -32767;
+    _logicalName = YGenericSensor.LOGICALNAME_INVALID;
+    _advertisedValue = YGenericSensor.ADVERTISEDVALUE_INVALID;
+    _unit = YGenericSensor.UNIT_INVALID;
+    _currentValue = YGenericSensor.CURRENTVALUE_INVALID;
+    _lowestValue = YGenericSensor.LOWESTVALUE_INVALID;
+    _highestValue = YGenericSensor.HIGHESTVALUE_INVALID;
+    _currentRawValue = YGenericSensor.CURRENTRAWVALUE_INVALID;
+    _calibrationParam = YGenericSensor.CALIBRATIONPARAM_INVALID;
+    _signalValue = YGenericSensor.SIGNALVALUE_INVALID;
+    _signalUnit = YGenericSensor.SIGNALUNIT_INVALID;
+    _signalRange = YGenericSensor.SIGNALRANGE_INVALID;
+    _valueRange = YGenericSensor.VALUERANGE_INVALID;
+    _resolution = YGenericSensor.RESOLUTION_INVALID;
+    _calibrationOffset = 0;
   }
 
   protected override int _parse(YAPI.TJSONRECORD j)
@@ -136,15 +148,15 @@ public class YCurrent : YFunction
       }
       else if (member.name == "currentValue")
       {
-        _currentValue = Math.Round(member.ivalue/65536.0);
+        _currentValue = Math.Round(member.ivalue/65.536) / 1000;
       }
       else if (member.name == "lowestValue")
       {
-        _lowestValue = Math.Round(member.ivalue/65536.0);
+        _lowestValue = Math.Round(member.ivalue/65.536) / 1000;
       }
       else if (member.name == "highestValue")
       {
-        _highestValue = Math.Round(member.ivalue/65536.0);
+        _highestValue = Math.Round(member.ivalue/65.536) / 1000;
       }
       else if (member.name == "currentRawValue")
       {
@@ -153,6 +165,22 @@ public class YCurrent : YFunction
       else if (member.name == "calibrationParam")
       {
         _calibrationParam = member.svalue;
+      }
+      else if (member.name == "signalValue")
+      {
+        _signalValue = Math.Round(member.ivalue/65.536) / 1000;
+      }
+      else if (member.name == "signalUnit")
+      {
+        _signalUnit = member.svalue;
+      }
+      else if (member.name == "signalRange")
+      {
+        _signalRange = member.svalue;
+      }
+      else if (member.name == "valueRange")
+      {
+        _valueRange = member.svalue;
       }
       else if (member.name == "resolution")
       {
@@ -166,17 +194,17 @@ public class YCurrent : YFunction
 
   /**
    * <summary>
-   *   Returns the logical name of the current sensor.
+   *   Returns the logical name of the generic sensor.
    * <para>
    * </para>
    * <para>
    * </para>
    * </summary>
    * <returns>
-   *   a string corresponding to the logical name of the current sensor
+   *   a string corresponding to the logical name of the generic sensor
    * </returns>
    * <para>
-   *   On failure, throws an exception or returns <c>YCurrent.LOGICALNAME_INVALID</c>.
+   *   On failure, throws an exception or returns <c>YGenericSensor.LOGICALNAME_INVALID</c>.
    * </para>
    */
   public string get_logicalName()
@@ -184,14 +212,14 @@ public class YCurrent : YFunction
     if (_cacheExpiration <= YAPI.GetTickCount())
     {
       if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YCurrent.LOGICALNAME_INVALID;
+        return YGenericSensor.LOGICALNAME_INVALID;
     }
     return  _logicalName;
   }
 
   /**
    * <summary>
-   *   Changes the logical name of the current sensor.
+   *   Changes the logical name of the generic sensor.
    * <para>
    *   You can use <c>yCheckLogicalName()</c>
    *   prior to this call to make sure that your parameter is valid.
@@ -202,7 +230,7 @@ public class YCurrent : YFunction
    * </para>
    * </summary>
    * <param name="newval">
-   *   a string corresponding to the logical name of the current sensor
+   *   a string corresponding to the logical name of the generic sensor
    * </param>
    * <para>
    * </para>
@@ -222,17 +250,17 @@ public class YCurrent : YFunction
 
   /**
    * <summary>
-   *   Returns the current value of the current sensor (no more than 6 characters).
+   *   Returns the current value of the generic sensor (no more than 6 characters).
    * <para>
    * </para>
    * <para>
    * </para>
    * </summary>
    * <returns>
-   *   a string corresponding to the current value of the current sensor (no more than 6 characters)
+   *   a string corresponding to the current value of the generic sensor (no more than 6 characters)
    * </returns>
    * <para>
-   *   On failure, throws an exception or returns <c>YCurrent.ADVERTISEDVALUE_INVALID</c>.
+   *   On failure, throws an exception or returns <c>YGenericSensor.ADVERTISEDVALUE_INVALID</c>.
    * </para>
    */
   public string get_advertisedValue()
@@ -240,7 +268,7 @@ public class YCurrent : YFunction
     if (_cacheExpiration <= YAPI.GetTickCount())
     {
       if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YCurrent.ADVERTISEDVALUE_INVALID;
+        return YGenericSensor.ADVERTISEDVALUE_INVALID;
     }
     return  _advertisedValue;
   }
@@ -257,17 +285,46 @@ public class YCurrent : YFunction
    *   a string corresponding to the measuring unit for the measured value
    * </returns>
    * <para>
-   *   On failure, throws an exception or returns <c>YCurrent.UNIT_INVALID</c>.
+   *   On failure, throws an exception or returns <c>YGenericSensor.UNIT_INVALID</c>.
    * </para>
    */
   public string get_unit()
   {
-    if (_unit == YCurrent.UNIT_INVALID)
+    if (_cacheExpiration <= YAPI.GetTickCount())
     {
       if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YCurrent.UNIT_INVALID;
+        return YGenericSensor.UNIT_INVALID;
     }
     return  _unit;
+  }
+
+  /**
+   * <summary>
+   *   Changes the measuring unit for the measured value.
+   * <para>
+   *   Remember to call the <c>saveToFlash()</c> method of the module if the
+   *   modification must be kept.
+   * </para>
+   * <para>
+   * </para>
+   * </summary>
+   * <param name="newval">
+   *   a string corresponding to the measuring unit for the measured value
+   * </param>
+   * <para>
+   * </para>
+   * <returns>
+   *   <c>YAPI.SUCCESS</c> if the call succeeds.
+   * </returns>
+   * <para>
+   *   On failure, throws an exception or returns a negative error code.
+   * </para>
+   */
+  public int set_unit(string newval)
+  {
+    string rest_val;
+    rest_val = newval;
+    return _setAttr("unit", rest_val);
   }
 
   /**
@@ -282,7 +339,7 @@ public class YCurrent : YFunction
    *   a floating point number corresponding to the current measured value
    * </returns>
    * <para>
-   *   On failure, throws an exception or returns <c>YCurrent.CURRENTVALUE_INVALID</c>.
+   *   On failure, throws an exception or returns <c>YGenericSensor.CURRENTVALUE_INVALID</c>.
    * </para>
    */
   public double get_currentValue()
@@ -290,10 +347,10 @@ public class YCurrent : YFunction
     if (_cacheExpiration <= YAPI.GetTickCount())
     {
       if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YCurrent.CURRENTVALUE_INVALID;
+        return YGenericSensor.CURRENTVALUE_INVALID;
     }
     double res = YAPI._applyCalibration(_currentRawValue, _calibrationParam, _calibrationOffset, _resolution);
-    if (res != YCurrent.CURRENTVALUE_INVALID) 
+    if (res != YGenericSensor.CURRENTVALUE_INVALID) 
        return  res;
     return  _currentValue;
   }
@@ -337,7 +394,7 @@ public class YCurrent : YFunction
    *   a floating point number corresponding to the minimal value observed
    * </returns>
    * <para>
-   *   On failure, throws an exception or returns <c>YCurrent.LOWESTVALUE_INVALID</c>.
+   *   On failure, throws an exception or returns <c>YGenericSensor.LOWESTVALUE_INVALID</c>.
    * </para>
    */
   public double get_lowestValue()
@@ -345,7 +402,7 @@ public class YCurrent : YFunction
     if (_cacheExpiration <= YAPI.GetTickCount())
     {
       if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YCurrent.LOWESTVALUE_INVALID;
+        return YGenericSensor.LOWESTVALUE_INVALID;
     }
     return  _lowestValue;
   }
@@ -389,7 +446,7 @@ public class YCurrent : YFunction
    *   a floating point number corresponding to the maximal value observed
    * </returns>
    * <para>
-   *   On failure, throws an exception or returns <c>YCurrent.HIGHESTVALUE_INVALID</c>.
+   *   On failure, throws an exception or returns <c>YGenericSensor.HIGHESTVALUE_INVALID</c>.
    * </para>
    */
   public double get_highestValue()
@@ -397,7 +454,7 @@ public class YCurrent : YFunction
     if (_cacheExpiration <= YAPI.GetTickCount())
     {
       if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YCurrent.HIGHESTVALUE_INVALID;
+        return YGenericSensor.HIGHESTVALUE_INVALID;
     }
     return  _highestValue;
   }
@@ -414,7 +471,7 @@ public class YCurrent : YFunction
    *   a floating point number corresponding to the uncalibrated, unrounded raw value returned by the sensor
    * </returns>
    * <para>
-   *   On failure, throws an exception or returns <c>YCurrent.CURRENTRAWVALUE_INVALID</c>.
+   *   On failure, throws an exception or returns <c>YGenericSensor.CURRENTRAWVALUE_INVALID</c>.
    * </para>
    */
   public double get_currentRawValue()
@@ -422,7 +479,7 @@ public class YCurrent : YFunction
     if (_cacheExpiration <= YAPI.GetTickCount())
     {
       if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YCurrent.CURRENTRAWVALUE_INVALID;
+        return YGenericSensor.CURRENTRAWVALUE_INVALID;
     }
     return  _currentRawValue;
   }
@@ -432,7 +489,7 @@ public class YCurrent : YFunction
     if (_cacheExpiration <= YAPI.GetTickCount())
     {
       if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YCurrent.CALIBRATIONPARAM_INVALID;
+        return YGenericSensor.CALIBRATIONPARAM_INVALID;
     }
     return  _calibrationParam;
   }
@@ -501,7 +558,163 @@ public class YCurrent : YFunction
 
   /**
    * <summary>
-   *   Changes the resolution of the measured values.
+   *   Returns the measured value of the electrical signal used by the sensor.
+   * <para>
+   * </para>
+   * <para>
+   * </para>
+   * </summary>
+   * <returns>
+   *   a floating point number corresponding to the measured value of the electrical signal used by the sensor
+   * </returns>
+   * <para>
+   *   On failure, throws an exception or returns <c>YGenericSensor.SIGNALVALUE_INVALID</c>.
+   * </para>
+   */
+  public double get_signalValue()
+  {
+    if (_cacheExpiration <= YAPI.GetTickCount())
+    {
+      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
+        return YGenericSensor.SIGNALVALUE_INVALID;
+    }
+    return  _signalValue;
+  }
+
+  /**
+   * <summary>
+   *   Returns the measuring unit of the electrical signal used by the sensor.
+   * <para>
+   * </para>
+   * <para>
+   * </para>
+   * </summary>
+   * <returns>
+   *   a string corresponding to the measuring unit of the electrical signal used by the sensor
+   * </returns>
+   * <para>
+   *   On failure, throws an exception or returns <c>YGenericSensor.SIGNALUNIT_INVALID</c>.
+   * </para>
+   */
+  public string get_signalUnit()
+  {
+    if (_signalUnit == YGenericSensor.SIGNALUNIT_INVALID)
+    {
+      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
+        return YGenericSensor.SIGNALUNIT_INVALID;
+    }
+    return  _signalUnit;
+  }
+
+  /**
+   * <summary>
+   *   Returns the electric signal range used by the sensor.
+   * <para>
+   * </para>
+   * <para>
+   * </para>
+   * </summary>
+   * <returns>
+   *   a string corresponding to the electric signal range used by the sensor
+   * </returns>
+   * <para>
+   *   On failure, throws an exception or returns <c>YGenericSensor.SIGNALRANGE_INVALID</c>.
+   * </para>
+   */
+  public string get_signalRange()
+  {
+    if (_cacheExpiration <= YAPI.GetTickCount())
+    {
+      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
+        return YGenericSensor.SIGNALRANGE_INVALID;
+    }
+    return  _signalRange;
+  }
+
+  /**
+   * <summary>
+   *   Changes the electric signal range used by the sensor.
+   * <para>
+   * </para>
+   * <para>
+   * </para>
+   * </summary>
+   * <param name="newval">
+   *   a string corresponding to the electric signal range used by the sensor
+   * </param>
+   * <para>
+   * </para>
+   * <returns>
+   *   <c>YAPI.SUCCESS</c> if the call succeeds.
+   * </returns>
+   * <para>
+   *   On failure, throws an exception or returns a negative error code.
+   * </para>
+   */
+  public int set_signalRange(string newval)
+  {
+    string rest_val;
+    rest_val = newval;
+    return _setAttr("signalRange", rest_val);
+  }
+
+  /**
+   * <summary>
+   *   Returns the physical value range measured by the sensor.
+   * <para>
+   * </para>
+   * <para>
+   * </para>
+   * </summary>
+   * <returns>
+   *   a string corresponding to the physical value range measured by the sensor
+   * </returns>
+   * <para>
+   *   On failure, throws an exception or returns <c>YGenericSensor.VALUERANGE_INVALID</c>.
+   * </para>
+   */
+  public string get_valueRange()
+  {
+    if (_cacheExpiration <= YAPI.GetTickCount())
+    {
+      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
+        return YGenericSensor.VALUERANGE_INVALID;
+    }
+    return  _valueRange;
+  }
+
+  /**
+   * <summary>
+   *   Changes the physical value range measured by the sensor.
+   * <para>
+   *   The range change may have a side effect
+   *   on the display resolution, as it may be adapted automatically.
+   * </para>
+   * <para>
+   * </para>
+   * </summary>
+   * <param name="newval">
+   *   a string corresponding to the physical value range measured by the sensor
+   * </param>
+   * <para>
+   * </para>
+   * <returns>
+   *   <c>YAPI.SUCCESS</c> if the call succeeds.
+   * </returns>
+   * <para>
+   *   On failure, throws an exception or returns a negative error code.
+   * </para>
+   */
+  public int set_valueRange(string newval)
+  {
+    string rest_val;
+    rest_val = newval;
+    return _setAttr("valueRange", rest_val);
+  }
+
+  /**
+   * <summary>
+   *   Changes the resolution of the measured physical values.
    * <para>
    *   The resolution corresponds to the numerical precision
    *   when displaying value. It does not change the precision of the measure itself.
@@ -510,7 +723,7 @@ public class YCurrent : YFunction
    * </para>
    * </summary>
    * <param name="newval">
-   *   a floating point number corresponding to the resolution of the measured values
+   *   a floating point number corresponding to the resolution of the measured physical values
    * </param>
    * <para>
    * </para>
@@ -533,7 +746,7 @@ public class YCurrent : YFunction
    *   Returns the resolution of the measured values.
    * <para>
    *   The resolution corresponds to the numerical precision
-   *   when displaying value, which is not always the same as the actual precision of the sensor.
+   *   of the values, which is not always the same as the actual precision of the sensor.
    * </para>
    * <para>
    * </para>
@@ -542,7 +755,7 @@ public class YCurrent : YFunction
    *   a floating point number corresponding to the resolution of the measured values
    * </returns>
    * <para>
-   *   On failure, throws an exception or returns <c>YCurrent.RESOLUTION_INVALID</c>.
+   *   On failure, throws an exception or returns <c>YGenericSensor.RESOLUTION_INVALID</c>.
    * </para>
    */
   public double get_resolution()
@@ -550,31 +763,31 @@ public class YCurrent : YFunction
     if (_cacheExpiration <= YAPI.GetTickCount())
     {
       if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YCurrent.RESOLUTION_INVALID;
+        return YGenericSensor.RESOLUTION_INVALID;
     }
     return  _resolution;
   }
 
   /**
    * <summary>
-   *   Continues the enumeration of current sensors started using <c>yFirstCurrent()</c>.
+   *   Continues the enumeration of generic sensors started using <c>yFirstGenericSensor()</c>.
    * <para>
    * </para>
    * </summary>
    * <returns>
-   *   a pointer to a <c>YCurrent</c> object, corresponding to
-   *   a current sensor currently online, or a <c>null</c> pointer
-   *   if there are no more current sensors to enumerate.
+   *   a pointer to a <c>YGenericSensor</c> object, corresponding to
+   *   a generic sensor currently online, or a <c>null</c> pointer
+   *   if there are no more generic sensors to enumerate.
    * </returns>
    */
-  public YCurrent nextCurrent()
+  public YGenericSensor nextGenericSensor()
   {
     string hwid = "";
     if (YAPI.YISERR(_nextFunction(ref hwid)))
       return null;
     if (hwid == "")
       return null;
-    return FindCurrent(hwid);
+    return FindGenericSensor(hwid);
   }
 
   /**
@@ -622,13 +835,13 @@ public class YCurrent : YFunction
     }
   }
 
-  //--- (end of YCurrent implementation)
+  //--- (end of YGenericSensor implementation)
 
-  //--- (Current functions)
+  //--- (GenericSensor functions)
 
   /**
    * <summary>
-   *   Retrieves a current sensor for a given identifier.
+   *   Retrieves a generic sensor for a given identifier.
    * <para>
    *   The identifier can be specified using several formats:
    * </para>
@@ -652,47 +865,47 @@ public class YCurrent : YFunction
    * <para>
    * </para>
    * <para>
-   *   This function does not require that the current sensor is online at the time
+   *   This function does not require that the generic sensor is online at the time
    *   it is invoked. The returned object is nevertheless valid.
-   *   Use the method <c>YCurrent.isOnline()</c> to test if the current sensor is
+   *   Use the method <c>YGenericSensor.isOnline()</c> to test if the generic sensor is
    *   indeed online at a given time. In case of ambiguity when looking for
-   *   a current sensor by logical name, no error is notified: the first instance
+   *   a generic sensor by logical name, no error is notified: the first instance
    *   found is returned. The search is performed first by hardware name,
    *   then by logical name.
    * </para>
    * </summary>
    * <param name="func">
-   *   a string that uniquely characterizes the current sensor
+   *   a string that uniquely characterizes the generic sensor
    * </param>
    * <returns>
-   *   a <c>YCurrent</c> object allowing you to drive the current sensor.
+   *   a <c>YGenericSensor</c> object allowing you to drive the generic sensor.
    * </returns>
    */
-  public static YCurrent FindCurrent(string func)
+  public static YGenericSensor FindGenericSensor(string func)
   {
-    YCurrent res;
-    if (_CurrentCache.ContainsKey(func))
-      return (YCurrent)_CurrentCache[func];
-    res = new YCurrent(func);
-    _CurrentCache.Add(func, res);
+    YGenericSensor res;
+    if (_GenericSensorCache.ContainsKey(func))
+      return (YGenericSensor)_GenericSensorCache[func];
+    res = new YGenericSensor(func);
+    _GenericSensorCache.Add(func, res);
     return res;
   }
 
   /**
    * <summary>
-   *   Starts the enumeration of current sensors currently accessible.
+   *   Starts the enumeration of generic sensors currently accessible.
    * <para>
-   *   Use the method <c>YCurrent.nextCurrent()</c> to iterate on
-   *   next current sensors.
+   *   Use the method <c>YGenericSensor.nextGenericSensor()</c> to iterate on
+   *   next generic sensors.
    * </para>
    * </summary>
    * <returns>
-   *   a pointer to a <c>YCurrent</c> object, corresponding to
-   *   the first current sensor currently online, or a <c>null</c> pointer
+   *   a pointer to a <c>YGenericSensor</c> object, corresponding to
+   *   the first generic sensor currently online, or a <c>null</c> pointer
    *   if there are none.
    * </returns>
    */
-  public static YCurrent FirstCurrent()
+  public static YGenericSensor FirstGenericSensor()
   {
     YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
     YDEV_DESCR dev = default(YDEV_DESCR);
@@ -705,7 +918,7 @@ public class YCurrent : YFunction
     string errmsg = "";
     int size = Marshal.SizeOf(v_fundescr[0]);
     IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
-    err = YAPI.apiGetFunctionsByClass("Current", 0, p, size, ref neededsize, ref errmsg);
+    err = YAPI.apiGetFunctionsByClass("GenericSensor", 0, p, size, ref neededsize, ref errmsg);
     Marshal.Copy(p, v_fundescr, 0, 1);
     Marshal.FreeHGlobal(p);
     if ((YAPI.YISERR(err) | (neededsize == 0)))
@@ -717,12 +930,12 @@ public class YCurrent : YFunction
     errmsg = "";
     if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
       return null;
-    return FindCurrent(serial + "." + funcId);
+    return FindGenericSensor(serial + "." + funcId);
   }
 
-  private static void _CurrentCleanup()
+  private static void _GenericSensorCleanup()
   { }
 
 
-  //--- (end of Current functions)
+  //--- (end of GenericSensor functions)
 }

@@ -1,2 +1,8 @@
-- Improve handling of device disconnection in the middle of a request close
-- Publish library to GitHub
+- clarify license agreement
+- minor fixes for mono compatibility
+- improve robustness of low-level USB stack 
+- fix 5 seconds timeout on YAPI.FreeAPI() when connected through the network
+- fix possible 100% CPU load when the API was connecting to an IP Hub
+- fix potential segmentation fault when unplugging device in bootloader
+- remove some unnecessary file of VisualStudio projects
+- fix a memory leak

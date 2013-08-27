@@ -100,9 +100,6 @@
     <Compile Include="..\..\Sources\yocto_voltage.cs">
       <Link>API\yocto_voltage.cs</Link>
     </Compile>
-    <Compile Include="..\..\Sources\yocto_vsource.cs">
-      <Link>API\yocto_vsource.cs</Link>
-    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

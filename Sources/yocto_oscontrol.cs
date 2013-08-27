@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: yocto_dualpower.cs 12324 2013-08-13 15:10:31Z mvuilleu $
+ * $Id: yocto_oscontrol.cs 12337 2013-08-14 15:22:22Z mvuilleu $
  *
- * Implements yFindDualPower(), the high-level API for DualPower functions
+ * Implements yFindOsControl(), the high-level API for OsControl functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -49,67 +49,50 @@ using YFUN_DESCR = System.Int32;
 
 /**
  * <summary>
- *   Yoctopuce application programming interface allows you to control
- *   the power source to use for module functions that require high current.
+ *   The OScontrol object allows some control over the operating system running a VirtualHub.
  * <para>
- *   The module can also automatically disconnect the external power
- *   when a voltage drop is observed on the external power source
- *   (external battery running out of power).
+ *   OsControl is available on the VirtualHub software only. This feature must be activated at the VirtualHub
+ *   start up with -o option.
  * </para>
  * <para>
  * </para>
  * </summary>
  */
-public class YDualPower : YFunction
+public class YOsControl : YFunction
 {
   //--- (globals)
 
 
   //--- (end of globals)
 
-  //--- (YDualPower definitions)
+  //--- (YOsControl definitions)
 
-  public delegate void UpdateCallback(YDualPower func, string value);
+  public delegate void UpdateCallback(YOsControl func, string value);
 
 
   public const string LOGICALNAME_INVALID = YAPI.INVALID_STRING;
   public const string ADVERTISEDVALUE_INVALID = YAPI.INVALID_STRING;
-  public const int POWERSTATE_OFF = 0;
-  public const int POWERSTATE_FROM_USB = 1;
-  public const int POWERSTATE_FROM_EXT = 2;
-  public const int POWERSTATE_INVALID = -1;
-
-  public const int POWERCONTROL_AUTO = 0;
-  public const int POWERCONTROL_FROM_USB = 1;
-  public const int POWERCONTROL_FROM_EXT = 2;
-  public const int POWERCONTROL_OFF = 3;
-  public const int POWERCONTROL_INVALID = -1;
-
-  public const int EXTVOLTAGE_INVALID = YAPI.INVALID_UNSIGNED;
+  public const int SHUTDOWNCOUNTDOWN_INVALID = YAPI.INVALID_UNSIGNED;
 
 
-  //--- (end of YDualPower definitions)
+  //--- (end of YOsControl definitions)
 
-  //--- (YDualPower implementation)
+  //--- (YOsControl implementation)
 
-  private static Hashtable _DualPowerCache = new Hashtable();
+  private static Hashtable _OsControlCache = new Hashtable();
   private UpdateCallback _callback;
 
   protected string _logicalName;
   protected string _advertisedValue;
-  protected long _powerState;
-  protected long _powerControl;
-  protected long _extVoltage;
+  protected long _shutdownCountdown;
 
 
-  public YDualPower(string func)
-    : base("DualPower", func)
+  public YOsControl(string func)
+    : base("OsControl", func)
   {
-    _logicalName = YDualPower.LOGICALNAME_INVALID;
-    _advertisedValue = YDualPower.ADVERTISEDVALUE_INVALID;
-    _powerState = YDualPower.POWERSTATE_INVALID;
-    _powerControl = YDualPower.POWERCONTROL_INVALID;
-    _extVoltage = YDualPower.EXTVOLTAGE_INVALID;
+    _logicalName = YOsControl.LOGICALNAME_INVALID;
+    _advertisedValue = YOsControl.ADVERTISEDVALUE_INVALID;
+    _shutdownCountdown = YOsControl.SHUTDOWNCOUNTDOWN_INVALID;
   }
 
   protected override int _parse(YAPI.TJSONRECORD j)
@@ -128,17 +111,9 @@ public class YDualPower : YFunction
       {
         _advertisedValue = member.svalue;
       }
-      else if (member.name == "powerState")
+      else if (member.name == "shutdownCountdown")
       {
-        _powerState = member.ivalue;
-      }
-      else if (member.name == "powerControl")
-      {
-        _powerControl = member.ivalue;
-      }
-      else if (member.name == "extVoltage")
-      {
-        _extVoltage = member.ivalue;
+        _shutdownCountdown = member.ivalue;
       }
     }
     return 0;
@@ -148,17 +123,17 @@ public class YDualPower : YFunction
 
   /**
    * <summary>
-   *   Returns the logical name of the power control.
+   *   Returns the logical name of the OS control, corresponding to the network name of the module.
    * <para>
    * </para>
    * <para>
    * </para>
    * </summary>
    * <returns>
-   *   a string corresponding to the logical name of the power control
+   *   a string corresponding to the logical name of the OS control, corresponding to the network name of the module
    * </returns>
    * <para>
-   *   On failure, throws an exception or returns <c>YDualPower.LOGICALNAME_INVALID</c>.
+   *   On failure, throws an exception or returns <c>YOsControl.LOGICALNAME_INVALID</c>.
    * </para>
    */
   public string get_logicalName()
@@ -166,14 +141,14 @@ public class YDualPower : YFunction
     if (_cacheExpiration <= YAPI.GetTickCount())
     {
       if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YDualPower.LOGICALNAME_INVALID;
+        return YOsControl.LOGICALNAME_INVALID;
     }
     return  _logicalName;
   }
 
   /**
    * <summary>
-   *   Changes the logical name of the power control.
+   *   Changes the logical name of the OS control.
    * <para>
    *   You can use <c>yCheckLogicalName()</c>
    *   prior to this call to make sure that your parameter is valid.
@@ -184,7 +159,7 @@ public class YDualPower : YFunction
    * </para>
    * </summary>
    * <param name="newval">
-   *   a string corresponding to the logical name of the power control
+   *   a string corresponding to the logical name of the OS control
    * </param>
    * <para>
    * </para>
@@ -204,17 +179,17 @@ public class YDualPower : YFunction
 
   /**
    * <summary>
-   *   Returns the current value of the power control (no more than 6 characters).
+   *   Returns the current value of the OS control (no more than 6 characters).
    * <para>
    * </para>
    * <para>
    * </para>
    * </summary>
    * <returns>
-   *   a string corresponding to the current value of the power control (no more than 6 characters)
+   *   a string corresponding to the current value of the OS control (no more than 6 characters)
    * </returns>
    * <para>
-   *   On failure, throws an exception or returns <c>YDualPower.ADVERTISEDVALUE_INVALID</c>.
+   *   On failure, throws an exception or returns <c>YOsControl.ADVERTISEDVALUE_INVALID</c>.
    * </para>
    */
   public string get_advertisedValue()
@@ -222,77 +197,55 @@ public class YDualPower : YFunction
     if (_cacheExpiration <= YAPI.GetTickCount())
     {
       if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YDualPower.ADVERTISEDVALUE_INVALID;
+        return YOsControl.ADVERTISEDVALUE_INVALID;
     }
     return  _advertisedValue;
   }
 
   /**
    * <summary>
-   *   Returns the current power source for module functions that require lots of current.
+   *   Returns the remaining number of seconds before the OS shutdown, or zero when no
+   *   shutdown has been scheduled.
    * <para>
    * </para>
    * <para>
    * </para>
    * </summary>
    * <returns>
-   *   a value among <c>YDualPower.POWERSTATE_OFF</c>, <c>YDualPower.POWERSTATE_FROM_USB</c> and
-   *   <c>YDualPower.POWERSTATE_FROM_EXT</c> corresponding to the current power source for module
-   *   functions that require lots of current
+   *   an integer corresponding to the remaining number of seconds before the OS shutdown, or zero when no
+   *   shutdown has been scheduled
    * </returns>
    * <para>
-   *   On failure, throws an exception or returns <c>YDualPower.POWERSTATE_INVALID</c>.
+   *   On failure, throws an exception or returns <c>YOsControl.SHUTDOWNCOUNTDOWN_INVALID</c>.
    * </para>
    */
-  public int get_powerState()
+  public int get_shutdownCountdown()
   {
     if (_cacheExpiration <= YAPI.GetTickCount())
     {
       if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YDualPower.POWERSTATE_INVALID;
+        return YOsControl.SHUTDOWNCOUNTDOWN_INVALID;
     }
-    return (int) _powerState;
+    return (int) _shutdownCountdown;
+  }
+
+  public int set_shutdownCountdown(int newval)
+  {
+    string rest_val;
+    rest_val = (newval).ToString();
+    return _setAttr("shutdownCountdown", rest_val);
   }
 
   /**
    * <summary>
-   *   Returns the selected power source for module functions that require lots of current.
+   *   Schedules an OS shutdown after a given number of seconds.
    * <para>
    * </para>
    * <para>
    * </para>
    * </summary>
-   * <returns>
-   *   a value among <c>YDualPower.POWERCONTROL_AUTO</c>, <c>YDualPower.POWERCONTROL_FROM_USB</c>,
-   *   <c>YDualPower.POWERCONTROL_FROM_EXT</c> and <c>YDualPower.POWERCONTROL_OFF</c> corresponding to the
-   *   selected power source for module functions that require lots of current
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YDualPower.POWERCONTROL_INVALID</c>.
-   * </para>
-   */
-  public int get_powerControl()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
-    {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YDualPower.POWERCONTROL_INVALID;
-    }
-    return (int) _powerControl;
-  }
-
-  /**
-   * <summary>
-   *   Changes the selected power source for module functions that require lots of current.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="newval">
-   *   a value among <c>YDualPower.POWERCONTROL_AUTO</c>, <c>YDualPower.POWERCONTROL_FROM_USB</c>,
-   *   <c>YDualPower.POWERCONTROL_FROM_EXT</c> and <c>YDualPower.POWERCONTROL_OFF</c> corresponding to the
-   *   selected power source for module functions that require lots of current
+   * <param name="secBeforeShutDown">
+   *   number of seconds before shutdown
    * </param>
    * <para>
    * </para>
@@ -303,58 +256,33 @@ public class YDualPower : YFunction
    *   On failure, throws an exception or returns a negative error code.
    * </para>
    */
-  public int set_powerControl(int newval)
+  public int shutdown(int secBeforeShutDown)
   {
     string rest_val;
-    rest_val = (newval).ToString();
-    return _setAttr("powerControl", rest_val);
+    rest_val = (secBeforeShutDown).ToString();
+    return _setAttr("shutdownCountdown", rest_val);
   }
 
   /**
    * <summary>
-   *   Returns the measured voltage on the external power source, in millivolts.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   an integer corresponding to the measured voltage on the external power source, in millivolts
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YDualPower.EXTVOLTAGE_INVALID</c>.
-   * </para>
-   */
-  public int get_extVoltage()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
-    {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YDualPower.EXTVOLTAGE_INVALID;
-    }
-    return (int) _extVoltage;
-  }
-
-  /**
-   * <summary>
-   *   Continues the enumeration of dual power controls started using <c>yFirstDualPower()</c>.
+   *   Continues the enumeration of OS control started using <c>yFirstOsControl()</c>.
    * <para>
    * </para>
    * </summary>
    * <returns>
-   *   a pointer to a <c>YDualPower</c> object, corresponding to
-   *   a dual power control currently online, or a <c>null</c> pointer
-   *   if there are no more dual power controls to enumerate.
+   *   a pointer to a <c>YOsControl</c> object, corresponding to
+   *   OS control currently online, or a <c>null</c> pointer
+   *   if there are no more OS control to enumerate.
    * </returns>
    */
-  public YDualPower nextDualPower()
+  public YOsControl nextOsControl()
   {
     string hwid = "";
     if (YAPI.YISERR(_nextFunction(ref hwid)))
       return null;
     if (hwid == "")
       return null;
-    return FindDualPower(hwid);
+    return FindOsControl(hwid);
   }
 
   /**
@@ -402,13 +330,13 @@ public class YDualPower : YFunction
     }
   }
 
-  //--- (end of YDualPower implementation)
+  //--- (end of YOsControl implementation)
 
-  //--- (DualPower functions)
+  //--- (OsControl functions)
 
   /**
    * <summary>
-   *   Retrieves a dual power control for a given identifier.
+   *   Retrieves OS control for a given identifier.
    * <para>
    *   The identifier can be specified using several formats:
    * </para>
@@ -432,47 +360,47 @@ public class YDualPower : YFunction
    * <para>
    * </para>
    * <para>
-   *   This function does not require that the power control is online at the time
+   *   This function does not require that the OS control is online at the time
    *   it is invoked. The returned object is nevertheless valid.
-   *   Use the method <c>YDualPower.isOnline()</c> to test if the power control is
+   *   Use the method <c>YOsControl.isOnline()</c> to test if the OS control is
    *   indeed online at a given time. In case of ambiguity when looking for
-   *   a dual power control by logical name, no error is notified: the first instance
+   *   OS control by logical name, no error is notified: the first instance
    *   found is returned. The search is performed first by hardware name,
    *   then by logical name.
    * </para>
    * </summary>
    * <param name="func">
-   *   a string that uniquely characterizes the power control
+   *   a string that uniquely characterizes the OS control
    * </param>
    * <returns>
-   *   a <c>YDualPower</c> object allowing you to drive the power control.
+   *   a <c>YOsControl</c> object allowing you to drive the OS control.
    * </returns>
    */
-  public static YDualPower FindDualPower(string func)
+  public static YOsControl FindOsControl(string func)
   {
-    YDualPower res;
-    if (_DualPowerCache.ContainsKey(func))
-      return (YDualPower)_DualPowerCache[func];
-    res = new YDualPower(func);
-    _DualPowerCache.Add(func, res);
+    YOsControl res;
+    if (_OsControlCache.ContainsKey(func))
+      return (YOsControl)_OsControlCache[func];
+    res = new YOsControl(func);
+    _OsControlCache.Add(func, res);
     return res;
   }
 
   /**
    * <summary>
-   *   Starts the enumeration of dual power controls currently accessible.
+   *   Starts the enumeration of OS control currently accessible.
    * <para>
-   *   Use the method <c>YDualPower.nextDualPower()</c> to iterate on
-   *   next dual power controls.
+   *   Use the method <c>YOsControl.nextOsControl()</c> to iterate on
+   *   next OS control.
    * </para>
    * </summary>
    * <returns>
-   *   a pointer to a <c>YDualPower</c> object, corresponding to
-   *   the first dual power control currently online, or a <c>null</c> pointer
+   *   a pointer to a <c>YOsControl</c> object, corresponding to
+   *   the first OS control currently online, or a <c>null</c> pointer
    *   if there are none.
    * </returns>
    */
-  public static YDualPower FirstDualPower()
+  public static YOsControl FirstOsControl()
   {
     YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
     YDEV_DESCR dev = default(YDEV_DESCR);
@@ -485,7 +413,7 @@ public class YDualPower : YFunction
     string errmsg = "";
     int size = Marshal.SizeOf(v_fundescr[0]);
     IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
-    err = YAPI.apiGetFunctionsByClass("DualPower", 0, p, size, ref neededsize, ref errmsg);
+    err = YAPI.apiGetFunctionsByClass("OsControl", 0, p, size, ref neededsize, ref errmsg);
     Marshal.Copy(p, v_fundescr, 0, 1);
     Marshal.FreeHGlobal(p);
     if ((YAPI.YISERR(err) | (neededsize == 0)))
@@ -497,12 +425,12 @@ public class YDualPower : YFunction
     errmsg = "";
     if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
       return null;
-    return FindDualPower(serial + "." + funcId);
+    return FindOsControl(serial + "." + funcId);
   }
 
-  private static void _DualPowerCleanup()
+  private static void _OsControlCleanup()
   { }
 
 
-  //--- (end of DualPower functions)
+  //--- (end of OsControl functions)
 }

@@ -1,42 +1,41 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cpp 4867 2012-02-06 18:12:35Z seb $
+ * $Id: yocto_api.cs 12441 2013-08-21 12:44:22Z martinm $
  *
  * High-level programming interface, common to all modules
  *
- * - - - - - - - - - License information: - - - - - - - - - 
+ * - - - - - - - - - License information: - - - - - - - - -
  *
- * Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
- * 1) If you have obtained this file from www.yoctopuce.com,
- *    Yoctopuce Sarl licenses to you (hereafter Licensee) the
- *    right to use, modify, copy, and integrate this source file
- *    into your own solution for the sole purpose of interfacing
- *    a Yoctopuce product with Licensee's solution.
+ *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ *  non-exclusive license to use, modify, copy and integrate this
+ *  file into your software for the sole purpose of interfacing 
+ *  with Yoctopuce products. 
  *
- *    The use of this file and all relationship between Yoctopuce 
- *    and Licensee are governed by Yoctopuce General Terms and 
- *    Conditions.
+ *  You may reproduce and distribute copies of this file in 
+ *  source or object form, as long as the sole purpose of this
+ *  code is to interface with Yoctopuce products. You must retain 
+ *  this notice in the distributed source file.
  *
- *    THE SOFTWARE AND DOCUMENTATION ARE PROVIDED "AS IS" WITHOUT
- *    WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *    WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
- *    FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
- *    EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *    INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *    COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *    SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
- *    LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
- *    CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
- *    BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
- *    WARRANTY, OR OTHERWISE.
+ *  You should refer to Yoctopuce General Terms and Conditions
+ *  for additional information regarding your rights and 
+ *  obligations.
  *
- * 2) If your intent is not to interface with Yoctopuce products,
- *    you are not entitled to use, read or create any derived 
- *    material from this source file.
+ *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED "AS IS" WITHOUT
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
+ *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
+ *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
+ *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
+ *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
+ *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ *  WARRANTY, OR OTHERWISE.
  *
  *********************************************************************/
-
 
 using System;
 using System.Collections;
@@ -751,7 +750,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.01";
     public const int YOCTO_API_VERSION_BCD = 0x0101;
 
-    public const string YOCTO_API_BUILD_NO = "11167";
+    public const string YOCTO_API_BUILD_NO = "12553";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -794,11 +793,19 @@ public class YAPI
         public u8 beacon;
     }
 
+    public const int YIOHDL_SIZE = 8;
     [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct YIOHDL
     {
-        [MarshalAs(UnmanagedType.U1, SizeConst = 8)]
-        public u8 raw;
+        [MarshalAs(UnmanagedType.U1, SizeConst = YAPI.YIOHDL_SIZE)]
+        public u8 raw0;
+        public u8 raw1;
+        public u8 raw2;
+        public u8 raw3;
+        public u8 raw4;
+        public u8 raw5;
+        public u8 raw6;
+        public u8 raw7;
     }
 
     public enum yDEVICE_PROP
@@ -860,6 +867,7 @@ public class YAPI
   public const int EXHAUSTED = -10;               // you have run out of a limited ressource, check the documentation
   public const int DOUBLE_ACCES = -11;            // you have two process that try to acces to the same device
   public const int UNAUTHORIZED = -12;            // unauthorized access to password-protected device
+  public const int RTC_NOT_READY = -13;           // real-time clock has not been initialized (or time was lost)
 
 
   //--- (end of generated code: globals)  
@@ -925,7 +933,7 @@ public class YAPI
     public class YDevice
     {
         private YDEV_DESCR _devdescr;
-        private long _cacheStamp;
+        private ulong _cacheStamp;
         private TJsonParser _cacheJson;
         private List<u32> _functions = new List<u32>();
 
@@ -984,7 +992,14 @@ public class YAPI
             int replysize = 0;
             YRETCODE res;
 
-            iohdl.raw = 0; // dummy, useless init to avoid compiler warning
+            iohdl.raw0 = 0; // dummy, useless init to avoid compiler warning
+            iohdl.raw1 = 0;
+            iohdl.raw2 = 0;
+            iohdl.raw3 = 0;
+            iohdl.raw4 = 0;
+            iohdl.raw5 = 0;
+            iohdl.raw6 = 0;
+            iohdl.raw7 = 0;
 
             requestbuf = Marshal.AllocHGlobal(request.Length);
             Marshal.Copy(request, 0, requestbuf, request.Length);
@@ -2122,11 +2137,11 @@ public class YAPI
         int functionReturnValue = 0;
 
         StringBuilder errBuffer = new StringBuilder(YOCTO_ERRMSG_LEN);
-        long timeout = 0;
+        ulong timeout = 0;
         int res = 0;
 
 
-        timeout = GetTickCount() + ms_duration;
+        timeout = GetTickCount() + (ulong)ms_duration;
         res = SUCCESS;
         errBuffer.Length = 0;
 
@@ -2167,9 +2182,9 @@ public class YAPI
      *   a long integer corresponding to the millisecond counter.
      * </returns>
      */
-    public static long GetTickCount()
+    public static ulong GetTickCount()
     {
-        return Convert.ToInt64(_yapiGetTickCount());
+        return Convert.ToUInt64((ulong)_yapiGetTickCount());
     }
     /**
      * <summary>
@@ -2513,7 +2528,7 @@ public abstract class YFunction
     protected object _userData;
     protected GenericUpdateCallback _genCallback;
 
-    protected long _cacheExpiration;
+    protected ulong _cacheExpiration;
     public YFunction(string classname, string func)
     {
         _className = classname;
@@ -3359,7 +3374,7 @@ public abstract class YFunction
         }
 
         _parse(node.GetValueOrDefault());
-        _cacheExpiration = YAPI.GetTickCount() + msValidity;
+        _cacheExpiration = YAPI.GetTickCount() + (ulong)msValidity;
         functionReturnValue = YAPI.SUCCESS;
         return functionReturnValue;
     }
@@ -4272,6 +4287,28 @@ public class YModule : YFunction
   public byte[] get_icon2d()
   {
     return this._download("icon2d.png");
+    
+  }
+
+  /**
+   * <summary>
+   *   Returns a string with last logs of the module.
+   * <para>
+   *   This method return only
+   *   logs that are still in the module.
+   * </para>
+   * <para>
+   * </para>
+   * </summary>
+   * <returns>
+   *   a string with last logs of the module.
+   * </returns>
+   */
+  public string get_lastLogs()
+  {
+    byte[] content;
+    content = this._download("logs.txt");
+    return YAPI.DefaultEncoding.GetString(content);
     
   }
 

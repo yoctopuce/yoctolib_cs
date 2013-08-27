@@ -28,7 +28,7 @@ namespace ConsoleApplication1
       }
 
       
-      if (args.Length < 2)  usage();
+      if (args.Length < 1)  usage();
 
       m = YModule.FindModule(args[0]); // use serial or logical name
 
@@ -48,6 +48,9 @@ namespace ConsoleApplication1
           Console.WriteLine("ON");
         else
           Console.WriteLine("OFF");
+        Console.WriteLine("upTime:       " + (m.get_upTime() / 1000 ).ToString()+ " sec");
+        Console.WriteLine("USB current:  " + m.get_usbCurrent().ToString() + " mA");
+        Console.WriteLine("Logs:\r\n"+ m.get_lastLogs());
 
       }
     else 

@@ -97,9 +97,6 @@
     <Compile Include="..\..\Sources\yocto_voltage.cs">
       <Link>yocto_api\yocto_voltage.cs</Link>
     </Compile>
-    <Compile Include="..\..\Sources\yocto_vsource.cs">
-      <Link>yocto_api\yocto_vsource.cs</Link>
-    </Compile>
     <Compile Include="..\..\Sources\yocto_carbondioxide.cs">
       <Link>yocto_api\yocto_carbondioxide.cs</Link>
     </Compile>
