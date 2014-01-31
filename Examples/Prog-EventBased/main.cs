@@ -8,85 +8,61 @@ namespace ConsoleApplication1
   class Program
   {
 
-    static void anButtonChangeCallBack(YFunction fct, string value)
+    static void anButtonValueChangeCallBack(YFunction fct, string value)
     {
-      Console.WriteLine("Position change         :" + fct.describe() + " = " + value);
+      Console.WriteLine(fct.get_hardwareId() + ": " + value + " (new value)");
     }
 
-    static void temperatureChangeCallBack(YFunction fct, string value)
+    static void sensorValueChangeCallBack(YSensor fct, string value)
     {
-      Console.WriteLine("Temperature change      :" + fct.describe() + " = " + value +"°C");
+      Console.WriteLine(fct.get_hardwareId() + ": " + value + " (new value)");
     }
 
-    static void lightSensorChangeCallBack(YFunction fct, string value)
+    static void sensorTimedReportCallBack(YSensor fct, YMeasure measure)
     {
-      Console.WriteLine("Light change            :" + fct.describe() + " = " + value + "lx");
-    }
-
-    static void voltageSensorChangeCallBack(YFunction fct, string value)
-    {
-      Console.WriteLine("voltage change        :" + fct.describe() + " = " + value + "V");
+      Console.WriteLine(fct.get_hardwareId() + ": " + measure.get_averageValue() + " " + fct.get_unit() + " (timed report)");
     }
 
     static void deviceArrival(YModule m)
     {
-      Console.WriteLine("Device arrival          : " + m.ToString());
-      int fctcount = m.functionCount();
-      string fctName, fctFullName;
+      string serial = m.get_serialNumber();
+      Console.WriteLine("Device arrival : " + serial);
 
+      // First solution: look for a specific type of function (eg. anButton)
+      int fctcount = m.functionCount();
       for (int i = 0; i < fctcount; i++)
       {
-        fctName = m.functionId(i);
-        fctFullName = m.get_serialNumber() + "." + fctName;
+          string hardwareId = serial + "." + m.functionId(i);
+          if (hardwareId.IndexOf(".anButton") >= 0)  
+          {
+              Console.WriteLine("- " + hardwareId);
+              YAnButton anButton = YAnButton.FindAnButton(hardwareId);
+              anButton.registerValueCallback(anButtonValueChangeCallBack);
+          }
+      }
 
-        // register call back for anbuttons
-        if (fctName.IndexOf("anButton")==0)  
-        { 
-          YAnButton bt = YAnButton.FindAnButton(fctFullName);
-          if(bt.isOnline()) bt.set_callback(anButtonChangeCallBack);
-          Console.WriteLine("Callback registered for : " + fctFullName);
-        }
-
-        // register call back for temperature sensors
-        if (fctName.IndexOf("temperature")==0)
-        { 
-          YTemperature t = YTemperature.FindTemperature(fctFullName);
-          if (t.isOnline()) t.set_callback(temperatureChangeCallBack);
-          Console.WriteLine("Callback registered for : " + fctFullName);
-        }
-
-        // register call back for light sensors
-        if (fctName.IndexOf("lightSensor")==0)
-        { 
-          YLightSensor l = YLightSensor.FindLightSensor(fctFullName);
-          if (l.isOnline()) l.set_callback(lightSensorChangeCallBack);
-          Console.WriteLine("Callback registered for : " + fctFullName);
-        }
- 
-        // register call back for voltage sensors
-        if (fctName.IndexOf("voltage") == 0)
-        {
-          YVoltage v = YVoltage.FindVoltage(fctFullName);
-          if (v.isOnline()) v.set_callback(voltageSensorChangeCallBack);
-          Console.WriteLine("Callback registered for : " + fctFullName);
-        }
-
-        // and so on for other sensor type.....
-
+      // Alternate solution: register any kind of sensor on the device
+      YSensor sensor = YSensor.FirstSensor();
+      while(sensor != null) {
+          if(sensor.get_module().get_serialNumber() == serial) {
+              string hardwareId = sensor.get_hardwareId();
+              Console.WriteLine("- " + hardwareId);
+              sensor.registerValueCallback(sensorValueChangeCallBack);
+              sensor.registerTimedReportCallback(sensorTimedReportCallBack);
+          }
+          sensor = sensor.nextSensor();
       }
     }
 
     static void deviceRemoval(YModule m)
     {
-      Console.WriteLine("Device removal          : " + m.get_serialNumber());
+      Console.WriteLine("Device removal : " + m.get_serialNumber());
     }
 
     static void Main(string[] args)
     {
 
       string errmsg = "";
-
- 
 
       if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS)
       {

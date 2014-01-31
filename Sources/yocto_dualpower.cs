@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_dualpower.cs 12324 2013-08-13 15:10:31Z mvuilleu $
+ * $Id: yocto_dualpower.cs 14699 2014-01-23 15:40:07Z seb $
  *
  * Implements yFindDualPower(), the high-level API for DualPower functions
  *
@@ -47,6 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+    //--- (YDualPower return codes)
+    //--- (end of YDualPower return codes)
+//--- (YDualPower class start)
 /**
  * <summary>
  *   Yoctopuce application programming interface allows you to control
@@ -62,447 +65,336 @@ using YFUN_DESCR = System.Int32;
  */
 public class YDualPower : YFunction
 {
-  //--- (globals)
+//--- (end of YDualPower class start)
+    //--- (YDualPower definitions)
+    public new delegate void ValueCallback(YDualPower func, string value);
+    public new delegate void TimedReportCallback(YDualPower func, YMeasure measure);
 
+    public const int POWERSTATE_OFF = 0;
+    public const int POWERSTATE_FROM_USB = 1;
+    public const int POWERSTATE_FROM_EXT = 2;
+    public const int POWERSTATE_INVALID = -1;
 
-  //--- (end of globals)
+    public const int POWERCONTROL_AUTO = 0;
+    public const int POWERCONTROL_FROM_USB = 1;
+    public const int POWERCONTROL_FROM_EXT = 2;
+    public const int POWERCONTROL_OFF = 3;
+    public const int POWERCONTROL_INVALID = -1;
 
-  //--- (YDualPower definitions)
+    public const int EXTVOLTAGE_INVALID = YAPI.INVALID_UINT;
+    protected int _powerState = POWERSTATE_INVALID;
+    protected int _powerControl = POWERCONTROL_INVALID;
+    protected int _extVoltage = EXTVOLTAGE_INVALID;
+    protected ValueCallback _valueCallbackDualPower = null;
+    //--- (end of YDualPower definitions)
 
-  public delegate void UpdateCallback(YDualPower func, string value);
-
-
-  public const string LOGICALNAME_INVALID = YAPI.INVALID_STRING;
-  public const string ADVERTISEDVALUE_INVALID = YAPI.INVALID_STRING;
-  public const int POWERSTATE_OFF = 0;
-  public const int POWERSTATE_FROM_USB = 1;
-  public const int POWERSTATE_FROM_EXT = 2;
-  public const int POWERSTATE_INVALID = -1;
-
-  public const int POWERCONTROL_AUTO = 0;
-  public const int POWERCONTROL_FROM_USB = 1;
-  public const int POWERCONTROL_FROM_EXT = 2;
-  public const int POWERCONTROL_OFF = 3;
-  public const int POWERCONTROL_INVALID = -1;
-
-  public const int EXTVOLTAGE_INVALID = YAPI.INVALID_UNSIGNED;
-
-
-  //--- (end of YDualPower definitions)
-
-  //--- (YDualPower implementation)
-
-  private static Hashtable _DualPowerCache = new Hashtable();
-  private UpdateCallback _callback;
-
-  protected string _logicalName;
-  protected string _advertisedValue;
-  protected long _powerState;
-  protected long _powerControl;
-  protected long _extVoltage;
-
-
-  public YDualPower(string func)
-    : base("DualPower", func)
-  {
-    _logicalName = YDualPower.LOGICALNAME_INVALID;
-    _advertisedValue = YDualPower.ADVERTISEDVALUE_INVALID;
-    _powerState = YDualPower.POWERSTATE_INVALID;
-    _powerControl = YDualPower.POWERCONTROL_INVALID;
-    _extVoltage = YDualPower.EXTVOLTAGE_INVALID;
-  }
-
-  protected override int _parse(YAPI.TJSONRECORD j)
-  {
-    YAPI.TJSONRECORD member = default(YAPI.TJSONRECORD);
-    int i = 0;
-    if ((j.recordtype != YAPI.TJSONRECORDTYPE.JSON_STRUCT)) goto failed;
-    for (i = 0; i <= j.membercount - 1; i++)
+    public YDualPower(string func)
+        : base(func)
     {
-      member = j.members[i];
-      if (member.name == "logicalName")
-      {
-        _logicalName = member.svalue;
-      }
-      else if (member.name == "advertisedValue")
-      {
-        _advertisedValue = member.svalue;
-      }
-      else if (member.name == "powerState")
-      {
-        _powerState = member.ivalue;
-      }
-      else if (member.name == "powerControl")
-      {
-        _powerControl = member.ivalue;
-      }
-      else if (member.name == "extVoltage")
-      {
-        _extVoltage = member.ivalue;
-      }
+        _className = "DualPower";
+        //--- (YDualPower attributes initialization)
+        //--- (end of YDualPower attributes initialization)
     }
-    return 0;
-  failed:
-    return -1;
-  }
 
-  /**
-   * <summary>
-   *   Returns the logical name of the power control.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a string corresponding to the logical name of the power control
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YDualPower.LOGICALNAME_INVALID</c>.
-   * </para>
-   */
-  public string get_logicalName()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    //--- (YDualPower implementation)
+
+    protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YDualPower.LOGICALNAME_INVALID;
+        if (member.name == "powerState")
+        {
+            _powerState = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "powerControl")
+        {
+            _powerControl = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "extVoltage")
+        {
+            _extVoltage = (int)member.ivalue;
+            return;
+        }
+        base._parseAttr(member);
     }
-    return  _logicalName;
-  }
 
-  /**
-   * <summary>
-   *   Changes the logical name of the power control.
-   * <para>
-   *   You can use <c>yCheckLogicalName()</c>
-   *   prior to this call to make sure that your parameter is valid.
-   *   Remember to call the <c>saveToFlash()</c> method of the module if the
-   *   modification must be kept.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="newval">
-   *   a string corresponding to the logical name of the power control
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int set_logicalName(string newval)
-  {
-    string rest_val;
-    rest_val = newval;
-    return _setAttr("logicalName", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Returns the current value of the power control (no more than 6 characters).
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a string corresponding to the current value of the power control (no more than 6 characters)
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YDualPower.ADVERTISEDVALUE_INVALID</c>.
-   * </para>
-   */
-  public string get_advertisedValue()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Returns the current power source for module functions that require lots of current.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among <c>YDualPower.POWERSTATE_OFF</c>, <c>YDualPower.POWERSTATE_FROM_USB</c> and
+     *   <c>YDualPower.POWERSTATE_FROM_EXT</c> corresponding to the current power source for module
+     *   functions that require lots of current
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YDualPower.POWERSTATE_INVALID</c>.
+     * </para>
+     */
+    public int get_powerState()
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YDualPower.ADVERTISEDVALUE_INVALID;
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return POWERSTATE_INVALID;
+            }
+        }
+        return this._powerState;
     }
-    return  _advertisedValue;
-  }
 
-  /**
-   * <summary>
-   *   Returns the current power source for module functions that require lots of current.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a value among <c>YDualPower.POWERSTATE_OFF</c>, <c>YDualPower.POWERSTATE_FROM_USB</c> and
-   *   <c>YDualPower.POWERSTATE_FROM_EXT</c> corresponding to the current power source for module
-   *   functions that require lots of current
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YDualPower.POWERSTATE_INVALID</c>.
-   * </para>
-   */
-  public int get_powerState()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Returns the selected power source for module functions that require lots of current.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among <c>YDualPower.POWERCONTROL_AUTO</c>, <c>YDualPower.POWERCONTROL_FROM_USB</c>,
+     *   <c>YDualPower.POWERCONTROL_FROM_EXT</c> and <c>YDualPower.POWERCONTROL_OFF</c> corresponding to the
+     *   selected power source for module functions that require lots of current
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YDualPower.POWERCONTROL_INVALID</c>.
+     * </para>
+     */
+    public int get_powerControl()
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YDualPower.POWERSTATE_INVALID;
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return POWERCONTROL_INVALID;
+            }
+        }
+        return this._powerControl;
     }
-    return (int) _powerState;
-  }
 
-  /**
-   * <summary>
-   *   Returns the selected power source for module functions that require lots of current.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a value among <c>YDualPower.POWERCONTROL_AUTO</c>, <c>YDualPower.POWERCONTROL_FROM_USB</c>,
-   *   <c>YDualPower.POWERCONTROL_FROM_EXT</c> and <c>YDualPower.POWERCONTROL_OFF</c> corresponding to the
-   *   selected power source for module functions that require lots of current
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YDualPower.POWERCONTROL_INVALID</c>.
-   * </para>
-   */
-  public int get_powerControl()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Changes the selected power source for module functions that require lots of current.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a value among <c>YDualPower.POWERCONTROL_AUTO</c>, <c>YDualPower.POWERCONTROL_FROM_USB</c>,
+     *   <c>YDualPower.POWERCONTROL_FROM_EXT</c> and <c>YDualPower.POWERCONTROL_OFF</c> corresponding to the
+     *   selected power source for module functions that require lots of current
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_powerControl(int newval)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YDualPower.POWERCONTROL_INVALID;
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("powerControl", rest_val);
     }
-    return (int) _powerControl;
-  }
 
-  /**
-   * <summary>
-   *   Changes the selected power source for module functions that require lots of current.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="newval">
-   *   a value among <c>YDualPower.POWERCONTROL_AUTO</c>, <c>YDualPower.POWERCONTROL_FROM_USB</c>,
-   *   <c>YDualPower.POWERCONTROL_FROM_EXT</c> and <c>YDualPower.POWERCONTROL_OFF</c> corresponding to the
-   *   selected power source for module functions that require lots of current
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int set_powerControl(int newval)
-  {
-    string rest_val;
-    rest_val = (newval).ToString();
-    return _setAttr("powerControl", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Returns the measured voltage on the external power source, in millivolts.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   an integer corresponding to the measured voltage on the external power source, in millivolts
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YDualPower.EXTVOLTAGE_INVALID</c>.
-   * </para>
-   */
-  public int get_extVoltage()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Returns the measured voltage on the external power source, in millivolts.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the measured voltage on the external power source, in millivolts
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YDualPower.EXTVOLTAGE_INVALID</c>.
+     * </para>
+     */
+    public int get_extVoltage()
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YDualPower.EXTVOLTAGE_INVALID;
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return EXTVOLTAGE_INVALID;
+            }
+        }
+        return this._extVoltage;
     }
-    return (int) _extVoltage;
-  }
 
-  /**
-   * <summary>
-   *   Continues the enumeration of dual power controls started using <c>yFirstDualPower()</c>.
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a pointer to a <c>YDualPower</c> object, corresponding to
-   *   a dual power control currently online, or a <c>null</c> pointer
-   *   if there are no more dual power controls to enumerate.
-   * </returns>
-   */
-  public YDualPower nextDualPower()
-  {
-    string hwid = "";
-    if (YAPI.YISERR(_nextFunction(ref hwid)))
-      return null;
-    if (hwid == "")
-      return null;
-    return FindDualPower(hwid);
-  }
-
-  /**
-   * <summary>
-   *   Registers the callback function that is invoked on every change of advertised value.
-   * <para>
-   *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
-   *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
-   *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="callback">
-   *   the callback function to call, or a null pointer. The callback function should take two
-   *   arguments: the function object of which the value has changed, and the character string describing
-   *   the new advertised value.
-   * @noreturn
-   * </param>
-   */
-  public void registerValueCallback(UpdateCallback callback)
-  {
-    if (callback != null)
+    /**
+     * <summary>
+     *   Retrieves a dual power control for a given identifier.
+     * <para>
+     *   The identifier can be specified using several formats:
+     * </para>
+     * <para>
+     * </para>
+     * <para>
+     *   - FunctionLogicalName
+     * </para>
+     * <para>
+     *   - ModuleSerialNumber.FunctionIdentifier
+     * </para>
+     * <para>
+     *   - ModuleSerialNumber.FunctionLogicalName
+     * </para>
+     * <para>
+     *   - ModuleLogicalName.FunctionIdentifier
+     * </para>
+     * <para>
+     *   - ModuleLogicalName.FunctionLogicalName
+     * </para>
+     * <para>
+     * </para>
+     * <para>
+     *   This function does not require that the power control is online at the time
+     *   it is invoked. The returned object is nevertheless valid.
+     *   Use the method <c>YDualPower.isOnline()</c> to test if the power control is
+     *   indeed online at a given time. In case of ambiguity when looking for
+     *   a dual power control by logical name, no error is notified: the first instance
+     *   found is returned. The search is performed first by hardware name,
+     *   then by logical name.
+     * </para>
+     * </summary>
+     * <param name="func">
+     *   a string that uniquely characterizes the power control
+     * </param>
+     * <returns>
+     *   a <c>YDualPower</c> object allowing you to drive the power control.
+     * </returns>
+     */
+    public static YDualPower FindDualPower( string func)
     {
-      _registerFuncCallback(this);
+        YDualPower obj;
+        obj = (YDualPower) YFunction._FindFromCache("DualPower", func);
+        if (obj == null) {
+            obj = new YDualPower(func);
+            YFunction._AddToCache("DualPower", func, obj);
+        }
+        return obj;
     }
-    else
+
+    /**
+     * <summary>
+     *   Registers the callback function that is invoked on every change of advertised value.
+     * <para>
+     *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
+     *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
+     *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="callback">
+     *   the callback function to call, or a null pointer. The callback function should take two
+     *   arguments: the function object of which the value has changed, and the character string describing
+     *   the new advertised value.
+     * @noreturn
+     * </param>
+     */
+    public int registerValueCallback( ValueCallback callback)
     {
-      _unregisterFuncCallback(this);
+        string val;
+        if (callback != null) {
+            YFunction._UpdateValueCallbackList(this, true);
+        } else {
+            YFunction._UpdateValueCallbackList(this, false);
+        }
+        this._valueCallbackDualPower = callback;
+        // Immediately invoke value callback with current value
+        if (callback != null && this.isOnline()) {
+            val = this._advertisedValue;
+            if (!(val == "")) {
+                this._invokeValueCallback(val);
+            }
+        }
+        return 0;
     }
-    _callback = new UpdateCallback(callback);
-  }
 
-  public void set_callback(UpdateCallback callback)
-  { registerValueCallback(callback); }
-  public void setCallback(UpdateCallback callback)
-  { registerValueCallback(callback); }
-
-
-  public override void advertiseValue(string value)
-  {
-    if (_callback != null)
+    public override int _invokeValueCallback( string value)
     {
-      _callback(this, value);
+        if (this._valueCallbackDualPower != null) {
+            this._valueCallbackDualPower(this, value);
+        } else {
+            base._invokeValueCallback(value);
+        }
+        return 0;
     }
-  }
 
-  //--- (end of YDualPower implementation)
+    /**
+     * <summary>
+     *   Continues the enumeration of dual power controls started using <c>yFirstDualPower()</c>.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a pointer to a <c>YDualPower</c> object, corresponding to
+     *   a dual power control currently online, or a <c>null</c> pointer
+     *   if there are no more dual power controls to enumerate.
+     * </returns>
+     */
+    public YDualPower nextDualPower()
+    {
+        string hwid = "";
+        if (YAPI.YISERR(_nextFunction(ref hwid)))
+            return null;
+        if (hwid == "")
+            return null;
+        return FindDualPower(hwid);
+    }
 
-  //--- (DualPower functions)
+    //--- (end of YDualPower implementation)
 
-  /**
-   * <summary>
-   *   Retrieves a dual power control for a given identifier.
-   * <para>
-   *   The identifier can be specified using several formats:
-   * </para>
-   * <para>
-   * </para>
-   * <para>
-   *   - FunctionLogicalName
-   * </para>
-   * <para>
-   *   - ModuleSerialNumber.FunctionIdentifier
-   * </para>
-   * <para>
-   *   - ModuleSerialNumber.FunctionLogicalName
-   * </para>
-   * <para>
-   *   - ModuleLogicalName.FunctionIdentifier
-   * </para>
-   * <para>
-   *   - ModuleLogicalName.FunctionLogicalName
-   * </para>
-   * <para>
-   * </para>
-   * <para>
-   *   This function does not require that the power control is online at the time
-   *   it is invoked. The returned object is nevertheless valid.
-   *   Use the method <c>YDualPower.isOnline()</c> to test if the power control is
-   *   indeed online at a given time. In case of ambiguity when looking for
-   *   a dual power control by logical name, no error is notified: the first instance
-   *   found is returned. The search is performed first by hardware name,
-   *   then by logical name.
-   * </para>
-   * </summary>
-   * <param name="func">
-   *   a string that uniquely characterizes the power control
-   * </param>
-   * <returns>
-   *   a <c>YDualPower</c> object allowing you to drive the power control.
-   * </returns>
-   */
-  public static YDualPower FindDualPower(string func)
-  {
-    YDualPower res;
-    if (_DualPowerCache.ContainsKey(func))
-      return (YDualPower)_DualPowerCache[func];
-    res = new YDualPower(func);
-    _DualPowerCache.Add(func, res);
-    return res;
-  }
+    //--- (DualPower functions)
 
-  /**
-   * <summary>
-   *   Starts the enumeration of dual power controls currently accessible.
-   * <para>
-   *   Use the method <c>YDualPower.nextDualPower()</c> to iterate on
-   *   next dual power controls.
-   * </para>
-   * </summary>
-   * <returns>
-   *   a pointer to a <c>YDualPower</c> object, corresponding to
-   *   the first dual power control currently online, or a <c>null</c> pointer
-   *   if there are none.
-   * </returns>
-   */
-  public static YDualPower FirstDualPower()
-  {
-    YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
-    YDEV_DESCR dev = default(YDEV_DESCR);
-    int neededsize = 0;
-    int err = 0;
-    string serial = null;
-    string funcId = null;
-    string funcName = null;
-    string funcVal = null;
-    string errmsg = "";
-    int size = Marshal.SizeOf(v_fundescr[0]);
-    IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
-    err = YAPI.apiGetFunctionsByClass("DualPower", 0, p, size, ref neededsize, ref errmsg);
-    Marshal.Copy(p, v_fundescr, 0, 1);
-    Marshal.FreeHGlobal(p);
-    if ((YAPI.YISERR(err) | (neededsize == 0)))
-      return null;
-    serial = "";
-    funcId = "";
-    funcName = "";
-    funcVal = "";
-    errmsg = "";
-    if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
-      return null;
-    return FindDualPower(serial + "." + funcId);
-  }
-
-  private static void _DualPowerCleanup()
-  { }
+    /**
+     * <summary>
+     *   Starts the enumeration of dual power controls currently accessible.
+     * <para>
+     *   Use the method <c>YDualPower.nextDualPower()</c> to iterate on
+     *   next dual power controls.
+     * </para>
+     * </summary>
+     * <returns>
+     *   a pointer to a <c>YDualPower</c> object, corresponding to
+     *   the first dual power control currently online, or a <c>null</c> pointer
+     *   if there are none.
+     * </returns>
+     */
+    public static YDualPower FirstDualPower()
+    {
+        YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
+        YDEV_DESCR dev = default(YDEV_DESCR);
+        int neededsize = 0;
+        int err = 0;
+        string serial = null;
+        string funcId = null;
+        string funcName = null;
+        string funcVal = null;
+        string errmsg = "";
+        int size = Marshal.SizeOf(v_fundescr[0]);
+        IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
+        err = YAPI.apiGetFunctionsByClass("DualPower", 0, p, size, ref neededsize, ref errmsg);
+        Marshal.Copy(p, v_fundescr, 0, 1);
+        Marshal.FreeHGlobal(p);
+        if ((YAPI.YISERR(err) | (neededsize == 0)))
+            return null;
+        serial = "";
+        funcId = "";
+        funcName = "";
+        funcVal = "";
+        errmsg = "";
+        if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
+            return null;
+        return FindDualPower(serial + "." + funcId);
+    }
 
 
-  //--- (end of DualPower functions)
+
+    //--- (end of DualPower functions)
 }

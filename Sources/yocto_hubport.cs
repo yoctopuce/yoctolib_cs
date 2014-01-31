@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_hubport.cs 12337 2013-08-14 15:22:22Z mvuilleu $
+ * $Id: yocto_hubport.cs 14699 2014-01-23 15:40:07Z seb $
  *
  * Implements yFindHubPort(), the high-level API for HubPort functions
  *
@@ -47,451 +47,355 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+    //--- (YHubPort return codes)
+    //--- (end of YHubPort return codes)
+//--- (YHubPort class start)
+/**
+ * <summary>
+ *   YHubPort objects provide control over the power supply for every
+ *   YoctoHub port and provide information about the device connected to it.
+ * <para>
+ *   The logical name of a YHubPort is always automatically set to the
+ *   unique serial number of the Yoctopuce device connected to it.
+ * </para>
+ * <para>
+ * </para>
+ * </summary>
+ */
 public class YHubPort : YFunction
 {
-  //--- (globals)
+//--- (end of YHubPort class start)
+    //--- (YHubPort definitions)
+    public new delegate void ValueCallback(YHubPort func, string value);
+    public new delegate void TimedReportCallback(YHubPort func, YMeasure measure);
 
+    public const int ENABLED_FALSE = 0;
+    public const int ENABLED_TRUE = 1;
+    public const int ENABLED_INVALID = -1;
 
-  //--- (end of globals)
+    public const int PORTSTATE_OFF = 0;
+    public const int PORTSTATE_OVRLD = 1;
+    public const int PORTSTATE_ON = 2;
+    public const int PORTSTATE_RUN = 3;
+    public const int PORTSTATE_PROG = 4;
+    public const int PORTSTATE_INVALID = -1;
 
-  //--- (YHubPort definitions)
+    public const int BAUDRATE_INVALID = YAPI.INVALID_UINT;
+    protected int _enabled = ENABLED_INVALID;
+    protected int _portState = PORTSTATE_INVALID;
+    protected int _baudRate = BAUDRATE_INVALID;
+    protected ValueCallback _valueCallbackHubPort = null;
+    //--- (end of YHubPort definitions)
 
-  public delegate void UpdateCallback(YHubPort func, string value);
-
-
-  public const string LOGICALNAME_INVALID = YAPI.INVALID_STRING;
-  public const string ADVERTISEDVALUE_INVALID = YAPI.INVALID_STRING;
-  public const int ENABLED_FALSE = 0;
-  public const int ENABLED_TRUE = 1;
-  public const int ENABLED_INVALID = -1;
-
-  public const int PORTSTATE_OFF = 0;
-  public const int PORTSTATE_OVRLD = 1;
-  public const int PORTSTATE_ON = 2;
-  public const int PORTSTATE_RUN = 3;
-  public const int PORTSTATE_PROG = 4;
-  public const int PORTSTATE_INVALID = -1;
-
-  public const int BAUDRATE_INVALID = YAPI.INVALID_UNSIGNED;
-
-
-  //--- (end of YHubPort definitions)
-
-  //--- (YHubPort implementation)
-
-  private static Hashtable _HubPortCache = new Hashtable();
-  private UpdateCallback _callback;
-
-  protected string _logicalName;
-  protected string _advertisedValue;
-  protected long _enabled;
-  protected long _portState;
-  protected long _baudRate;
-
-
-  public YHubPort(string func)
-    : base("HubPort", func)
-  {
-    _logicalName = YHubPort.LOGICALNAME_INVALID;
-    _advertisedValue = YHubPort.ADVERTISEDVALUE_INVALID;
-    _enabled = YHubPort.ENABLED_INVALID;
-    _portState = YHubPort.PORTSTATE_INVALID;
-    _baudRate = YHubPort.BAUDRATE_INVALID;
-  }
-
-  protected override int _parse(YAPI.TJSONRECORD j)
-  {
-    YAPI.TJSONRECORD member = default(YAPI.TJSONRECORD);
-    int i = 0;
-    if ((j.recordtype != YAPI.TJSONRECORDTYPE.JSON_STRUCT)) goto failed;
-    for (i = 0; i <= j.membercount - 1; i++)
+    public YHubPort(string func)
+        : base(func)
     {
-      member = j.members[i];
-      if (member.name == "logicalName")
-      {
-        _logicalName = member.svalue;
-      }
-      else if (member.name == "advertisedValue")
-      {
-        _advertisedValue = member.svalue;
-      }
-      else if (member.name == "enabled")
-      {
-        _enabled = member.ivalue >0?1:0;
-      }
-      else if (member.name == "portState")
-      {
-        _portState = member.ivalue;
-      }
-      else if (member.name == "baudRate")
-      {
-        _baudRate = member.ivalue;
-      }
+        _className = "HubPort";
+        //--- (YHubPort attributes initialization)
+        //--- (end of YHubPort attributes initialization)
     }
-    return 0;
-  failed:
-    return -1;
-  }
 
-  /**
-   * <summary>
-   *   Returns the logical name of the Yocto-hub port, which is always the serial number of the
-   *   connected module.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a string corresponding to the logical name of the Yocto-hub port, which is always the serial number of the
-   *   connected module
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YHubPort.LOGICALNAME_INVALID</c>.
-   * </para>
-   */
-  public string get_logicalName()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    //--- (YHubPort implementation)
+
+    protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YHubPort.LOGICALNAME_INVALID;
+        if (member.name == "enabled")
+        {
+            _enabled = member.ivalue >0?1:0;
+            return;
+        }
+        if (member.name == "portState")
+        {
+            _portState = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "baudRate")
+        {
+            _baudRate = (int)member.ivalue;
+            return;
+        }
+        base._parseAttr(member);
     }
-    return  _logicalName;
-  }
 
-  /**
-   * <summary>
-   *   It is not possible to configure the logical name of a Yocto-hub port.
-   * <para>
-   *   The logical
-   *   name is automatically set to the serial number of the connected module.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="newval">
-   *   a string
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int set_logicalName(string newval)
-  {
-    string rest_val;
-    rest_val = newval;
-    return _setAttr("logicalName", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Returns the current value of the Yocto-hub port (no more than 6 characters).
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a string corresponding to the current value of the Yocto-hub port (no more than 6 characters)
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YHubPort.ADVERTISEDVALUE_INVALID</c>.
-   * </para>
-   */
-  public string get_advertisedValue()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Returns true if the Yocto-hub port is powered, false otherwise.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   either <c>YHubPort.ENABLED_FALSE</c> or <c>YHubPort.ENABLED_TRUE</c>, according to true if the
+     *   Yocto-hub port is powered, false otherwise
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YHubPort.ENABLED_INVALID</c>.
+     * </para>
+     */
+    public int get_enabled()
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YHubPort.ADVERTISEDVALUE_INVALID;
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return ENABLED_INVALID;
+            }
+        }
+        return this._enabled;
     }
-    return  _advertisedValue;
-  }
 
-  /**
-   * <summary>
-   *   Returns true if the Yocto-hub port is powered, false otherwise.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   either <c>YHubPort.ENABLED_FALSE</c> or <c>YHubPort.ENABLED_TRUE</c>, according to true if the
-   *   Yocto-hub port is powered, false otherwise
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YHubPort.ENABLED_INVALID</c>.
-   * </para>
-   */
-  public int get_enabled()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Changes the activation of the Yocto-hub port.
+     * <para>
+     *   If the port is enabled, the
+     *   connected module is powered. Otherwise, port power is shut down.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   either <c>YHubPort.ENABLED_FALSE</c> or <c>YHubPort.ENABLED_TRUE</c>, according to the activation
+     *   of the Yocto-hub port
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_enabled(int newval)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YHubPort.ENABLED_INVALID;
+        string rest_val;
+        rest_val = (newval > 0 ? "1" : "0");
+        return _setAttr("enabled", rest_val);
     }
-    return (int) _enabled;
-  }
 
-  /**
-   * <summary>
-   *   Changes the activation of the Yocto-hub port.
-   * <para>
-   *   If the port is enabled, the
-   *   *      connected module is powered. Otherwise, port power is shut down.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="newval">
-   *   either <c>YHubPort.ENABLED_FALSE</c> or <c>YHubPort.ENABLED_TRUE</c>, according to the activation
-   *   of the Yocto-hub port
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int set_enabled(int newval)
-  {
-    string rest_val;
-    rest_val = (newval > 0 ? "1" : "0");
-    return _setAttr("enabled", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Returns the current state of the Yocto-hub port.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a value among <c>YHubPort.PORTSTATE_OFF</c>, <c>YHubPort.PORTSTATE_OVRLD</c>,
-   *   <c>YHubPort.PORTSTATE_ON</c>, <c>YHubPort.PORTSTATE_RUN</c> and <c>YHubPort.PORTSTATE_PROG</c>
-   *   corresponding to the current state of the Yocto-hub port
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YHubPort.PORTSTATE_INVALID</c>.
-   * </para>
-   */
-  public int get_portState()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Returns the current state of the Yocto-hub port.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among <c>YHubPort.PORTSTATE_OFF</c>, <c>YHubPort.PORTSTATE_OVRLD</c>,
+     *   <c>YHubPort.PORTSTATE_ON</c>, <c>YHubPort.PORTSTATE_RUN</c> and <c>YHubPort.PORTSTATE_PROG</c>
+     *   corresponding to the current state of the Yocto-hub port
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YHubPort.PORTSTATE_INVALID</c>.
+     * </para>
+     */
+    public int get_portState()
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YHubPort.PORTSTATE_INVALID;
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PORTSTATE_INVALID;
+            }
+        }
+        return this._portState;
     }
-    return (int) _portState;
-  }
 
-  /**
-   * <summary>
-   *   Returns the current baud rate used by this Yocto-hub port, in kbps.
-   * <para>
-   *   The default value is 1000 kbps, but a slower rate may be used if communication
-   *   problems are encountered.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   an integer corresponding to the current baud rate used by this Yocto-hub port, in kbps
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YHubPort.BAUDRATE_INVALID</c>.
-   * </para>
-   */
-  public int get_baudRate()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Returns the current baud rate used by this Yocto-hub port, in kbps.
+     * <para>
+     *   The default value is 1000 kbps, but a slower rate may be used if communication
+     *   problems are encountered.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the current baud rate used by this Yocto-hub port, in kbps
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YHubPort.BAUDRATE_INVALID</c>.
+     * </para>
+     */
+    public int get_baudRate()
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YHubPort.BAUDRATE_INVALID;
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BAUDRATE_INVALID;
+            }
+        }
+        return this._baudRate;
     }
-    return (int) _baudRate;
-  }
 
-  /**
-   * <summary>
-   *   Continues the enumeration of Yocto-hub ports started using <c>yFirstHubPort()</c>.
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a pointer to a <c>YHubPort</c> object, corresponding to
-   *   a Yocto-hub port currently online, or a <c>null</c> pointer
-   *   if there are no more Yocto-hub ports to enumerate.
-   * </returns>
-   */
-  public YHubPort nextHubPort()
-  {
-    string hwid = "";
-    if (YAPI.YISERR(_nextFunction(ref hwid)))
-      return null;
-    if (hwid == "")
-      return null;
-    return FindHubPort(hwid);
-  }
-
-  /**
-   * <summary>
-   *   Registers the callback function that is invoked on every change of advertised value.
-   * <para>
-   *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
-   *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
-   *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="callback">
-   *   the callback function to call, or a null pointer. The callback function should take two
-   *   arguments: the function object of which the value has changed, and the character string describing
-   *   the new advertised value.
-   * @noreturn
-   * </param>
-   */
-  public void registerValueCallback(UpdateCallback callback)
-  {
-    if (callback != null)
+    /**
+     * <summary>
+     *   Retrieves a Yocto-hub port for a given identifier.
+     * <para>
+     *   The identifier can be specified using several formats:
+     * </para>
+     * <para>
+     * </para>
+     * <para>
+     *   - FunctionLogicalName
+     * </para>
+     * <para>
+     *   - ModuleSerialNumber.FunctionIdentifier
+     * </para>
+     * <para>
+     *   - ModuleSerialNumber.FunctionLogicalName
+     * </para>
+     * <para>
+     *   - ModuleLogicalName.FunctionIdentifier
+     * </para>
+     * <para>
+     *   - ModuleLogicalName.FunctionLogicalName
+     * </para>
+     * <para>
+     * </para>
+     * <para>
+     *   This function does not require that the Yocto-hub port is online at the time
+     *   it is invoked. The returned object is nevertheless valid.
+     *   Use the method <c>YHubPort.isOnline()</c> to test if the Yocto-hub port is
+     *   indeed online at a given time. In case of ambiguity when looking for
+     *   a Yocto-hub port by logical name, no error is notified: the first instance
+     *   found is returned. The search is performed first by hardware name,
+     *   then by logical name.
+     * </para>
+     * </summary>
+     * <param name="func">
+     *   a string that uniquely characterizes the Yocto-hub port
+     * </param>
+     * <returns>
+     *   a <c>YHubPort</c> object allowing you to drive the Yocto-hub port.
+     * </returns>
+     */
+    public static YHubPort FindHubPort( string func)
     {
-      _registerFuncCallback(this);
+        YHubPort obj;
+        obj = (YHubPort) YFunction._FindFromCache("HubPort", func);
+        if (obj == null) {
+            obj = new YHubPort(func);
+            YFunction._AddToCache("HubPort", func, obj);
+        }
+        return obj;
     }
-    else
+
+    /**
+     * <summary>
+     *   Registers the callback function that is invoked on every change of advertised value.
+     * <para>
+     *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
+     *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
+     *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="callback">
+     *   the callback function to call, or a null pointer. The callback function should take two
+     *   arguments: the function object of which the value has changed, and the character string describing
+     *   the new advertised value.
+     * @noreturn
+     * </param>
+     */
+    public int registerValueCallback( ValueCallback callback)
     {
-      _unregisterFuncCallback(this);
+        string val;
+        if (callback != null) {
+            YFunction._UpdateValueCallbackList(this, true);
+        } else {
+            YFunction._UpdateValueCallbackList(this, false);
+        }
+        this._valueCallbackHubPort = callback;
+        // Immediately invoke value callback with current value
+        if (callback != null && this.isOnline()) {
+            val = this._advertisedValue;
+            if (!(val == "")) {
+                this._invokeValueCallback(val);
+            }
+        }
+        return 0;
     }
-    _callback = new UpdateCallback(callback);
-  }
 
-  public void set_callback(UpdateCallback callback)
-  { registerValueCallback(callback); }
-  public void setCallback(UpdateCallback callback)
-  { registerValueCallback(callback); }
-
-
-  public override void advertiseValue(string value)
-  {
-    if (_callback != null)
+    public override int _invokeValueCallback( string value)
     {
-      _callback(this, value);
+        if (this._valueCallbackHubPort != null) {
+            this._valueCallbackHubPort(this, value);
+        } else {
+            base._invokeValueCallback(value);
+        }
+        return 0;
     }
-  }
 
-  //--- (end of YHubPort implementation)
+    /**
+     * <summary>
+     *   Continues the enumeration of Yocto-hub ports started using <c>yFirstHubPort()</c>.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a pointer to a <c>YHubPort</c> object, corresponding to
+     *   a Yocto-hub port currently online, or a <c>null</c> pointer
+     *   if there are no more Yocto-hub ports to enumerate.
+     * </returns>
+     */
+    public YHubPort nextHubPort()
+    {
+        string hwid = "";
+        if (YAPI.YISERR(_nextFunction(ref hwid)))
+            return null;
+        if (hwid == "")
+            return null;
+        return FindHubPort(hwid);
+    }
 
-  //--- (HubPort functions)
+    //--- (end of YHubPort implementation)
 
-  /**
-   * <summary>
-   *   Retrieves a Yocto-hub port for a given identifier.
-   * <para>
-   *   The identifier can be specified using several formats:
-   * </para>
-   * <para>
-   * </para>
-   * <para>
-   *   - FunctionLogicalName
-   * </para>
-   * <para>
-   *   - ModuleSerialNumber.FunctionIdentifier
-   * </para>
-   * <para>
-   *   - ModuleSerialNumber.FunctionLogicalName
-   * </para>
-   * <para>
-   *   - ModuleLogicalName.FunctionIdentifier
-   * </para>
-   * <para>
-   *   - ModuleLogicalName.FunctionLogicalName
-   * </para>
-   * <para>
-   * </para>
-   * <para>
-   *   This function does not require that the Yocto-hub port is online at the time
-   *   it is invoked. The returned object is nevertheless valid.
-   *   Use the method <c>YHubPort.isOnline()</c> to test if the Yocto-hub port is
-   *   indeed online at a given time. In case of ambiguity when looking for
-   *   a Yocto-hub port by logical name, no error is notified: the first instance
-   *   found is returned. The search is performed first by hardware name,
-   *   then by logical name.
-   * </para>
-   * </summary>
-   * <param name="func">
-   *   a string that uniquely characterizes the Yocto-hub port
-   * </param>
-   * <returns>
-   *   a <c>YHubPort</c> object allowing you to drive the Yocto-hub port.
-   * </returns>
-   */
-  public static YHubPort FindHubPort(string func)
-  {
-    YHubPort res;
-    if (_HubPortCache.ContainsKey(func))
-      return (YHubPort)_HubPortCache[func];
-    res = new YHubPort(func);
-    _HubPortCache.Add(func, res);
-    return res;
-  }
+    //--- (HubPort functions)
 
-  /**
-   * <summary>
-   *   Starts the enumeration of Yocto-hub ports currently accessible.
-   * <para>
-   *   Use the method <c>YHubPort.nextHubPort()</c> to iterate on
-   *   next Yocto-hub ports.
-   * </para>
-   * </summary>
-   * <returns>
-   *   a pointer to a <c>YHubPort</c> object, corresponding to
-   *   the first Yocto-hub port currently online, or a <c>null</c> pointer
-   *   if there are none.
-   * </returns>
-   */
-  public static YHubPort FirstHubPort()
-  {
-    YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
-    YDEV_DESCR dev = default(YDEV_DESCR);
-    int neededsize = 0;
-    int err = 0;
-    string serial = null;
-    string funcId = null;
-    string funcName = null;
-    string funcVal = null;
-    string errmsg = "";
-    int size = Marshal.SizeOf(v_fundescr[0]);
-    IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
-    err = YAPI.apiGetFunctionsByClass("HubPort", 0, p, size, ref neededsize, ref errmsg);
-    Marshal.Copy(p, v_fundescr, 0, 1);
-    Marshal.FreeHGlobal(p);
-    if ((YAPI.YISERR(err) | (neededsize == 0)))
-      return null;
-    serial = "";
-    funcId = "";
-    funcName = "";
-    funcVal = "";
-    errmsg = "";
-    if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
-      return null;
-    return FindHubPort(serial + "." + funcId);
-  }
-
-  private static void _HubPortCleanup()
-  { }
+    /**
+     * <summary>
+     *   Starts the enumeration of Yocto-hub ports currently accessible.
+     * <para>
+     *   Use the method <c>YHubPort.nextHubPort()</c> to iterate on
+     *   next Yocto-hub ports.
+     * </para>
+     * </summary>
+     * <returns>
+     *   a pointer to a <c>YHubPort</c> object, corresponding to
+     *   the first Yocto-hub port currently online, or a <c>null</c> pointer
+     *   if there are none.
+     * </returns>
+     */
+    public static YHubPort FirstHubPort()
+    {
+        YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
+        YDEV_DESCR dev = default(YDEV_DESCR);
+        int neededsize = 0;
+        int err = 0;
+        string serial = null;
+        string funcId = null;
+        string funcName = null;
+        string funcVal = null;
+        string errmsg = "";
+        int size = Marshal.SizeOf(v_fundescr[0]);
+        IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
+        err = YAPI.apiGetFunctionsByClass("HubPort", 0, p, size, ref neededsize, ref errmsg);
+        Marshal.Copy(p, v_fundescr, 0, 1);
+        Marshal.FreeHGlobal(p);
+        if ((YAPI.YISERR(err) | (neededsize == 0)))
+            return null;
+        serial = "";
+        funcId = "";
+        funcName = "";
+        funcVal = "";
+        errmsg = "";
+        if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
+            return null;
+        return FindHubPort(serial + "." + funcId);
+    }
 
 
-  //--- (end of HubPort functions)
+
+    //--- (end of HubPort functions)
 }

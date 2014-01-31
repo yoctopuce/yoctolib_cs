@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_voc.cs 12324 2013-08-13 15:10:31Z mvuilleu $
+ * $Id: yocto_voc.cs 14699 2014-01-23 15:40:07Z seb $
  *
  * Implements yFindVoc(), the high-level API for Voc functions
  *
@@ -47,6 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+    //--- (YVoc return codes)
+    //--- (end of YVoc return codes)
+//--- (YVoc class start)
 /**
  * <summary>
  *   The Yoctopuce application programming interface allows you to read an instant
@@ -57,643 +60,240 @@ using YFUN_DESCR = System.Int32;
  * </para>
  * </summary>
  */
-public class YVoc : YFunction
+public class YVoc : YSensor
 {
-  //--- (globals)
+//--- (end of YVoc class start)
+    //--- (YVoc definitions)
+    public new delegate void ValueCallback(YVoc func, string value);
+    public new delegate void TimedReportCallback(YVoc func, YMeasure measure);
 
+    protected ValueCallback _valueCallbackVoc = null;
+    protected TimedReportCallback _timedReportCallbackVoc = null;
+    //--- (end of YVoc definitions)
 
-  //--- (end of globals)
-
-  //--- (YVoc definitions)
-
-  public delegate void UpdateCallback(YVoc func, string value);
-
-
-  public const string LOGICALNAME_INVALID = YAPI.INVALID_STRING;
-  public const string ADVERTISEDVALUE_INVALID = YAPI.INVALID_STRING;
-  public const string UNIT_INVALID = YAPI.INVALID_STRING;
-  public const double CURRENTVALUE_INVALID = YAPI.INVALID_DOUBLE;
-  public const double LOWESTVALUE_INVALID = YAPI.INVALID_DOUBLE;
-  public const double HIGHESTVALUE_INVALID = YAPI.INVALID_DOUBLE;
-  public const double CURRENTRAWVALUE_INVALID = YAPI.INVALID_DOUBLE;
-  public const string CALIBRATIONPARAM_INVALID = YAPI.INVALID_STRING;
-  public const double RESOLUTION_INVALID = YAPI.INVALID_DOUBLE;
-
-
-  //--- (end of YVoc definitions)
-
-  //--- (YVoc implementation)
-
-  private static Hashtable _VocCache = new Hashtable();
-  private UpdateCallback _callback;
-
-  protected string _logicalName;
-  protected string _advertisedValue;
-  protected string _unit;
-  protected double _currentValue;
-  protected double _lowestValue;
-  protected double _highestValue;
-  protected double _currentRawValue;
-  protected string _calibrationParam;
-  protected double _resolution;
-  protected long _calibrationOffset;
-
-
-  public YVoc(string func)
-    : base("Voc", func)
-  {
-    _logicalName = YVoc.LOGICALNAME_INVALID;
-    _advertisedValue = YVoc.ADVERTISEDVALUE_INVALID;
-    _unit = YVoc.UNIT_INVALID;
-    _currentValue = YVoc.CURRENTVALUE_INVALID;
-    _lowestValue = YVoc.LOWESTVALUE_INVALID;
-    _highestValue = YVoc.HIGHESTVALUE_INVALID;
-    _currentRawValue = YVoc.CURRENTRAWVALUE_INVALID;
-    _calibrationParam = YVoc.CALIBRATIONPARAM_INVALID;
-    _resolution = YVoc.RESOLUTION_INVALID;
-    _calibrationOffset = 0;
-  }
-
-  protected override int _parse(YAPI.TJSONRECORD j)
-  {
-    YAPI.TJSONRECORD member = default(YAPI.TJSONRECORD);
-    int i = 0;
-    if ((j.recordtype != YAPI.TJSONRECORDTYPE.JSON_STRUCT)) goto failed;
-    for (i = 0; i <= j.membercount - 1; i++)
+    public YVoc(string func)
+        : base(func)
     {
-      member = j.members[i];
-      if (member.name == "logicalName")
-      {
-        _logicalName = member.svalue;
-      }
-      else if (member.name == "advertisedValue")
-      {
-        _advertisedValue = member.svalue;
-      }
-      else if (member.name == "unit")
-      {
-        _unit = member.svalue;
-      }
-      else if (member.name == "currentValue")
-      {
-        _currentValue = Math.Round(member.ivalue/6553.6) / 10;
-      }
-      else if (member.name == "lowestValue")
-      {
-        _lowestValue = Math.Round(member.ivalue/6553.6) / 10;
-      }
-      else if (member.name == "highestValue")
-      {
-        _highestValue = Math.Round(member.ivalue/6553.6) / 10;
-      }
-      else if (member.name == "currentRawValue")
-      {
-        _currentRawValue = member.ivalue/65536.0;
-      }
-      else if (member.name == "calibrationParam")
-      {
-        _calibrationParam = member.svalue;
-      }
-      else if (member.name == "resolution")
-      {
-        _resolution = (member.ivalue > 100 ? 1.0 / Math.Round(65536.0/member.ivalue) : 0.001 / Math.Round(67.0/member.ivalue));
-      }
+        _className = "Voc";
+        //--- (YVoc attributes initialization)
+        //--- (end of YVoc attributes initialization)
     }
-    return 0;
-  failed:
-    return -1;
-  }
 
-  /**
-   * <summary>
-   *   Returns the logical name of the Volatile Organic Compound sensor.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a string corresponding to the logical name of the Volatile Organic Compound sensor
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YVoc.LOGICALNAME_INVALID</c>.
-   * </para>
-   */
-  public string get_logicalName()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    //--- (YVoc implementation)
+
+    protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YVoc.LOGICALNAME_INVALID;
+        base._parseAttr(member);
     }
-    return  _logicalName;
-  }
 
-  /**
-   * <summary>
-   *   Changes the logical name of the Volatile Organic Compound sensor.
-   * <para>
-   *   You can use <c>yCheckLogicalName()</c>
-   *   prior to this call to make sure that your parameter is valid.
-   *   Remember to call the <c>saveToFlash()</c> method of the module if the
-   *   modification must be kept.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="newval">
-   *   a string corresponding to the logical name of the Volatile Organic Compound sensor
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int set_logicalName(string newval)
-  {
-    string rest_val;
-    rest_val = newval;
-    return _setAttr("logicalName", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Returns the current value of the Volatile Organic Compound sensor (no more than 6 characters).
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a string corresponding to the current value of the Volatile Organic Compound sensor (no more than 6 characters)
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YVoc.ADVERTISEDVALUE_INVALID</c>.
-   * </para>
-   */
-  public string get_advertisedValue()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Retrieves a Volatile Organic Compound sensor for a given identifier.
+     * <para>
+     *   The identifier can be specified using several formats:
+     * </para>
+     * <para>
+     * </para>
+     * <para>
+     *   - FunctionLogicalName
+     * </para>
+     * <para>
+     *   - ModuleSerialNumber.FunctionIdentifier
+     * </para>
+     * <para>
+     *   - ModuleSerialNumber.FunctionLogicalName
+     * </para>
+     * <para>
+     *   - ModuleLogicalName.FunctionIdentifier
+     * </para>
+     * <para>
+     *   - ModuleLogicalName.FunctionLogicalName
+     * </para>
+     * <para>
+     * </para>
+     * <para>
+     *   This function does not require that the Volatile Organic Compound sensor is online at the time
+     *   it is invoked. The returned object is nevertheless valid.
+     *   Use the method <c>YVoc.isOnline()</c> to test if the Volatile Organic Compound sensor is
+     *   indeed online at a given time. In case of ambiguity when looking for
+     *   a Volatile Organic Compound sensor by logical name, no error is notified: the first instance
+     *   found is returned. The search is performed first by hardware name,
+     *   then by logical name.
+     * </para>
+     * </summary>
+     * <param name="func">
+     *   a string that uniquely characterizes the Volatile Organic Compound sensor
+     * </param>
+     * <returns>
+     *   a <c>YVoc</c> object allowing you to drive the Volatile Organic Compound sensor.
+     * </returns>
+     */
+    public static YVoc FindVoc( string func)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YVoc.ADVERTISEDVALUE_INVALID;
+        YVoc obj;
+        obj = (YVoc) YFunction._FindFromCache("Voc", func);
+        if (obj == null) {
+            obj = new YVoc(func);
+            YFunction._AddToCache("Voc", func, obj);
+        }
+        return obj;
     }
-    return  _advertisedValue;
-  }
 
-  /**
-   * <summary>
-   *   Returns the measuring unit for the measured value.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a string corresponding to the measuring unit for the measured value
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YVoc.UNIT_INVALID</c>.
-   * </para>
-   */
-  public string get_unit()
-  {
-    if (_unit == YVoc.UNIT_INVALID)
+    /**
+     * <summary>
+     *   Registers the callback function that is invoked on every change of advertised value.
+     * <para>
+     *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
+     *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
+     *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="callback">
+     *   the callback function to call, or a null pointer. The callback function should take two
+     *   arguments: the function object of which the value has changed, and the character string describing
+     *   the new advertised value.
+     * @noreturn
+     * </param>
+     */
+    public int registerValueCallback( ValueCallback callback)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YVoc.UNIT_INVALID;
+        string val;
+        if (callback != null) {
+            YFunction._UpdateValueCallbackList(this, true);
+        } else {
+            YFunction._UpdateValueCallbackList(this, false);
+        }
+        this._valueCallbackVoc = callback;
+        // Immediately invoke value callback with current value
+        if (callback != null && this.isOnline()) {
+            val = this._advertisedValue;
+            if (!(val == "")) {
+                this._invokeValueCallback(val);
+            }
+        }
+        return 0;
     }
-    return  _unit;
-  }
 
-  /**
-   * <summary>
-   *   Returns the current measured value.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a floating point number corresponding to the current measured value
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YVoc.CURRENTVALUE_INVALID</c>.
-   * </para>
-   */
-  public double get_currentValue()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    public override int _invokeValueCallback( string value)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YVoc.CURRENTVALUE_INVALID;
+        if (this._valueCallbackVoc != null) {
+            this._valueCallbackVoc(this, value);
+        } else {
+            base._invokeValueCallback(value);
+        }
+        return 0;
     }
-    double res = YAPI._applyCalibration(_currentRawValue, _calibrationParam, _calibrationOffset, _resolution);
-    if (res != YVoc.CURRENTVALUE_INVALID) 
-       return  res;
-    return  _currentValue;
-  }
 
-  /**
-   * <summary>
-   *   Changes the recorded minimal value observed.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="newval">
-   *   a floating point number corresponding to the recorded minimal value observed
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int set_lowestValue(double newval)
-  {
-    string rest_val;
-    rest_val = Math.Round(newval*65536.0).ToString();
-    return _setAttr("lowestValue", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Returns the minimal value observed.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a floating point number corresponding to the minimal value observed
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YVoc.LOWESTVALUE_INVALID</c>.
-   * </para>
-   */
-  public double get_lowestValue()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Registers the callback function that is invoked on every periodic timed notification.
+     * <para>
+     *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
+     *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
+     *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="callback">
+     *   the callback function to call, or a null pointer. The callback function should take two
+     *   arguments: the function object of which the value has changed, and an YMeasure object describing
+     *   the new advertised value.
+     * @noreturn
+     * </param>
+     */
+    public int registerTimedReportCallback( TimedReportCallback callback)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YVoc.LOWESTVALUE_INVALID;
+        if (callback != null) {
+            YFunction._UpdateTimedReportCallbackList(this, true);
+        } else {
+            YFunction._UpdateTimedReportCallbackList(this, false);
+        }
+        this._timedReportCallbackVoc = callback;
+        return 0;
     }
-    return  _lowestValue;
-  }
 
-  /**
-   * <summary>
-   *   Changes the recorded maximal value observed.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="newval">
-   *   a floating point number corresponding to the recorded maximal value observed
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int set_highestValue(double newval)
-  {
-    string rest_val;
-    rest_val = Math.Round(newval*65536.0).ToString();
-    return _setAttr("highestValue", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Returns the maximal value observed.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a floating point number corresponding to the maximal value observed
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YVoc.HIGHESTVALUE_INVALID</c>.
-   * </para>
-   */
-  public double get_highestValue()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    public override int _invokeTimedReportCallback( YMeasure value)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YVoc.HIGHESTVALUE_INVALID;
+        if (this._timedReportCallbackVoc != null) {
+            this._timedReportCallbackVoc(this, value);
+        } else {
+            base._invokeTimedReportCallback(value);
+        }
+        return 0;
     }
-    return  _highestValue;
-  }
 
-  /**
-   * <summary>
-   *   Returns the unrounded and uncalibrated raw value returned by the sensor.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a floating point number corresponding to the unrounded and uncalibrated raw value returned by the sensor
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YVoc.CURRENTRAWVALUE_INVALID</c>.
-   * </para>
-   */
-  public double get_currentRawValue()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Continues the enumeration of Volatile Organic Compound sensors started using <c>yFirstVoc()</c>.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a pointer to a <c>YVoc</c> object, corresponding to
+     *   a Volatile Organic Compound sensor currently online, or a <c>null</c> pointer
+     *   if there are no more Volatile Organic Compound sensors to enumerate.
+     * </returns>
+     */
+    public YVoc nextVoc()
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YVoc.CURRENTRAWVALUE_INVALID;
+        string hwid = "";
+        if (YAPI.YISERR(_nextFunction(ref hwid)))
+            return null;
+        if (hwid == "")
+            return null;
+        return FindVoc(hwid);
     }
-    return  _currentRawValue;
-  }
 
-  public string get_calibrationParam()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    //--- (end of YVoc implementation)
+
+    //--- (Voc functions)
+
+    /**
+     * <summary>
+     *   Starts the enumeration of Volatile Organic Compound sensors currently accessible.
+     * <para>
+     *   Use the method <c>YVoc.nextVoc()</c> to iterate on
+     *   next Volatile Organic Compound sensors.
+     * </para>
+     * </summary>
+     * <returns>
+     *   a pointer to a <c>YVoc</c> object, corresponding to
+     *   the first Volatile Organic Compound sensor currently online, or a <c>null</c> pointer
+     *   if there are none.
+     * </returns>
+     */
+    public static YVoc FirstVoc()
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YVoc.CALIBRATIONPARAM_INVALID;
+        YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
+        YDEV_DESCR dev = default(YDEV_DESCR);
+        int neededsize = 0;
+        int err = 0;
+        string serial = null;
+        string funcId = null;
+        string funcName = null;
+        string funcVal = null;
+        string errmsg = "";
+        int size = Marshal.SizeOf(v_fundescr[0]);
+        IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
+        err = YAPI.apiGetFunctionsByClass("Voc", 0, p, size, ref neededsize, ref errmsg);
+        Marshal.Copy(p, v_fundescr, 0, 1);
+        Marshal.FreeHGlobal(p);
+        if ((YAPI.YISERR(err) | (neededsize == 0)))
+            return null;
+        serial = "";
+        funcId = "";
+        funcName = "";
+        funcVal = "";
+        errmsg = "";
+        if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
+            return null;
+        return FindVoc(serial + "." + funcId);
     }
-    return  _calibrationParam;
-  }
-
-  public int set_calibrationParam(string newval)
-  {
-    string rest_val;
-    rest_val = newval;
-    return _setAttr("calibrationParam", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Configures error correction data points, in particular to compensate for
-   *   a possible perturbation of the measure caused by an enclosure.
-   * <para>
-   *   It is possible
-   *   to configure up to five correction points. Correction points must be provided
-   *   in ascending order, and be in the range of the sensor. The device will automatically
-   *   perform a linear interpolation of the error correction between specified
-   *   points. Remember to call the <c>saveToFlash()</c> method of the module if the
-   *   modification must be kept.
-   * </para>
-   * <para>
-   *   For more information on advanced capabilities to refine the calibration of
-   *   sensors, please contact support@yoctopuce.com.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="rawValues">
-   *   array of floating point numbers, corresponding to the raw
-   *   values returned by the sensor for the correction points.
-   * </param>
-   * <param name="refValues">
-   *   array of floating point numbers, corresponding to the corrected
-   *   values for the correction points.
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int calibrateFromPoints(double[] rawValues,double[] refValues)
-  {
-    string rest_val;
-    rest_val = YAPI._encodeCalibrationPoints(rawValues,refValues,this._resolution,this._calibrationOffset,this._calibrationParam);
-    return _setAttr("calibrationParam", rest_val);
-  }
-
-  public int loadCalibrationPoints(ref double[] rawValues,ref double[] refValues)
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
-    {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return _lastErrorType;
-    }
-    int[] dummy=null; 
-    return YAPI._decodeCalibrationPoints(this._calibrationParam,ref dummy,ref rawValues,ref refValues,  this._resolution, this._calibrationOffset); 
-    
-  }
-
-  /**
-   * <summary>
-   *   Returns the resolution of the measured values.
-   * <para>
-   *   The resolution corresponds to the numerical precision
-   *   of the values, which is not always the same as the actual precision of the sensor.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a floating point number corresponding to the resolution of the measured values
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YVoc.RESOLUTION_INVALID</c>.
-   * </para>
-   */
-  public double get_resolution()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
-    {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YVoc.RESOLUTION_INVALID;
-    }
-    return  _resolution;
-  }
-
-  /**
-   * <summary>
-   *   Continues the enumeration of Volatile Organic Compound sensors started using <c>yFirstVoc()</c>.
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a pointer to a <c>YVoc</c> object, corresponding to
-   *   a Volatile Organic Compound sensor currently online, or a <c>null</c> pointer
-   *   if there are no more Volatile Organic Compound sensors to enumerate.
-   * </returns>
-   */
-  public YVoc nextVoc()
-  {
-    string hwid = "";
-    if (YAPI.YISERR(_nextFunction(ref hwid)))
-      return null;
-    if (hwid == "")
-      return null;
-    return FindVoc(hwid);
-  }
-
-  /**
-   * <summary>
-   *   Registers the callback function that is invoked on every change of advertised value.
-   * <para>
-   *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
-   *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
-   *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="callback">
-   *   the callback function to call, or a null pointer. The callback function should take two
-   *   arguments: the function object of which the value has changed, and the character string describing
-   *   the new advertised value.
-   * @noreturn
-   * </param>
-   */
-  public void registerValueCallback(UpdateCallback callback)
-  {
-    if (callback != null)
-    {
-      _registerFuncCallback(this);
-    }
-    else
-    {
-      _unregisterFuncCallback(this);
-    }
-    _callback = new UpdateCallback(callback);
-  }
-
-  public void set_callback(UpdateCallback callback)
-  { registerValueCallback(callback); }
-  public void setCallback(UpdateCallback callback)
-  { registerValueCallback(callback); }
 
 
-  public override void advertiseValue(string value)
-  {
-    if (_callback != null)
-    {
-      _callback(this, value);
-    }
-  }
 
-  //--- (end of YVoc implementation)
-
-  //--- (Voc functions)
-
-  /**
-   * <summary>
-   *   Retrieves a Volatile Organic Compound sensor for a given identifier.
-   * <para>
-   *   The identifier can be specified using several formats:
-   * </para>
-   * <para>
-   * </para>
-   * <para>
-   *   - FunctionLogicalName
-   * </para>
-   * <para>
-   *   - ModuleSerialNumber.FunctionIdentifier
-   * </para>
-   * <para>
-   *   - ModuleSerialNumber.FunctionLogicalName
-   * </para>
-   * <para>
-   *   - ModuleLogicalName.FunctionIdentifier
-   * </para>
-   * <para>
-   *   - ModuleLogicalName.FunctionLogicalName
-   * </para>
-   * <para>
-   * </para>
-   * <para>
-   *   This function does not require that the Volatile Organic Compound sensor is online at the time
-   *   it is invoked. The returned object is nevertheless valid.
-   *   Use the method <c>YVoc.isOnline()</c> to test if the Volatile Organic Compound sensor is
-   *   indeed online at a given time. In case of ambiguity when looking for
-   *   a Volatile Organic Compound sensor by logical name, no error is notified: the first instance
-   *   found is returned. The search is performed first by hardware name,
-   *   then by logical name.
-   * </para>
-   * </summary>
-   * <param name="func">
-   *   a string that uniquely characterizes the Volatile Organic Compound sensor
-   * </param>
-   * <returns>
-   *   a <c>YVoc</c> object allowing you to drive the Volatile Organic Compound sensor.
-   * </returns>
-   */
-  public static YVoc FindVoc(string func)
-  {
-    YVoc res;
-    if (_VocCache.ContainsKey(func))
-      return (YVoc)_VocCache[func];
-    res = new YVoc(func);
-    _VocCache.Add(func, res);
-    return res;
-  }
-
-  /**
-   * <summary>
-   *   Starts the enumeration of Volatile Organic Compound sensors currently accessible.
-   * <para>
-   *   Use the method <c>YVoc.nextVoc()</c> to iterate on
-   *   next Volatile Organic Compound sensors.
-   * </para>
-   * </summary>
-   * <returns>
-   *   a pointer to a <c>YVoc</c> object, corresponding to
-   *   the first Volatile Organic Compound sensor currently online, or a <c>null</c> pointer
-   *   if there are none.
-   * </returns>
-   */
-  public static YVoc FirstVoc()
-  {
-    YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
-    YDEV_DESCR dev = default(YDEV_DESCR);
-    int neededsize = 0;
-    int err = 0;
-    string serial = null;
-    string funcId = null;
-    string funcName = null;
-    string funcVal = null;
-    string errmsg = "";
-    int size = Marshal.SizeOf(v_fundescr[0]);
-    IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
-    err = YAPI.apiGetFunctionsByClass("Voc", 0, p, size, ref neededsize, ref errmsg);
-    Marshal.Copy(p, v_fundescr, 0, 1);
-    Marshal.FreeHGlobal(p);
-    if ((YAPI.YISERR(err) | (neededsize == 0)))
-      return null;
-    serial = "";
-    funcId = "";
-    funcName = "";
-    funcVal = "";
-    errmsg = "";
-    if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
-      return null;
-    return FindVoc(serial + "." + funcId);
-  }
-
-  private static void _VocCleanup()
-  { }
-
-
-  //--- (end of Voc functions)
+    //--- (end of Voc functions)
 }

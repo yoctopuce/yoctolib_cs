@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_oscontrol.cs 12337 2013-08-14 15:22:22Z mvuilleu $
+ * $Id: yocto_oscontrol.cs 14699 2014-01-23 15:40:07Z seb $
  *
  * Implements yFindOsControl(), the high-level API for OsControl functions
  *
@@ -47,6 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+    //--- (YOsControl return codes)
+    //--- (end of YOsControl return codes)
+//--- (YOsControl class start)
 /**
  * <summary>
  *   The OScontrol object allows some control over the operating system running a VirtualHub.
@@ -60,377 +63,260 @@ using YFUN_DESCR = System.Int32;
  */
 public class YOsControl : YFunction
 {
-  //--- (globals)
+//--- (end of YOsControl class start)
+    //--- (YOsControl definitions)
+    public new delegate void ValueCallback(YOsControl func, string value);
+    public new delegate void TimedReportCallback(YOsControl func, YMeasure measure);
 
+    public const int SHUTDOWNCOUNTDOWN_INVALID = YAPI.INVALID_UINT;
+    protected int _shutdownCountdown = SHUTDOWNCOUNTDOWN_INVALID;
+    protected ValueCallback _valueCallbackOsControl = null;
+    //--- (end of YOsControl definitions)
 
-  //--- (end of globals)
-
-  //--- (YOsControl definitions)
-
-  public delegate void UpdateCallback(YOsControl func, string value);
-
-
-  public const string LOGICALNAME_INVALID = YAPI.INVALID_STRING;
-  public const string ADVERTISEDVALUE_INVALID = YAPI.INVALID_STRING;
-  public const int SHUTDOWNCOUNTDOWN_INVALID = YAPI.INVALID_UNSIGNED;
-
-
-  //--- (end of YOsControl definitions)
-
-  //--- (YOsControl implementation)
-
-  private static Hashtable _OsControlCache = new Hashtable();
-  private UpdateCallback _callback;
-
-  protected string _logicalName;
-  protected string _advertisedValue;
-  protected long _shutdownCountdown;
-
-
-  public YOsControl(string func)
-    : base("OsControl", func)
-  {
-    _logicalName = YOsControl.LOGICALNAME_INVALID;
-    _advertisedValue = YOsControl.ADVERTISEDVALUE_INVALID;
-    _shutdownCountdown = YOsControl.SHUTDOWNCOUNTDOWN_INVALID;
-  }
-
-  protected override int _parse(YAPI.TJSONRECORD j)
-  {
-    YAPI.TJSONRECORD member = default(YAPI.TJSONRECORD);
-    int i = 0;
-    if ((j.recordtype != YAPI.TJSONRECORDTYPE.JSON_STRUCT)) goto failed;
-    for (i = 0; i <= j.membercount - 1; i++)
+    public YOsControl(string func)
+        : base(func)
     {
-      member = j.members[i];
-      if (member.name == "logicalName")
-      {
-        _logicalName = member.svalue;
-      }
-      else if (member.name == "advertisedValue")
-      {
-        _advertisedValue = member.svalue;
-      }
-      else if (member.name == "shutdownCountdown")
-      {
-        _shutdownCountdown = member.ivalue;
-      }
+        _className = "OsControl";
+        //--- (YOsControl attributes initialization)
+        //--- (end of YOsControl attributes initialization)
     }
-    return 0;
-  failed:
-    return -1;
-  }
 
-  /**
-   * <summary>
-   *   Returns the logical name of the OS control, corresponding to the network name of the module.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a string corresponding to the logical name of the OS control, corresponding to the network name of the module
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YOsControl.LOGICALNAME_INVALID</c>.
-   * </para>
-   */
-  public string get_logicalName()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    //--- (YOsControl implementation)
+
+    protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YOsControl.LOGICALNAME_INVALID;
+        if (member.name == "shutdownCountdown")
+        {
+            _shutdownCountdown = (int)member.ivalue;
+            return;
+        }
+        base._parseAttr(member);
     }
-    return  _logicalName;
-  }
 
-  /**
-   * <summary>
-   *   Changes the logical name of the OS control.
-   * <para>
-   *   You can use <c>yCheckLogicalName()</c>
-   *   prior to this call to make sure that your parameter is valid.
-   *   Remember to call the <c>saveToFlash()</c> method of the module if the
-   *   modification must be kept.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="newval">
-   *   a string corresponding to the logical name of the OS control
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int set_logicalName(string newval)
-  {
-    string rest_val;
-    rest_val = newval;
-    return _setAttr("logicalName", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Returns the current value of the OS control (no more than 6 characters).
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a string corresponding to the current value of the OS control (no more than 6 characters)
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YOsControl.ADVERTISEDVALUE_INVALID</c>.
-   * </para>
-   */
-  public string get_advertisedValue()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Returns the remaining number of seconds before the OS shutdown, or zero when no
+     *   shutdown has been scheduled.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the remaining number of seconds before the OS shutdown, or zero when no
+     *   shutdown has been scheduled
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YOsControl.SHUTDOWNCOUNTDOWN_INVALID</c>.
+     * </para>
+     */
+    public int get_shutdownCountdown()
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YOsControl.ADVERTISEDVALUE_INVALID;
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SHUTDOWNCOUNTDOWN_INVALID;
+            }
+        }
+        return this._shutdownCountdown;
     }
-    return  _advertisedValue;
-  }
 
-  /**
-   * <summary>
-   *   Returns the remaining number of seconds before the OS shutdown, or zero when no
-   *   shutdown has been scheduled.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   an integer corresponding to the remaining number of seconds before the OS shutdown, or zero when no
-   *   shutdown has been scheduled
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YOsControl.SHUTDOWNCOUNTDOWN_INVALID</c>.
-   * </para>
-   */
-  public int get_shutdownCountdown()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    public int set_shutdownCountdown(int newval)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YOsControl.SHUTDOWNCOUNTDOWN_INVALID;
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("shutdownCountdown", rest_val);
     }
-    return (int) _shutdownCountdown;
-  }
 
-  public int set_shutdownCountdown(int newval)
-  {
-    string rest_val;
-    rest_val = (newval).ToString();
-    return _setAttr("shutdownCountdown", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Schedules an OS shutdown after a given number of seconds.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="secBeforeShutDown">
-   *   number of seconds before shutdown
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int shutdown(int secBeforeShutDown)
-  {
-    string rest_val;
-    rest_val = (secBeforeShutDown).ToString();
-    return _setAttr("shutdownCountdown", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Continues the enumeration of OS control started using <c>yFirstOsControl()</c>.
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a pointer to a <c>YOsControl</c> object, corresponding to
-   *   OS control currently online, or a <c>null</c> pointer
-   *   if there are no more OS control to enumerate.
-   * </returns>
-   */
-  public YOsControl nextOsControl()
-  {
-    string hwid = "";
-    if (YAPI.YISERR(_nextFunction(ref hwid)))
-      return null;
-    if (hwid == "")
-      return null;
-    return FindOsControl(hwid);
-  }
-
-  /**
-   * <summary>
-   *   Registers the callback function that is invoked on every change of advertised value.
-   * <para>
-   *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
-   *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
-   *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="callback">
-   *   the callback function to call, or a null pointer. The callback function should take two
-   *   arguments: the function object of which the value has changed, and the character string describing
-   *   the new advertised value.
-   * @noreturn
-   * </param>
-   */
-  public void registerValueCallback(UpdateCallback callback)
-  {
-    if (callback != null)
+    /**
+     * <summary>
+     *   Retrieves OS control for a given identifier.
+     * <para>
+     *   The identifier can be specified using several formats:
+     * </para>
+     * <para>
+     * </para>
+     * <para>
+     *   - FunctionLogicalName
+     * </para>
+     * <para>
+     *   - ModuleSerialNumber.FunctionIdentifier
+     * </para>
+     * <para>
+     *   - ModuleSerialNumber.FunctionLogicalName
+     * </para>
+     * <para>
+     *   - ModuleLogicalName.FunctionIdentifier
+     * </para>
+     * <para>
+     *   - ModuleLogicalName.FunctionLogicalName
+     * </para>
+     * <para>
+     * </para>
+     * <para>
+     *   This function does not require that the OS control is online at the time
+     *   it is invoked. The returned object is nevertheless valid.
+     *   Use the method <c>YOsControl.isOnline()</c> to test if the OS control is
+     *   indeed online at a given time. In case of ambiguity when looking for
+     *   OS control by logical name, no error is notified: the first instance
+     *   found is returned. The search is performed first by hardware name,
+     *   then by logical name.
+     * </para>
+     * </summary>
+     * <param name="func">
+     *   a string that uniquely characterizes the OS control
+     * </param>
+     * <returns>
+     *   a <c>YOsControl</c> object allowing you to drive the OS control.
+     * </returns>
+     */
+    public static YOsControl FindOsControl( string func)
     {
-      _registerFuncCallback(this);
+        YOsControl obj;
+        obj = (YOsControl) YFunction._FindFromCache("OsControl", func);
+        if (obj == null) {
+            obj = new YOsControl(func);
+            YFunction._AddToCache("OsControl", func, obj);
+        }
+        return obj;
     }
-    else
+
+    /**
+     * <summary>
+     *   Registers the callback function that is invoked on every change of advertised value.
+     * <para>
+     *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
+     *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
+     *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="callback">
+     *   the callback function to call, or a null pointer. The callback function should take two
+     *   arguments: the function object of which the value has changed, and the character string describing
+     *   the new advertised value.
+     * @noreturn
+     * </param>
+     */
+    public int registerValueCallback( ValueCallback callback)
     {
-      _unregisterFuncCallback(this);
+        string val;
+        if (callback != null) {
+            YFunction._UpdateValueCallbackList(this, true);
+        } else {
+            YFunction._UpdateValueCallbackList(this, false);
+        }
+        this._valueCallbackOsControl = callback;
+        // Immediately invoke value callback with current value
+        if (callback != null && this.isOnline()) {
+            val = this._advertisedValue;
+            if (!(val == "")) {
+                this._invokeValueCallback(val);
+            }
+        }
+        return 0;
     }
-    _callback = new UpdateCallback(callback);
-  }
 
-  public void set_callback(UpdateCallback callback)
-  { registerValueCallback(callback); }
-  public void setCallback(UpdateCallback callback)
-  { registerValueCallback(callback); }
-
-
-  public override void advertiseValue(string value)
-  {
-    if (_callback != null)
+    public override int _invokeValueCallback( string value)
     {
-      _callback(this, value);
+        if (this._valueCallbackOsControl != null) {
+            this._valueCallbackOsControl(this, value);
+        } else {
+            base._invokeValueCallback(value);
+        }
+        return 0;
     }
-  }
 
-  //--- (end of YOsControl implementation)
+    /**
+     * <summary>
+     *   Schedules an OS shutdown after a given number of seconds.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="secBeforeShutDown">
+     *   number of seconds before shutdown
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int shutdown( int secBeforeShutDown)
+    {
+        return this.set_shutdownCountdown(secBeforeShutDown);
+    }
 
-  //--- (OsControl functions)
+    /**
+     * <summary>
+     *   Continues the enumeration of OS control started using <c>yFirstOsControl()</c>.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a pointer to a <c>YOsControl</c> object, corresponding to
+     *   OS control currently online, or a <c>null</c> pointer
+     *   if there are no more OS control to enumerate.
+     * </returns>
+     */
+    public YOsControl nextOsControl()
+    {
+        string hwid = "";
+        if (YAPI.YISERR(_nextFunction(ref hwid)))
+            return null;
+        if (hwid == "")
+            return null;
+        return FindOsControl(hwid);
+    }
 
-  /**
-   * <summary>
-   *   Retrieves OS control for a given identifier.
-   * <para>
-   *   The identifier can be specified using several formats:
-   * </para>
-   * <para>
-   * </para>
-   * <para>
-   *   - FunctionLogicalName
-   * </para>
-   * <para>
-   *   - ModuleSerialNumber.FunctionIdentifier
-   * </para>
-   * <para>
-   *   - ModuleSerialNumber.FunctionLogicalName
-   * </para>
-   * <para>
-   *   - ModuleLogicalName.FunctionIdentifier
-   * </para>
-   * <para>
-   *   - ModuleLogicalName.FunctionLogicalName
-   * </para>
-   * <para>
-   * </para>
-   * <para>
-   *   This function does not require that the OS control is online at the time
-   *   it is invoked. The returned object is nevertheless valid.
-   *   Use the method <c>YOsControl.isOnline()</c> to test if the OS control is
-   *   indeed online at a given time. In case of ambiguity when looking for
-   *   OS control by logical name, no error is notified: the first instance
-   *   found is returned. The search is performed first by hardware name,
-   *   then by logical name.
-   * </para>
-   * </summary>
-   * <param name="func">
-   *   a string that uniquely characterizes the OS control
-   * </param>
-   * <returns>
-   *   a <c>YOsControl</c> object allowing you to drive the OS control.
-   * </returns>
-   */
-  public static YOsControl FindOsControl(string func)
-  {
-    YOsControl res;
-    if (_OsControlCache.ContainsKey(func))
-      return (YOsControl)_OsControlCache[func];
-    res = new YOsControl(func);
-    _OsControlCache.Add(func, res);
-    return res;
-  }
+    //--- (end of YOsControl implementation)
 
-  /**
-   * <summary>
-   *   Starts the enumeration of OS control currently accessible.
-   * <para>
-   *   Use the method <c>YOsControl.nextOsControl()</c> to iterate on
-   *   next OS control.
-   * </para>
-   * </summary>
-   * <returns>
-   *   a pointer to a <c>YOsControl</c> object, corresponding to
-   *   the first OS control currently online, or a <c>null</c> pointer
-   *   if there are none.
-   * </returns>
-   */
-  public static YOsControl FirstOsControl()
-  {
-    YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
-    YDEV_DESCR dev = default(YDEV_DESCR);
-    int neededsize = 0;
-    int err = 0;
-    string serial = null;
-    string funcId = null;
-    string funcName = null;
-    string funcVal = null;
-    string errmsg = "";
-    int size = Marshal.SizeOf(v_fundescr[0]);
-    IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
-    err = YAPI.apiGetFunctionsByClass("OsControl", 0, p, size, ref neededsize, ref errmsg);
-    Marshal.Copy(p, v_fundescr, 0, 1);
-    Marshal.FreeHGlobal(p);
-    if ((YAPI.YISERR(err) | (neededsize == 0)))
-      return null;
-    serial = "";
-    funcId = "";
-    funcName = "";
-    funcVal = "";
-    errmsg = "";
-    if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
-      return null;
-    return FindOsControl(serial + "." + funcId);
-  }
+    //--- (OsControl functions)
 
-  private static void _OsControlCleanup()
-  { }
+    /**
+     * <summary>
+     *   Starts the enumeration of OS control currently accessible.
+     * <para>
+     *   Use the method <c>YOsControl.nextOsControl()</c> to iterate on
+     *   next OS control.
+     * </para>
+     * </summary>
+     * <returns>
+     *   a pointer to a <c>YOsControl</c> object, corresponding to
+     *   the first OS control currently online, or a <c>null</c> pointer
+     *   if there are none.
+     * </returns>
+     */
+    public static YOsControl FirstOsControl()
+    {
+        YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
+        YDEV_DESCR dev = default(YDEV_DESCR);
+        int neededsize = 0;
+        int err = 0;
+        string serial = null;
+        string funcId = null;
+        string funcName = null;
+        string funcVal = null;
+        string errmsg = "";
+        int size = Marshal.SizeOf(v_fundescr[0]);
+        IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
+        err = YAPI.apiGetFunctionsByClass("OsControl", 0, p, size, ref neededsize, ref errmsg);
+        Marshal.Copy(p, v_fundescr, 0, 1);
+        Marshal.FreeHGlobal(p);
+        if ((YAPI.YISERR(err) | (neededsize == 0)))
+            return null;
+        serial = "";
+        funcId = "";
+        funcName = "";
+        funcVal = "";
+        errmsg = "";
+        if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
+            return null;
+        return FindOsControl(serial + "." + funcId);
+    }
 
 
-  //--- (end of OsControl functions)
+
+    //--- (end of OsControl functions)
 }

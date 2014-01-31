@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_lightsensor.cs 12324 2013-08-13 15:10:31Z mvuilleu $
+ * $Id: yocto_lightsensor.cs 14699 2014-01-23 15:40:07Z seb $
  *
  * Implements yFindLightSensor(), the high-level API for LightSensor functions
  *
@@ -47,6 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+    //--- (YLightSensor return codes)
+    //--- (end of YLightSensor return codes)
+//--- (YLightSensor class start)
 /**
  * <summary>
  *   The Yoctopuce application programming interface allows you to read an instant
@@ -57,682 +60,279 @@ using YFUN_DESCR = System.Int32;
  * </para>
  * </summary>
  */
-public class YLightSensor : YFunction
+public class YLightSensor : YSensor
 {
-  //--- (globals)
+//--- (end of YLightSensor class start)
+    //--- (YLightSensor definitions)
+    public new delegate void ValueCallback(YLightSensor func, string value);
+    public new delegate void TimedReportCallback(YLightSensor func, YMeasure measure);
 
+    protected ValueCallback _valueCallbackLightSensor = null;
+    protected TimedReportCallback _timedReportCallbackLightSensor = null;
+    //--- (end of YLightSensor definitions)
 
-  //--- (end of globals)
-
-  //--- (YLightSensor definitions)
-
-  public delegate void UpdateCallback(YLightSensor func, string value);
-
-
-  public const string LOGICALNAME_INVALID = YAPI.INVALID_STRING;
-  public const string ADVERTISEDVALUE_INVALID = YAPI.INVALID_STRING;
-  public const string UNIT_INVALID = YAPI.INVALID_STRING;
-  public const double CURRENTVALUE_INVALID = YAPI.INVALID_DOUBLE;
-  public const double LOWESTVALUE_INVALID = YAPI.INVALID_DOUBLE;
-  public const double HIGHESTVALUE_INVALID = YAPI.INVALID_DOUBLE;
-  public const double CURRENTRAWVALUE_INVALID = YAPI.INVALID_DOUBLE;
-  public const string CALIBRATIONPARAM_INVALID = YAPI.INVALID_STRING;
-  public const double RESOLUTION_INVALID = YAPI.INVALID_DOUBLE;
-
-
-  //--- (end of YLightSensor definitions)
-
-  //--- (YLightSensor implementation)
-
-  private static Hashtable _LightSensorCache = new Hashtable();
-  private UpdateCallback _callback;
-
-  protected string _logicalName;
-  protected string _advertisedValue;
-  protected string _unit;
-  protected double _currentValue;
-  protected double _lowestValue;
-  protected double _highestValue;
-  protected double _currentRawValue;
-  protected string _calibrationParam;
-  protected double _resolution;
-  protected long _calibrationOffset;
-
-
-  public YLightSensor(string func)
-    : base("LightSensor", func)
-  {
-    _logicalName = YLightSensor.LOGICALNAME_INVALID;
-    _advertisedValue = YLightSensor.ADVERTISEDVALUE_INVALID;
-    _unit = YLightSensor.UNIT_INVALID;
-    _currentValue = YLightSensor.CURRENTVALUE_INVALID;
-    _lowestValue = YLightSensor.LOWESTVALUE_INVALID;
-    _highestValue = YLightSensor.HIGHESTVALUE_INVALID;
-    _currentRawValue = YLightSensor.CURRENTRAWVALUE_INVALID;
-    _calibrationParam = YLightSensor.CALIBRATIONPARAM_INVALID;
-    _resolution = YLightSensor.RESOLUTION_INVALID;
-    _calibrationOffset = 0;
-  }
-
-  protected override int _parse(YAPI.TJSONRECORD j)
-  {
-    YAPI.TJSONRECORD member = default(YAPI.TJSONRECORD);
-    int i = 0;
-    if ((j.recordtype != YAPI.TJSONRECORDTYPE.JSON_STRUCT)) goto failed;
-    for (i = 0; i <= j.membercount - 1; i++)
+    public YLightSensor(string func)
+        : base(func)
     {
-      member = j.members[i];
-      if (member.name == "logicalName")
-      {
-        _logicalName = member.svalue;
-      }
-      else if (member.name == "advertisedValue")
-      {
-        _advertisedValue = member.svalue;
-      }
-      else if (member.name == "unit")
-      {
-        _unit = member.svalue;
-      }
-      else if (member.name == "currentValue")
-      {
-        _currentValue = Math.Round(member.ivalue/6553.6) / 10;
-      }
-      else if (member.name == "lowestValue")
-      {
-        _lowestValue = Math.Round(member.ivalue/6553.6) / 10;
-      }
-      else if (member.name == "highestValue")
-      {
-        _highestValue = Math.Round(member.ivalue/6553.6) / 10;
-      }
-      else if (member.name == "currentRawValue")
-      {
-        _currentRawValue = member.ivalue/65536.0;
-      }
-      else if (member.name == "calibrationParam")
-      {
-        _calibrationParam = member.svalue;
-      }
-      else if (member.name == "resolution")
-      {
-        _resolution = (member.ivalue > 100 ? 1.0 / Math.Round(65536.0/member.ivalue) : 0.001 / Math.Round(67.0/member.ivalue));
-      }
+        _className = "LightSensor";
+        //--- (YLightSensor attributes initialization)
+        //--- (end of YLightSensor attributes initialization)
     }
-    return 0;
-  failed:
-    return -1;
-  }
 
-  /**
-   * <summary>
-   *   Returns the logical name of the light sensor.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a string corresponding to the logical name of the light sensor
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YLightSensor.LOGICALNAME_INVALID</c>.
-   * </para>
-   */
-  public string get_logicalName()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    //--- (YLightSensor implementation)
+
+    protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YLightSensor.LOGICALNAME_INVALID;
+        base._parseAttr(member);
     }
-    return  _logicalName;
-  }
 
-  /**
-   * <summary>
-   *   Changes the logical name of the light sensor.
-   * <para>
-   *   You can use <c>yCheckLogicalName()</c>
-   *   prior to this call to make sure that your parameter is valid.
-   *   Remember to call the <c>saveToFlash()</c> method of the module if the
-   *   modification must be kept.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="newval">
-   *   a string corresponding to the logical name of the light sensor
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int set_logicalName(string newval)
-  {
-    string rest_val;
-    rest_val = newval;
-    return _setAttr("logicalName", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Returns the current value of the light sensor (no more than 6 characters).
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a string corresponding to the current value of the light sensor (no more than 6 characters)
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YLightSensor.ADVERTISEDVALUE_INVALID</c>.
-   * </para>
-   */
-  public string get_advertisedValue()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    public int set_currentValue(double newval)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YLightSensor.ADVERTISEDVALUE_INVALID;
+        string rest_val;
+        rest_val = Math.Round(newval*65536.0).ToString();
+        return _setAttr("currentValue", rest_val);
     }
-    return  _advertisedValue;
-  }
 
-  /**
-   * <summary>
-   *   Returns the measuring unit for the measured value.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a string corresponding to the measuring unit for the measured value
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YLightSensor.UNIT_INVALID</c>.
-   * </para>
-   */
-  public string get_unit()
-  {
-    if (_unit == YLightSensor.UNIT_INVALID)
+    /**
+     * <summary>
+     *   Changes the sensor-specific calibration parameter so that the current value
+     *   matches a desired target (linear scaling).
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="calibratedVal">
+     *   the desired target value.
+     * </param>
+     * <para>
+     *   Remember to call the <c>saveToFlash()</c> method of the module if the
+     *   modification must be kept.
+     * </para>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int calibrate(double calibratedVal)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YLightSensor.UNIT_INVALID;
+        string rest_val;
+        rest_val = Math.Round(calibratedVal*65536.0).ToString();
+        return _setAttr("currentValue", rest_val);
     }
-    return  _unit;
-  }
 
-  public int set_currentValue(double newval)
-  {
-    string rest_val;
-    rest_val = Math.Round(newval*65536.0).ToString();
-    return _setAttr("currentValue", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Returns the current measured value.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a floating point number corresponding to the current measured value
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YLightSensor.CURRENTVALUE_INVALID</c>.
-   * </para>
-   */
-  public double get_currentValue()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Retrieves a light sensor for a given identifier.
+     * <para>
+     *   The identifier can be specified using several formats:
+     * </para>
+     * <para>
+     * </para>
+     * <para>
+     *   - FunctionLogicalName
+     * </para>
+     * <para>
+     *   - ModuleSerialNumber.FunctionIdentifier
+     * </para>
+     * <para>
+     *   - ModuleSerialNumber.FunctionLogicalName
+     * </para>
+     * <para>
+     *   - ModuleLogicalName.FunctionIdentifier
+     * </para>
+     * <para>
+     *   - ModuleLogicalName.FunctionLogicalName
+     * </para>
+     * <para>
+     * </para>
+     * <para>
+     *   This function does not require that the light sensor is online at the time
+     *   it is invoked. The returned object is nevertheless valid.
+     *   Use the method <c>YLightSensor.isOnline()</c> to test if the light sensor is
+     *   indeed online at a given time. In case of ambiguity when looking for
+     *   a light sensor by logical name, no error is notified: the first instance
+     *   found is returned. The search is performed first by hardware name,
+     *   then by logical name.
+     * </para>
+     * </summary>
+     * <param name="func">
+     *   a string that uniquely characterizes the light sensor
+     * </param>
+     * <returns>
+     *   a <c>YLightSensor</c> object allowing you to drive the light sensor.
+     * </returns>
+     */
+    public static YLightSensor FindLightSensor( string func)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YLightSensor.CURRENTVALUE_INVALID;
+        YLightSensor obj;
+        obj = (YLightSensor) YFunction._FindFromCache("LightSensor", func);
+        if (obj == null) {
+            obj = new YLightSensor(func);
+            YFunction._AddToCache("LightSensor", func, obj);
+        }
+        return obj;
     }
-    double res = YAPI._applyCalibration(_currentRawValue, _calibrationParam, _calibrationOffset, _resolution);
-    if (res != YLightSensor.CURRENTVALUE_INVALID) 
-       return  res;
-    return  _currentValue;
-  }
 
-  /**
-   * <summary>
-   *   Changes the sensor-specific calibration parameter so that the current value
-   *   matches a desired target (linear scaling).
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="calibratedVal">
-   *   the desired target value.
-   * </param>
-   * <para>
-   *   Remember to call the <c>saveToFlash()</c> method of the module if the
-   *   modification must be kept.
-   * </para>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int calibrate(double calibratedVal)
-  {
-    string rest_val;
-    rest_val = Math.Round(calibratedVal*65536.0).ToString();
-    return _setAttr("currentValue", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Changes the recorded minimal value observed.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="newval">
-   *   a floating point number corresponding to the recorded minimal value observed
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int set_lowestValue(double newval)
-  {
-    string rest_val;
-    rest_val = Math.Round(newval*65536.0).ToString();
-    return _setAttr("lowestValue", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Returns the minimal value observed.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a floating point number corresponding to the minimal value observed
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YLightSensor.LOWESTVALUE_INVALID</c>.
-   * </para>
-   */
-  public double get_lowestValue()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Registers the callback function that is invoked on every change of advertised value.
+     * <para>
+     *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
+     *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
+     *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="callback">
+     *   the callback function to call, or a null pointer. The callback function should take two
+     *   arguments: the function object of which the value has changed, and the character string describing
+     *   the new advertised value.
+     * @noreturn
+     * </param>
+     */
+    public int registerValueCallback( ValueCallback callback)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YLightSensor.LOWESTVALUE_INVALID;
+        string val;
+        if (callback != null) {
+            YFunction._UpdateValueCallbackList(this, true);
+        } else {
+            YFunction._UpdateValueCallbackList(this, false);
+        }
+        this._valueCallbackLightSensor = callback;
+        // Immediately invoke value callback with current value
+        if (callback != null && this.isOnline()) {
+            val = this._advertisedValue;
+            if (!(val == "")) {
+                this._invokeValueCallback(val);
+            }
+        }
+        return 0;
     }
-    return  _lowestValue;
-  }
 
-  /**
-   * <summary>
-   *   Changes the recorded maximal value observed.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="newval">
-   *   a floating point number corresponding to the recorded maximal value observed
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int set_highestValue(double newval)
-  {
-    string rest_val;
-    rest_val = Math.Round(newval*65536.0).ToString();
-    return _setAttr("highestValue", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Returns the maximal value observed.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a floating point number corresponding to the maximal value observed
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YLightSensor.HIGHESTVALUE_INVALID</c>.
-   * </para>
-   */
-  public double get_highestValue()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    public override int _invokeValueCallback( string value)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YLightSensor.HIGHESTVALUE_INVALID;
+        if (this._valueCallbackLightSensor != null) {
+            this._valueCallbackLightSensor(this, value);
+        } else {
+            base._invokeValueCallback(value);
+        }
+        return 0;
     }
-    return  _highestValue;
-  }
 
-  /**
-   * <summary>
-   *   Returns the unrounded and uncalibrated raw value returned by the sensor.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a floating point number corresponding to the unrounded and uncalibrated raw value returned by the sensor
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YLightSensor.CURRENTRAWVALUE_INVALID</c>.
-   * </para>
-   */
-  public double get_currentRawValue()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Registers the callback function that is invoked on every periodic timed notification.
+     * <para>
+     *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
+     *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
+     *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="callback">
+     *   the callback function to call, or a null pointer. The callback function should take two
+     *   arguments: the function object of which the value has changed, and an YMeasure object describing
+     *   the new advertised value.
+     * @noreturn
+     * </param>
+     */
+    public int registerTimedReportCallback( TimedReportCallback callback)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YLightSensor.CURRENTRAWVALUE_INVALID;
+        if (callback != null) {
+            YFunction._UpdateTimedReportCallbackList(this, true);
+        } else {
+            YFunction._UpdateTimedReportCallbackList(this, false);
+        }
+        this._timedReportCallbackLightSensor = callback;
+        return 0;
     }
-    return  _currentRawValue;
-  }
 
-  public string get_calibrationParam()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    public override int _invokeTimedReportCallback( YMeasure value)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YLightSensor.CALIBRATIONPARAM_INVALID;
+        if (this._timedReportCallbackLightSensor != null) {
+            this._timedReportCallbackLightSensor(this, value);
+        } else {
+            base._invokeTimedReportCallback(value);
+        }
+        return 0;
     }
-    return  _calibrationParam;
-  }
 
-  public int set_calibrationParam(string newval)
-  {
-    string rest_val;
-    rest_val = newval;
-    return _setAttr("calibrationParam", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Configures error correction data points, in particular to compensate for
-   *   a possible perturbation of the measure caused by an enclosure.
-   * <para>
-   *   It is possible
-   *   to configure up to five correction points. Correction points must be provided
-   *   in ascending order, and be in the range of the sensor. The device will automatically
-   *   perform a linear interpolation of the error correction between specified
-   *   points. Remember to call the <c>saveToFlash()</c> method of the module if the
-   *   modification must be kept.
-   * </para>
-   * <para>
-   *   For more information on advanced capabilities to refine the calibration of
-   *   sensors, please contact support@yoctopuce.com.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="rawValues">
-   *   array of floating point numbers, corresponding to the raw
-   *   values returned by the sensor for the correction points.
-   * </param>
-   * <param name="refValues">
-   *   array of floating point numbers, corresponding to the corrected
-   *   values for the correction points.
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int calibrateFromPoints(double[] rawValues,double[] refValues)
-  {
-    string rest_val;
-    rest_val = YAPI._encodeCalibrationPoints(rawValues,refValues,this._resolution,this._calibrationOffset,this._calibrationParam);
-    return _setAttr("calibrationParam", rest_val);
-  }
-
-  public int loadCalibrationPoints(ref double[] rawValues,ref double[] refValues)
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Continues the enumeration of light sensors started using <c>yFirstLightSensor()</c>.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a pointer to a <c>YLightSensor</c> object, corresponding to
+     *   a light sensor currently online, or a <c>null</c> pointer
+     *   if there are no more light sensors to enumerate.
+     * </returns>
+     */
+    public YLightSensor nextLightSensor()
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return _lastErrorType;
+        string hwid = "";
+        if (YAPI.YISERR(_nextFunction(ref hwid)))
+            return null;
+        if (hwid == "")
+            return null;
+        return FindLightSensor(hwid);
     }
-    int[] dummy=null; 
-    return YAPI._decodeCalibrationPoints(this._calibrationParam,ref dummy,ref rawValues,ref refValues,  this._resolution, this._calibrationOffset); 
-    
-  }
 
-  /**
-   * <summary>
-   *   Returns the resolution of the measured values.
-   * <para>
-   *   The resolution corresponds to the numerical precision
-   *   of the values, which is not always the same as the actual precision of the sensor.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a floating point number corresponding to the resolution of the measured values
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YLightSensor.RESOLUTION_INVALID</c>.
-   * </para>
-   */
-  public double get_resolution()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    //--- (end of YLightSensor implementation)
+
+    //--- (LightSensor functions)
+
+    /**
+     * <summary>
+     *   Starts the enumeration of light sensors currently accessible.
+     * <para>
+     *   Use the method <c>YLightSensor.nextLightSensor()</c> to iterate on
+     *   next light sensors.
+     * </para>
+     * </summary>
+     * <returns>
+     *   a pointer to a <c>YLightSensor</c> object, corresponding to
+     *   the first light sensor currently online, or a <c>null</c> pointer
+     *   if there are none.
+     * </returns>
+     */
+    public static YLightSensor FirstLightSensor()
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YLightSensor.RESOLUTION_INVALID;
+        YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
+        YDEV_DESCR dev = default(YDEV_DESCR);
+        int neededsize = 0;
+        int err = 0;
+        string serial = null;
+        string funcId = null;
+        string funcName = null;
+        string funcVal = null;
+        string errmsg = "";
+        int size = Marshal.SizeOf(v_fundescr[0]);
+        IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
+        err = YAPI.apiGetFunctionsByClass("LightSensor", 0, p, size, ref neededsize, ref errmsg);
+        Marshal.Copy(p, v_fundescr, 0, 1);
+        Marshal.FreeHGlobal(p);
+        if ((YAPI.YISERR(err) | (neededsize == 0)))
+            return null;
+        serial = "";
+        funcId = "";
+        funcName = "";
+        funcVal = "";
+        errmsg = "";
+        if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
+            return null;
+        return FindLightSensor(serial + "." + funcId);
     }
-    return  _resolution;
-  }
-
-  /**
-   * <summary>
-   *   Continues the enumeration of light sensors started using <c>yFirstLightSensor()</c>.
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a pointer to a <c>YLightSensor</c> object, corresponding to
-   *   a light sensor currently online, or a <c>null</c> pointer
-   *   if there are no more light sensors to enumerate.
-   * </returns>
-   */
-  public YLightSensor nextLightSensor()
-  {
-    string hwid = "";
-    if (YAPI.YISERR(_nextFunction(ref hwid)))
-      return null;
-    if (hwid == "")
-      return null;
-    return FindLightSensor(hwid);
-  }
-
-  /**
-   * <summary>
-   *   Registers the callback function that is invoked on every change of advertised value.
-   * <para>
-   *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
-   *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
-   *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="callback">
-   *   the callback function to call, or a null pointer. The callback function should take two
-   *   arguments: the function object of which the value has changed, and the character string describing
-   *   the new advertised value.
-   * @noreturn
-   * </param>
-   */
-  public void registerValueCallback(UpdateCallback callback)
-  {
-    if (callback != null)
-    {
-      _registerFuncCallback(this);
-    }
-    else
-    {
-      _unregisterFuncCallback(this);
-    }
-    _callback = new UpdateCallback(callback);
-  }
-
-  public void set_callback(UpdateCallback callback)
-  { registerValueCallback(callback); }
-  public void setCallback(UpdateCallback callback)
-  { registerValueCallback(callback); }
 
 
-  public override void advertiseValue(string value)
-  {
-    if (_callback != null)
-    {
-      _callback(this, value);
-    }
-  }
 
-  //--- (end of YLightSensor implementation)
-
-  //--- (LightSensor functions)
-
-  /**
-   * <summary>
-   *   Retrieves a light sensor for a given identifier.
-   * <para>
-   *   The identifier can be specified using several formats:
-   * </para>
-   * <para>
-   * </para>
-   * <para>
-   *   - FunctionLogicalName
-   * </para>
-   * <para>
-   *   - ModuleSerialNumber.FunctionIdentifier
-   * </para>
-   * <para>
-   *   - ModuleSerialNumber.FunctionLogicalName
-   * </para>
-   * <para>
-   *   - ModuleLogicalName.FunctionIdentifier
-   * </para>
-   * <para>
-   *   - ModuleLogicalName.FunctionLogicalName
-   * </para>
-   * <para>
-   * </para>
-   * <para>
-   *   This function does not require that the light sensor is online at the time
-   *   it is invoked. The returned object is nevertheless valid.
-   *   Use the method <c>YLightSensor.isOnline()</c> to test if the light sensor is
-   *   indeed online at a given time. In case of ambiguity when looking for
-   *   a light sensor by logical name, no error is notified: the first instance
-   *   found is returned. The search is performed first by hardware name,
-   *   then by logical name.
-   * </para>
-   * </summary>
-   * <param name="func">
-   *   a string that uniquely characterizes the light sensor
-   * </param>
-   * <returns>
-   *   a <c>YLightSensor</c> object allowing you to drive the light sensor.
-   * </returns>
-   */
-  public static YLightSensor FindLightSensor(string func)
-  {
-    YLightSensor res;
-    if (_LightSensorCache.ContainsKey(func))
-      return (YLightSensor)_LightSensorCache[func];
-    res = new YLightSensor(func);
-    _LightSensorCache.Add(func, res);
-    return res;
-  }
-
-  /**
-   * <summary>
-   *   Starts the enumeration of light sensors currently accessible.
-   * <para>
-   *   Use the method <c>YLightSensor.nextLightSensor()</c> to iterate on
-   *   next light sensors.
-   * </para>
-   * </summary>
-   * <returns>
-   *   a pointer to a <c>YLightSensor</c> object, corresponding to
-   *   the first light sensor currently online, or a <c>null</c> pointer
-   *   if there are none.
-   * </returns>
-   */
-  public static YLightSensor FirstLightSensor()
-  {
-    YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
-    YDEV_DESCR dev = default(YDEV_DESCR);
-    int neededsize = 0;
-    int err = 0;
-    string serial = null;
-    string funcId = null;
-    string funcName = null;
-    string funcVal = null;
-    string errmsg = "";
-    int size = Marshal.SizeOf(v_fundescr[0]);
-    IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
-    err = YAPI.apiGetFunctionsByClass("LightSensor", 0, p, size, ref neededsize, ref errmsg);
-    Marshal.Copy(p, v_fundescr, 0, 1);
-    Marshal.FreeHGlobal(p);
-    if ((YAPI.YISERR(err) | (neededsize == 0)))
-      return null;
-    serial = "";
-    funcId = "";
-    funcName = "";
-    funcVal = "";
-    errmsg = "";
-    if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
-      return null;
-    return FindLightSensor(serial + "." + funcId);
-  }
-
-  private static void _LightSensorCleanup()
-  { }
-
-
-  //--- (end of LightSensor functions)
+    //--- (end of LightSensor functions)
 }

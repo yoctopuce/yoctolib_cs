@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wakeupmonitor.cs 12324 2013-08-13 15:10:31Z mvuilleu $
+ * $Id: yocto_wakeupmonitor.cs 14699 2014-01-23 15:40:07Z seb $
  *
  * Implements yFindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -47,724 +47,620 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+    //--- (YWakeUpMonitor return codes)
+    //--- (end of YWakeUpMonitor return codes)
+//--- (YWakeUpMonitor class start)
+/**
+ * <summary>
+ *   The WakeUpMonitor function handles globally all wake-up sources, as well
+ *   as automated sleep mode.
+ * <para>
+ * </para>
+ * <para>
+ * </para>
+ * </summary>
+ */
 public class YWakeUpMonitor : YFunction
 {
-  //--- (globals)
+//--- (end of YWakeUpMonitor class start)
+    //--- (YWakeUpMonitor definitions)
+    public new delegate void ValueCallback(YWakeUpMonitor func, string value);
+    public new delegate void TimedReportCallback(YWakeUpMonitor func, YMeasure measure);
 
+    public const int POWERDURATION_INVALID = YAPI.INVALID_INT;
+    public const int SLEEPCOUNTDOWN_INVALID = YAPI.INVALID_INT;
+    public const long NEXTWAKEUP_INVALID = YAPI.INVALID_LONG;
+    public const int WAKEUPREASON_USBPOWER = 0;
+    public const int WAKEUPREASON_EXTPOWER = 1;
+    public const int WAKEUPREASON_ENDOFSLEEP = 2;
+    public const int WAKEUPREASON_EXTSIG1 = 3;
+    public const int WAKEUPREASON_EXTSIG2 = 4;
+    public const int WAKEUPREASON_EXTSIG3 = 5;
+    public const int WAKEUPREASON_EXTSIG4 = 6;
+    public const int WAKEUPREASON_SCHEDULE1 = 7;
+    public const int WAKEUPREASON_SCHEDULE2 = 8;
+    public const int WAKEUPREASON_SCHEDULE3 = 9;
+    public const int WAKEUPREASON_SCHEDULE4 = 10;
+    public const int WAKEUPREASON_SCHEDULE5 = 11;
+    public const int WAKEUPREASON_SCHEDULE6 = 12;
+    public const int WAKEUPREASON_INVALID = -1;
 
-  //--- (end of globals)
+    public const int WAKEUPSTATE_SLEEPING = 0;
+    public const int WAKEUPSTATE_AWAKE = 1;
+    public const int WAKEUPSTATE_INVALID = -1;
 
-  //--- (YWakeUpMonitor definitions)
+    public const long RTCTIME_INVALID = YAPI.INVALID_LONG;
+    protected int _powerDuration = POWERDURATION_INVALID;
+    protected int _sleepCountdown = SLEEPCOUNTDOWN_INVALID;
+    protected long _nextWakeUp = NEXTWAKEUP_INVALID;
+    protected int _wakeUpReason = WAKEUPREASON_INVALID;
+    protected int _wakeUpState = WAKEUPSTATE_INVALID;
+    protected long _rtcTime = RTCTIME_INVALID;
+    protected int _endOfTime = 2145960000;
+    protected ValueCallback _valueCallbackWakeUpMonitor = null;
+    //--- (end of YWakeUpMonitor definitions)
 
-  public delegate void UpdateCallback(YWakeUpMonitor func, string value);
-
-
-  public const string LOGICALNAME_INVALID = YAPI.INVALID_STRING;
-  public const string ADVERTISEDVALUE_INVALID = YAPI.INVALID_STRING;
-  public const int POWERDURATION_INVALID = YAPI.INVALID_INT;
-  public const int SLEEPCOUNTDOWN_INVALID = YAPI.INVALID_INT;
-  public const long NEXTWAKEUP_INVALID = YAPI.INVALID_LONG;
-  public const int WAKEUPREASON_USBPOWER = 0;
-  public const int WAKEUPREASON_EXTPOWER = 1;
-  public const int WAKEUPREASON_ENDOFSLEEP = 2;
-  public const int WAKEUPREASON_EXTSIG1 = 3;
-  public const int WAKEUPREASON_EXTSIG2 = 4;
-  public const int WAKEUPREASON_EXTSIG3 = 5;
-  public const int WAKEUPREASON_EXTSIG4 = 6;
-  public const int WAKEUPREASON_SCHEDULE1 = 7;
-  public const int WAKEUPREASON_SCHEDULE2 = 8;
-  public const int WAKEUPREASON_SCHEDULE3 = 9;
-  public const int WAKEUPREASON_SCHEDULE4 = 10;
-  public const int WAKEUPREASON_SCHEDULE5 = 11;
-  public const int WAKEUPREASON_SCHEDULE6 = 12;
-  public const int WAKEUPREASON_INVALID = -1;
-
-  public const int WAKEUPSTATE_SLEEPING = 0;
-  public const int WAKEUPSTATE_AWAKE = 1;
-  public const int WAKEUPSTATE_INVALID = -1;
-
-  public const long RTCTIME_INVALID = YAPI.INVALID_LONG;
-
-
-  //--- (end of YWakeUpMonitor definitions)
-
-  //--- (YWakeUpMonitor implementation)
-
-  private static Hashtable _WakeUpMonitorCache = new Hashtable();
-  private UpdateCallback _callback;
-
-  protected string _logicalName;
-  protected string _advertisedValue;
-  protected long _powerDuration;
-  protected long _sleepCountdown;
-  protected long _nextWakeUp;
-  protected long _wakeUpReason;
-  protected long _wakeUpState;
-  protected long _rtcTime;
-  protected long _endOfTime;
-
-
-  public YWakeUpMonitor(string func)
-    : base("WakeUpMonitor", func)
-  {
-    _logicalName = YWakeUpMonitor.LOGICALNAME_INVALID;
-    _advertisedValue = YWakeUpMonitor.ADVERTISEDVALUE_INVALID;
-    _powerDuration = YWakeUpMonitor.POWERDURATION_INVALID;
-    _sleepCountdown = YWakeUpMonitor.SLEEPCOUNTDOWN_INVALID;
-    _nextWakeUp = YWakeUpMonitor.NEXTWAKEUP_INVALID;
-    _wakeUpReason = YWakeUpMonitor.WAKEUPREASON_INVALID;
-    _wakeUpState = YWakeUpMonitor.WAKEUPSTATE_INVALID;
-    _rtcTime = YWakeUpMonitor.RTCTIME_INVALID;
-    _endOfTime = 2145960000;
-  }
-
-  protected override int _parse(YAPI.TJSONRECORD j)
-  {
-    YAPI.TJSONRECORD member = default(YAPI.TJSONRECORD);
-    int i = 0;
-    if ((j.recordtype != YAPI.TJSONRECORDTYPE.JSON_STRUCT)) goto failed;
-    for (i = 0; i <= j.membercount - 1; i++)
+    public YWakeUpMonitor(string func)
+        : base(func)
     {
-      member = j.members[i];
-      if (member.name == "logicalName")
-      {
-        _logicalName = member.svalue;
-      }
-      else if (member.name == "advertisedValue")
-      {
-        _advertisedValue = member.svalue;
-      }
-      else if (member.name == "powerDuration")
-      {
-        _powerDuration = member.ivalue;
-      }
-      else if (member.name == "sleepCountdown")
-      {
-        _sleepCountdown = member.ivalue;
-      }
-      else if (member.name == "nextWakeUp")
-      {
-        _nextWakeUp = member.ivalue;
-      }
-      else if (member.name == "wakeUpReason")
-      {
-        _wakeUpReason = member.ivalue;
-      }
-      else if (member.name == "wakeUpState")
-      {
-        _wakeUpState = member.ivalue;
-      }
-      else if (member.name == "rtcTime")
-      {
-        _rtcTime = member.ivalue;
-      }
+        _className = "WakeUpMonitor";
+        //--- (YWakeUpMonitor attributes initialization)
+        //--- (end of YWakeUpMonitor attributes initialization)
     }
-    return 0;
-  failed:
-    return -1;
-  }
 
-  /**
-   * <summary>
-   *   Returns the logical name of the monitor.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a string corresponding to the logical name of the monitor
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YWakeUpMonitor.LOGICALNAME_INVALID</c>.
-   * </para>
-   */
-  public string get_logicalName()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    //--- (YWakeUpMonitor implementation)
+
+    protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YWakeUpMonitor.LOGICALNAME_INVALID;
+        if (member.name == "powerDuration")
+        {
+            _powerDuration = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "sleepCountdown")
+        {
+            _sleepCountdown = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "nextWakeUp")
+        {
+            _nextWakeUp = member.ivalue;
+            return;
+        }
+        if (member.name == "wakeUpReason")
+        {
+            _wakeUpReason = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "wakeUpState")
+        {
+            _wakeUpState = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "rtcTime")
+        {
+            _rtcTime = member.ivalue;
+            return;
+        }
+        base._parseAttr(member);
     }
-    return  _logicalName;
-  }
 
-  /**
-   * <summary>
-   *   Changes the logical name of the monitor.
-   * <para>
-   *   You can use <c>yCheckLogicalName()</c>
-   *   prior to this call to make sure that your parameter is valid.
-   *   Remember to call the <c>saveToFlash()</c> method of the module if the
-   *   modification must be kept.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="newval">
-   *   a string corresponding to the logical name of the monitor
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int set_logicalName(string newval)
-  {
-    string rest_val;
-    rest_val = newval;
-    return _setAttr("logicalName", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Returns the current value of the monitor (no more than 6 characters).
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a string corresponding to the current value of the monitor (no more than 6 characters)
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YWakeUpMonitor.ADVERTISEDVALUE_INVALID</c>.
-   * </para>
-   */
-  public string get_advertisedValue()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Returns the maximal wake up time (in seconds) before automatically going to sleep.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the maximal wake up time (in seconds) before automatically going to sleep
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YWakeUpMonitor.POWERDURATION_INVALID</c>.
+     * </para>
+     */
+    public int get_powerDuration()
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YWakeUpMonitor.ADVERTISEDVALUE_INVALID;
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return POWERDURATION_INVALID;
+            }
+        }
+        return this._powerDuration;
     }
-    return  _advertisedValue;
-  }
 
-  /**
-   * <summary>
-   *   Returns the maximal wake up time (seconds) before going to sleep automatically.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   an integer corresponding to the maximal wake up time (seconds) before going to sleep automatically
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YWakeUpMonitor.POWERDURATION_INVALID</c>.
-   * </para>
-   */
-  public int get_powerDuration()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Changes the maximal wake up time (seconds) before automatically going to sleep.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the maximal wake up time (seconds) before automatically going to sleep
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_powerDuration(int newval)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YWakeUpMonitor.POWERDURATION_INVALID;
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("powerDuration", rest_val);
     }
-    return (int) _powerDuration;
-  }
 
-  /**
-   * <summary>
-   *   Changes the maximal wake up time (seconds) before going to sleep automatically.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="newval">
-   *   an integer corresponding to the maximal wake up time (seconds) before going to sleep automatically
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int set_powerDuration(int newval)
-  {
-    string rest_val;
-    rest_val = (newval).ToString();
-    return _setAttr("powerDuration", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Returns the delay before next sleep.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   an integer corresponding to the delay before next sleep
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YWakeUpMonitor.SLEEPCOUNTDOWN_INVALID</c>.
-   * </para>
-   */
-  public int get_sleepCountdown()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Returns the delay before the  next sleep period.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the delay before the  next sleep period
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YWakeUpMonitor.SLEEPCOUNTDOWN_INVALID</c>.
+     * </para>
+     */
+    public int get_sleepCountdown()
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YWakeUpMonitor.SLEEPCOUNTDOWN_INVALID;
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SLEEPCOUNTDOWN_INVALID;
+            }
+        }
+        return this._sleepCountdown;
     }
-    return (int) _sleepCountdown;
-  }
 
-  /**
-   * <summary>
-   *   Changes the delay before next sleep.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="newval">
-   *   an integer corresponding to the delay before next sleep
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int set_sleepCountdown(int newval)
-  {
-    string rest_val;
-    rest_val = (newval).ToString();
-    return _setAttr("sleepCountdown", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Returns the next scheduled wake-up date/time (UNIX format)
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   an integer corresponding to the next scheduled wake-up date/time (UNIX format)
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YWakeUpMonitor.NEXTWAKEUP_INVALID</c>.
-   * </para>
-   */
-  public long get_nextWakeUp()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Changes the delay before the next sleep period.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the delay before the next sleep period
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_sleepCountdown(int newval)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YWakeUpMonitor.NEXTWAKEUP_INVALID;
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("sleepCountdown", rest_val);
     }
-    return  _nextWakeUp;
-  }
 
-  /**
-   * <summary>
-   *   Changes the days of the week where a wake up must take place.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="newval">
-   *   an integer corresponding to the days of the week where a wake up must take place
-   * </param>
-   * <para>
-   * </para>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int set_nextWakeUp(long newval)
-  {
-    string rest_val;
-    rest_val = (newval).ToString();
-    return _setAttr("nextWakeUp", rest_val);
-  }
-
-  /**
-   * <summary>
-   *   Return the last wake up reason.
-   * <para>
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a value among <c>YWakeUpMonitor.WAKEUPREASON_USBPOWER</c>, <c>YWakeUpMonitor.WAKEUPREASON_EXTPOWER</c>,
-   *   <c>YWakeUpMonitor.WAKEUPREASON_ENDOFSLEEP</c>, <c>YWakeUpMonitor.WAKEUPREASON_EXTSIG1</c>,
-   *   <c>YWakeUpMonitor.WAKEUPREASON_EXTSIG2</c>, <c>YWakeUpMonitor.WAKEUPREASON_EXTSIG3</c>,
-   *   <c>YWakeUpMonitor.WAKEUPREASON_EXTSIG4</c>, <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE1</c>,
-   *   <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE2</c>, <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE3</c>,
-   *   <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE4</c>, <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE5</c> and
-   *   <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE6</c>
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YWakeUpMonitor.WAKEUPREASON_INVALID</c>.
-   * </para>
-   */
-  public int get_wakeUpReason()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Returns the next scheduled wake up date/time (UNIX format)
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the next scheduled wake up date/time (UNIX format)
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YWakeUpMonitor.NEXTWAKEUP_INVALID</c>.
+     * </para>
+     */
+    public long get_nextWakeUp()
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YWakeUpMonitor.WAKEUPREASON_INVALID;
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return NEXTWAKEUP_INVALID;
+            }
+        }
+        return this._nextWakeUp;
     }
-    return (int) _wakeUpReason;
-  }
 
-  /**
-   * <summary>
-   *   Returns  the current state of the monitor
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   either <c>YWakeUpMonitor.WAKEUPSTATE_SLEEPING</c> or <c>YWakeUpMonitor.WAKEUPSTATE_AWAKE</c>,
-   *   according to  the current state of the monitor
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns <c>YWakeUpMonitor.WAKEUPSTATE_INVALID</c>.
-   * </para>
-   */
-  public int get_wakeUpState()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Changes the days of the week when a wake up must take place.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the days of the week when a wake up must take place
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_nextWakeUp(long newval)
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YWakeUpMonitor.WAKEUPSTATE_INVALID;
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("nextWakeUp", rest_val);
     }
-    return (int) _wakeUpState;
-  }
 
-  public int set_wakeUpState(int newval)
-  {
-    string rest_val;
-    rest_val = (newval).ToString();
-    return _setAttr("wakeUpState", rest_val);
-  }
-
-  public long get_rtcTime()
-  {
-    if (_cacheExpiration <= YAPI.GetTickCount())
+    /**
+     * <summary>
+     *   Returns the latest wake up reason.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among <c>YWakeUpMonitor.WAKEUPREASON_USBPOWER</c>, <c>YWakeUpMonitor.WAKEUPREASON_EXTPOWER</c>,
+     *   <c>YWakeUpMonitor.WAKEUPREASON_ENDOFSLEEP</c>, <c>YWakeUpMonitor.WAKEUPREASON_EXTSIG1</c>,
+     *   <c>YWakeUpMonitor.WAKEUPREASON_EXTSIG2</c>, <c>YWakeUpMonitor.WAKEUPREASON_EXTSIG3</c>,
+     *   <c>YWakeUpMonitor.WAKEUPREASON_EXTSIG4</c>, <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE1</c>,
+     *   <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE2</c>, <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE3</c>,
+     *   <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE4</c>, <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE5</c> and
+     *   <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE6</c> corresponding to the latest wake up reason
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YWakeUpMonitor.WAKEUPREASON_INVALID</c>.
+     * </para>
+     */
+    public int get_wakeUpReason()
     {
-      if (YAPI.YISERR(load(YAPI.DefaultCacheValidity)))
-        return YWakeUpMonitor.RTCTIME_INVALID;
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return WAKEUPREASON_INVALID;
+            }
+        }
+        return this._wakeUpReason;
     }
-    return  _rtcTime;
-  }
 
-  /**
-   * <summary>
-   *   Forces a wakeup.
-   * <para>
-   * </para>
-   * </summary>
-   */
-  public int wakeUp()
-  {
-    return this.set_wakeUpState(WAKEUPSTATE_AWAKE);
-    
-  }
-
-  /**
-   * <summary>
-   *   Go to sleep until the next wakeup condition is met,  the
-   *   RTC time must have been set before calling this function.
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="secBeforeSleep">
-   *   number of seconds before going into sleep mode,
-   * </param>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int sleep( int secBeforeSleep)
-  {
-    int currTime;
-    currTime = (int)(this.get_rtcTime());
-    if (!(currTime != 0)) {  this._throw( YAPI.RTC_NOT_READY, "RTC time not set"); return  YAPI.RTC_NOT_READY;};
-    this.set_nextWakeUp(this._endOfTime);
-    this.set_sleepCountdown(secBeforeSleep);
-    return YAPI.SUCCESS; 
-    
-  }
-
-  /**
-   * <summary>
-   *   Go to sleep for a specific time or until the next wakeup condition is met, the
-   *   RTC time must have been set before calling this function.
-   * <para>
-   *   The count down before sleep
-   *   can be canceled with resetSleepCountDown.
-   * </para>
-   * </summary>
-   * <param name="secUntilWakeUp">
-   *   sleep duration, in secondes
-   * </param>
-   * <param name="secBeforeSleep">
-   *   number of seconds before going into sleep mode
-   * </param>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int sleepFor( int secUntilWakeUp,  int secBeforeSleep)
-  {
-    int currTime;
-    currTime = (int)(this.get_rtcTime());
-    if (!(currTime != 0)) {  this._throw( YAPI.RTC_NOT_READY, "RTC time not set"); return  YAPI.RTC_NOT_READY;};
-    this.set_nextWakeUp(currTime+secUntilWakeUp);
-    this.set_sleepCountdown(secBeforeSleep);
-    return YAPI.SUCCESS; 
-    
-  }
-
-  /**
-   * <summary>
-   *   Go to sleep until a specific date is reached or until the next wakeup condition is met, the
-   *   RTC time must have been set before calling this function.
-   * <para>
-   *   The count down before sleep
-   *   can be canceled with resetSleepCountDown.
-   * </para>
-   * </summary>
-   * <param name="wakeUpTime">
-   *   wake-up datetime (UNIX format)
-   * </param>
-   * <param name="secBeforeSleep">
-   *   number of seconds before going into sleep mode
-   * </param>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   * </returns>
-   * <para>
-   *   On failure, throws an exception or returns a negative error code.
-   * </para>
-   */
-  public int sleepUntil( int wakeUpTime,  int secBeforeSleep)
-  {
-    int currTime;
-    currTime = (int)(this.get_rtcTime());
-    if (!(currTime != 0)) {  this._throw( YAPI.RTC_NOT_READY, "RTC time not set"); return  YAPI.RTC_NOT_READY;};
-    this.set_nextWakeUp(wakeUpTime);
-    this.set_sleepCountdown(secBeforeSleep);
-    return YAPI.SUCCESS; 
-    
-  }
-
-  /**
-   * <summary>
-   *   Reset the sleep countdown.
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   <c>YAPI.SUCCESS</c> if the call succeeds.
-   *   On failure, throws an exception or returns a negative error code.
-   * </returns>
-   */
-  public int resetSleepCountDown()
-  {
-    this.set_sleepCountdown(0);
-    this.set_nextWakeUp(0);
-    return YAPI.SUCCESS; 
-    
-  }
-
-  /**
-   * <summary>
-   *   Continues the enumeration of monitors started using <c>yFirstWakeUpMonitor()</c>.
-   * <para>
-   * </para>
-   * </summary>
-   * <returns>
-   *   a pointer to a <c>YWakeUpMonitor</c> object, corresponding to
-   *   a monitor currently online, or a <c>null</c> pointer
-   *   if there are no more monitors to enumerate.
-   * </returns>
-   */
-  public YWakeUpMonitor nextWakeUpMonitor()
-  {
-    string hwid = "";
-    if (YAPI.YISERR(_nextFunction(ref hwid)))
-      return null;
-    if (hwid == "")
-      return null;
-    return FindWakeUpMonitor(hwid);
-  }
-
-  /**
-   * <summary>
-   *   Registers the callback function that is invoked on every change of advertised value.
-   * <para>
-   *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
-   *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
-   *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-   * </para>
-   * <para>
-   * </para>
-   * </summary>
-   * <param name="callback">
-   *   the callback function to call, or a null pointer. The callback function should take two
-   *   arguments: the function object of which the value has changed, and the character string describing
-   *   the new advertised value.
-   * @noreturn
-   * </param>
-   */
-  public void registerValueCallback(UpdateCallback callback)
-  {
-    if (callback != null)
+    /**
+     * <summary>
+     *   Returns  the current state of the monitor
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   either <c>YWakeUpMonitor.WAKEUPSTATE_SLEEPING</c> or <c>YWakeUpMonitor.WAKEUPSTATE_AWAKE</c>,
+     *   according to  the current state of the monitor
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YWakeUpMonitor.WAKEUPSTATE_INVALID</c>.
+     * </para>
+     */
+    public int get_wakeUpState()
     {
-      _registerFuncCallback(this);
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return WAKEUPSTATE_INVALID;
+            }
+        }
+        return this._wakeUpState;
     }
-    else
+
+    public int set_wakeUpState(int newval)
     {
-      _unregisterFuncCallback(this);
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("wakeUpState", rest_val);
     }
-    _callback = new UpdateCallback(callback);
-  }
 
-  public void set_callback(UpdateCallback callback)
-  { registerValueCallback(callback); }
-  public void setCallback(UpdateCallback callback)
-  { registerValueCallback(callback); }
-
-
-  public override void advertiseValue(string value)
-  {
-    if (_callback != null)
+    public long get_rtcTime()
     {
-      _callback(this, value);
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return RTCTIME_INVALID;
+            }
+        }
+        return this._rtcTime;
     }
-  }
 
-  //--- (end of YWakeUpMonitor implementation)
+    /**
+     * <summary>
+     *   Retrieves a monitor for a given identifier.
+     * <para>
+     *   The identifier can be specified using several formats:
+     * </para>
+     * <para>
+     * </para>
+     * <para>
+     *   - FunctionLogicalName
+     * </para>
+     * <para>
+     *   - ModuleSerialNumber.FunctionIdentifier
+     * </para>
+     * <para>
+     *   - ModuleSerialNumber.FunctionLogicalName
+     * </para>
+     * <para>
+     *   - ModuleLogicalName.FunctionIdentifier
+     * </para>
+     * <para>
+     *   - ModuleLogicalName.FunctionLogicalName
+     * </para>
+     * <para>
+     * </para>
+     * <para>
+     *   This function does not require that the monitor is online at the time
+     *   it is invoked. The returned object is nevertheless valid.
+     *   Use the method <c>YWakeUpMonitor.isOnline()</c> to test if the monitor is
+     *   indeed online at a given time. In case of ambiguity when looking for
+     *   a monitor by logical name, no error is notified: the first instance
+     *   found is returned. The search is performed first by hardware name,
+     *   then by logical name.
+     * </para>
+     * </summary>
+     * <param name="func">
+     *   a string that uniquely characterizes the monitor
+     * </param>
+     * <returns>
+     *   a <c>YWakeUpMonitor</c> object allowing you to drive the monitor.
+     * </returns>
+     */
+    public static YWakeUpMonitor FindWakeUpMonitor( string func)
+    {
+        YWakeUpMonitor obj;
+        obj = (YWakeUpMonitor) YFunction._FindFromCache("WakeUpMonitor", func);
+        if (obj == null) {
+            obj = new YWakeUpMonitor(func);
+            YFunction._AddToCache("WakeUpMonitor", func, obj);
+        }
+        return obj;
+    }
 
-  //--- (WakeUpMonitor functions)
+    /**
+     * <summary>
+     *   Registers the callback function that is invoked on every change of advertised value.
+     * <para>
+     *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
+     *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
+     *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="callback">
+     *   the callback function to call, or a null pointer. The callback function should take two
+     *   arguments: the function object of which the value has changed, and the character string describing
+     *   the new advertised value.
+     * @noreturn
+     * </param>
+     */
+    public int registerValueCallback( ValueCallback callback)
+    {
+        string val;
+        if (callback != null) {
+            YFunction._UpdateValueCallbackList(this, true);
+        } else {
+            YFunction._UpdateValueCallbackList(this, false);
+        }
+        this._valueCallbackWakeUpMonitor = callback;
+        // Immediately invoke value callback with current value
+        if (callback != null && this.isOnline()) {
+            val = this._advertisedValue;
+            if (!(val == "")) {
+                this._invokeValueCallback(val);
+            }
+        }
+        return 0;
+    }
 
-  /**
-   * <summary>
-   *   Retrieves a monitor for a given identifier.
-   * <para>
-   *   The identifier can be specified using several formats:
-   * </para>
-   * <para>
-   * </para>
-   * <para>
-   *   - FunctionLogicalName
-   * </para>
-   * <para>
-   *   - ModuleSerialNumber.FunctionIdentifier
-   * </para>
-   * <para>
-   *   - ModuleSerialNumber.FunctionLogicalName
-   * </para>
-   * <para>
-   *   - ModuleLogicalName.FunctionIdentifier
-   * </para>
-   * <para>
-   *   - ModuleLogicalName.FunctionLogicalName
-   * </para>
-   * <para>
-   * </para>
-   * <para>
-   *   This function does not require that the monitor is online at the time
-   *   it is invoked. The returned object is nevertheless valid.
-   *   Use the method <c>YWakeUpMonitor.isOnline()</c> to test if the monitor is
-   *   indeed online at a given time. In case of ambiguity when looking for
-   *   a monitor by logical name, no error is notified: the first instance
-   *   found is returned. The search is performed first by hardware name,
-   *   then by logical name.
-   * </para>
-   * </summary>
-   * <param name="func">
-   *   a string that uniquely characterizes the monitor
-   * </param>
-   * <returns>
-   *   a <c>YWakeUpMonitor</c> object allowing you to drive the monitor.
-   * </returns>
-   */
-  public static YWakeUpMonitor FindWakeUpMonitor(string func)
-  {
-    YWakeUpMonitor res;
-    if (_WakeUpMonitorCache.ContainsKey(func))
-      return (YWakeUpMonitor)_WakeUpMonitorCache[func];
-    res = new YWakeUpMonitor(func);
-    _WakeUpMonitorCache.Add(func, res);
-    return res;
-  }
+    public override int _invokeValueCallback( string value)
+    {
+        if (this._valueCallbackWakeUpMonitor != null) {
+            this._valueCallbackWakeUpMonitor(this, value);
+        } else {
+            base._invokeValueCallback(value);
+        }
+        return 0;
+    }
 
-  /**
-   * <summary>
-   *   Starts the enumeration of monitors currently accessible.
-   * <para>
-   *   Use the method <c>YWakeUpMonitor.nextWakeUpMonitor()</c> to iterate on
-   *   next monitors.
-   * </para>
-   * </summary>
-   * <returns>
-   *   a pointer to a <c>YWakeUpMonitor</c> object, corresponding to
-   *   the first monitor currently online, or a <c>null</c> pointer
-   *   if there are none.
-   * </returns>
-   */
-  public static YWakeUpMonitor FirstWakeUpMonitor()
-  {
-    YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
-    YDEV_DESCR dev = default(YDEV_DESCR);
-    int neededsize = 0;
-    int err = 0;
-    string serial = null;
-    string funcId = null;
-    string funcName = null;
-    string funcVal = null;
-    string errmsg = "";
-    int size = Marshal.SizeOf(v_fundescr[0]);
-    IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
-    err = YAPI.apiGetFunctionsByClass("WakeUpMonitor", 0, p, size, ref neededsize, ref errmsg);
-    Marshal.Copy(p, v_fundescr, 0, 1);
-    Marshal.FreeHGlobal(p);
-    if ((YAPI.YISERR(err) | (neededsize == 0)))
-      return null;
-    serial = "";
-    funcId = "";
-    funcName = "";
-    funcVal = "";
-    errmsg = "";
-    if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
-      return null;
-    return FindWakeUpMonitor(serial + "." + funcId);
-  }
+    /**
+     * <summary>
+     *   Forces a wake up.
+     * <para>
+     * </para>
+     * </summary>
+     */
+    public virtual int wakeUp()
+    {
+        return this.set_wakeUpState(WAKEUPSTATE_AWAKE);
+    }
 
-  private static void _WakeUpMonitorCleanup()
-  { }
+    /**
+     * <summary>
+     *   Goes to sleep until the next wake up condition is met,  the
+     *   RTC time must have been set before calling this function.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="secBeforeSleep">
+     *   number of seconds before going into sleep mode,
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int sleep( int secBeforeSleep)
+    {
+        int currTime = 0;
+        currTime = (int)(this.get_rtcTime());
+        if (!(currTime != 0)) { this._throw( YAPI.RTC_NOT_READY, "RTC time not set"); return YAPI.RTC_NOT_READY; }
+        this.set_nextWakeUp(this._endOfTime);
+        this.set_sleepCountdown(secBeforeSleep);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
+     *   Goes to sleep for a specific duration or until the next wake up condition is met, the
+     *   RTC time must have been set before calling this function.
+     * <para>
+     *   The count down before sleep
+     *   can be canceled with resetSleepCountDown.
+     * </para>
+     * </summary>
+     * <param name="secUntilWakeUp">
+     *   sleep duration, in secondes
+     * </param>
+     * <param name="secBeforeSleep">
+     *   number of seconds before going into sleep mode
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int sleepFor( int secUntilWakeUp,  int secBeforeSleep)
+    {
+        int currTime = 0;
+        currTime = (int)(this.get_rtcTime());
+        if (!(currTime != 0)) { this._throw( YAPI.RTC_NOT_READY, "RTC time not set"); return YAPI.RTC_NOT_READY; }
+        this.set_nextWakeUp(currTime+secUntilWakeUp);
+        this.set_sleepCountdown(secBeforeSleep);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
+     *   Go to sleep until a specific date is reached or until the next wake up condition is met, the
+     *   RTC time must have been set before calling this function.
+     * <para>
+     *   The count down before sleep
+     *   can be canceled with resetSleepCountDown.
+     * </para>
+     * </summary>
+     * <param name="wakeUpTime">
+     *   wake-up datetime (UNIX format)
+     * </param>
+     * <param name="secBeforeSleep">
+     *   number of seconds before going into sleep mode
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int sleepUntil( int wakeUpTime,  int secBeforeSleep)
+    {
+        int currTime = 0;
+        currTime = (int)(this.get_rtcTime());
+        if (!(currTime != 0)) { this._throw( YAPI.RTC_NOT_READY, "RTC time not set"); return YAPI.RTC_NOT_READY; }
+        this.set_nextWakeUp(wakeUpTime);
+        this.set_sleepCountdown(secBeforeSleep);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
+     *   Resets the sleep countdown.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     *   On failure, throws an exception or returns a negative error code.
+     * </returns>
+     */
+    public virtual int resetSleepCountDown()
+    {
+        this.set_sleepCountdown(0);
+        this.set_nextWakeUp(0);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
+     *   Continues the enumeration of monitors started using <c>yFirstWakeUpMonitor()</c>.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a pointer to a <c>YWakeUpMonitor</c> object, corresponding to
+     *   a monitor currently online, or a <c>null</c> pointer
+     *   if there are no more monitors to enumerate.
+     * </returns>
+     */
+    public YWakeUpMonitor nextWakeUpMonitor()
+    {
+        string hwid = "";
+        if (YAPI.YISERR(_nextFunction(ref hwid)))
+            return null;
+        if (hwid == "")
+            return null;
+        return FindWakeUpMonitor(hwid);
+    }
+
+    //--- (end of YWakeUpMonitor implementation)
+
+    //--- (WakeUpMonitor functions)
+
+    /**
+     * <summary>
+     *   Starts the enumeration of monitors currently accessible.
+     * <para>
+     *   Use the method <c>YWakeUpMonitor.nextWakeUpMonitor()</c> to iterate on
+     *   next monitors.
+     * </para>
+     * </summary>
+     * <returns>
+     *   a pointer to a <c>YWakeUpMonitor</c> object, corresponding to
+     *   the first monitor currently online, or a <c>null</c> pointer
+     *   if there are none.
+     * </returns>
+     */
+    public static YWakeUpMonitor FirstWakeUpMonitor()
+    {
+        YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
+        YDEV_DESCR dev = default(YDEV_DESCR);
+        int neededsize = 0;
+        int err = 0;
+        string serial = null;
+        string funcId = null;
+        string funcName = null;
+        string funcVal = null;
+        string errmsg = "";
+        int size = Marshal.SizeOf(v_fundescr[0]);
+        IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
+        err = YAPI.apiGetFunctionsByClass("WakeUpMonitor", 0, p, size, ref neededsize, ref errmsg);
+        Marshal.Copy(p, v_fundescr, 0, 1);
+        Marshal.FreeHGlobal(p);
+        if ((YAPI.YISERR(err) | (neededsize == 0)))
+            return null;
+        serial = "";
+        funcId = "";
+        funcName = "";
+        funcVal = "";
+        errmsg = "";
+        if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
+            return null;
+        return FindWakeUpMonitor(serial + "." + funcId);
+    }
 
 
-  //--- (end of WakeUpMonitor functions)
+
+    //--- (end of WakeUpMonitor functions)
 }

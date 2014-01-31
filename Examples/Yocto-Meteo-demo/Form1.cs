@@ -126,7 +126,7 @@ namespace WindowsFormsApplication1
             // No exception please
             YAPI.DisableExceptions();
 
-            if (YAPI.RegisterHub("172.17.17.53", ref errmsg) != YAPI.SUCCESS)
+            if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS)
             {
                 MessageBox.Show(errmsg);
                 statusbar.Text = "RegisterHub error: " + errmsg;
@@ -316,7 +316,7 @@ namespace WindowsFormsApplication1
 
                 for (int row = 0; row < stream.get_rowCount(); row += increment)
                 {
-                    long nbsec = unixtime + row * stream.get_dataSamplesInterval();
+                    long nbsec = unixtime + row * (long)stream.get_dataSamplesInterval();
                     DateTime t = new DateTime(1970, 1, 1, 0, 0, 0).AddSeconds(nbsec);
                     TimeSpan delta = DateTime.Now - t;
                     if (delta.TotalDays > 2)
