@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs 14699 2014-01-23 15:40:07Z seb $
+ * $Id: yocto_files.cs 15131 2014-02-28 10:23:25Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -241,7 +241,7 @@ public class YFiles : YFunction
      *   a <c>YFiles</c> object allowing you to drive the filesystem.
      * </returns>
      */
-    public static YFiles FindFiles( string func)
+    public static YFiles FindFiles(string func)
     {
         YFiles obj;
         obj = (YFiles) YFunction._FindFromCache("Files", func);
@@ -270,7 +270,7 @@ public class YFiles : YFunction
      * @noreturn
      * </param>
      */
-    public int registerValueCallback( ValueCallback callback)
+    public int registerValueCallback(ValueCallback callback)
     {
         string val;
         if (callback != null) {
@@ -289,7 +289,7 @@ public class YFiles : YFunction
         return 0;
     }
 
-    public override int _invokeValueCallback( string value)
+    public override int _invokeValueCallback(string value)
     {
         if (this._valueCallbackFiles != null) {
             this._valueCallbackFiles(this, value);
@@ -299,7 +299,7 @@ public class YFiles : YFunction
         return 0;
     }
 
-    public virtual byte[] sendCommand( string command)
+    public virtual byte[] sendCommand(string command)
     {
         string url;
         url = "files.json?a="+command;
@@ -351,7 +351,7 @@ public class YFiles : YFunction
      *   On failure, throws an exception or returns an empty list.
      * </para>
      */
-    public virtual List<YFileRecord> get_list( string pattern)
+    public virtual List<YFileRecord> get_list(string pattern)
     {
         byte[] json;
         List<string> filelist = new List<string>();
@@ -381,7 +381,7 @@ public class YFiles : YFunction
      *   On failure, throws an exception or returns an empty content.
      * </para>
      */
-    public virtual byte[] download( string pathname)
+    public virtual byte[] download(string pathname)
     {
         return this._download(pathname);
     }
@@ -406,7 +406,7 @@ public class YFiles : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int upload( string pathname,  byte[] content)
+    public virtual int upload(string pathname, byte[] content)
     {
         return this._upload(pathname, content);
     }
@@ -432,7 +432,7 @@ public class YFiles : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int remove( string pathname)
+    public virtual int remove(string pathname)
     {
         byte[] json;
         string res;

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 14799 2014-01-31 14:59:44Z seb $
+ * $Id: yocto_api.cs 15275 2014-03-06 17:44:50Z martinm $
  *
  * High-level programming interface, common to all modules
  *
@@ -760,7 +760,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "14801";
+    public const string YOCTO_API_BUILD_NO = "15466";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -916,6 +916,9 @@ public class YAPI
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void _yapiHubDiscoveryCallback(IntPtr serial, IntPtr url);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void _yapiDeviceLogCallback(YFUN_DESCR dev, IntPtr data);
 
     // - Variables used to store public yocto_api callbacks
     private static yLogFunc ylog = null;
@@ -1249,6 +1252,25 @@ public class YAPI
     {
         if (ylog != null)
             ylog(Marshal.PtrToStringAnsi(log));
+    }
+
+
+    private static void native_yDeviceLogCallback(YFUN_DESCR devdescr, IntPtr data)
+    {
+        yDeviceSt infos = emptyDeviceSt();
+        YModule modul;
+        String errmsg = "";
+        YModule.LogCallback callback;
+
+        if (yapiGetDeviceInfo(devdescr, ref infos, ref errmsg) != YAPI.SUCCESS) {
+            return;
+        }
+        modul = YModule.FindModule(infos.serial + ".module");
+        callback = modul.get_logCallback();
+        if (callback != null)
+        {
+            callback(modul, Marshal.PtrToStringAnsi(data));
+        }
     }
 
 
@@ -1785,6 +1807,8 @@ public class YAPI
     public static _yapiDeviceUpdateFunc native_yDeviceChangeDelegate = native_yDeviceChangeCallback;
     static GCHandle native_yDeviceChangeAnchor = GCHandle.Alloc(native_yDeviceChangeDelegate);
 
+    public static _yapiDeviceLogCallback native_yDeviceLogDelegate = native_yDeviceLogCallback;
+    static GCHandle native_yDeviceLogAnchor = GCHandle.Alloc(native_yDeviceLogDelegate);
 
 
     /**
@@ -1888,7 +1912,7 @@ public class YAPI
         _yapiRegisterFunctionUpdateCallback(Marshal.GetFunctionPointerForDelegate(native_yFunctionUpdateDelegate));
         _yapiRegisterTimedReportCallback(Marshal.GetFunctionPointerForDelegate(native_yTimedReportDelegate));
         _yapiRegisterHubDiscoveryCallback(Marshal.GetFunctionPointerForDelegate(native_yapiHubDiscoveryDelegate));
-        // native_yLogFunctionDelegate has to be protected from GC by an external reference further down
+        _yapiRegisterDeviceLogCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceLogDelegate));
         _yapiRegisterLogFunction(Marshal.GetFunctionPointerForDelegate(native_yLogFunctionDelegate));
         for (i = 1; i <= 20; i++)
             RegisterCalibrationHandler(i, yLinearCalibrationHandler);
@@ -2261,7 +2285,9 @@ public class YAPI
     /**
      * <summary>
      *   Force a hub discovery, if a callback as been registered with <c>yRegisterDeviceRemovalCallback</c> it
-     *   will be called for each net work hub that will respond to the discovery
+     *   will be called for each net work hub that will respond to the discovery.
+     * <para>
+     * </para>
      * </summary>
      * <param name="errmsg">
      *   a string passed by reference to receive any error message.
@@ -2595,6 +2621,12 @@ public class YAPI
     [DllImport("yapi.dll", EntryPoint = "yapiTriggerHubDiscovery", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static int _yapiTriggerHubDiscovery(StringBuilder errmsg);
 
+    [DllImport("yapi.dll", EntryPoint = "yapiRegisterDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    internal extern static void _yapiRegisterDeviceLogCallback(IntPtr fct);
+
+    [DllImport("yapi.dll", EntryPoint = "yapiStartStopDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    internal extern static int _yapiStartStopDeviceLogCallback(StringBuilder errmsg, int start_stop);
+
     private static void csmodule_initialization()
     {
         YDevice_devCache = new List<YDevice>();
@@ -2700,7 +2732,7 @@ public class YDataStream
     //--- (generated code: YDataStream implementation)
 
 
-    public virtual int _initFromDataSet( YDataSet dataset,  List<int> encoded)
+    public virtual int _initFromDataSet(YDataSet dataset, List<int> encoded)
     {
         int val = 0;
         int i = 0;
@@ -2800,7 +2832,7 @@ public class YDataStream
         return 0;
     }
 
-    public virtual int parse( byte[] sdata)
+    public virtual int parse(byte[] sdata)
     {
         int idx = 0;
         List<int> udat = new List<int>();
@@ -2853,7 +2885,7 @@ public class YDataStream
         return this.parse(this._parent._download(this.get_url()));
     }
 
-    public virtual double _decodeVal( int w)
+    public virtual double _decodeVal(int w)
     {
         double val = 0;
         val = w;
@@ -2868,7 +2900,7 @@ public class YDataStream
         return val;
     }
 
-    public virtual double _decodeAvg( int dw,  int count)
+    public virtual double _decodeAvg(int dw, int count)
     {
         double val = 0;
         val = dw;
@@ -3226,7 +3258,7 @@ public class YDataStream
      *   On failure, throws an exception or returns YDataStream.DATA_INVALID.
      * </para>
      */
-    public virtual double get_data( int row,  int col)
+    public virtual double get_data(int row, int col)
     {
         if ((this._values.Count == 0) || !(this._isClosed)) {
             this.loadStream();
@@ -3478,7 +3510,19 @@ public class YDataSet
 
     protected int _parse(string data)
     {
-        YAPI.TJsonParser p = new YAPI.TJsonParser(data, false);
+        YAPI.TJsonParser p;
+            
+        if (!YAPI.ExceptionsDisabled)  p= new YAPI.TJsonParser(data, false);
+        else try 
+        {
+            p = new YAPI.TJsonParser(data, false);
+        }
+        catch 
+        {
+
+            return YAPI.NOT_SUPPORTED;
+        }    
+           
         Nullable<YAPI.TJSONRECORD> node, arr;
         YDataStream stream;
         double summaryMinVal = Double.MaxValue;
@@ -3532,7 +3576,7 @@ public class YDataSet
                 }
             }
         }
-        if (this._streams.Count > 0)
+        if ((this._streams.Count > 0) && (summaryTotalTime>0))
         {
             // update time boundaries with actual data
             stream = this._streams[this._streams.Count - 1];
@@ -3565,7 +3609,7 @@ public class YDataSet
         return this._calib;
     }
 
-    public virtual int processMore( int progress,  byte[] data)
+    public virtual int processMore(int progress, byte[] data)
     {
         YDataStream stream;
         List<List<double>> dataRows = new List<List<double>>();
@@ -4611,7 +4655,7 @@ public class YFunction
      *   a <c>YFunction</c> object allowing you to drive the function.
      * </returns>
      */
-    public static YFunction FindFunction( string func)
+    public static YFunction FindFunction(string func)
     {
         YFunction obj;
         obj = (YFunction) YFunction._FindFromCache("Function", func);
@@ -4640,7 +4684,7 @@ public class YFunction
      * @noreturn
      * </param>
      */
-    public virtual int registerValueCallback( ValueCallback callback)
+    public virtual int registerValueCallback(ValueCallback callback)
     {
         string val;
         if (callback != null) {
@@ -4659,7 +4703,7 @@ public class YFunction
         return 0;
     }
 
-    public virtual int _invokeValueCallback( string value)
+    public virtual int _invokeValueCallback(string value)
     {
         if (this._valueCallbackFunction != null) {
             this._valueCallbackFunction(this, value);
@@ -4673,17 +4717,73 @@ public class YFunction
         return 0;
     }
 
+    /**
+     * <summary>
+     *   c
+     * <para>
+     *   omment from .yc definition
+     * </para>
+     * </summary>
+     */
+    public YFunction nextFunction()
+    {
+        string hwid = "";
+        if (YAPI.YISERR(_nextFunction(ref hwid)))
+            return null;
+        if (hwid == "")
+            return null;
+        return FindFunction(hwid);
+    }
 
     //--- (end of generated code: YFunction implementation)
 
-    //--- generated code: Function functions)
+    //--- (generated code: Function functions)
+
+    /**
+     * <summary>
+     *   c
+     * <para>
+     *   omment from .yc definition
+     * </para>
+     * </summary>
+     */
+    public static YFunction FirstFunction()
+    {
+        YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
+        YDEV_DESCR dev = default(YDEV_DESCR);
+        int neededsize = 0;
+        int err = 0;
+        string serial = null;
+        string funcId = null;
+        string funcName = null;
+        string funcVal = null;
+        string errmsg = "";
+        int size = Marshal.SizeOf(v_fundescr[0]);
+        IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
+        err = YAPI.apiGetFunctionsByClass("Function", 0, p, size, ref neededsize, ref errmsg);
+        Marshal.Copy(p, v_fundescr, 0, 1);
+        Marshal.FreeHGlobal(p);
+        if ((YAPI.YISERR(err) | (neededsize == 0)))
+            return null;
+        serial = "";
+        funcId = "";
+        funcName = "";
+        funcVal = "";
+        errmsg = "";
+        if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
+            return null;
+        return FindFunction(serial + "." + funcId);
+    }
+
+
+
     //--- (end of generated code: Function functions)
 
 
 
     /**
      * <summary>
-     *   Returns a short text that describes the function in the form <c>TYPE(NAME)=SERIAL&#46;FUNCTIONID</c>.
+     *   Returns a short text that describes unambiguously the instance of the function in the form <c>TYPE(NAME)=SERIAL&#46;FUNCTIONID</c>.
      * <para>
      *   More precisely,
      *   <c>TYPE</c>       is the type of the function,
@@ -4823,6 +4923,12 @@ public class YFunction
         }
 
         return funcid;
+    }
+
+
+    public string FriendlyName
+    {
+        get { return this.get_friendlyName(); }
     }
 
     /**
@@ -5022,7 +5128,21 @@ public class YFunction
         Nullable<YAPI.TJSONRECORD> node;
 
         string st = YAPI.DefaultEncoding.GetString(data);
-        YAPI.TJsonParser p = new YAPI.TJsonParser(st, false);
+        YAPI.TJsonParser p;
+ 
+         if (!YAPI.ExceptionsDisabled)  p= new YAPI.TJsonParser(st, false);
+        else try 
+        {
+            p = new YAPI.TJsonParser(st, false);
+        }
+        catch 
+        {
+            return "";
+        }    
+            
+            
+            
+           
         node = p.GetChildNode(null, key);
     
         return node.Value.svalue;
@@ -5031,7 +5151,19 @@ public class YFunction
     protected List<string> _json_get_array(byte[] data)
     {
         string st = YAPI.DefaultEncoding.GetString(data);
-        YAPI.TJsonParser p = new YAPI.TJsonParser(st, false);
+        YAPI.TJsonParser p;
+
+        if (!YAPI.ExceptionsDisabled) p = new YAPI.TJsonParser(st, false);
+        else try
+            {
+                p = new YAPI.TJsonParser(st, false);
+            }
+            catch 
+            {
+
+                return null;
+            }    
+
 
         return p.GetAllChilds(null);
     }
@@ -5270,7 +5402,7 @@ public class YModule : YFunction
 {
 //--- (end of generated code: YModule class start)
     //--- (generated code: YModule definitions)
-    public delegate void LogCallback(YModule module,  string log);
+    public delegate void LogCallback(YModule module, string logline);
     public new delegate void ValueCallback(YModule func, string value);
     public new delegate void TimedReportCallback(YModule func, YMeasure measure);
 
@@ -5309,6 +5441,7 @@ public class YModule : YFunction
     protected int _rebootCountdown = REBOOTCOUNTDOWN_INVALID;
     protected int _usbBandwidth = USBBANDWIDTH_INVALID;
     protected ValueCallback _valueCallbackModule = null;
+    protected LogCallback _logCallback = null;
     //--- (end of generated code: YModule definitions)
 
     public YModule(string func)
@@ -5319,6 +5452,34 @@ public class YModule : YFunction
         //--- (end of generated code: YModule attributes initialization)
     }
 
+    /**
+     * <summary>
+     *   todo
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="callback">
+     *   the callback function to call, or a null pointer. The callback function should take two
+     *   arguments: the function object of which the value has changed, and the character string describing
+     *   the new advertised value.
+     * @noreturn
+     * </param>
+     */
+    public int registerLogCallback(LogCallback callback)
+    {
+      _logCallback = callback;
+      if (_logCallback ==null){
+          YAPI._yapiStartStopDeviceLogCallback(new StringBuilder(_serial), 0);
+      } else {
+          YAPI._yapiStartStopDeviceLogCallback(new StringBuilder(_serial), 1);
+      }
+      return YAPI.SUCCESS;
+    }
+
+    public LogCallback get_logCallback() 
+    {
+        return _logCallback;
+    }
 
     //--- (generated code: YModule implementation)
 
@@ -5817,7 +5978,7 @@ public class YModule : YFunction
      *   or get additional information on the module.
      * </returns>
      */
-    public static YModule FindModule( string func)
+    public static YModule FindModule(string func)
     {
         YModule obj;
         obj = (YModule) YFunction._FindFromCache("Module", func);
@@ -5846,7 +6007,7 @@ public class YModule : YFunction
      * @noreturn
      * </param>
      */
-    public int registerValueCallback( ValueCallback callback)
+    public int registerValueCallback(ValueCallback callback)
     {
         string val;
         if (callback != null) {
@@ -5865,7 +6026,7 @@ public class YModule : YFunction
         return 0;
     }
 
-    public override int _invokeValueCallback( string value)
+    public override int _invokeValueCallback(string value)
     {
         if (this._valueCallbackModule != null) {
             this._valueCallbackModule(this, value);
@@ -5930,7 +6091,7 @@ public class YModule : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int reboot( int secBeforeReboot)
+    public virtual int reboot(int secBeforeReboot)
     {
         return this.set_rebootCountdown(secBeforeReboot);
     }
@@ -5951,7 +6112,7 @@ public class YModule : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int triggerFirmwareUpdate( int secBeforeReboot)
+    public virtual int triggerFirmwareUpdate(int secBeforeReboot)
     {
         return this.set_rebootCountdown(-secBeforeReboot);
     }
@@ -5972,7 +6133,7 @@ public class YModule : YFunction
      *   On failure, throws an exception or returns an empty content.
      * </para>
      */
-    public virtual byte[] download( string pathname)
+    public virtual byte[] download(string pathname)
     {
         return this._download(pathname);
     }
@@ -6997,7 +7158,7 @@ public class YSensor : YFunction
      *   a <c>YSensor</c> object allowing you to drive the sensor.
      * </returns>
      */
-    public static YSensor FindSensor( string func)
+    public static YSensor FindSensor(string func)
     {
         YSensor obj;
         obj = (YSensor) YFunction._FindFromCache("Sensor", func);
@@ -7026,7 +7187,7 @@ public class YSensor : YFunction
      * @noreturn
      * </param>
      */
-    public int registerValueCallback( ValueCallback callback)
+    public int registerValueCallback(ValueCallback callback)
     {
         string val;
         if (callback != null) {
@@ -7045,7 +7206,7 @@ public class YSensor : YFunction
         return 0;
     }
 
-    public override int _invokeValueCallback( string value)
+    public override int _invokeValueCallback(string value)
     {
         if (this._valueCallbackSensor != null) {
             this._valueCallbackSensor(this, value);
@@ -7202,7 +7363,7 @@ public class YSensor : YFunction
      *   using methods from the YDataSet object.
      * </returns>
      */
-    public virtual YDataSet get_recordedData( long startTime,  long endTime)
+    public virtual YDataSet get_recordedData(long startTime, long endTime)
     {
         string funcid;
         string funit;
@@ -7230,7 +7391,7 @@ public class YSensor : YFunction
      * @noreturn
      * </param>
      */
-    public virtual int registerTimedReportCallback( TimedReportCallback callback)
+    public virtual int registerTimedReportCallback(TimedReportCallback callback)
     {
         if (callback != null) {
             YFunction._UpdateTimedReportCallbackList(this, true);
@@ -7241,7 +7402,7 @@ public class YSensor : YFunction
         return 0;
     }
 
-    public virtual int _invokeTimedReportCallback( YMeasure value)
+    public virtual int _invokeTimedReportCallback(YMeasure value)
     {
         if (this._timedReportCallbackSensor != null) {
             this._timedReportCallbackSensor(this, value);
@@ -7277,8 +7438,14 @@ public class YSensor : YFunction
      *   array of floating point numbers, corresponding to the corrected
      *   values for the correction points.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
-    public virtual int calibrateFromPoints( List<double> rawValues,  List<double> refValues)
+    public virtual int calibrateFromPoints(List<double> rawValues, List<double> refValues)
     {
         string rest_val;
         // may throw an exception
@@ -7310,7 +7477,7 @@ public class YSensor : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int loadCalibrationPoints( List<double> rawValues,  List<double> refValues)
+    public virtual int loadCalibrationPoints(List<double> rawValues, List<double> refValues)
     {
         rawValues.Clear();
         refValues.Clear();
@@ -7337,7 +7504,7 @@ public class YSensor : YFunction
         return YAPI.SUCCESS;
     }
 
-    public virtual string _encodeCalibrationPoints( List<double> rawValues,  List<double> refValues)
+    public virtual string _encodeCalibrationPoints(List<double> rawValues, List<double> refValues)
     {
         string res;
         int npt = 0;
@@ -7390,7 +7557,7 @@ public class YSensor : YFunction
         return res;
     }
 
-    public virtual double _applyCalibration( double rawValue)
+    public virtual double _applyCalibration(double rawValue)
     {
         if (rawValue == CURRENTVALUE_INVALID) {
             return CURRENTVALUE_INVALID;
@@ -7407,7 +7574,7 @@ public class YSensor : YFunction
         return this._calhdl(rawValue, this._caltyp, this._calpar, this._calraw, this._calref);
     }
 
-    public virtual YMeasure _decodeTimedReport( double timestamp,  List<int> report)
+    public virtual YMeasure _decodeTimedReport(double timestamp, List<int> report)
     {
         int i = 0;
         int byteVal = 0;
@@ -7466,7 +7633,7 @@ public class YSensor : YFunction
         return new YMeasure(startTime, endTime, minVal, avgVal, maxVal);
     }
 
-    public virtual double _decodeVal( int w)
+    public virtual double _decodeVal(int w)
     {
         double val = 0;
         val = w;
@@ -7481,7 +7648,7 @@ public class YSensor : YFunction
         return val;
     }
 
-    public virtual double _decodeAvg( int dw)
+    public virtual double _decodeAvg(int dw)
     {
         double val = 0;
         val = dw;

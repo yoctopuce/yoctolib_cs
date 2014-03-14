@@ -1,6 +1,6 @@
 /********************************************************************
  *
- * $Id: yocto_datalogger.cs 14699 2014-01-23 15:40:07Z seb $
+ * $Id: yocto_datalogger.cs 15131 2014-02-28 10:23:25Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -648,7 +648,7 @@ public class YDataLogger : YFunction
      *   a <c>YDataLogger</c> object allowing you to drive the data logger.
      * </returns>
      */
-    public static YDataLogger FindDataLogger( string func)
+    public static YDataLogger FindDataLogger(string func)
     {
         YDataLogger obj;
         obj = (YDataLogger) YFunction._FindFromCache("DataLogger", func);
@@ -677,7 +677,7 @@ public class YDataLogger : YFunction
      * @noreturn
      * </param>
      */
-    public int registerValueCallback( ValueCallback callback)
+    public int registerValueCallback(ValueCallback callback)
     {
         string val;
         if (callback != null) {
@@ -696,7 +696,7 @@ public class YDataLogger : YFunction
         return 0;
     }
 
-    public override int _invokeValueCallback( string value)
+    public override int _invokeValueCallback(string value)
     {
         if (this._valueCallbackDataLogger != null) {
             this._valueCallbackDataLogger(this, value);
@@ -751,7 +751,7 @@ public class YDataLogger : YFunction
         return this.parse_dataSets(this._download("logger.json"));
     }
 
-    public virtual List<YDataSet> parse_dataSets( byte[] json)
+    public virtual List<YDataSet> parse_dataSets(byte[] json)
     {
         List<string> dslist = new List<string>();
         List<YDataSet> res = new List<YDataSet>();

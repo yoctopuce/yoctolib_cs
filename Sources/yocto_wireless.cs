@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wireless.cs 14699 2014-01-23 15:40:07Z seb $
+ * $Id: yocto_wireless.cs 15131 2014-02-28 10:23:25Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -442,7 +442,7 @@ public class YWireless : YFunction
      *   a <c>YWireless</c> object allowing you to drive the wireless lan interface.
      * </returns>
      */
-    public static YWireless FindWireless( string func)
+    public static YWireless FindWireless(string func)
     {
         YWireless obj;
         obj = (YWireless) YFunction._FindFromCache("Wireless", func);
@@ -471,7 +471,7 @@ public class YWireless : YFunction
      * @noreturn
      * </param>
      */
-    public int registerValueCallback( ValueCallback callback)
+    public int registerValueCallback(ValueCallback callback)
     {
         string val;
         if (callback != null) {
@@ -490,7 +490,7 @@ public class YWireless : YFunction
         return 0;
     }
 
-    public override int _invokeValueCallback( string value)
+    public override int _invokeValueCallback(string value)
     {
         if (this._valueCallbackWireless != null) {
             this._valueCallbackWireless(this, value);

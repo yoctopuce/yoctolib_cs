@@ -46,11 +46,17 @@
     <Compile Include="..\..\Sources\yocto_api.cs">
       <Link>yocto_api\yocto_api.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\yocto_accelerometer.cs">
+      <Link>yocto_api\yocto_accelerometer.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_anbutton.cs">
       <Link>yocto_api\yocto_anbutton.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_carbondioxide.cs">
       <Link>yocto_api\yocto_carbondioxide.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_compass.cs">
+      <Link>yocto_api\yocto_compass.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_colorled.cs">
       <Link>yocto_api\yocto_colorled.cs</Link>
@@ -76,6 +82,9 @@
     <Compile Include="..\..\Sources\yocto_genericsensor.cs">
       <Link>yocto_api\yocto_genericsensor.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\yocto_gyro.cs">
+      <Link>yocto_api\yocto_gyro.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_hubport.cs">
       <Link>yocto_api\yocto_hubport.cs</Link>
     </Compile>
@@ -87,6 +96,9 @@
     </Compile>
     <Compile Include="..\..\Sources\yocto_lightsensor.cs">
       <Link>yocto_api\yocto_lightsensor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_magnetometer.cs">
+      <Link>yocto_api\yocto_magnetometer.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_network.cs">
       <Link>yocto_api\yocto_network.cs</Link>
@@ -100,8 +112,17 @@
     <Compile Include="..\..\Sources\yocto_pressure.cs">
       <Link>yocto_api\yocto_pressure.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\yocto_pwmoutput.cs">
+      <Link>yocto_api\yocto_pwmoutput.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_pwmpowersource.cs">
+      <Link>yocto_api\yocto_pwmpowersource.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_realtimeclock.cs">
       <Link>yocto_api\yocto_realtimeclock.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_refframe.cs">
+      <Link>yocto_api\yocto_refframe.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_relay.cs">
       <Link>yocto_api\yocto_relay.cs</Link>
@@ -111,6 +132,9 @@
     </Compile>
     <Compile Include="..\..\Sources\yocto_temperature.cs">
       <Link>yocto_api\yocto_temperature.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_tilt.cs">
+      <Link>yocto_api\yocto_tilt.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_voc.cs">
       <Link>yocto_api\yocto_voc.cs</Link>

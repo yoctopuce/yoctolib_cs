@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 14699 2014-01-23 15:40:07Z seb $
+ * $Id: yocto_display.cs 15131 2014-02-28 10:23:25Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -162,7 +162,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int selectColorPen( int color)
+    public virtual int selectColorPen(int color)
     {
         return this.command_push("c"+String.Format("{0:X06}",color));
     }
@@ -189,7 +189,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int selectGrayPen( int graylevel)
+    public virtual int selectGrayPen(int graylevel)
     {
         return this.command_push("g"+Convert.ToString(graylevel));
     }
@@ -239,7 +239,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int setAntialiasingMode( bool mode)
+    public virtual int setAntialiasingMode(bool mode)
     {
         return this.command_push("a"+(mode?"1":"0"));
     }
@@ -263,7 +263,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int drawPixel( int x,  int y)
+    public virtual int drawPixel(int x, int y)
     {
         return this.command_flush("P"+Convert.ToString(x)+","+Convert.ToString(y));
     }
@@ -293,7 +293,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int drawRect( int x1,  int y1,  int x2,  int y2)
+    public virtual int drawRect(int x1, int y1, int x2, int y2)
     {
         return this.command_flush("R"+Convert.ToString(x1)+","+Convert.ToString(y1)+","+Convert.ToString(x2)+","+Convert.ToString(y2));
     }
@@ -323,7 +323,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int drawBar( int x1,  int y1,  int x2,  int y2)
+    public virtual int drawBar(int x1, int y1, int x2, int y2)
     {
         return this.command_flush("B"+Convert.ToString(x1)+","+Convert.ToString(y1)+","+Convert.ToString(x2)+","+Convert.ToString(y2));
     }
@@ -350,7 +350,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int drawCircle( int x,  int y,  int r)
+    public virtual int drawCircle(int x, int y, int r)
     {
         return this.command_flush("C"+Convert.ToString(x)+","+Convert.ToString(y)+","+Convert.ToString(r));
     }
@@ -377,7 +377,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int drawDisc( int x,  int y,  int r)
+    public virtual int drawDisc(int x, int y, int r)
     {
         return this.command_flush("D"+Convert.ToString(x)+","+Convert.ToString(y)+","+Convert.ToString(r));
     }
@@ -403,7 +403,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int selectFont( string fontname)
+    public virtual int selectFont(string fontname)
     {
         return this.command_push("&"+fontname+""+((char)(27)).ToString());
     }
@@ -444,7 +444,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int drawText( int x,  int y,  ALIGN anchor,  string text)
+    public virtual int drawText(int x, int y, ALIGN anchor, string text)
     {
         return this.command_flush("T"+Convert.ToString(x)+","+Convert.ToString(y)+","+((int)(anchor)).ToString()+","+text+""+((char)(27)).ToString());
     }
@@ -475,7 +475,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int drawImage( int x,  int y,  string imagename)
+    public virtual int drawImage(int x, int y, string imagename)
     {
         return this.command_flush("*"+Convert.ToString(x)+","+Convert.ToString(y)+","+imagename+""+((char)(27)).ToString());
     }
@@ -516,7 +516,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int drawBitmap( int x,  int y,  int w,  byte[] bitmap,  int bgcol)
+    public virtual int drawBitmap(int x, int y, int w, byte[] bitmap, int bgcol)
     {
         string destname;
         destname = "layer"+Convert.ToString(this._id)+":"+Convert.ToString(w)+","+Convert.ToString(bgcol)+"@"+Convert.ToString(x)+","+Convert.ToString(y);
@@ -542,7 +542,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int moveTo( int x,  int y)
+    public virtual int moveTo(int x, int y)
     {
         return this.command_push("@"+Convert.ToString(x)+","+Convert.ToString(y));
     }
@@ -568,7 +568,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int lineTo( int x,  int y)
+    public virtual int lineTo(int x, int y)
     {
         return this.command_flush("-"+Convert.ToString(x)+","+Convert.ToString(y));
     }
@@ -593,7 +593,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int consoleOut( string text)
+    public virtual int consoleOut(string text)
     {
         return this.command_flush("!"+text+""+((char)(27)).ToString());
     }
@@ -623,7 +623,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int setConsoleMargins( int x1,  int y1,  int x2,  int y2)
+    public virtual int setConsoleMargins(int x1, int y1, int x2, int y2)
     {
         return this.command_push("m"+Convert.ToString(x1)+","+Convert.ToString(y1)+","+Convert.ToString(x2)+","+Convert.ToString(y2));
     }
@@ -646,7 +646,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int setConsoleBackground( int bgcol)
+    public virtual int setConsoleBackground(int bgcol)
     {
         return this.command_push("b"+Convert.ToString(bgcol));
     }
@@ -668,7 +668,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int setConsoleWordWrap( bool wordwrap)
+    public virtual int setConsoleWordWrap(bool wordwrap)
     {
         return this.command_push("w"+(wordwrap?"1":"0"));
     }
@@ -717,7 +717,7 @@ public enum   ALIGN
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int setLayerPosition( int x,  int y,  int scrollTime)
+    public virtual int setLayerPosition(int x, int y, int scrollTime)
     {
         return this.command_flush("#"+Convert.ToString(x)+","+Convert.ToString(y)+","+Convert.ToString(scrollTime));
     }
@@ -1463,7 +1463,7 @@ public class YDisplay : YFunction
      *   a <c>YDisplay</c> object allowing you to drive the display.
      * </returns>
      */
-    public static YDisplay FindDisplay( string func)
+    public static YDisplay FindDisplay(string func)
     {
         YDisplay obj;
         obj = (YDisplay) YFunction._FindFromCache("Display", func);
@@ -1492,7 +1492,7 @@ public class YDisplay : YFunction
      * @noreturn
      * </param>
      */
-    public int registerValueCallback( ValueCallback callback)
+    public int registerValueCallback(ValueCallback callback)
     {
         string val;
         if (callback != null) {
@@ -1511,7 +1511,7 @@ public class YDisplay : YFunction
         return 0;
     }
 
-    public override int _invokeValueCallback( string value)
+    public override int _invokeValueCallback(string value)
     {
         if (this._valueCallbackDisplay != null) {
             this._valueCallbackDisplay(this, value);
@@ -1561,7 +1561,7 @@ public class YDisplay : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int fade( int brightness,  int duration)
+    public virtual int fade(int brightness, int duration)
     {
         this.flushLayers();
         return this.sendCommand("+"+Convert.ToString(brightness)+","+Convert.ToString(duration));
@@ -1609,7 +1609,7 @@ public class YDisplay : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int saveSequence( string sequenceName)
+    public virtual int saveSequence(string sequenceName)
     {
         this.flushLayers();
         this._recording = false;
@@ -1636,7 +1636,7 @@ public class YDisplay : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int playSequence( string sequenceName)
+    public virtual int playSequence(string sequenceName)
     {
         this.flushLayers();
         return this.sendCommand("S"+sequenceName);
@@ -1664,7 +1664,7 @@ public class YDisplay : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int pauseSequence( int delay_ms)
+    public virtual int pauseSequence(int delay_ms)
     {
         this.flushLayers();
         return this.sendCommand("W"+Convert.ToString(delay_ms));
@@ -1712,7 +1712,7 @@ public class YDisplay : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int upload( string pathname,  byte[] content)
+    public virtual int upload(string pathname, byte[] content)
     {
         return this._upload(pathname, content);
     }
@@ -1741,7 +1741,7 @@ public class YDisplay : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int copyLayerContent( int srcLayerId,  int dstLayerId)
+    public virtual int copyLayerContent(int srcLayerId, int dstLayerId)
     {
         this.flushLayers();
         return this.sendCommand("o"+Convert.ToString(srcLayerId)+","+Convert.ToString(dstLayerId));
@@ -1772,7 +1772,7 @@ public class YDisplay : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int swapLayerContent( int layerIdA,  int layerIdB)
+    public virtual int swapLayerContent(int layerIdA, int layerIdB)
     {
         this.flushLayers();
         return this.sendCommand("E"+Convert.ToString(layerIdA)+","+Convert.ToString(layerIdB));
@@ -1844,13 +1844,6 @@ public class YDisplay : YFunction
       return _allDisplayLayers[layerId];
   }
 
-  /**
-   * Force a flush of all commands buffered by all layers.
-   * 
-   * @return YAPI_SUCCESS if the call succeeds.
-   * 
-   * On failure, throws an exception or returns a negative error code.
-   */
   int flushLayers()
   {  
       int i;
@@ -1871,13 +1864,6 @@ public class YDisplay : YFunction
       }
   }
 
-  /**
-   * Add a given command string to the currently recorded display sequence
-   * 
-   * @return YAPI_SUCCESS if the call succeeds.
-   * 
-   * On failure, throws an exception or returns a negative error code.
-   */
   public int sendCommand(string cmd )
   {  
       if (!_recording) {

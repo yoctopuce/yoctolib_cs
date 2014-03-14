@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_servo.cs 14699 2014-01-23 15:40:07Z seb $
+ * $Id: yocto_servo.cs 15251 2014-03-06 10:14:33Z seb $
  *
  * Implements yFindServo(), the high-level API for Servo functions
  *
@@ -10,24 +10,24 @@
  *
  *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
  *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ *  file into your software for the sole purpose of interfacing
+ *  with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
+ *  You may reproduce and distribute copies of this file in
  *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
+ *  code is to interface with Yoctopuce products. You must retain
  *  this notice in the distributed source file.
  *
  *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
+ *  for additional information regarding your rights and
  *  obligations.
  *
  *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
  *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
+ *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
+ *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
  *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
  *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
  *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
@@ -78,13 +78,25 @@ public class YServo : YFunction
     }
 
     public const int POSITION_INVALID = YAPI.INVALID_INT;
+    public const int ENABLED_FALSE = 0;
+    public const int ENABLED_TRUE = 1;
+    public const int ENABLED_INVALID = -1;
+
     public const int RANGE_INVALID = YAPI.INVALID_UINT;
     public const int NEUTRAL_INVALID = YAPI.INVALID_UINT;
+    public const int POSITIONATPOWERON_INVALID = YAPI.INVALID_INT;
+    public const int ENABLEDATPOWERON_FALSE = 0;
+    public const int ENABLEDATPOWERON_TRUE = 1;
+    public const int ENABLEDATPOWERON_INVALID = -1;
+
     public static readonly YServoMove MOVE_INVALID = null;
     protected int _position = POSITION_INVALID;
+    protected int _enabled = ENABLED_INVALID;
     protected int _range = RANGE_INVALID;
     protected int _neutral = NEUTRAL_INVALID;
     protected YServoMove _move = new YServoMove();
+    protected int _positionAtPowerOn = POSITIONATPOWERON_INVALID;
+    protected int _enabledAtPowerOn = ENABLEDATPOWERON_INVALID;
     protected ValueCallback _valueCallbackServo = null;
     //--- (end of YServo definitions)
 
@@ -103,6 +115,11 @@ public class YServo : YFunction
         if (member.name == "position")
         {
             _position = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "enabled")
+        {
+            _enabled = member.ivalue >0?1:0;
             return;
         }
         if (member.name == "range")
@@ -129,6 +146,16 @@ public class YServo : YFunction
                         _move.ms = (int) submemb.ivalue;
                 }
             }
+            return;
+        }
+        if (member.name == "positionAtPowerOn")
+        {
+            _positionAtPowerOn = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "enabledAtPowerOn")
+        {
+            _enabledAtPowerOn = member.ivalue >0?1:0;
             return;
         }
         base._parseAttr(member);
@@ -184,6 +211,58 @@ public class YServo : YFunction
         string rest_val;
         rest_val = (newval).ToString();
         return _setAttr("position", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the state of the servos.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   either <c>YServo.ENABLED_FALSE</c> or <c>YServo.ENABLED_TRUE</c>, according to the state of the servos
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YServo.ENABLED_INVALID</c>.
+     * </para>
+     */
+    public int get_enabled()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return ENABLED_INVALID;
+            }
+        }
+        return this._enabled;
+    }
+
+    /**
+     * <summary>
+     *   Stops or starts the servo.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   either <c>YServo.ENABLED_FALSE</c> or <c>YServo.ENABLED_TRUE</c>
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_enabled(int newval)
+    {
+        string rest_val;
+        rest_val = (newval > 0 ? "1" : "0");
+        return _setAttr("enabled", rest_val);
     }
 
     /**
@@ -348,6 +427,115 @@ public class YServo : YFunction
 
     /**
      * <summary>
+     *   Returns the servo position at device power up.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the servo position at device power up
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YServo.POSITIONATPOWERON_INVALID</c>.
+     * </para>
+     */
+    public int get_positionAtPowerOn()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return POSITIONATPOWERON_INVALID;
+            }
+        }
+        return this._positionAtPowerOn;
+    }
+
+    /**
+     * <summary>
+     *   Configure the servo position at device power up.
+     * <para>
+     *   Remember to call the matching
+     *   module <c>saveToFlash()</c> method, otherwise this call will have no effect.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_positionAtPowerOn(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("positionAtPowerOn", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the servo signal generator state at power up.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   either <c>YServo.ENABLEDATPOWERON_FALSE</c> or <c>YServo.ENABLEDATPOWERON_TRUE</c>, according to
+     *   the servo signal generator state at power up
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YServo.ENABLEDATPOWERON_INVALID</c>.
+     * </para>
+     */
+    public int get_enabledAtPowerOn()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return ENABLEDATPOWERON_INVALID;
+            }
+        }
+        return this._enabledAtPowerOn;
+    }
+
+    /**
+     * <summary>
+     *   Configure the servo signal generator state at power up.
+     * <para>
+     *   Remember to call the matching module <c>saveToFlash()</c>
+     *   method, otherwise this call will have no effect.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   either <c>YServo.ENABLEDATPOWERON_FALSE</c> or <c>YServo.ENABLEDATPOWERON_TRUE</c>
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_enabledAtPowerOn(int newval)
+    {
+        string rest_val;
+        rest_val = (newval > 0 ? "1" : "0");
+        return _setAttr("enabledAtPowerOn", rest_val);
+    }
+
+    /**
+     * <summary>
      *   Retrieves a servo for a given identifier.
      * <para>
      *   The identifier can be specified using several formats:
@@ -388,7 +576,7 @@ public class YServo : YFunction
      *   a <c>YServo</c> object allowing you to drive the servo.
      * </returns>
      */
-    public static YServo FindServo( string func)
+    public static YServo FindServo(string func)
     {
         YServo obj;
         obj = (YServo) YFunction._FindFromCache("Servo", func);
@@ -417,7 +605,7 @@ public class YServo : YFunction
      * @noreturn
      * </param>
      */
-    public int registerValueCallback( ValueCallback callback)
+    public int registerValueCallback(ValueCallback callback)
     {
         string val;
         if (callback != null) {
@@ -436,7 +624,7 @@ public class YServo : YFunction
         return 0;
     }
 
-    public override int _invokeValueCallback( string value)
+    public override int _invokeValueCallback(string value)
     {
         if (this._valueCallbackServo != null) {
             this._valueCallbackServo(this, value);

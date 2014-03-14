@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_digitalio.cs 14699 2014-01-23 15:40:07Z seb $
+ * $Id: yocto_digitalio.cs 15251 2014-03-06 10:14:33Z seb $
  *
  * Implements yFindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -10,24 +10,24 @@
  *
  *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
  *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ *  file into your software for the sole purpose of interfacing
+ *  with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
+ *  You may reproduce and distribute copies of this file in
  *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
+ *  code is to interface with Yoctopuce products. You must retain
  *  this notice in the distributed source file.
  *
  *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
+ *  for additional information regarding your rights and
  *  obligations.
  *
  *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
  *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
+ *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
+ *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
  *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
  *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
  *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
@@ -502,7 +502,7 @@ public class YDigitalIO : YFunction
      *   a <c>YDigitalIO</c> object allowing you to drive the digital IO port.
      * </returns>
      */
-    public static YDigitalIO FindDigitalIO( string func)
+    public static YDigitalIO FindDigitalIO(string func)
     {
         YDigitalIO obj;
         obj = (YDigitalIO) YFunction._FindFromCache("DigitalIO", func);
@@ -531,7 +531,7 @@ public class YDigitalIO : YFunction
      * @noreturn
      * </param>
      */
-    public int registerValueCallback( ValueCallback callback)
+    public int registerValueCallback(ValueCallback callback)
     {
         string val;
         if (callback != null) {
@@ -550,7 +550,7 @@ public class YDigitalIO : YFunction
         return 0;
     }
 
-    public override int _invokeValueCallback( string value)
+    public override int _invokeValueCallback(string value)
     {
         if (this._valueCallbackDigitalIO != null) {
             this._valueCallbackDigitalIO(this, value);
@@ -579,7 +579,7 @@ public class YDigitalIO : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int set_bitState( int bitno,  int bitstate)
+    public virtual int set_bitState(int bitno, int bitstate)
     {
         if (!(bitstate >= 0)) { this._throw( YAPI.INVALID_ARGUMENT, "invalid bitstate"); return YAPI.INVALID_ARGUMENT; }
         if (!(bitstate <= 1)) { this._throw( YAPI.INVALID_ARGUMENT, "invalid bitstate"); return YAPI.INVALID_ARGUMENT; }
@@ -602,7 +602,7 @@ public class YDigitalIO : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int get_bitState( int bitno)
+    public virtual int get_bitState(int bitno)
     {
         int portVal = 0;
         portVal = this.get_portState();
@@ -625,7 +625,7 @@ public class YDigitalIO : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int toggle_bitState( int bitno)
+    public virtual int toggle_bitState(int bitno)
     {
         return this.set_command("T"+Convert.ToString(bitno));
     }
@@ -650,7 +650,7 @@ public class YDigitalIO : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int set_bitDirection( int bitno,  int bitdirection)
+    public virtual int set_bitDirection(int bitno, int bitdirection)
     {
         if (!(bitdirection >= 0)) { this._throw( YAPI.INVALID_ARGUMENT, "invalid direction"); return YAPI.INVALID_ARGUMENT; }
         if (!(bitdirection <= 1)) { this._throw( YAPI.INVALID_ARGUMENT, "invalid direction"); return YAPI.INVALID_ARGUMENT; }
@@ -673,7 +673,7 @@ public class YDigitalIO : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int get_bitDirection( int bitno)
+    public virtual int get_bitDirection(int bitno)
     {
         int portDir = 0;
         portDir = this.get_portDirection();
@@ -700,7 +700,7 @@ public class YDigitalIO : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int set_bitPolarity( int bitno,  int bitpolarity)
+    public virtual int set_bitPolarity(int bitno, int bitpolarity)
     {
         if (!(bitpolarity >= 0)) { this._throw( YAPI.INVALID_ARGUMENT, "invalid bitpolarity"); return YAPI.INVALID_ARGUMENT; }
         if (!(bitpolarity <= 1)) { this._throw( YAPI.INVALID_ARGUMENT, "invalid bitpolarity"); return YAPI.INVALID_ARGUMENT; }
@@ -723,7 +723,7 @@ public class YDigitalIO : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int get_bitPolarity( int bitno)
+    public virtual int get_bitPolarity(int bitno)
     {
         int portPol = 0;
         portPol = this.get_portPolarity();
@@ -751,7 +751,7 @@ public class YDigitalIO : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int set_bitOpenDrain( int bitno,  int opendrain)
+    public virtual int set_bitOpenDrain(int bitno, int opendrain)
     {
         if (!(opendrain >= 0)) { this._throw( YAPI.INVALID_ARGUMENT, "invalid state"); return YAPI.INVALID_ARGUMENT; }
         if (!(opendrain <= 1)) { this._throw( YAPI.INVALID_ARGUMENT, "invalid state"); return YAPI.INVALID_ARGUMENT; }
@@ -776,7 +776,7 @@ public class YDigitalIO : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int get_bitOpenDrain( int bitno)
+    public virtual int get_bitOpenDrain(int bitno)
     {
         int portOpenDrain = 0;
         portOpenDrain = this.get_portOpenDrain();
@@ -805,7 +805,7 @@ public class YDigitalIO : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int pulse( int bitno,  int ms_duration)
+    public virtual int pulse(int bitno, int ms_duration)
     {
         return this.set_command("Z"+Convert.ToString( bitno)+",0,"+Convert.ToString(ms_duration));
     }
@@ -835,7 +835,7 @@ public class YDigitalIO : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int delayedPulse( int bitno,  int ms_delay,  int ms_duration)
+    public virtual int delayedPulse(int bitno, int ms_delay, int ms_duration)
     {
         return this.set_command("Z"+Convert.ToString(bitno)+","+Convert.ToString(ms_delay)+","+Convert.ToString(ms_duration));
     }
