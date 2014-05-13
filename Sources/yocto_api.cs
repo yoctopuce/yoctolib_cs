@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 15275 2014-03-06 17:44:50Z martinm $
+ * $Id: yocto_api.cs 16091 2014-05-08 12:10:31Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -760,7 +760,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "15466";
+    public const string YOCTO_API_BUILD_NO = "16182";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -3361,7 +3361,7 @@ public class YMeasure
      *   Returns the end time of the measure, relative to the Jan 1, 1970 UTC
      *   (Unix timestamp).
      * <para>
-     *   When the recording rate is higher then 1 sample
+     *   When the recording rate is higher than 1 sample
      *   per second, the timestamp may have a fractional part.
      * </para>
      * <para>
@@ -4287,7 +4287,7 @@ public class YFunction
             }
         }
 
-        request = request + uchangeval + " \r\n\r\n";
+        request = request + uchangeval + "&. \r\n\r\n";
         functionReturnValue = YAPI.SUCCESS;
         return functionReturnValue;
     }
@@ -4338,7 +4338,9 @@ public class YFunction
                 return res;
             }
         }
-        _cacheExpiration = 0;
+        if (_cacheExpiration != 0) {
+           _cacheExpiration = YAPI.GetTickCount();
+        }
         return YAPI.SUCCESS;
     }
 
@@ -4829,7 +4831,7 @@ public class YFunction
      *   Returns the unique hardware identifier of the function in the form <c>SERIAL.FUNCTIONID</c>.
      * <para>
      *   The unique hardware identifier is composed of the device serial
-     *   number and of the hardware identifier of the function. (for example <c>RELAYLO1-123456.relay1</c>)
+     *   number and of the hardware identifier of the function (for example <c>RELAYLO1-123456.relay1</c>).
      * </para>
      * <para>
      * </para>
@@ -5454,14 +5456,17 @@ public class YModule : YFunction
 
     /**
      * <summary>
-     *   todo
+     *   Registers a device log callback function.
+     * <para>
+     *   This callback will be called each time
+     *   that a module sends a new log message. Mostly useful to debug a Yoctopuce module.
+     * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="callback">
      *   the callback function to call, or a null pointer. The callback function should take two
-     *   arguments: the function object of which the value has changed, and the character string describing
-     *   the new advertised value.
+     *   arguments: the module object that emitted the log message, and the character string containing the log.
      * @noreturn
      * </param>
      */
@@ -5922,36 +5927,6 @@ public class YModule : YFunction
             }
         }
         return this._usbBandwidth;
-    }
-
-    /**
-     * <summary>
-     *   Changes the number of USB interfaces used by the module.
-     * <para>
-     *   You must reboot the module
-     *   after changing this setting.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="newval">
-     *   either <c>YModule.USBBANDWIDTH_SIMPLE</c> or <c>YModule.USBBANDWIDTH_DOUBLE</c>, according to the
-     *   number of USB interfaces used by the module
-     * </param>
-     * <para>
-     * </para>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public int set_usbBandwidth(int newval)
-    {
-        string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("usbBandwidth", rest_val);
     }
 
     /**
@@ -7539,8 +7514,8 @@ public class YSensor : YFunction
             res = ""+Convert.ToString(npt);
             idx = 0;
             while (idx < npt) {
-                iRaw = (int) Math.Round(rawValues[idx] * this._scale - this._offset);
-                iRef = (int) Math.Round(refValues[idx] * this._scale - this._offset);
+                iRaw = (int) Math.Round(rawValues[idx] * this._scale + this._offset);
+                iRef = (int) Math.Round(refValues[idx] * this._scale + this._offset);
                 res = ""+ res+","+Convert.ToString( iRaw)+","+Convert.ToString(iRef);
                 idx = idx + 1;
             }
