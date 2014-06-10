@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 16091 2014-05-08 12:10:31Z seb $
+ * $Id: yocto_api.cs 16246 2014-05-16 12:09:39Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -760,7 +760,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "16182";
+    public const string YOCTO_API_BUILD_NO = "16490";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -4586,6 +4586,11 @@ public class YFunction
     public int set_logicalName(string newval)
     {
         string rest_val;
+        if (!YAPI.CheckLogicalName(newval))
+        {
+            _throw(YAPI.INVALID_ARGUMENT, "Invalid name :" + newval);
+            return YAPI.INVALID_ARGUMENT;
+        }
         rest_val = newval;
         return _setAttr("logicalName", rest_val);
     }

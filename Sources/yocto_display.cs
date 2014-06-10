@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 15131 2014-02-28 10:23:25Z seb $
+ * $Id: yocto_display.cs 16340 2014-05-30 10:41:54Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -1524,6 +1524,10 @@ public class YDisplay : YFunction
     /**
      * <summary>
      *   Clears the display screen and resets all display layers to their default state.
+     * <para>
+     *   Using this function in a sequence will kill the sequence play-back. Don't use that
+     *   function to reset the display at sequence start-up.
+     * </para>
      * <para>
      * </para>
      * </summary>
