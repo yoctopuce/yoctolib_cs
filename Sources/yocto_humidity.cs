@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_humidity.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_humidity.cs 17354 2014-08-29 10:07:05Z seb $
  *
  * Implements yFindHumidity(), the high-level API for Humidity functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YHumidity return codes)
     //--- (end of YHumidity return codes)
+//--- (YHumidity dlldef)
+//--- (end of YHumidity dlldef)
 //--- (YHumidity class start)
 /**
  * <summary>

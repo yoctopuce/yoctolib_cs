@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_refframe.cs 15376 2014-03-10 16:22:13Z seb $
+ * $Id: yocto_refframe.cs 17481 2014-09-03 09:38:35Z mvuilleu $
  *
  * Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YRefFrame return codes)
     //--- (end of YRefFrame return codes)
+//--- (YRefFrame dlldef)
+//--- (end of YRefFrame dlldef)
 //--- (YRefFrame class start)
 /**
  * <summary>
@@ -135,7 +137,7 @@ public enum   MOUNTORIENTATION
         }
         if (member.name == "bearing")
         {
-            _bearing = member.ivalue / 65536.0;
+            _bearing = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         if (member.name == "calibrationParam")
@@ -203,7 +205,7 @@ public enum   MOUNTORIENTATION
     public int set_bearing(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval*65536.0).ToString();
+        rest_val = Math.Round(newval * 65536.0).ToString();
         return _setAttr("bearing", rest_val);
     }
 
@@ -375,9 +377,9 @@ public enum   MOUNTORIENTATION
      */
     public virtual MOUNTPOSITION get_mountPosition()
     {
-        int pos = 0;
-        pos = this.get_mountPos();
-        return (MOUNTPOSITION) ((pos) >> (2));
+        int position;
+        position = this.get_mountPos();
+        return (MOUNTPOSITION) ((position) >> (2));
     }
 
     /**
@@ -405,9 +407,9 @@ public enum   MOUNTORIENTATION
      */
     public virtual MOUNTORIENTATION get_mountOrientation()
     {
-        int pos = 0;
-        pos = this.get_mountPos();
-        return (MOUNTORIENTATION) ((pos) & (3));
+        int position;
+        position = this.get_mountPos();
+        return (MOUNTORIENTATION) ((position) & (3));
     }
 
     /**
@@ -449,19 +451,19 @@ public enum   MOUNTORIENTATION
      */
     public virtual int set_mountPosition(MOUNTPOSITION position, MOUNTORIENTATION orientation)
     {
-        int pos = 0;
-        pos = (((int)position) << (2)) + (int)orientation;
-        return this.set_mountPos(pos);
+        int mixedPos;
+        mixedPos = (((int)position) << (2)) + (int)orientation;
+        return this.set_mountPos(mixedPos);
     }
 
     public virtual int _calibSort(int start, int stopidx)
     {
-        int idx = 0;
-        int changed = 0;
-        double a = 0;
-        double b = 0;
-        double xa = 0;
-        double xb = 0;
+        int idx;
+        int changed;
+        double a;
+        double b;
+        double xa;
+        double xb;
         
         // bubble sort is good since we will re-sort again after offset adjustment
         changed = 1;
@@ -472,20 +474,20 @@ public enum   MOUNTORIENTATION
             while (idx < stopidx) {
                 b = this._calibDataAcc[idx];
                 if (a > b) {
-                    this._calibDataAcc[ idx-1] = b;
-                    this._calibDataAcc[ idx] = a;
+                    this._calibDataAcc[idx-1] = b;
+                    this._calibDataAcc[idx] = a;
                     xa = this._calibDataAccX[idx-1];
                     xb = this._calibDataAccX[idx];
-                    this._calibDataAccX[ idx-1] = xb;
-                    this._calibDataAccX[ idx] = xa;
+                    this._calibDataAccX[idx-1] = xb;
+                    this._calibDataAccX[idx] = xa;
                     xa = this._calibDataAccY[idx-1];
                     xb = this._calibDataAccY[idx];
-                    this._calibDataAccY[ idx-1] = xb;
-                    this._calibDataAccY[ idx] = xa;
+                    this._calibDataAccY[idx-1] = xb;
+                    this._calibDataAccY[idx] = xa;
                     xa = this._calibDataAccZ[idx-1];
                     xb = this._calibDataAccZ[idx];
-                    this._calibDataAccZ[ idx-1] = xb;
-                    this._calibDataAccZ[ idx] = xa;
+                    this._calibDataAccZ[idx-1] = xb;
+                    this._calibDataAccZ[idx] = xa;
                     changed = changed + 1;
                 } else {
                     a = b;
@@ -560,19 +562,19 @@ public enum   MOUNTORIENTATION
      */
     public virtual int more3DCalibration()
     {
-        int currTick = 0;
+        int currTick;
         byte[] jsonData;
-        double xVal = 0;
-        double yVal = 0;
-        double zVal = 0;
-        double xSq = 0;
-        double ySq = 0;
-        double zSq = 0;
-        double norm = 0;
-        int orient = 0;
-        int idx = 0;
-        int pos = 0;
-        int err = 0;
+        double xVal;
+        double yVal;
+        double zVal;
+        double xSq;
+        double ySq;
+        double zSq;
+        double norm;
+        int orient;
+        int idx;
+        int intpos;
+        int err;
         // make sure calibration has been started
         if (this._calibStage == 0) {
             return YAPI.INVALID_ARGUMENT;
@@ -622,6 +624,7 @@ public enum   MOUNTORIENTATION
         this._calibPrevTick = currTick;
         
         // Determine the device orientation index
+        orient = 0;
         if (zSq > 0.5) {
             if (zVal > 0) {
                 orient = 0;
@@ -680,12 +683,12 @@ public enum   MOUNTORIENTATION
         }
         
         // Stage done, compute preliminary result
-        pos = (this._calibStage - 1) * this._calibCount;
-        this._calibSort(pos, pos + this._calibCount);
-        pos = pos + ((this._calibCount) / (2));
+        intpos = (this._calibStage - 1) * this._calibCount;
+        this._calibSort(intpos, intpos + this._calibCount);
+        intpos = intpos + ((this._calibCount) / (2));
         this._calibLogMsg = "Stage "+Convert.ToString( this._calibStage)+": median is "+Convert.ToString(
-        (int) Math.Round(1000*this._calibDataAccX[pos]))+","+Convert.ToString(
-        (int) Math.Round(1000*this._calibDataAccY[pos]))+","+Convert.ToString((int) Math.Round(1000*this._calibDataAccZ[pos]));
+        (int) Math.Round(1000*this._calibDataAccX[intpos]))+","+Convert.ToString(
+        (int) Math.Round(1000*this._calibDataAccY[intpos]))+","+Convert.ToString((int) Math.Round(1000*this._calibDataAccZ[intpos]));
         
         // move to next stage
         this._calibStage = this._calibStage + 1;
@@ -702,16 +705,16 @@ public enum   MOUNTORIENTATION
         zVal = 0;
         idx = 0;
         while (idx < 6) {
-            pos = idx * this._calibCount + ((this._calibCount) / (2));
+            intpos = idx * this._calibCount + ((this._calibCount) / (2));
             orient = this._calibOrient[idx];
             if (orient == 0 || orient == 1) {
-                zVal = zVal + this._calibDataAccZ[pos];
+                zVal = zVal + this._calibDataAccZ[intpos];
             }
             if (orient == 2 || orient == 3) {
-                xVal = xVal + this._calibDataAccX[pos];
+                xVal = xVal + this._calibDataAccX[intpos];
             }
             if (orient == 4 || orient == 5) {
-                yVal = yVal + this._calibDataAccY[pos];
+                yVal = yVal + this._calibDataAccY[intpos];
             }
             idx = idx + 1;
         }
@@ -720,19 +723,19 @@ public enum   MOUNTORIENTATION
         this._calibAccZOfs = zVal / 2.0;
         
         // Recompute all norms, taking into account the computed shift, and re-sort
-        pos = 0;
-        while (pos < this._calibDataAcc.Count) {
-            xVal = this._calibDataAccX[pos] - this._calibAccXOfs;
-            yVal = this._calibDataAccY[pos] - this._calibAccYOfs;
-            zVal = this._calibDataAccZ[pos] - this._calibAccZOfs;
+        intpos = 0;
+        while (intpos < this._calibDataAcc.Count) {
+            xVal = this._calibDataAccX[intpos] - this._calibAccXOfs;
+            yVal = this._calibDataAccY[intpos] - this._calibAccYOfs;
+            zVal = this._calibDataAccZ[intpos] - this._calibAccZOfs;
             norm = Math.Sqrt(xVal * xVal + yVal * yVal + zVal * zVal);
-            this._calibDataAcc[ pos] = norm;
-            pos = pos + 1;
+            this._calibDataAcc[intpos] = norm;
+            intpos = intpos + 1;
         }
         idx = 0;
         while (idx < 6) {
-            pos = idx * this._calibCount;
-            this._calibSort(pos, pos + this._calibCount);
+            intpos = idx * this._calibCount;
+            this._calibSort(intpos, intpos + this._calibCount);
             idx = idx + 1;
         }
         
@@ -742,16 +745,16 @@ public enum   MOUNTORIENTATION
         zVal = 0;
         idx = 0;
         while (idx < 6) {
-            pos = idx * this._calibCount + ((this._calibCount) / (2));
+            intpos = idx * this._calibCount + ((this._calibCount) / (2));
             orient = this._calibOrient[idx];
             if (orient == 0 || orient == 1) {
-                zVal = zVal + this._calibDataAcc[pos];
+                zVal = zVal + this._calibDataAcc[intpos];
             }
             if (orient == 2 || orient == 3) {
-                xVal = xVal + this._calibDataAcc[pos];
+                xVal = xVal + this._calibDataAcc[intpos];
             }
             if (orient == 4 || orient == 5) {
-                yVal = yVal + this._calibDataAcc[pos];
+                yVal = yVal + this._calibDataAcc[intpos];
             }
             idx = idx + 1;
         }
@@ -862,15 +865,15 @@ public enum   MOUNTORIENTATION
      */
     public virtual int save3DCalibration()
     {
-        int shiftX = 0;
-        int shiftY = 0;
-        int shiftZ = 0;
-        int scaleExp = 0;
-        int scaleX = 0;
-        int scaleY = 0;
-        int scaleZ = 0;
-        int scaleLo = 0;
-        int scaleHi = 0;
+        int shiftX;
+        int shiftY;
+        int shiftZ;
+        int scaleExp;
+        int scaleX;
+        int scaleY;
+        int scaleZ;
+        int scaleLo;
+        int scaleHi;
         string newcalib;
         if (this._calibProgress != 100) {
             return YAPI.INVALID_ARGUMENT;
@@ -894,8 +897,10 @@ public enum   MOUNTORIENTATION
         scaleZ = (int) Math.Round(2048.0 / this._calibAccZScale) - 2048;
         if (scaleX < -2048 || scaleX >= 2048 || scaleY < -2048 || scaleY >= 2048 || scaleZ < -2048 || scaleZ >= 2048) {
             scaleExp = 3;
+        } else {
             if (scaleX < -1024 || scaleX >= 1024 || scaleY < -1024 || scaleY >= 1024 || scaleZ < -1024 || scaleZ >= 1024) {
                 scaleExp = 2;
+            } else {
                 if (scaleX < -512 || scaleX >= 512 || scaleY < -512 || scaleY >= 512 || scaleZ < -512 || scaleZ >= 512) {
                     scaleExp = 1;
                 } else {

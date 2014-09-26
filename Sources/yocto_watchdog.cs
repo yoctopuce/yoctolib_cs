@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_watchdog.cs 15434 2014-03-14 06:37:47Z mvuilleu $
+ * $Id: yocto_watchdog.cs 17354 2014-08-29 10:07:05Z seb $
  *
  * Implements yFindWatchdog(), the high-level API for Watchdog functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YWatchdog return codes)
     //--- (end of YWatchdog return codes)
+//--- (YWatchdog dlldef)
+//--- (end of YWatchdog dlldef)
 //--- (YWatchdog class start)
 /**
  * <summary>

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_realtimeclock.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_realtimeclock.cs 17354 2014-08-29 10:07:05Z seb $
  *
  * Implements yFindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YRealTimeClock return codes)
     //--- (end of YRealTimeClock return codes)
+//--- (YRealTimeClock dlldef)
+//--- (end of YRealTimeClock dlldef)
 //--- (YRealTimeClock class start)
 /**
  * <summary>

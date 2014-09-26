@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_relay.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_relay.cs 17354 2014-08-29 10:07:05Z seb $
  *
  * Implements yFindRelay(), the high-level API for Relay functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YRelay return codes)
     //--- (end of YRelay return codes)
+//--- (YRelay dlldef)
+//--- (end of YRelay dlldef)
 //--- (YRelay class start)
 /**
  * <summary>

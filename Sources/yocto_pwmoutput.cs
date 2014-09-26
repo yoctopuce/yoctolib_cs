@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pwmoutput.cs 15529 2014-03-20 17:54:15Z seb $
+ * $Id: yocto_pwmoutput.cs 17481 2014-09-03 09:38:35Z mvuilleu $
  *
  * Implements yFindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YPwmOutput return codes)
     //--- (end of YPwmOutput return codes)
+//--- (YPwmOutput dlldef)
+//--- (end of YPwmOutput dlldef)
 //--- (YPwmOutput class start)
 /**
  * <summary>
@@ -70,10 +72,10 @@ public class YPwmOutput : YFunction
     public const int ENABLED_TRUE = 1;
     public const int ENABLED_INVALID = -1;
 
+    public const double FREQUENCY_INVALID = YAPI.INVALID_DOUBLE;
+    public const double PERIOD_INVALID = YAPI.INVALID_DOUBLE;
     public const double DUTYCYCLE_INVALID = YAPI.INVALID_DOUBLE;
     public const double PULSEDURATION_INVALID = YAPI.INVALID_DOUBLE;
-    public const int FREQUENCY_INVALID = YAPI.INVALID_UINT;
-    public const double PERIOD_INVALID = YAPI.INVALID_DOUBLE;
     public const string PWMTRANSITION_INVALID = YAPI.INVALID_STRING;
     public const int ENABLEDATPOWERON_FALSE = 0;
     public const int ENABLEDATPOWERON_TRUE = 1;
@@ -81,10 +83,10 @@ public class YPwmOutput : YFunction
 
     public const double DUTYCYCLEATPOWERON_INVALID = YAPI.INVALID_DOUBLE;
     protected int _enabled = ENABLED_INVALID;
+    protected double _frequency = FREQUENCY_INVALID;
+    protected double _period = PERIOD_INVALID;
     protected double _dutyCycle = DUTYCYCLE_INVALID;
     protected double _pulseDuration = PULSEDURATION_INVALID;
-    protected int _frequency = FREQUENCY_INVALID;
-    protected double _period = PERIOD_INVALID;
     protected string _pwmTransition = PWMTRANSITION_INVALID;
     protected int _enabledAtPowerOn = ENABLEDATPOWERON_INVALID;
     protected double _dutyCycleAtPowerOn = DUTYCYCLEATPOWERON_INVALID;
@@ -108,24 +110,24 @@ public class YPwmOutput : YFunction
             _enabled = member.ivalue >0?1:0;
             return;
         }
-        if (member.name == "dutyCycle")
-        {
-            _dutyCycle = member.ivalue / 65536.0;
-            return;
-        }
-        if (member.name == "pulseDuration")
-        {
-            _pulseDuration = member.ivalue / 65536.0;
-            return;
-        }
         if (member.name == "frequency")
         {
-            _frequency = (int)member.ivalue;
+            _frequency = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         if (member.name == "period")
         {
-            _period = member.ivalue / 65536.0;
+            _period = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
+            return;
+        }
+        if (member.name == "dutyCycle")
+        {
+            _dutyCycle = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
+            return;
+        }
+        if (member.name == "pulseDuration")
+        {
+            _pulseDuration = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         if (member.name == "pwmTransition")
@@ -140,7 +142,7 @@ public class YPwmOutput : YFunction
         }
         if (member.name == "dutyCycleAtPowerOn")
         {
-            _dutyCycleAtPowerOn = member.ivalue / 65536.0;
+            _dutyCycleAtPowerOn = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         base._parseAttr(member);
@@ -200,6 +202,112 @@ public class YPwmOutput : YFunction
 
     /**
      * <summary>
+     *   Changes the PWM frequency.
+     * <para>
+     *   The duty cycle is kept unchanged thanks to an
+     *   automatic pulse width change.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a floating point number corresponding to the PWM frequency
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_frequency(double newval)
+    {
+        string rest_val;
+        rest_val = Math.Round(newval * 65536.0).ToString();
+        return _setAttr("frequency", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the PWM frequency in Hz.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a floating point number corresponding to the PWM frequency in Hz
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YPwmOutput.FREQUENCY_INVALID</c>.
+     * </para>
+     */
+    public double get_frequency()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return FREQUENCY_INVALID;
+            }
+        }
+        return this._frequency;
+    }
+
+    /**
+     * <summary>
+     *   Changes the PWM period in milliseconds.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a floating point number corresponding to the PWM period in milliseconds
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_period(double newval)
+    {
+        string rest_val;
+        rest_val = Math.Round(newval * 65536.0).ToString();
+        return _setAttr("period", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the PWM period in milliseconds.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a floating point number corresponding to the PWM period in milliseconds
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YPwmOutput.PERIOD_INVALID</c>.
+     * </para>
+     */
+    public double get_period()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PERIOD_INVALID;
+            }
+        }
+        return this._period;
+    }
+
+    /**
+     * <summary>
      *   Changes the PWM duty cycle, in per cents.
      * <para>
      * </para>
@@ -221,7 +329,7 @@ public class YPwmOutput : YFunction
     public int set_dutyCycle(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval*65536.0).ToString();
+        rest_val = Math.Round(newval * 65536.0).ToString();
         return _setAttr("dutyCycle", rest_val);
     }
 
@@ -274,20 +382,20 @@ public class YPwmOutput : YFunction
     public int set_pulseDuration(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval*65536.0).ToString();
+        rest_val = Math.Round(newval * 65536.0).ToString();
         return _setAttr("pulseDuration", rest_val);
     }
 
     /**
      * <summary>
-     *   Returns the PWM pulse length in milliseconds.
+     *   Returns the PWM pulse length in milliseconds, as a floating point number.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   a floating point number corresponding to the PWM pulse length in milliseconds
+     *   a floating point number corresponding to the PWM pulse length in milliseconds, as a floating point number
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YPwmOutput.PULSEDURATION_INVALID</c>.
@@ -301,112 +409,6 @@ public class YPwmOutput : YFunction
             }
         }
         return this._pulseDuration;
-    }
-
-    /**
-     * <summary>
-     *   Returns the PWM frequency in Hz.
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   an integer corresponding to the PWM frequency in Hz
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns <c>YPwmOutput.FREQUENCY_INVALID</c>.
-     * </para>
-     */
-    public int get_frequency()
-    {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return FREQUENCY_INVALID;
-            }
-        }
-        return this._frequency;
-    }
-
-    /**
-     * <summary>
-     *   Changes the PWM frequency.
-     * <para>
-     *   The duty cycle is kept unchanged thanks to an
-     *   automatic pulse width change.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="newval">
-     *   an integer corresponding to the PWM frequency
-     * </param>
-     * <para>
-     * </para>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public int set_frequency(int newval)
-    {
-        string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("frequency", rest_val);
-    }
-
-    /**
-     * <summary>
-     *   Changes the PWM period.
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="newval">
-     *   a floating point number corresponding to the PWM period
-     * </param>
-     * <para>
-     * </para>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public int set_period(double newval)
-    {
-        string rest_val;
-        rest_val = Math.Round(newval*65536.0).ToString();
-        return _setAttr("period", rest_val);
-    }
-
-    /**
-     * <summary>
-     *   Returns the PWM period in milliseconds.
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   a floating point number corresponding to the PWM period in milliseconds
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns <c>YPwmOutput.PERIOD_INVALID</c>.
-     * </para>
-     */
-    public double get_period()
-    {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PERIOD_INVALID;
-            }
-        }
-        return this._period;
     }
 
     public string get_pwmTransition()
@@ -507,7 +509,7 @@ public class YPwmOutput : YFunction
     public int set_dutyCycleAtPowerOn(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval*65536.0).ToString();
+        rest_val = Math.Round(newval * 65536.0).ToString();
         return _setAttr("dutyCycleAtPowerOn", rest_val);
     }
 

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wakeupmonitor.cs 16424 2014-06-04 14:26:41Z seb $
+ * $Id: yocto_wakeupmonitor.cs 17481 2014-09-03 09:38:35Z mvuilleu $
  *
  * Implements yFindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YWakeUpMonitor return codes)
     //--- (end of YWakeUpMonitor return codes)
+//--- (YWakeUpMonitor dlldef)
+//--- (end of YWakeUpMonitor dlldef)
 //--- (YWakeUpMonitor class start)
 /**
  * <summary>
@@ -74,15 +76,8 @@ public class YWakeUpMonitor : YFunction
     public const int WAKEUPREASON_EXTPOWER = 1;
     public const int WAKEUPREASON_ENDOFSLEEP = 2;
     public const int WAKEUPREASON_EXTSIG1 = 3;
-    public const int WAKEUPREASON_EXTSIG2 = 4;
-    public const int WAKEUPREASON_EXTSIG3 = 5;
-    public const int WAKEUPREASON_EXTSIG4 = 6;
-    public const int WAKEUPREASON_SCHEDULE1 = 7;
-    public const int WAKEUPREASON_SCHEDULE2 = 8;
-    public const int WAKEUPREASON_SCHEDULE3 = 9;
-    public const int WAKEUPREASON_SCHEDULE4 = 10;
-    public const int WAKEUPREASON_SCHEDULE5 = 11;
-    public const int WAKEUPREASON_SCHEDULE6 = 12;
+    public const int WAKEUPREASON_SCHEDULE1 = 4;
+    public const int WAKEUPREASON_SCHEDULE2 = 5;
     public const int WAKEUPREASON_INVALID = -1;
 
     public const int WAKEUPSTATE_SLEEPING = 0;
@@ -310,11 +305,8 @@ public class YWakeUpMonitor : YFunction
      * <returns>
      *   a value among <c>YWakeUpMonitor.WAKEUPREASON_USBPOWER</c>, <c>YWakeUpMonitor.WAKEUPREASON_EXTPOWER</c>,
      *   <c>YWakeUpMonitor.WAKEUPREASON_ENDOFSLEEP</c>, <c>YWakeUpMonitor.WAKEUPREASON_EXTSIG1</c>,
-     *   <c>YWakeUpMonitor.WAKEUPREASON_EXTSIG2</c>, <c>YWakeUpMonitor.WAKEUPREASON_EXTSIG3</c>,
-     *   <c>YWakeUpMonitor.WAKEUPREASON_EXTSIG4</c>, <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE1</c>,
-     *   <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE2</c>, <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE3</c>,
-     *   <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE4</c>, <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE5</c> and
-     *   <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE6</c> corresponding to the latest wake up reason
+     *   <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE1</c> and <c>YWakeUpMonitor.WAKEUPREASON_SCHEDULE2</c>
+     *   corresponding to the latest wake up reason
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YWakeUpMonitor.WAKEUPREASON_INVALID</c>.
@@ -502,7 +494,7 @@ public class YWakeUpMonitor : YFunction
      */
     public virtual int sleep(int secBeforeSleep)
     {
-        int currTime = 0;
+        int currTime;
         currTime = (int)(this.get_rtcTime());
         if (!(currTime != 0)) { this._throw( YAPI.RTC_NOT_READY, "RTC time not set"); return YAPI.RTC_NOT_READY; }
         this.set_nextWakeUp(this._endOfTime);
@@ -534,7 +526,7 @@ public class YWakeUpMonitor : YFunction
      */
     public virtual int sleepFor(int secUntilWakeUp, int secBeforeSleep)
     {
-        int currTime = 0;
+        int currTime;
         currTime = (int)(this.get_rtcTime());
         if (!(currTime != 0)) { this._throw( YAPI.RTC_NOT_READY, "RTC time not set"); return YAPI.RTC_NOT_READY; }
         this.set_nextWakeUp(currTime+secUntilWakeUp);
@@ -566,7 +558,7 @@ public class YWakeUpMonitor : YFunction
      */
     public virtual int sleepUntil(int wakeUpTime, int secBeforeSleep)
     {
-        int currTime = 0;
+        int currTime;
         currTime = (int)(this.get_rtcTime());
         if (!(currTime != 0)) { this._throw( YAPI.RTC_NOT_READY, "RTC time not set"); return YAPI.RTC_NOT_READY; }
         this.set_nextWakeUp(wakeUpTime);

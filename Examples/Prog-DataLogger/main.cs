@@ -23,6 +23,7 @@ namespace ConsoleApplication1
                 progress = dataset.loadMore();
                 Console.Write(String.Format("\b\b\b\b{0,3:##0}%", progress));
             } while(progress <100);
+            Console.WriteLine("");
             List<YMeasure> details = dataset.get_measures();
             foreach (YMeasure m in details) {
                 Console.WriteLine(String.Format("from {0} to {1} : min={2:0.00}{5} avg={3:0.00}{5}  max={4:0.00}{5}",

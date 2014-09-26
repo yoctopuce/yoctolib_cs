@@ -118,6 +118,9 @@
     <Compile Include="..\..\Sources\yocto_pressure.cs">
       <Link>yocto_api\yocto_pressure.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\yocto_pwminput.cs">
+      <Link>yocto_api\yocto_pwminput.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_pwmoutput.cs">
       <Link>yocto_api\yocto_pwmoutput.cs</Link>
     </Compile>
@@ -132,6 +135,9 @@
     </Compile>
     <Compile Include="..\..\Sources\yocto_relay.cs">
       <Link>yocto_api\yocto_relay.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_serialport.cs">
+      <Link>yocto_api\yocto_serialport.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_servo.cs">
       <Link>yocto_api\yocto_servo.cs</Link>
@@ -170,7 +176,7 @@
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

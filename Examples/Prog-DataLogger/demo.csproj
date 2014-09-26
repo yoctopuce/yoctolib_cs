@@ -52,11 +52,17 @@
     <Compile Include="..\..\Sources\yocto_colorled.cs">
       <Link>yocto_api\yocto_colorled.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\yocto_compass.cs">
+      <Link>yocto_api\yocto_compass.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_datalogger.cs">
       <Link>yocto_api\yocto_datalogger.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_dualpower.cs">
       <Link>yocto_api\yocto_dualpower.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_gyro.cs">
+      <Link>yocto_api\yocto_gyro.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_hubport.cs">
       <Link>yocto_api\yocto_hubport.cs</Link>
@@ -70,6 +76,9 @@
     <Compile Include="..\..\Sources\yocto_lightsensor.cs">
       <Link>yocto_api\yocto_lightsensor.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\yocto_magnetometer.cs">
+      <Link>yocto_api\yocto_magnetometer.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_pressure.cs">
       <Link>yocto_api\yocto_pressure.cs</Link>
     </Compile>
@@ -81,6 +90,9 @@
     </Compile>
     <Compile Include="..\..\Sources\yocto_temperature.cs">
       <Link>yocto_api\yocto_temperature.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_tilt.cs">
+      <Link>yocto_api\yocto_tilt.cs</Link>
     </Compile>
     <Compile Include="main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

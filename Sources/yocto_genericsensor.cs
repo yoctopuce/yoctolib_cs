@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_genericsensor.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_genericsensor.cs 17481 2014-09-03 09:38:35Z mvuilleu $
  *
  * Implements yFindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YGenericSensor return codes)
     //--- (end of YGenericSensor return codes)
+//--- (YGenericSensor dlldef)
+//--- (end of YGenericSensor dlldef)
 //--- (YGenericSensor class start)
 /**
  * <summary>
@@ -71,10 +73,12 @@ public class YGenericSensor : YSensor
     public const string SIGNALUNIT_INVALID = YAPI.INVALID_STRING;
     public const string SIGNALRANGE_INVALID = YAPI.INVALID_STRING;
     public const string VALUERANGE_INVALID = YAPI.INVALID_STRING;
+    public const double SIGNALBIAS_INVALID = YAPI.INVALID_DOUBLE;
     protected double _signalValue = SIGNALVALUE_INVALID;
     protected string _signalUnit = SIGNALUNIT_INVALID;
     protected string _signalRange = SIGNALRANGE_INVALID;
     protected string _valueRange = VALUERANGE_INVALID;
+    protected double _signalBias = SIGNALBIAS_INVALID;
     protected ValueCallback _valueCallbackGenericSensor = null;
     protected TimedReportCallback _timedReportCallbackGenericSensor = null;
     //--- (end of YGenericSensor definitions)
@@ -93,7 +97,7 @@ public class YGenericSensor : YSensor
     {
         if (member.name == "signalValue")
         {
-            _signalValue = member.ivalue / 65536.0;
+            _signalValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         if (member.name == "signalUnit")
@@ -109,6 +113,11 @@ public class YGenericSensor : YSensor
         if (member.name == "valueRange")
         {
             _valueRange = member.svalue;
+            return;
+        }
+        if (member.name == "signalBias")
+        {
+            _signalBias = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         base._parseAttr(member);
@@ -274,8 +283,8 @@ public class YGenericSensor : YSensor
      * <summary>
      *   Changes the physical value range measured by the sensor.
      * <para>
-     *   The range change may have a side effect
-     *   on the display resolution, as it may be adapted automatically.
+     *   As a side effect, the range modification may
+     *   automatically modify the display resolution.
      * </para>
      * <para>
      * </para>
@@ -297,6 +306,62 @@ public class YGenericSensor : YSensor
         string rest_val;
         rest_val = newval;
         return _setAttr("valueRange", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Changes the electric signal bias for zero shift adjustment.
+     * <para>
+     *   If your electric signal reads positif when it should be zero, setup
+     *   a positive signalBias of the same value to fix the zero shift.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a floating point number corresponding to the electric signal bias for zero shift adjustment
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_signalBias(double newval)
+    {
+        string rest_val;
+        rest_val = Math.Round(newval * 65536.0).ToString();
+        return _setAttr("signalBias", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the electric signal bias for zero shift adjustment.
+     * <para>
+     *   A positive bias means that the signal is over-reporting the measure,
+     *   while a negative bias means that the signal is underreporting the measure.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a floating point number corresponding to the electric signal bias for zero shift adjustment
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YGenericSensor.SIGNALBIAS_INVALID</c>.
+     * </para>
+     */
+    public double get_signalBias()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SIGNALBIAS_INVALID;
+            }
+        }
+        return this._signalBias;
     }
 
     /**
@@ -436,6 +501,31 @@ public class YGenericSensor : YSensor
             base._invokeTimedReportCallback(value);
         }
         return 0;
+    }
+
+    /**
+     * <summary>
+     *   Adjusts the signal bias so that the current signal value is need
+     *   precisely as zero.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int zeroAdjust()
+    {
+        double currSignal;
+        double currBias;
+        currSignal = this.get_signalValue();
+        currBias = this.get_signalBias();
+        return this.set_signalBias(currSignal + currBias);
     }
 
     /**

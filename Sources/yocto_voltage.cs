@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_voltage.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_voltage.cs 17354 2014-08-29 10:07:05Z seb $
  *
  * Implements yFindVoltage(), the high-level API for Voltage functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YVoltage return codes)
     //--- (end of YVoltage return codes)
+//--- (YVoltage dlldef)
+//--- (end of YVoltage dlldef)
 //--- (YVoltage class start)
 /**
  * <summary>

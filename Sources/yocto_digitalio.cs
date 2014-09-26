@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_digitalio.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_digitalio.cs 17481 2014-09-03 09:38:35Z mvuilleu $
  *
  * Implements yFindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YDigitalIO return codes)
     //--- (end of YDigitalIO return codes)
+//--- (YDigitalIO dlldef)
+//--- (end of YDigitalIO dlldef)
 //--- (YDigitalIO class start)
 /**
  * <summary>
@@ -604,7 +606,7 @@ public class YDigitalIO : YFunction
      */
     public virtual int get_bitState(int bitno)
     {
-        int portVal = 0;
+        int portVal;
         portVal = this.get_portState();
         return ((((portVal) >> (bitno))) & (1));
     }
@@ -675,7 +677,7 @@ public class YDigitalIO : YFunction
      */
     public virtual int get_bitDirection(int bitno)
     {
-        int portDir = 0;
+        int portDir;
         portDir = this.get_portDirection();
         return ((((portDir) >> (bitno))) & (1));
     }
@@ -725,7 +727,7 @@ public class YDigitalIO : YFunction
      */
     public virtual int get_bitPolarity(int bitno)
     {
-        int portPol = 0;
+        int portPol;
         portPol = this.get_portPolarity();
         return ((((portPol) >> (bitno))) & (1));
     }
@@ -778,7 +780,7 @@ public class YDigitalIO : YFunction
      */
     public virtual int get_bitOpenDrain(int bitno)
     {
-        int portOpenDrain = 0;
+        int portOpenDrain;
         portOpenDrain = this.get_portOpenDrain();
         return ((((portOpenDrain) >> (bitno))) & (1));
     }

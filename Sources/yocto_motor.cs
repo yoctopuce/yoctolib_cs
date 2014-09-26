@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_motor.cs 16185 2014-05-12 16:00:20Z seb $
+ * $Id: yocto_motor.cs 17354 2014-08-29 10:07:05Z seb $
  *
  * Implements yFindMotor(), the high-level API for Motor functions
  *
@@ -49,16 +49,18 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YMotor return codes)
     //--- (end of YMotor return codes)
+//--- (YMotor dlldef)
+//--- (end of YMotor dlldef)
 //--- (YMotor class start)
 /**
  * <summary>
  *   Yoctopuce application programming interface allows you to drive the
- *   power sent to motor to make it turn both ways, but also to drive accelerations
+ *   power sent to the motor to make it turn both ways, but also to drive accelerations
  *   and decelerations.
  * <para>
  *   The motor will then accelerate automatically: you will not
  *   have to monitor it. The API also allows to slow down the motor by shortening
- *   its terminals: the motor will then act as an electromagnetic break.
+ *   its terminals: the motor will then act as an electromagnetic brake.
  * </para>
  * <para>
  * </para>
@@ -72,7 +74,7 @@ public class YMotor : YFunction
     public new delegate void TimedReportCallback(YMotor func, YMeasure measure);
 
     public const int MOTORSTATUS_IDLE = 0;
-    public const int MOTORSTATUS_BREAK = 1;
+    public const int MOTORSTATUS_BRAKE = 1;
     public const int MOTORSTATUS_FORWD = 2;
     public const int MOTORSTATUS_BACKWD = 3;
     public const int MOTORSTATUS_LOVOLT = 4;
@@ -82,19 +84,19 @@ public class YMotor : YFunction
     public const int MOTORSTATUS_INVALID = -1;
 
     public const double DRIVINGFORCE_INVALID = YAPI.INVALID_DOUBLE;
-    public const double BREAKINGFORCE_INVALID = YAPI.INVALID_DOUBLE;
+    public const double BRAKINGFORCE_INVALID = YAPI.INVALID_DOUBLE;
     public const double CUTOFFVOLTAGE_INVALID = YAPI.INVALID_DOUBLE;
     public const int OVERCURRENTLIMIT_INVALID = YAPI.INVALID_INT;
-    public const int FREQUENCY_INVALID = YAPI.INVALID_UINT;
+    public const double FREQUENCY_INVALID = YAPI.INVALID_DOUBLE;
     public const int STARTERTIME_INVALID = YAPI.INVALID_INT;
     public const int FAILSAFETIMEOUT_INVALID = YAPI.INVALID_UINT;
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _motorStatus = MOTORSTATUS_INVALID;
     protected double _drivingForce = DRIVINGFORCE_INVALID;
-    protected double _breakingForce = BREAKINGFORCE_INVALID;
+    protected double _brakingForce = BRAKINGFORCE_INVALID;
     protected double _cutOffVoltage = CUTOFFVOLTAGE_INVALID;
     protected int _overCurrentLimit = OVERCURRENTLIMIT_INVALID;
-    protected int _frequency = FREQUENCY_INVALID;
+    protected double _frequency = FREQUENCY_INVALID;
     protected int _starterTime = STARTERTIME_INVALID;
     protected int _failSafeTimeout = FAILSAFETIMEOUT_INVALID;
     protected string _command = COMMAND_INVALID;
@@ -120,17 +122,17 @@ public class YMotor : YFunction
         }
         if (member.name == "drivingForce")
         {
-            _drivingForce = member.ivalue / 65536.0;
+            _drivingForce = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
-        if (member.name == "breakingForce")
+        if (member.name == "brakingForce")
         {
-            _breakingForce = member.ivalue / 65536.0;
+            _brakingForce = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         if (member.name == "cutOffVoltage")
         {
-            _cutOffVoltage = member.ivalue / 65536.0;
+            _cutOffVoltage = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         if (member.name == "overCurrentLimit")
@@ -140,7 +142,7 @@ public class YMotor : YFunction
         }
         if (member.name == "frequency")
         {
-            _frequency = (int)member.ivalue;
+            _frequency = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         if (member.name == "starterTime")
@@ -169,10 +171,10 @@ public class YMotor : YFunction
      *   IDLE   when the motor is stopped/in free wheel, ready to start;
      *   FORWD  when the controller is driving the motor forward;
      *   BACKWD when the controller is driving the motor backward;
-     *   BREAK  when the controller is breaking;
+     *   BRAKE  when the controller is braking;
      *   LOVOLT when the controller has detected a low voltage condition;
      *   HICURR when the controller has detected an overcurrent condition;
-     *   HIHEAT when the controller detected an overheat condition;
+     *   HIHEAT when the controller has detected an overheat condition;
      *   FAILSF when the controller switched on the failsafe security.
      * </para>
      * <para>
@@ -183,7 +185,7 @@ public class YMotor : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   a value among <c>YMotor.MOTORSTATUS_IDLE</c>, <c>YMotor.MOTORSTATUS_BREAK</c>,
+     *   a value among <c>YMotor.MOTORSTATUS_IDLE</c>, <c>YMotor.MOTORSTATUS_BRAKE</c>,
      *   <c>YMotor.MOTORSTATUS_FORWD</c>, <c>YMotor.MOTORSTATUS_BACKWD</c>,
      *   <c>YMotor.MOTORSTATUS_LOVOLT</c>, <c>YMotor.MOTORSTATUS_HICURR</c>,
      *   <c>YMotor.MOTORSTATUS_HIHEAT</c> and <c>YMotor.MOTORSTATUS_FAILSF</c>
@@ -217,7 +219,7 @@ public class YMotor : YFunction
      *   to 100%. If you want go easy on your mechanics and avoid excessive current consumption,
      *   try to avoid brutal power changes. For example, immediate transition from forward full power
      *   to reverse full power is a very bad idea. Each time the driving power is modified, the
-     *   breaking power is set to zero.
+     *   braking power is set to zero.
      * </para>
      * <para>
      * </para>
@@ -237,7 +239,7 @@ public class YMotor : YFunction
     public int set_drivingForce(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval*65536.0).ToString();
+        rest_val = Math.Round(newval * 65536.0).ToString();
         return _setAttr("drivingForce", rest_val);
     }
 
@@ -268,16 +270,16 @@ public class YMotor : YFunction
 
     /**
      * <summary>
-     *   Changes immediately the breaking force applied to the motor (in per cents).
+     *   Changes immediately the braking force applied to the motor (in percents).
      * <para>
-     *   The value 0 corresponds to no breaking (free wheel). When the breaking force
+     *   The value 0 corresponds to no braking (free wheel). When the braking force
      *   is changed, the driving power is set to zero. The value is a percentage.
      * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="newval">
-     *   a floating point number corresponding to immediately the breaking force applied to the motor (in per cents)
+     *   a floating point number corresponding to immediately the braking force applied to the motor (in percents)
      * </param>
      * <para>
      * </para>
@@ -288,56 +290,56 @@ public class YMotor : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public int set_breakingForce(double newval)
+    public int set_brakingForce(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval*65536.0).ToString();
-        return _setAttr("breakingForce", rest_val);
+        rest_val = Math.Round(newval * 65536.0).ToString();
+        return _setAttr("brakingForce", rest_val);
     }
 
     /**
      * <summary>
-     *   Returns the breaking force applied to the motor, as a percentage.
+     *   Returns the braking force applied to the motor, as a percentage.
      * <para>
-     *   The value 0 corresponds to no breaking (free wheel).
+     *   The value 0 corresponds to no braking (free wheel).
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   a floating point number corresponding to the breaking force applied to the motor, as a percentage
+     *   a floating point number corresponding to the braking force applied to the motor, as a percentage
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns <c>YMotor.BREAKINGFORCE_INVALID</c>.
+     *   On failure, throws an exception or returns <c>YMotor.BRAKINGFORCE_INVALID</c>.
      * </para>
      */
-    public double get_breakingForce()
+    public double get_brakingForce()
     {
         if (this._cacheExpiration <= YAPI.GetTickCount()) {
             if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BREAKINGFORCE_INVALID;
+                return BRAKINGFORCE_INVALID;
             }
         }
-        return this._breakingForce;
+        return this._brakingForce;
     }
 
     /**
      * <summary>
-     *   Changes the threshold voltage under which the controller will automatically switch to error state
-     *   and prevent further current draw.
+     *   Changes the threshold voltage under which the controller automatically switches to error state
+     *   and prevents further current draw.
      * <para>
      *   This setting prevent damage to a battery that can
      *   occur when drawing current from an "empty" battery.
-     *   Note that whatever the cutoff threshold, the controller will switch to undervoltage
+     *   Note that whatever the cutoff threshold, the controller switches to undervoltage
      *   error state if the power supply goes under 3V, even for a very brief time.
      * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="newval">
-     *   a floating point number corresponding to the threshold voltage under which the controller will
-     *   automatically switch to error state
-     *   and prevent further current draw
+     *   a floating point number corresponding to the threshold voltage under which the controller
+     *   automatically switches to error state
+     *   and prevents further current draw
      * </param>
      * <para>
      * </para>
@@ -351,25 +353,25 @@ public class YMotor : YFunction
     public int set_cutOffVoltage(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval*65536.0).ToString();
+        rest_val = Math.Round(newval * 65536.0).ToString();
         return _setAttr("cutOffVoltage", rest_val);
     }
 
     /**
      * <summary>
-     *   Returns the threshold voltage under which the controller will automatically switch to error state
-     *   and prevent further current draw.
+     *   Returns the threshold voltage under which the controller automatically switches to error state
+     *   and prevents further current draw.
      * <para>
-     *   This setting prevent damage to a battery that can
+     *   This setting prevents damage to a battery that can
      *   occur when drawing current from an "empty" battery.
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   a floating point number corresponding to the threshold voltage under which the controller will
-     *   automatically switch to error state
-     *   and prevent further current draw
+     *   a floating point number corresponding to the threshold voltage under which the controller
+     *   automatically switches to error state
+     *   and prevents further current draw
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YMotor.CUTOFFVOLTAGE_INVALID</c>.
@@ -387,8 +389,8 @@ public class YMotor : YFunction
 
     /**
      * <summary>
-     *   Returns the current threshold (in mA) above which the controller will automatically
-     *   switch to error state.
+     *   Returns the current threshold (in mA) above which the controller automatically
+     *   switches to error state.
      * <para>
      *   A zero value means that there is no limit.
      * </para>
@@ -396,8 +398,8 @@ public class YMotor : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the current threshold (in mA) above which the controller will automatically
-     *   switch to error state
+     *   an integer corresponding to the current threshold (in mA) above which the controller automatically
+     *   switches to error state
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YMotor.OVERCURRENTLIMIT_INVALID</c>.
@@ -415,19 +417,19 @@ public class YMotor : YFunction
 
     /**
      * <summary>
-     *   Changes tthe current threshold (in mA) above which the controller will automatically
-     *   switch to error state.
+     *   Changes the current threshold (in mA) above which the controller automatically
+     *   switches to error state.
      * <para>
      *   A zero value means that there is no limit. Note that whatever the
-     *   current limit is, the controller will switch to OVERCURRENT status if the current
+     *   current limit is, the controller switches to OVERCURRENT status if the current
      *   goes above 32A, even for a very brief time.
      * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to tthe current threshold (in mA) above which the controller will automatically
-     *   switch to error state
+     *   an integer corresponding to the current threshold (in mA) above which the controller automatically
+     *   switches to error state
      * </param>
      * <para>
      * </para>
@@ -447,31 +449,6 @@ public class YMotor : YFunction
 
     /**
      * <summary>
-     *   Returns the PWM frequency used to control the motor.
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   an integer corresponding to the PWM frequency used to control the motor
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns <c>YMotor.FREQUENCY_INVALID</c>.
-     * </para>
-     */
-    public int get_frequency()
-    {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return FREQUENCY_INVALID;
-            }
-        }
-        return this._frequency;
-    }
-
-    /**
-     * <summary>
      *   Changes the PWM frequency used to control the motor.
      * <para>
      *   Low frequency is usually
@@ -483,7 +460,7 @@ public class YMotor : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to the PWM frequency used to control the motor
+     *   a floating point number corresponding to the PWM frequency used to control the motor
      * </param>
      * <para>
      * </para>
@@ -494,11 +471,36 @@ public class YMotor : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public int set_frequency(int newval)
+    public int set_frequency(double newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
+        rest_val = Math.Round(newval * 65536.0).ToString();
         return _setAttr("frequency", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the PWM frequency used to control the motor.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a floating point number corresponding to the PWM frequency used to control the motor
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YMotor.FREQUENCY_INVALID</c>.
+     * </para>
+     */
+    public double get_frequency()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return FREQUENCY_INVALID;
+            }
+        }
+        return this._frequency;
     }
 
     /**
@@ -562,8 +564,8 @@ public class YMotor : YFunction
      *   Returns the delay in milliseconds allowed for the controller to run autonomously without
      *   receiving any instruction from the control process.
      * <para>
-     *   Once this delay is elapsed,
-     *   the controller will automatically stop the motor and switch to FAILSAFE error.
+     *   When this delay has elapsed,
+     *   the controller automatically stops the motor and switches to FAILSAFE error.
      *   Failsafe security is disabled when the value is zero.
      * </para>
      * <para>
@@ -592,8 +594,8 @@ public class YMotor : YFunction
      *   Changes the delay in milliseconds allowed for the controller to run autonomously without
      *   receiving any instruction from the control process.
      * <para>
-     *   Once this delay is elapsed,
-     *   the controller will automatically stop the motor and switch to FAILSAFE error.
+     *   When this delay has elapsed,
+     *   the controller automatically stops the motor and switches to FAILSAFE error.
      *   Failsafe security is disabled when the value is zero.
      * </para>
      * <para>
@@ -742,7 +744,7 @@ public class YMotor : YFunction
      * <para>
      *   When the motor is running and the failsafe feature
      *   is active, this function should be called periodically to prove that the control process
-     *   is running properly. Otherwise, the motor will be automatically stopped after the specified
+     *   is running properly. Otherwise, the motor is automatically stopped after the specified
      *   timeout. Calling a motor <i>set</i> function implicitely rearms the failsafe timer.
      * </para>
      * </summary>
@@ -773,7 +775,7 @@ public class YMotor : YFunction
      * </para>
      * </summary>
      * <param name="targetPower">
-     *   desired motor power, in per cents (between -100% and +100%)
+     *   desired motor power, in percents (between -100% and +100%)
      * </param>
      * <param name="delay">
      *   duration (in ms) of the transition
@@ -792,12 +794,12 @@ public class YMotor : YFunction
 
     /**
      * <summary>
-     *   Changes progressively the breaking force applied to the motor for a specific duration.
+     *   Changes progressively the braking force applied to the motor for a specific duration.
      * <para>
      * </para>
      * </summary>
      * <param name="targetPower">
-     *   desired breaking force, in per cents
+     *   desired braking force, in percents
      * </param>
      * <param name="delay">
      *   duration (in ms) of the transition
@@ -809,7 +811,7 @@ public class YMotor : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int breakingForceMove(double targetPower, int delay)
+    public virtual int brakingForceMove(double targetPower, int delay)
     {
         return this.set_command("B"+Convert.ToString((int) Math.Round(targetPower*10))+","+Convert.ToString(delay));
     }

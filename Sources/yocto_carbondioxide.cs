@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_carbondioxide.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_carbondioxide.cs 17354 2014-08-29 10:07:05Z seb $
  *
  * Implements yFindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YCarbonDioxide return codes)
     //--- (end of YCarbonDioxide return codes)
+//--- (YCarbonDioxide dlldef)
+//--- (end of YCarbonDioxide dlldef)
 //--- (YCarbonDioxide class start)
 /**
  * <summary>

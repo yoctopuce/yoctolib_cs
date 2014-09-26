@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_oscontrol.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_oscontrol.cs 17354 2014-08-29 10:07:05Z seb $
  *
  * Implements yFindOsControl(), the high-level API for OsControl functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YOsControl return codes)
     //--- (end of YOsControl return codes)
+//--- (YOsControl dlldef)
+//--- (end of YOsControl dlldef)
 //--- (YOsControl class start)
 /**
  * <summary>

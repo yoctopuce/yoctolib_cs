@@ -1,0 +1,1812 @@
+/*********************************************************************
+ *
+ * $Id: yocto_serialport.cs 17610 2014-09-13 11:30:24Z mvuilleu $
+ *
+ * Implements yFindSerialPort(), the high-level API for SerialPort functions
+ *
+ * - - - - - - - - - License information: - - - - - - - - - 
+ *
+ *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ *
+ *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ *  non-exclusive license to use, modify, copy and integrate this
+ *  file into your software for the sole purpose of interfacing
+ *  with Yoctopuce products.
+ *
+ *  You may reproduce and distribute copies of this file in
+ *  source or object form, as long as the sole purpose of this
+ *  code is to interface with Yoctopuce products. You must retain
+ *  this notice in the distributed source file.
+ *
+ *  You should refer to Yoctopuce General Terms and Conditions
+ *  for additional information regarding your rights and
+ *  obligations.
+ *
+ *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
+ *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
+ *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
+ *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
+ *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
+ *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ *  WARRANTY, OR OTHERWISE.
+ *
+ *********************************************************************/
+
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
+using System.Text;
+using YDEV_DESCR = System.Int32;
+using YFUN_DESCR = System.Int32;
+
+    //--- (YSerialPort return codes)
+    //--- (end of YSerialPort return codes)
+//--- (YSerialPort dlldef)
+//--- (end of YSerialPort dlldef)
+//--- (YSerialPort class start)
+/**
+ * <summary>
+ *   The SerialPort function interface allows you to fully drive a Yoctopuce
+ *   serial port, to send and receive data, and to configure communication
+ *   parameters (baud rate, bit count, parity, flow control and protocol).
+ * <para>
+ *   Note that Yoctopuce serial ports are not exposed as virtual COM ports.
+ *   They are meant to be used in the same way as all Yoctopuce devices.
+ * </para>
+ * <para>
+ * </para>
+ * </summary>
+ */
+public class YSerialPort : YFunction
+{
+//--- (end of YSerialPort class start)
+    //--- (YSerialPort definitions)
+    public new delegate void ValueCallback(YSerialPort func, string value);
+    public new delegate void TimedReportCallback(YSerialPort func, YMeasure measure);
+
+    public const string SERIALMODE_INVALID = YAPI.INVALID_STRING;
+    public const string PROTOCOL_INVALID = YAPI.INVALID_STRING;
+    public const int RXCOUNT_INVALID = YAPI.INVALID_UINT;
+    public const int TXCOUNT_INVALID = YAPI.INVALID_UINT;
+    public const int ERRCOUNT_INVALID = YAPI.INVALID_UINT;
+    public const int MSGCOUNT_INVALID = YAPI.INVALID_UINT;
+    public const string LASTMSG_INVALID = YAPI.INVALID_STRING;
+    public const string COMMAND_INVALID = YAPI.INVALID_STRING;
+    protected string _serialMode = SERIALMODE_INVALID;
+    protected string _protocol = PROTOCOL_INVALID;
+    protected int _rxCount = RXCOUNT_INVALID;
+    protected int _txCount = TXCOUNT_INVALID;
+    protected int _errCount = ERRCOUNT_INVALID;
+    protected int _msgCount = MSGCOUNT_INVALID;
+    protected string _lastMsg = LASTMSG_INVALID;
+    protected string _command = COMMAND_INVALID;
+    protected ValueCallback _valueCallbackSerialPort = null;
+    protected int _rxptr = 0;
+    //--- (end of YSerialPort definitions)
+
+    public YSerialPort(string func)
+        : base(func)
+    {
+        _className = "SerialPort";
+        //--- (YSerialPort attributes initialization)
+        //--- (end of YSerialPort attributes initialization)
+    }
+
+    //--- (YSerialPort implementation)
+
+    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    {
+        if (member.name == "serialMode")
+        {
+            _serialMode = member.svalue;
+            return;
+        }
+        if (member.name == "protocol")
+        {
+            _protocol = member.svalue;
+            return;
+        }
+        if (member.name == "rxCount")
+        {
+            _rxCount = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "txCount")
+        {
+            _txCount = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "errCount")
+        {
+            _errCount = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "msgCount")
+        {
+            _msgCount = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "lastMsg")
+        {
+            _lastMsg = member.svalue;
+            return;
+        }
+        if (member.name == "command")
+        {
+            _command = member.svalue;
+            return;
+        }
+        base._parseAttr(member);
+    }
+
+    /**
+     * <summary>
+     *   Returns the serial port communication parameters, as a string such as
+     *   "9600,8N1".
+     * <para>
+     *   The string includes the baud rate, the number of data bits,
+     *   the parity, and the number of stop bits. An optional suffix is included
+     *   if flow control is active: "CtsRts" for hardware handshake, "XOnXOff"
+     *   for logical flow control and "Simplex" for acquiring a shared bus using
+     *   the RTS line (as used by some RS485 adapters for instance).
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to the serial port communication parameters, as a string such as
+     *   "9600,8N1"
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSerialPort.SERIALMODE_INVALID</c>.
+     * </para>
+     */
+    public string get_serialMode()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SERIALMODE_INVALID;
+            }
+        }
+        return this._serialMode;
+    }
+
+    /**
+     * <summary>
+     *   Changes the serial port communication parameters, with a string such as
+     *   "9600,8N1".
+     * <para>
+     *   The string includes the baud rate, the number of data bits,
+     *   the parity, and the number of stop bits. An optional suffix can be added
+     *   to enable flow control: "CtsRts" for hardware handshake, "XOnXOff"
+     *   for logical flow control and "Simplex" for acquiring a shared bus using
+     *   the RTS line (as used by some RS485 adapters for instance).
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a string corresponding to the serial port communication parameters, with a string such as
+     *   "9600,8N1"
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_serialMode(string newval)
+    {
+        string rest_val;
+        rest_val = newval;
+        return _setAttr("serialMode", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the type of protocol used over the serial line, as a string.
+     * <para>
+     *   Possible values are "Line" for ASCII messages separated by CR and/or LF,
+     *   "Frame:[timeout]ms" for binary messages separated by a delay time,
+     *   "Modbus-ASCII" for MODBUS messages in ASCII mode,
+     *   "Modbus-RTU" for MODBUS messages in RTU mode,
+     *   "Char" for a continuous ASCII stream or
+     *   "Byte" for a continuous binary stream.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to the type of protocol used over the serial line, as a string
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSerialPort.PROTOCOL_INVALID</c>.
+     * </para>
+     */
+    public string get_protocol()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PROTOCOL_INVALID;
+            }
+        }
+        return this._protocol;
+    }
+
+    /**
+     * <summary>
+     *   Changes the type of protocol used over the serial line.
+     * <para>
+     *   Possible values are "Line" for ASCII messages separated by CR and/or LF,
+     *   "Frame:[timeout]ms" for binary messages separated by a delay time,
+     *   "Modbus-ASCII" for MODBUS messages in ASCII mode,
+     *   "Modbus-RTU" for MODBUS messages in RTU mode,
+     *   "Char" for a continuous ASCII stream or
+     *   "Byte" for a continuous binary stream.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a string corresponding to the type of protocol used over the serial line
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_protocol(string newval)
+    {
+        string rest_val;
+        rest_val = newval;
+        return _setAttr("protocol", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the total number of bytes received since last reset.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the total number of bytes received since last reset
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSerialPort.RXCOUNT_INVALID</c>.
+     * </para>
+     */
+    public int get_rxCount()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return RXCOUNT_INVALID;
+            }
+        }
+        return this._rxCount;
+    }
+
+    /**
+     * <summary>
+     *   Returns the total number of bytes transmitted since last reset.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the total number of bytes transmitted since last reset
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSerialPort.TXCOUNT_INVALID</c>.
+     * </para>
+     */
+    public int get_txCount()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return TXCOUNT_INVALID;
+            }
+        }
+        return this._txCount;
+    }
+
+    /**
+     * <summary>
+     *   Returns the total number of communication errors detected since last reset.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the total number of communication errors detected since last reset
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSerialPort.ERRCOUNT_INVALID</c>.
+     * </para>
+     */
+    public int get_errCount()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return ERRCOUNT_INVALID;
+            }
+        }
+        return this._errCount;
+    }
+
+    /**
+     * <summary>
+     *   Returns the total number of messages received since last reset.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the total number of messages received since last reset
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSerialPort.MSGCOUNT_INVALID</c>.
+     * </para>
+     */
+    public int get_msgCount()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return MSGCOUNT_INVALID;
+            }
+        }
+        return this._msgCount;
+    }
+
+    /**
+     * <summary>
+     *   Returns the latest message fully received (for Line, Frame and Modbus protocols).
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to the latest message fully received (for Line, Frame and Modbus protocols)
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSerialPort.LASTMSG_INVALID</c>.
+     * </para>
+     */
+    public string get_lastMsg()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return LASTMSG_INVALID;
+            }
+        }
+        return this._lastMsg;
+    }
+
+    public string get_command()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return COMMAND_INVALID;
+            }
+        }
+        return this._command;
+    }
+
+    public int set_command(string newval)
+    {
+        string rest_val;
+        rest_val = newval;
+        return _setAttr("command", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Retrieves a serial port for a given identifier.
+     * <para>
+     *   The identifier can be specified using several formats:
+     * </para>
+     * <para>
+     * </para>
+     * <para>
+     *   - FunctionLogicalName
+     * </para>
+     * <para>
+     *   - ModuleSerialNumber.FunctionIdentifier
+     * </para>
+     * <para>
+     *   - ModuleSerialNumber.FunctionLogicalName
+     * </para>
+     * <para>
+     *   - ModuleLogicalName.FunctionIdentifier
+     * </para>
+     * <para>
+     *   - ModuleLogicalName.FunctionLogicalName
+     * </para>
+     * <para>
+     * </para>
+     * <para>
+     *   This function does not require that the serial port is online at the time
+     *   it is invoked. The returned object is nevertheless valid.
+     *   Use the method <c>YSerialPort.isOnline()</c> to test if the serial port is
+     *   indeed online at a given time. In case of ambiguity when looking for
+     *   a serial port by logical name, no error is notified: the first instance
+     *   found is returned. The search is performed first by hardware name,
+     *   then by logical name.
+     * </para>
+     * </summary>
+     * <param name="func">
+     *   a string that uniquely characterizes the serial port
+     * </param>
+     * <returns>
+     *   a <c>YSerialPort</c> object allowing you to drive the serial port.
+     * </returns>
+     */
+    public static YSerialPort FindSerialPort(string func)
+    {
+        YSerialPort obj;
+        obj = (YSerialPort) YFunction._FindFromCache("SerialPort", func);
+        if (obj == null) {
+            obj = new YSerialPort(func);
+            YFunction._AddToCache("SerialPort", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * <summary>
+     *   Registers the callback function that is invoked on every change of advertised value.
+     * <para>
+     *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
+     *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
+     *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="callback">
+     *   the callback function to call, or a null pointer. The callback function should take two
+     *   arguments: the function object of which the value has changed, and the character string describing
+     *   the new advertised value.
+     * @noreturn
+     * </param>
+     */
+    public int registerValueCallback(ValueCallback callback)
+    {
+        string val;
+        if (callback != null) {
+            YFunction._UpdateValueCallbackList(this, true);
+        } else {
+            YFunction._UpdateValueCallbackList(this, false);
+        }
+        this._valueCallbackSerialPort = callback;
+        // Immediately invoke value callback with current value
+        if (callback != null && this.isOnline()) {
+            val = this._advertisedValue;
+            if (!(val == "")) {
+                this._invokeValueCallback(val);
+            }
+        }
+        return 0;
+    }
+
+    public override int _invokeValueCallback(string value)
+    {
+        if (this._valueCallbackSerialPort != null) {
+            this._valueCallbackSerialPort(this, value);
+        } else {
+            base._invokeValueCallback(value);
+        }
+        return 0;
+    }
+
+    public virtual int sendCommand(string text)
+    {
+        return this.set_command(text);
+    }
+
+    /**
+     * <summary>
+     *   Clears the serial port buffer and resets counters to zero.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int reset()
+    {
+        this._rxptr = 0;
+        // may throw an exception
+        return this.sendCommand("Z");
+    }
+
+    /**
+     * <summary>
+     *   Manually sets the state of the RTS line.
+     * <para>
+     *   This function has no effect when
+     *   hardware handshake is enabled, as the RTS line is driven automatically.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="val">
+     *   1 to turn RTS on, 0 to turn RTS off
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int set_RTS(int val)
+    {
+        return this.sendCommand("R"+Convert.ToString(val));
+    }
+
+    /**
+     * <summary>
+     *   Read the level of the CTS line.
+     * <para>
+     *   The CTS line is usually driven by
+     *   the RTS signal of the connected serial device.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   1 if the CTS line is high, 0 if the CTS line is low.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int get_CTS()
+    {
+        byte[] buff;
+        int res;
+        
+        // may throw an exception
+        buff = this._download("cts.txt");
+        if (!((buff).Length == 1)) { this._throw( YAPI.IO_ERROR, "invalid CTS reply"); return YAPI.IO_ERROR; }
+        res = buff[0] - 48;
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Sends an ASCII string to the serial port, as is.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="text">
+     *   the text string to send
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int writeStr(string text)
+    {
+        byte[] buff;
+        int bufflen;
+        int idx;
+        int ch;
+        
+        buff = YAPI.DefaultEncoding.GetBytes(text);
+        bufflen = (buff).Length;
+        if (bufflen < 100) {
+            ch = 0x20;
+            idx = 0;
+            while ((idx < bufflen) && (ch != 0)) {
+                ch = buff[idx];
+                if ((ch >= 0x20) && (ch < 0x7f)) {
+                    idx = idx + 1;
+                } else {
+                    ch = 0;
+                }
+            }
+            if (idx >= bufflen) {
+                return this.sendCommand("+"+text);
+            }
+        }
+        // send string using file upload
+        return this._upload("txdata", buff);
+    }
+
+    /**
+     * <summary>
+     *   Sends a binary buffer to the serial port, as is.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="buff">
+     *   the binary buffer to send
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int writeBin(byte[] buff)
+    {
+        return this._upload("txdata", buff);
+    }
+
+    /**
+     * <summary>
+     *   Sends a byte sequence (provided as a list of bytes) to the serial port.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="byteList">
+     *   a list of byte codes
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int writeArray(List<int> byteList)
+    {
+        byte[] buff;
+        int bufflen;
+        int idx;
+        int hexb;
+        int res;
+        bufflen = byteList.Count;
+        buff = new byte[bufflen];
+        idx = 0;
+        while (idx < bufflen) {
+            hexb = byteList[idx];
+            buff[idx] = (byte)(hexb & 0xff);
+            idx = idx + 1;
+        }
+        // may throw an exception
+        res = this._upload("txdata", buff);
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Sends a byte sequence (provided as a hexadecimal string) to the serial port.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="hexString">
+     *   a string of hexadecimal byte codes
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int writeHex(string hexString)
+    {
+        byte[] buff;
+        int bufflen;
+        int idx;
+        int hexb;
+        int res;
+        bufflen = (hexString).Length;
+        if (bufflen < 100) {
+            return this.sendCommand("$"+hexString);
+        }
+        bufflen = ((bufflen) >> (1));
+        buff = new byte[bufflen];
+        idx = 0;
+        while (idx < bufflen) {
+            hexb = Convert.ToInt32((hexString).Substring( 2 * idx, 2), 16);
+            buff[idx] = (byte)(hexb & 0xff);
+            idx = idx + 1;
+        }
+        // may throw an exception
+        res = this._upload("txdata", buff);
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Sends an ASCII string to the serial port, followed by a line break (CR LF).
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="text">
+     *   the text string to send
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int writeLine(string text)
+    {
+        byte[] buff;
+        int bufflen;
+        int idx;
+        int ch;
+        
+        buff = YAPI.DefaultEncoding.GetBytes(""+text+"\r\n");
+        bufflen = (buff).Length-2;
+        if (bufflen < 100) {
+            ch = 0x20;
+            idx = 0;
+            while ((idx < bufflen) && (ch != 0)) {
+                ch = buff[idx];
+                if ((ch >= 0x20) && (ch < 0x7f)) {
+                    idx = idx + 1;
+                } else {
+                    ch = 0;
+                }
+            }
+            if (idx >= bufflen) {
+                return this.sendCommand("!"+text);
+            }
+        }
+        // send string using file upload
+        return this._upload("txdata", buff);
+    }
+
+    /**
+     * <summary>
+     *   Sends a MODBUS message (provided as a hexadecimal string) to the serial port.
+     * <para>
+     *   The message must start with the slave address. The MODBUS CRC/LRC is
+     *   automatically added by the function. This function does not wait for a reply.
+     * </para>
+     * </summary>
+     * <param name="hexString">
+     *   a hexadecimal message string, including device address but no CRC/LRC
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int writeMODBUS(string hexString)
+    {
+        return this.sendCommand(":"+hexString);
+    }
+
+    /**
+     * <summary>
+     *   Reads data from the receive buffer as a string, starting at current stream position.
+     * <para>
+     *   If data at current stream position is not available anymore in the receive buffer, the
+     *   function performs a short read.
+     * </para>
+     * </summary>
+     * <param name="nChars">
+     *   the maximum number of characters to read
+     * </param>
+     * <returns>
+     *   a string with receive buffer contents
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual string readStr(int nChars)
+    {
+        byte[] buff;
+        int bufflen;
+        int mult;
+        int endpos;
+        int startpos;
+        int missing;
+        string res;
+        if (nChars > 65535) {
+            nChars = 65535;
+        }
+        // may throw an exception
+        buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nChars));
+        bufflen = (buff).Length - 1;
+        endpos = 0;
+        mult = 1;
+        while ((bufflen > 0) && (buff[bufflen] != 64)) {
+            endpos = endpos + mult * (buff[bufflen] - 48);
+            mult = mult * 10;
+            bufflen = bufflen - 1;
+        }
+        startpos = ((endpos - bufflen) & (0x7fffffff));
+        if (startpos != this._rxptr) {
+            missing = ((startpos - this._rxptr) & (0x7fffffff));
+            if (missing > nChars) {
+                nChars = 0;
+                this._rxptr = startpos;
+            } else {
+                nChars = nChars - missing;
+            }
+        }
+        if (nChars > bufflen) {
+            nChars = bufflen;
+        }
+        this._rxptr = this._rxptr + nChars;
+        res = (YAPI.DefaultEncoding.GetString(buff)).Substring( 0, nChars);
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Reads data from the receive buffer as a hexadecimal string, starting at current stream position.
+     * <para>
+     *   If data at current stream position is not available anymore in the receive buffer, the
+     *   function performs a short read.
+     * </para>
+     * </summary>
+     * <param name="nBytes">
+     *   the maximum number of bytes to read
+     * </param>
+     * <returns>
+     *   a string with receive buffer contents, encoded in hexadecimal
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual string readHex(int nBytes)
+    {
+        byte[] buff;
+        int bufflen;
+        int mult;
+        int endpos;
+        int startpos;
+        int missing;
+        int ofs;
+        string res;
+        if (nBytes > 65535) {
+            nBytes = 65535;
+        }
+        // may throw an exception
+        buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nBytes));
+        bufflen = (buff).Length-1;
+        endpos = 0;
+        mult = 1;
+        while ((bufflen > 0) && (buff[bufflen] != 64)) {
+            endpos = endpos + mult * (buff[bufflen] - 48);
+            mult = mult * 10;
+            bufflen = bufflen - 1;
+        }
+        startpos = ((endpos - bufflen) & (0x7fffffff));
+        if (startpos != this._rxptr) {
+            missing = ((startpos - this._rxptr) & (0x7fffffff));
+            if (missing > nBytes) {
+                nBytes = 0;
+                this._rxptr = startpos;
+            } else {
+                nBytes = nBytes - missing;
+            }
+        }
+        if (nBytes > bufflen) {
+            nBytes = bufflen;
+        }
+        this._rxptr = this._rxptr + nBytes;
+        res = "";
+        ofs = 0;
+        while (ofs+3 < nBytes) {
+            res = ""+ res+""+String.Format("{0:X02}", buff[ofs])+""+String.Format("{0:X02}", buff[ofs+1])+""+String.Format("{0:X02}", buff[ofs+2])+""+String.Format("{0:X02}",buff[ofs+3]);
+            ofs = ofs + 4;
+        }
+        while (ofs < nBytes) {
+            res = ""+ res+""+String.Format("{0:X02}",buff[ofs]);
+            ofs = ofs + 1;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Reads a single line (or message) from the receive buffer, starting at current stream position.
+     * <para>
+     *   This function can only be used when the serial port is configured for a message protocol,
+     *   such as 'Line' mode or MODBUS protocols. It does not  work in plain stream modes, eg. 'Char' or 'Byte').
+     * </para>
+     * <para>
+     *   If data at current stream position is not available anymore in the receive buffer,
+     *   the function returns the oldest available line and moves the stream position just after.
+     *   If no new full line is received, the function returns an empty line.
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string with a single line of text
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual string readLine()
+    {
+        string url;
+        byte[] msgbin;
+        List<string> msgarr = new List<string>();
+        int msglen;
+        string res;
+        // may throw an exception
+        url = "rxmsg.json?pos="+Convert.ToString(this._rxptr)+"&len=1&maxw=1";
+        msgbin = this._download(url);
+        msgarr = this._json_get_array(msgbin);
+        msglen = msgarr.Count;
+        if (msglen == 0) {
+            return "";
+        }
+        // last element of array is the new position
+        msglen = msglen - 1;
+        this._rxptr = Convert.ToInt32(msgarr[msglen]);
+        if (msglen == 0) {
+            return "";
+        }
+        res = this._json_get_string(YAPI.DefaultEncoding.GetBytes(msgarr[0]));
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Searches for incoming messages in the serial port receive buffer matching a given pattern,
+     *   starting at current position.
+     * <para>
+     *   This function can only be used when the serial port is
+     *   configured for a message protocol, such as 'Line' mode or MODBUS protocols.
+     *   It does not work in plain stream modes, eg. 'Char' or 'Byte', for which there is no "start" of message.
+     * </para>
+     * <para>
+     *   The search returns all messages matching the expression provided as argument in the buffer.
+     *   If no matching message is found, the search waits for one up to the specified maximum timeout
+     *   (in milliseconds).
+     * </para>
+     * </summary>
+     * <param name="pattern">
+     *   a limited regular expression describing the expected message format,
+     *   or an empty string if all messages should be returned (no filtering).
+     *   When using binary protocols, the format applies to the hexadecimal
+     *   representation of the message.
+     * </param>
+     * <param name="maxWait">
+     *   the maximum number of milliseconds to wait for a message if none is found
+     *   in the receive buffer.
+     * </param>
+     * <returns>
+     *   an array of strings containing the messages found, if any.
+     *   Binary messages are converted to hexadecimal representation.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
+     */
+    public virtual List<string> readMessages(string pattern, int maxWait)
+    {
+        string url;
+        byte[] msgbin;
+        List<string> msgarr = new List<string>();
+        int msglen;
+        List<string> res = new List<string>();
+        int idx;
+        // may throw an exception
+        url = "rxmsg.json?pos="+Convert.ToString( this._rxptr)+"&maxw="+Convert.ToString( maxWait)+"&pat="+pattern;
+        msgbin = this._download(url);
+        msgarr = this._json_get_array(msgbin);
+        msglen = msgarr.Count;
+        if (msglen == 0) {
+            return res;
+        }
+        // last element of array is the new position
+        msglen = msglen - 1;
+        this._rxptr = Convert.ToInt32(msgarr[msglen]);
+        idx = 0;
+        while (idx < msglen) {
+            res.Add(this._json_get_string(YAPI.DefaultEncoding.GetBytes(msgarr[idx])));
+            idx = idx + 1;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Changes the current internal stream position to the specified value.
+     * <para>
+     *   This function
+     *   does not affect the device, it only changes the value stored in the YSerialPort object
+     *   for the next read operations.
+     * </para>
+     * </summary>
+     * <param name="rxCountVal">
+     *   the absolute position index (value of rxCount) for next read operations.
+     * </param>
+     * <returns>
+     *   nothing.
+     * </returns>
+     */
+    public virtual int read_seek(int rxCountVal)
+    {
+        this._rxptr = rxCountVal;
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
+     *   Sends a text line query to the serial port, and reads the reply, if any.
+     * <para>
+     *   This function can only be used when the serial port is configured for 'Line' protocol.
+     * </para>
+     * </summary>
+     * <param name="query">
+     *   the line query to send (without CR/LF)
+     * </param>
+     * <param name="maxWait">
+     *   the maximum number of milliseconds to wait for a reply.
+     * </param>
+     * <returns>
+     *   the next text line received after sending the text query, as a string.
+     *   Additional lines can be obtained by calling readLine or readMessages.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
+     */
+    public virtual string queryLine(string query, int maxWait)
+    {
+        string url;
+        byte[] msgbin;
+        List<string> msgarr = new List<string>();
+        int msglen;
+        string res;
+        // may throw an exception
+        url = "rxmsg.json?len=1&maxw="+Convert.ToString( maxWait)+"&cmd=!"+query;
+        msgbin = this._download(url);
+        msgarr = this._json_get_array(msgbin);
+        msglen = msgarr.Count;
+        if (msglen == 0) {
+            return "";
+        }
+        // last element of array is the new position
+        msglen = msglen - 1;
+        this._rxptr = Convert.ToInt32(msgarr[msglen]);
+        if (msglen == 0) {
+            return "";
+        }
+        res = this._json_get_string(YAPI.DefaultEncoding.GetBytes(msgarr[0]));
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Sends a message to a specified MODBUS slave connected to the serial port, and reads the
+     *   reply, if any.
+     * <para>
+     *   The message is the PDU, provided as a vector of bytes.
+     * </para>
+     * </summary>
+     * <param name="slaveNo">
+     *   the address of the slave MODBUS device to query
+     * </param>
+     * <param name="pduBytes">
+     *   the message to send (PDU), as a vector of bytes. The first byte of the
+     *   PDU is the MODBUS function code.
+     * </param>
+     * <returns>
+     *   the received reply, as a vector of bytes.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array (or a MODBUS error reply).
+     * </para>
+     */
+    public virtual List<int> queryMODBUS(int slaveNo, List<int> pduBytes)
+    {
+        int funCode;
+        int nib;
+        int i;
+        string cmd;
+        string url;
+        string pat;
+        byte[] msgs;
+        List<string> reps = new List<string>();
+        string rep;
+        List<int> res = new List<int>();
+        int replen;
+        int hexb;
+        funCode = pduBytes[0];
+        nib = ((funCode) >> (4));
+        pat = ""+String.Format("{0:X02}", slaveNo)+"["+String.Format("{0:X}", nib)+""+String.Format("{0:X}", (nib+8))+"]"+String.Format("{0:X}",((funCode) & (15)))+".*";
+        cmd = ""+String.Format("{0:X02}", slaveNo)+""+String.Format("{0:X02}",funCode);
+        i = 1;
+        while (i < pduBytes.Count) {
+            cmd = ""+ cmd+""+String.Format("{0:X02}",((pduBytes[i]) & (0xff)));
+            i = i + 1;
+        }
+        // may throw an exception
+        url = "rxmsg.json?cmd=:"+ cmd+"&pat=:"+pat;
+        msgs = this._download(url);
+        reps = this._json_get_array(msgs);
+        if (!(reps.Count > 1)) { this._throw( YAPI.IO_ERROR, "no reply from slave"); return res; }
+        if (reps.Count > 1) {
+            rep = this._json_get_string(YAPI.DefaultEncoding.GetBytes(reps[0]));
+            replen = (((rep).Length - 3) >> (1));
+            i = 0;
+            while (i < replen) {
+                hexb = Convert.ToInt32((rep).Substring(2 * i + 3, 2), 16);
+                res.Add(hexb);
+                i = i + 1;
+            }
+            if (res[0] != funCode) {
+                i = res[1];
+                if (!(i > 1)) { this._throw( YAPI.NOT_SUPPORTED, "MODBUS error: unsupported function code"); return res; }
+                if (!(i > 2)) { this._throw( YAPI.INVALID_ARGUMENT, "MODBUS error: illegal data address"); return res; }
+                if (!(i > 3)) { this._throw( YAPI.INVALID_ARGUMENT, "MODBUS error: illegal data value"); return res; }
+                if (!(i > 4)) { this._throw( YAPI.INVALID_ARGUMENT, "MODBUS error: failed to execute function"); return res; }
+            }
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Reads one or more contiguous internal bits (or coil status) from a MODBUS serial device.
+     * <para>
+     *   This method uses the MODBUS function code 0x01 (Read Coils).
+     * </para>
+     * </summary>
+     * <param name="slaveNo">
+     *   the address of the slave MODBUS device to query
+     * </param>
+     * <param name="pduAddr">
+     *   the relative address of the first bit/coil to read (zero-based)
+     * </param>
+     * <param name="nBits">
+     *   the number of bits/coils to read
+     * </param>
+     * <returns>
+     *   a vector of integers, each corresponding to one bit.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
+     */
+    public virtual List<int> modbusReadBits(int slaveNo, int pduAddr, int nBits)
+    {
+        List<int> pdu = new List<int>();
+        List<int> reply = new List<int>();
+        List<int> res = new List<int>();
+        int bitpos;
+        int idx;
+        int val;
+        int mask;
+        pdu.Add(0x01);
+        pdu.Add(((pduAddr) >> (8)));
+        pdu.Add(((pduAddr) & (0xff)));
+        pdu.Add(((nBits) >> (8)));
+        pdu.Add(((nBits) & (0xff)));
+        // may throw an exception
+        reply = this.queryMODBUS(slaveNo, pdu);
+        if (reply.Count == 0) {
+            return res;
+        }
+        if (reply[0] != pdu[0]) {
+            return res;
+        }
+        bitpos = 0;
+        idx = 2;
+        val = reply[idx];
+        mask = 1;
+        while (bitpos < nBits) {
+            if (((val) & (mask)) == 0) {
+                res.Add(0);
+            } else {
+                res.Add(1);
+            }
+            bitpos = bitpos + 1;
+            if (mask == 0x80) {
+                idx = idx + 1;
+                val = reply[idx];
+                mask = 1;
+            } else {
+                mask = ((mask) << (1));
+            }
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Reads one or more contiguous input bits (or discrete inputs) from a MODBUS serial device.
+     * <para>
+     *   This method uses the MODBUS function code 0x02 (Read Discrete Inputs).
+     * </para>
+     * </summary>
+     * <param name="slaveNo">
+     *   the address of the slave MODBUS device to query
+     * </param>
+     * <param name="pduAddr">
+     *   the relative address of the first bit/input to read (zero-based)
+     * </param>
+     * <param name="nBits">
+     *   the number of bits/inputs to read
+     * </param>
+     * <returns>
+     *   a vector of integers, each corresponding to one bit.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
+     */
+    public virtual List<int> modbusReadInputBits(int slaveNo, int pduAddr, int nBits)
+    {
+        List<int> pdu = new List<int>();
+        List<int> reply = new List<int>();
+        List<int> res = new List<int>();
+        int bitpos;
+        int idx;
+        int val;
+        int mask;
+        pdu.Add(0x02);
+        pdu.Add(((pduAddr) >> (8)));
+        pdu.Add(((pduAddr) & (0xff)));
+        pdu.Add(((nBits) >> (8)));
+        pdu.Add(((nBits) & (0xff)));
+        // may throw an exception
+        reply = this.queryMODBUS(slaveNo, pdu);
+        if (reply.Count == 0) {
+            return res;
+        }
+        if (reply[0] != pdu[0]) {
+            return res;
+        }
+        bitpos = 0;
+        idx = 2;
+        val = reply[idx];
+        mask = 1;
+        while (bitpos < nBits) {
+            if (((val) & (mask)) == 0) {
+                res.Add(0);
+            } else {
+                res.Add(1);
+            }
+            bitpos = bitpos + 1;
+            if (mask == 0x80) {
+                idx = idx + 1;
+                val = reply[idx];
+                mask = 1;
+            } else {
+                mask = ((mask) << (1));
+            }
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Reads one or more contiguous internal registers (holding registers) from a MODBUS serial device.
+     * <para>
+     *   This method uses the MODBUS function code 0x03 (Read Holding Registers).
+     * </para>
+     * </summary>
+     * <param name="slaveNo">
+     *   the address of the slave MODBUS device to query
+     * </param>
+     * <param name="pduAddr">
+     *   the relative address of the first holding register to read (zero-based)
+     * </param>
+     * <param name="nWords">
+     *   the number of holding registers to read
+     * </param>
+     * <returns>
+     *   a vector of integers, each corresponding to one 16-bit register value.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
+     */
+    public virtual List<int> modbusReadRegisters(int slaveNo, int pduAddr, int nWords)
+    {
+        List<int> pdu = new List<int>();
+        List<int> reply = new List<int>();
+        List<int> res = new List<int>();
+        int regpos;
+        int idx;
+        int val;
+        pdu.Add(0x03);
+        pdu.Add(((pduAddr) >> (8)));
+        pdu.Add(((pduAddr) & (0xff)));
+        pdu.Add(((nWords) >> (8)));
+        pdu.Add(((nWords) & (0xff)));
+        // may throw an exception
+        reply = this.queryMODBUS(slaveNo, pdu);
+        if (reply.Count == 0) {
+            return res;
+        }
+        if (reply[0] != pdu[0]) {
+            return res;
+        }
+        regpos = 0;
+        idx = 2;
+        while (regpos < nWords) {
+            val = ((reply[idx]) << (8));
+            idx = idx + 1;
+            val = val + reply[idx];
+            idx = idx + 1;
+            res.Add(val);
+            regpos = regpos + 1;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Reads one or more contiguous input registers (read-only registers) from a MODBUS serial device.
+     * <para>
+     *   This method uses the MODBUS function code 0x04 (Read Input Registers).
+     * </para>
+     * </summary>
+     * <param name="slaveNo">
+     *   the address of the slave MODBUS device to query
+     * </param>
+     * <param name="pduAddr">
+     *   the relative address of the first input register to read (zero-based)
+     * </param>
+     * <param name="nWords">
+     *   the number of input registers to read
+     * </param>
+     * <returns>
+     *   a vector of integers, each corresponding to one 16-bit input value.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
+     */
+    public virtual List<int> modbusReadInputRegisters(int slaveNo, int pduAddr, int nWords)
+    {
+        List<int> pdu = new List<int>();
+        List<int> reply = new List<int>();
+        List<int> res = new List<int>();
+        int regpos;
+        int idx;
+        int val;
+        pdu.Add(0x04);
+        pdu.Add(((pduAddr) >> (8)));
+        pdu.Add(((pduAddr) & (0xff)));
+        pdu.Add(((nWords) >> (8)));
+        pdu.Add(((nWords) & (0xff)));
+        // may throw an exception
+        reply = this.queryMODBUS(slaveNo, pdu);
+        if (reply.Count == 0) {
+            return res;
+        }
+        if (reply[0] != pdu[0]) {
+            return res;
+        }
+        regpos = 0;
+        idx = 2;
+        while (regpos < nWords) {
+            val = ((reply[idx]) << (8));
+            idx = idx + 1;
+            val = val + reply[idx];
+            idx = idx + 1;
+            res.Add(val);
+            regpos = regpos + 1;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Sets a single internal bit (or coil) on a MODBUS serial device.
+     * <para>
+     *   This method uses the MODBUS function code 0x05 (Write Single Coil).
+     * </para>
+     * </summary>
+     * <param name="slaveNo">
+     *   the address of the slave MODBUS device to drive
+     * </param>
+     * <param name="pduAddr">
+     *   the relative address of the bit/coil to set (zero-based)
+     * </param>
+     * <param name="value">
+     *   the value to set (0 for OFF state, non-zero for ON state)
+     * </param>
+     * <returns>
+     *   the number of bits/coils affected on the device (1)
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns zero.
+     * </para>
+     */
+    public virtual int modbusWriteBit(int slaveNo, int pduAddr, int value)
+    {
+        List<int> pdu = new List<int>();
+        List<int> reply = new List<int>();
+        int res;
+        res = 0;
+        if (value != 0) {
+            value = 0xff;
+        }
+        pdu.Add(0x05);
+        pdu.Add(((pduAddr) >> (8)));
+        pdu.Add(((pduAddr) & (0xff)));
+        pdu.Add(value);
+        pdu.Add(0x00);
+        // may throw an exception
+        reply = this.queryMODBUS(slaveNo, pdu);
+        if (reply.Count == 0) {
+            return res;
+        }
+        if (reply[0] != pdu[0]) {
+            return res;
+        }
+        res = 1;
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Sets several contiguous internal bits (or coils) on a MODBUS serial device.
+     * <para>
+     *   This method uses the MODBUS function code 0x0f (Write Multiple Coils).
+     * </para>
+     * </summary>
+     * <param name="slaveNo">
+     *   the address of the slave MODBUS device to drive
+     * </param>
+     * <param name="pduAddr">
+     *   the relative address of the first bit/coil to set (zero-based)
+     * </param>
+     * <param name="bits">
+     *   the vector of bits to be set (one integer per bit)
+     * </param>
+     * <returns>
+     *   the number of bits/coils affected on the device
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns zero.
+     * </para>
+     */
+    public virtual int modbusWriteBits(int slaveNo, int pduAddr, List<int> bits)
+    {
+        int nBits;
+        int nBytes;
+        int bitpos;
+        int val;
+        int mask;
+        List<int> pdu = new List<int>();
+        List<int> reply = new List<int>();
+        int res;
+        res = 0;
+        nBits = bits.Count;
+        nBytes = (((nBits + 7)) >> (3));
+        pdu.Add(0x0f);
+        pdu.Add(((pduAddr) >> (8)));
+        pdu.Add(((pduAddr) & (0xff)));
+        pdu.Add(((nBits) >> (8)));
+        pdu.Add(((nBits) & (0xff)));
+        pdu.Add(nBytes);
+        bitpos = 0;
+        val = 0;
+        mask = 1;
+        while (bitpos < nBits) {
+            if (bits[bitpos] != 0) {
+                val = ((val) | (mask));
+            }
+            bitpos = bitpos + 1;
+            if (mask == 0x80) {
+                pdu.Add(val);
+                val = 0;
+                mask = 1;
+            } else {
+                mask = ((mask) << (1));
+            }
+        }
+        if (mask != 1) {
+            pdu.Add(val);
+        }
+        // may throw an exception
+        reply = this.queryMODBUS(slaveNo, pdu);
+        if (reply.Count == 0) {
+            return res;
+        }
+        if (reply[0] != pdu[0]) {
+            return res;
+        }
+        res = ((reply[3]) << (8));
+        res = res + reply[4];
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Sets a single internal register (or holding register) on a MODBUS serial device.
+     * <para>
+     *   This method uses the MODBUS function code 0x06 (Write Single Register).
+     * </para>
+     * </summary>
+     * <param name="slaveNo">
+     *   the address of the slave MODBUS device to drive
+     * </param>
+     * <param name="pduAddr">
+     *   the relative address of the register to set (zero-based)
+     * </param>
+     * <param name="value">
+     *   the 16 bit value to set
+     * </param>
+     * <returns>
+     *   the number of registers affected on the device (1)
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns zero.
+     * </para>
+     */
+    public virtual int modbusWriteRegister(int slaveNo, int pduAddr, int value)
+    {
+        List<int> pdu = new List<int>();
+        List<int> reply = new List<int>();
+        int res;
+        res = 0;
+        if (value != 0) {
+            value = 0xff;
+        }
+        pdu.Add(0x06);
+        pdu.Add(((pduAddr) >> (8)));
+        pdu.Add(((pduAddr) & (0xff)));
+        pdu.Add(((value) >> (8)));
+        pdu.Add(((value) & (0xff)));
+        // may throw an exception
+        reply = this.queryMODBUS(slaveNo, pdu);
+        if (reply.Count == 0) {
+            return res;
+        }
+        if (reply[0] != pdu[0]) {
+            return res;
+        }
+        res = 1;
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Sets several contiguous internal registers (or holding registers) on a MODBUS serial device.
+     * <para>
+     *   This method uses the MODBUS function code 0x10 (Write Multiple Registers).
+     * </para>
+     * </summary>
+     * <param name="slaveNo">
+     *   the address of the slave MODBUS device to drive
+     * </param>
+     * <param name="pduAddr">
+     *   the relative address of the first internal register to set (zero-based)
+     * </param>
+     * <param name="values">
+     *   the vector of 16 bit values to set
+     * </param>
+     * <returns>
+     *   the number of registers affected on the device
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns zero.
+     * </para>
+     */
+    public virtual int modbusWriteRegisters(int slaveNo, int pduAddr, List<int> values)
+    {
+        int nWords;
+        int nBytes;
+        int regpos;
+        int val;
+        List<int> pdu = new List<int>();
+        List<int> reply = new List<int>();
+        int res;
+        res = 0;
+        nWords = values.Count;
+        nBytes = 2 * nWords;
+        pdu.Add(0x10);
+        pdu.Add(((pduAddr) >> (8)));
+        pdu.Add(((pduAddr) & (0xff)));
+        pdu.Add(((nWords) >> (8)));
+        pdu.Add(((nWords) & (0xff)));
+        pdu.Add(nBytes);
+        regpos = 0;
+        while (regpos < nWords) {
+            val = values[regpos];
+            pdu.Add(((val) >> (8)));
+            pdu.Add(((val) & (0xff)));
+            regpos = regpos + 1;
+        }
+        // may throw an exception
+        reply = this.queryMODBUS(slaveNo, pdu);
+        if (reply.Count == 0) {
+            return res;
+        }
+        if (reply[0] != pdu[0]) {
+            return res;
+        }
+        res = ((reply[3]) << (8));
+        res = res + reply[4];
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Sets several contiguous internal registers (holding registers) on a MODBUS serial device,
+     *   then performs a contiguous read of a set of (possibly different) internal registers.
+     * <para>
+     *   This method uses the MODBUS function code 0x17 (Read/Write Multiple Registers).
+     * </para>
+     * </summary>
+     * <param name="slaveNo">
+     *   the address of the slave MODBUS device to drive
+     * </param>
+     * <param name="pduWriteAddr">
+     *   the relative address of the first internal register to set (zero-based)
+     * </param>
+     * <param name="values">
+     *   the vector of 16 bit values to set
+     * </param>
+     * <param name="pduReadAddr">
+     *   the relative address of the first internal register to read (zero-based)
+     * </param>
+     * <param name="nReadWords">
+     *   the number of 16 bit values to read
+     * </param>
+     * <returns>
+     *   a vector of integers, each corresponding to one 16-bit register value read.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
+     */
+    public virtual List<int> modbusWriteAndReadRegisters(int slaveNo, int pduWriteAddr, List<int> values, int pduReadAddr, int nReadWords)
+    {
+        int nWriteWords;
+        int nBytes;
+        int regpos;
+        int val;
+        int idx;
+        List<int> pdu = new List<int>();
+        List<int> reply = new List<int>();
+        List<int> res = new List<int>();
+        nWriteWords = values.Count;
+        nBytes = 2 * nWriteWords;
+        pdu.Add(0x17);
+        pdu.Add(((pduReadAddr) >> (8)));
+        pdu.Add(((pduReadAddr) & (0xff)));
+        pdu.Add(((nReadWords) >> (8)));
+        pdu.Add(((nReadWords) & (0xff)));
+        pdu.Add(((pduWriteAddr) >> (8)));
+        pdu.Add(((pduWriteAddr) & (0xff)));
+        pdu.Add(((nWriteWords) >> (8)));
+        pdu.Add(((nWriteWords) & (0xff)));
+        pdu.Add(nBytes);
+        regpos = 0;
+        while (regpos < nWriteWords) {
+            val = values[regpos];
+            pdu.Add(((val) >> (8)));
+            pdu.Add(((val) & (0xff)));
+            regpos = regpos + 1;
+        }
+        // may throw an exception
+        reply = this.queryMODBUS(slaveNo, pdu);
+        if (reply.Count == 0) {
+            return res;
+        }
+        if (reply[0] != pdu[0]) {
+            return res;
+        }
+        regpos = 0;
+        idx = 2;
+        while (regpos < nReadWords) {
+            val = ((reply[idx]) << (8));
+            idx = idx + 1;
+            val = val + reply[idx];
+            idx = idx + 1;
+            res.Add(val);
+            regpos = regpos + 1;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Continues the enumeration of serial ports started using <c>yFirstSerialPort()</c>.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a pointer to a <c>YSerialPort</c> object, corresponding to
+     *   a serial port currently online, or a <c>null</c> pointer
+     *   if there are no more serial ports to enumerate.
+     * </returns>
+     */
+    public YSerialPort nextSerialPort()
+    {
+        string hwid = "";
+        if (YAPI.YISERR(_nextFunction(ref hwid)))
+            return null;
+        if (hwid == "")
+            return null;
+        return FindSerialPort(hwid);
+    }
+
+    //--- (end of YSerialPort implementation)
+
+    //--- (SerialPort functions)
+
+    /**
+     * <summary>
+     *   Starts the enumeration of serial ports currently accessible.
+     * <para>
+     *   Use the method <c>YSerialPort.nextSerialPort()</c> to iterate on
+     *   next serial ports.
+     * </para>
+     * </summary>
+     * <returns>
+     *   a pointer to a <c>YSerialPort</c> object, corresponding to
+     *   the first serial port currently online, or a <c>null</c> pointer
+     *   if there are none.
+     * </returns>
+     */
+    public static YSerialPort FirstSerialPort()
+    {
+        YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
+        YDEV_DESCR dev = default(YDEV_DESCR);
+        int neededsize = 0;
+        int err = 0;
+        string serial = null;
+        string funcId = null;
+        string funcName = null;
+        string funcVal = null;
+        string errmsg = "";
+        int size = Marshal.SizeOf(v_fundescr[0]);
+        IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
+        err = YAPI.apiGetFunctionsByClass("SerialPort", 0, p, size, ref neededsize, ref errmsg);
+        Marshal.Copy(p, v_fundescr, 0, 1);
+        Marshal.FreeHGlobal(p);
+        if ((YAPI.YISERR(err) | (neededsize == 0)))
+            return null;
+        serial = "";
+        funcId = "";
+        funcName = "";
+        funcVal = "";
+        errmsg = "";
+        if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
+            return null;
+        return FindSerialPort(serial + "." + funcId);
+    }
+
+
+
+    //--- (end of SerialPort functions)
+}

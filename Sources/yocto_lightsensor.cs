@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_lightsensor.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_lightsensor.cs 17655 2014-09-16 12:24:27Z mvuilleu $
  *
  * Implements yFindLightSensor(), the high-level API for LightSensor functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YLightSensor return codes)
     //--- (end of YLightSensor return codes)
+//--- (YLightSensor dlldef)
+//--- (end of YLightSensor dlldef)
 //--- (YLightSensor class start)
 /**
  * <summary>
@@ -67,6 +69,14 @@ public class YLightSensor : YSensor
     public new delegate void ValueCallback(YLightSensor func, string value);
     public new delegate void TimedReportCallback(YLightSensor func, YMeasure measure);
 
+    public const int MEASURETYPE_HUMAN_EYE = 0;
+    public const int MEASURETYPE_WIDE_SPECTRUM = 1;
+    public const int MEASURETYPE_INFRARED = 2;
+    public const int MEASURETYPE_HIGH_RATE = 3;
+    public const int MEASURETYPE_HIGH_ENERGY = 4;
+    public const int MEASURETYPE_INVALID = -1;
+
+    protected int _measureType = MEASURETYPE_INVALID;
     protected ValueCallback _valueCallbackLightSensor = null;
     protected TimedReportCallback _timedReportCallbackLightSensor = null;
     //--- (end of YLightSensor definitions)
@@ -83,13 +93,18 @@ public class YLightSensor : YSensor
 
     protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
+        if (member.name == "measureType")
+        {
+            _measureType = (int)member.ivalue;
+            return;
+        }
         base._parseAttr(member);
     }
 
     public int set_currentValue(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval*65536.0).ToString();
+        rest_val = Math.Round(newval * 65536.0).ToString();
         return _setAttr("currentValue", rest_val);
     }
 
@@ -121,8 +136,69 @@ public class YLightSensor : YSensor
     public int calibrate(double calibratedVal)
     {
         string rest_val;
-        rest_val = Math.Round(calibratedVal*65536.0).ToString();
+        rest_val = Math.Round(calibratedVal * 65536.0).ToString();
         return _setAttr("currentValue", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the type of light measure.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among <c>YLightSensor.MEASURETYPE_HUMAN_EYE</c>, <c>YLightSensor.MEASURETYPE_WIDE_SPECTRUM</c>,
+     *   <c>YLightSensor.MEASURETYPE_INFRARED</c>, <c>YLightSensor.MEASURETYPE_HIGH_RATE</c> and
+     *   <c>YLightSensor.MEASURETYPE_HIGH_ENERGY</c> corresponding to the type of light measure
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YLightSensor.MEASURETYPE_INVALID</c>.
+     * </para>
+     */
+    public int get_measureType()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return MEASURETYPE_INVALID;
+            }
+        }
+        return this._measureType;
+    }
+
+    /**
+     * <summary>
+     *   Modify the light sensor type used in the device.
+     * <para>
+     *   The measure can either
+     *   approximate the response of the human eye, focus on a specific light
+     *   spectrum, depending on the capabilities of the light-sensitive cell.
+     *   Remember to call the <c>saveToFlash()</c> method of the module if the
+     *   modification must be kept.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a value among <c>YLightSensor.MEASURETYPE_HUMAN_EYE</c>, <c>YLightSensor.MEASURETYPE_WIDE_SPECTRUM</c>,
+     *   <c>YLightSensor.MEASURETYPE_INFRARED</c>, <c>YLightSensor.MEASURETYPE_HIGH_RATE</c> and
+     *   <c>YLightSensor.MEASURETYPE_HIGH_ENERGY</c>
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_measureType(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("measureType", rest_val);
     }
 
     /**

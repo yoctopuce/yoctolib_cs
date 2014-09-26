@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_magnetometer.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_magnetometer.cs 17354 2014-08-29 10:07:05Z seb $
  *
  * Implements yFindMagnetometer(), the high-level API for Magnetometer functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YMagnetometer return codes)
     //--- (end of YMagnetometer return codes)
+//--- (YMagnetometer dlldef)
+//--- (end of YMagnetometer dlldef)
 //--- (YMagnetometer class start)
 /**
  * <summary>
@@ -91,17 +93,17 @@ public class YMagnetometer : YSensor
     {
         if (member.name == "xValue")
         {
-            _xValue = member.ivalue / 65536.0;
+            _xValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         if (member.name == "yValue")
         {
-            _yValue = member.ivalue / 65536.0;
+            _yValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         if (member.name == "zValue")
         {
-            _zValue = member.ivalue / 65536.0;
+            _zValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         base._parseAttr(member);

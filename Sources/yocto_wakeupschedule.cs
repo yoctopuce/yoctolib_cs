@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wakeupschedule.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_wakeupschedule.cs 17481 2014-09-03 09:38:35Z mvuilleu $
  *
  * Implements yFindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YWakeUpSchedule return codes)
     //--- (end of YWakeUpSchedule return codes)
+//--- (YWakeUpSchedule dlldef)
+//--- (end of YWakeUpSchedule dlldef)
 //--- (YWakeUpSchedule class start)
 /**
  * <summary>
@@ -580,7 +582,7 @@ public class YWakeUpSchedule : YFunction
      */
     public virtual long get_minutes()
     {
-        long res = 0;
+        long res;
         // may throw an exception
         res = this.get_minutesB();
         res = ((res) << (30));

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pressure.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_pressure.cs 17354 2014-08-29 10:07:05Z seb $
  *
  * Implements yFindPressure(), the high-level API for Pressure functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YPressure return codes)
     //--- (end of YPressure return codes)
+//--- (YPressure dlldef)
+//--- (end of YPressure dlldef)
 //--- (YPressure class start)
 /**
  * <summary>

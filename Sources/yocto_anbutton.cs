@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_anbutton.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_anbutton.cs 17672 2014-09-16 16:15:24Z seb $
  *
  * Implements yFindAnButton(), the high-level API for AnButton functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YAnButton return codes)
     //--- (end of YAnButton return codes)
+//--- (YAnButton dlldef)
+//--- (end of YAnButton dlldef)
 //--- (YAnButton class start)
 /**
  * <summary>
@@ -476,7 +478,7 @@ public class YAnButton : YFunction
     /**
      * <summary>
      *   Returns the number of elapsed milliseconds between the module power on and the last time
-     *   the input button was pressed (the input contact transitionned from open to closed).
+     *   the input button was pressed (the input contact transitioned from open to closed).
      * <para>
      * </para>
      * <para>
@@ -484,7 +486,7 @@ public class YAnButton : YFunction
      * </summary>
      * <returns>
      *   an integer corresponding to the number of elapsed milliseconds between the module power on and the last time
-     *   the input button was pressed (the input contact transitionned from open to closed)
+     *   the input button was pressed (the input contact transitioned from open to closed)
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YAnButton.LASTTIMEPRESSED_INVALID</c>.
@@ -503,7 +505,7 @@ public class YAnButton : YFunction
     /**
      * <summary>
      *   Returns the number of elapsed milliseconds between the module power on and the last time
-     *   the input button was released (the input contact transitionned from closed to open).
+     *   the input button was released (the input contact transitioned from closed to open).
      * <para>
      * </para>
      * <para>
@@ -511,7 +513,7 @@ public class YAnButton : YFunction
      * </summary>
      * <returns>
      *   an integer corresponding to the number of elapsed milliseconds between the module power on and the last time
-     *   the input button was released (the input contact transitionned from closed to open)
+     *   the input button was released (the input contact transitioned from closed to open)
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YAnButton.LASTTIMERELEASED_INVALID</c>.

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs 15131 2014-02-28 10:23:25Z seb $
+ * $Id: yocto_files.cs 17672 2014-09-16 16:15:24Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -309,7 +309,7 @@ public class YFiles : YFunction
 
     /**
      * <summary>
-     *   Reinitializes the filesystem to its clean, unfragmented, empty state.
+     *   Reinitialize the filesystem to its clean, unfragmented, empty state.
      * <para>
      *   All files previously uploaded are permanently lost.
      * </para>

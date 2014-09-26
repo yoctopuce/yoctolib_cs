@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_network.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_network.cs 17582 2014-09-10 17:12:40Z mvuilleu $
  *
  * Implements yFindNetwork(), the high-level API for Network functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YNetwork return codes)
     //--- (end of YNetwork return codes)
+//--- (YNetwork dlldef)
+//--- (end of YNetwork dlldef)
 //--- (YNetwork class start)
 /**
  * <summary>
@@ -395,78 +397,6 @@ public class YNetwork : YFunction
     {
         string rest_val;
         rest_val = newval;
-        return _setAttr("ipConfig", rest_val);
-    }
-
-    /**
-     * <summary>
-     *   Changes the configuration of the network interface to enable the use of an
-     *   IP address received from a DHCP server.
-     * <para>
-     *   Until an address is received from a DHCP
-     *   server, the module uses the IP parameters specified to this function.
-     *   Remember to call the <c>saveToFlash()</c> method and then to reboot the module to apply this setting.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="fallbackIpAddr">
-     *   fallback IP address, to be used when no DHCP reply is received
-     * </param>
-     * <param name="fallbackSubnetMaskLen">
-     *   fallback subnet mask length when no DHCP reply is received, as an
-     *   integer (eg. 24 means 255.255.255.0)
-     * </param>
-     * <param name="fallbackRouter">
-     *   fallback router IP address, to be used when no DHCP reply is received
-     * </param>
-     * <para>
-     * </para>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public int useDHCP(string fallbackIpAddr,int fallbackSubnetMaskLen,string fallbackRouter)
-    {
-        string rest_val;
-        rest_val = "DHCP:"+fallbackIpAddr+"/"+fallbackSubnetMaskLen.ToString()+"/"+fallbackRouter;
-        return _setAttr("ipConfig", rest_val);
-    }
-
-    /**
-     * <summary>
-     *   Changes the configuration of the network interface to use a static IP address.
-     * <para>
-     *   Remember to call the <c>saveToFlash()</c> method and then to reboot the module to apply this setting.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="ipAddress">
-     *   device IP address
-     * </param>
-     * <param name="subnetMaskLen">
-     *   subnet mask length, as an integer (eg. 24 means 255.255.255.0)
-     * </param>
-     * <param name="router">
-     *   router IP address (default gateway)
-     * </param>
-     * <para>
-     * </para>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public int useStaticIP(string ipAddress,int subnetMaskLen,string router)
-    {
-        string rest_val;
-        rest_val = "STATIC:"+ipAddress+"/"+subnetMaskLen.ToString()+"/"+router;
         return _setAttr("ipConfig", rest_val);
     }
 
@@ -1309,6 +1239,66 @@ public class YNetwork : YFunction
             base._invokeValueCallback(value);
         }
         return 0;
+    }
+
+    /**
+     * <summary>
+     *   Changes the configuration of the network interface to enable the use of an
+     *   IP address received from a DHCP server.
+     * <para>
+     *   Until an address is received from a DHCP
+     *   server, the module uses the IP parameters specified to this function.
+     *   Remember to call the <c>saveToFlash()</c> method and then to reboot the module to apply this setting.
+     * </para>
+     * </summary>
+     * <param name="fallbackIpAddr">
+     *   fallback IP address, to be used when no DHCP reply is received
+     * </param>
+     * <param name="fallbackSubnetMaskLen">
+     *   fallback subnet mask length when no DHCP reply is received, as an
+     *   integer (eg. 24 means 255.255.255.0)
+     * </param>
+     * <param name="fallbackRouter">
+     *   fallback router IP address, to be used when no DHCP reply is received
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int useDHCP(string fallbackIpAddr, int fallbackSubnetMaskLen, string fallbackRouter)
+    {
+        return this.set_ipConfig("DHCP:"+ fallbackIpAddr+"/"+Convert.ToString( fallbackSubnetMaskLen)+"/"+fallbackRouter);
+    }
+
+    /**
+     * <summary>
+     *   Changes the configuration of the network interface to use a static IP address.
+     * <para>
+     *   Remember to call the <c>saveToFlash()</c> method and then to reboot the module to apply this setting.
+     * </para>
+     * </summary>
+     * <param name="ipAddress">
+     *   device IP address
+     * </param>
+     * <param name="subnetMaskLen">
+     *   subnet mask length, as an integer (eg. 24 means 255.255.255.0)
+     * </param>
+     * <param name="router">
+     *   router IP address (default gateway)
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int useStaticIP(string ipAddress, int subnetMaskLen, string router)
+    {
+        return this.set_ipConfig("STATIC:"+ ipAddress+"/"+Convert.ToString( subnetMaskLen)+"/"+router);
     }
 
     /**

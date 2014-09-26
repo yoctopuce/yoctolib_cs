@@ -30,10 +30,8 @@ namespace WindowsFormsApplication1
             for (int i = 0; i < devicesList.Items.Count; i++)
                 if (devicesList.Items[i] == m) index = i;
 
-
             // if we removed the current module, we must fully refresh the ui
             bool mustrefresh = index == devicesList.SelectedIndex;
-
 
             if (index >= 0)
             { // remove it from the combo box
@@ -70,9 +68,7 @@ namespace WindowsFormsApplication1
             YAPI.RegisterDeviceArrivalCallback(arrivalCallback);
             YAPI.RegisterDeviceRemovalCallback(removalCallback);
 
-
             timer1.Enabled = true;
-
         }
 
 
@@ -103,26 +99,16 @@ namespace WindowsFormsApplication1
                 {
                     string fctName = currentDevice.functionId(i);
                     string fctFullName = currentDevice.get_serialNumber() + '.' + fctName;
-                    YFunction fct = null;
-                    // We have to have handle each sensor type independtly, (sorry about that)
-                    if (fctName.IndexOf("temperature") == 0) fct = (YFunction)YTemperature.FindTemperature(fctFullName);
-                    if (fctName.IndexOf("humidity") == 0) fct = (YFunction)YHumidity.FindHumidity(fctFullName);
-                    if (fctName.IndexOf("pressure") == 0) fct = (YFunction)YPressure.FindPressure(fctFullName);
-                    if (fctName.IndexOf("lightSensor") == 0) fct = (YFunction)YLightSensor.FindLightSensor(fctFullName);
-                    if (fctName.IndexOf("carbonDioxide") == 0) fct = (YFunction)YCarbonDioxide.FindCarbonDioxide(fctFullName);
-                    if (fctName.IndexOf("voltage") == 0) fct = (YFunction)YVoltage.FindVoltage(fctFullName);
-                    if (fctName.IndexOf("current") == 0) fct = (YFunction)YCurrent.FindCurrent(fctFullName);
+                    YSensor fct = YSensor.FindSensor(fctFullName);
                     // add the function in the second drop down
-                    if (fct != null) functionsList.Items.Add(fct);
+                    if (fct.isOnline()) functionsList.Items.Add(fct);
                 }
 
             }
-
             functionsList.Enabled = functionsList.Items.Count > 0;
             if (functionsList.Enabled) functionsList.SelectedIndex = 0;
 
             refreshFctUI(true);
-
         }
 
         private void refreshFctUI(bool newone)
@@ -143,7 +129,7 @@ namespace WindowsFormsApplication1
                 return;
             }
 
-            YFunction fct = (YFunction)functionsList.Items[functionsList.SelectedIndex];
+            YSensor fct = (YSensor)functionsList.Items[functionsList.SelectedIndex];
             if (newone)
             { // enable the ui
                 EnableCalibrationUI(true);
@@ -154,38 +140,25 @@ namespace WindowsFormsApplication1
                     rawedit[i].Text = "";
                     rawedit[i].BackColor = System.Drawing.SystemColors.Window;
                 }
-
-                if (fct is YTemperature) DisplayTemperatureCalPoints((YTemperature)fct);
-                if (fct is YPressure) DisplayPressureCalPoints((YPressure)fct);
-                if (fct is YHumidity) DisplayHumidityCalPoints((YHumidity)fct);
-                if (fct is YLightSensor) DisplayLightSensorCalPoints((YLightSensor)fct);
-                if (fct is YCarbonDioxide) DisplayCarbonDioxideCalPoints((YCarbonDioxide)fct);
-                if (fct is YVoltage) DisplayVoltageCalPoints((YVoltage)fct);
-                if (fct is YCurrent) DisplayCurrentCalPoints((YCurrent)fct);
+                DisplayCalPoints(fct);
             }
 
-            if (fct.isOnline())
-            {
-                if (fct is YTemperature) DisplayTemperature((YTemperature)fct);
-                if (fct is YPressure) DisplayPressure((YPressure)fct);
-                if (fct is YHumidity) DisplayHumidity((YHumidity)fct);
-                if (fct is YLightSensor) DisplayLightSensor((YLightSensor)fct);
-                if (fct is YCarbonDioxide) DisplayCarbonDioxide((YCarbonDioxide)fct);
-                if (fct is YVoltage) DisplayVoltage((YVoltage)fct);
-                if (fct is YCurrent) DisplayCurrent((YCurrent)fct);
-            }
+            if (fct.isOnline()) DisplayValue(fct);
         }
 
 
-        private void displayValue(double value, double rawvalue, double resolution, string valunit)
+        private void DisplayValue(YSensor fct)
         {
+            double value = fct.get_currentValue();
+            double rawvalue = fct.get_currentRawValue();
+            double resolution= fct.get_resolution();
+            string valunit = fct.get_unit();
             // displays the sensor value on the ui
             ValueDisplayUnits.Text = valunit;
 
-            if (resolution != YTemperature.RESOLUTION_INVALID)
+            if (resolution != YSensor.RESOLUTION_INVALID)
             {  // if resolution is available on the device the use it to  round the value
                 string format = "F" + ((int)-Math.Round(Math.Log10(resolution))).ToString();
-
 
                 RawValueDisplay.Text = "(raw value: " + (resolution * Math.Round(rawvalue / resolution)).ToString(format) + ")";
                 ValueDisplay.Text = (resolution * Math.Round(value / resolution)).ToString(format);
@@ -220,12 +193,13 @@ namespace WindowsFormsApplication1
         }
 
 
-        private void DisplayCalPoints(List<double> ValuesRaw, List<double> ValuesCal, double resolution)
+        private void DisplayCalPoints(YSensor fct)
         {
-            int i;
-            // little trick: if resolution is not available on the device, the
-            // calibration in not available either
-            if (resolution == YTemperature.RESOLUTION_INVALID)
+            List<double> ValuesRaw = new List<double>();
+            List<double> ValuesCal = new List<double>();
+
+            int retcode = fct.loadCalibrationPoints(ValuesRaw, ValuesCal);
+            if (retcode == YAPI.NOT_SUPPORTED)
             {
                 EnableCalibrationUI(false);
                 unsupported_warning.Visible = true;
@@ -234,16 +208,15 @@ namespace WindowsFormsApplication1
 
             // display the calibration points
             unsupported_warning.Visible = false;
+            int i;
             for (i = 0; i < ValuesRaw.Count; i++)
             {
-                rawedit[i].Text = ValuesRaw[i].ToString();
-                caledit[i].Text = ValuesCal[i].ToString();
+                rawedit[i].Text = YAPI._floatToStr(ValuesRaw[i]);
+                caledit[i].Text = YAPI._floatToStr(ValuesCal[i]);
                 rawedit[i].BackColor = System.Drawing.Color.FromArgb(0xA0, 0xFF, 0xA0);
                 caledit[i].BackColor = System.Drawing.Color.FromArgb(0xA0, 0xFF, 0xA0);
             }
         }
-
-
 
         private void timer1_Tick(object sender, EventArgs e)
         {
@@ -256,99 +229,6 @@ namespace WindowsFormsApplication1
             // refresh the UI values
             refreshFctUI(false);
 
-        }
-
-
-        // this the weak point of the API, methods get_currentValue,
-        // get_resolution,  get_unit etc... are present in all sensor classes, but 
-        // are  not inherited from the parent class (to keep the object model
-        // simple) we have to handle them independtly for each sensor type.
-
-        private void DisplayTemperature(YTemperature fct)
-        { displayValue(fct.get_currentValue(), fct.get_currentRawValue(), fct.get_resolution(), fct.get_unit()); }
-
-        private void DisplayPressure(YPressure fct)
-        { displayValue(fct.get_currentValue(), fct.get_currentRawValue(), fct.get_resolution(), fct.get_unit()); }
-
-
-        private void DisplayHumidity(YHumidity fct)
-        { displayValue(fct.get_currentValue(), fct.get_currentRawValue(), fct.get_resolution(), fct.get_unit()); }
-
-        private void DisplayLightSensor(YLightSensor fct)
-        { displayValue(fct.get_currentValue(), fct.get_currentRawValue(), fct.get_resolution(), fct.get_unit()); }
-
-        private void DisplayCarbonDioxide(YCarbonDioxide fct)
-        { displayValue(fct.get_currentValue(), fct.get_currentRawValue(), fct.get_resolution(), fct.get_unit()); }
-
-        private void DisplayVoltage(YVoltage fct)
-        { displayValue(fct.get_currentValue(), fct.get_currentRawValue(), fct.get_resolution(), fct.get_unit()); }
-
-        private void DisplayCurrent(YCurrent fct)
-        { displayValue(fct.get_currentValue(), fct.get_currentRawValue(), fct.get_resolution(), fct.get_unit()); }
-
-
-
-        private void DisplayTemperatureCalPoints(YTemperature fct)
-        {
-            List<double> ValuesRaw = new List<double>();
-            List<double> ValuesCal = new List<double>();
-
-            fct.loadCalibrationPoints(ValuesRaw, ValuesCal);
-            DisplayCalPoints(ValuesRaw, ValuesCal, fct.get_resolution());
-        }
-
-        private void DisplayPressureCalPoints(YPressure fct)
-        {
-            List<double> ValuesRaw = new List<double>();
-            List<double> ValuesCal = new List<double>();
-
-            fct.loadCalibrationPoints(ValuesRaw, ValuesCal);
-            DisplayCalPoints(ValuesRaw, ValuesCal, fct.get_resolution());
-        }
-
-        private void DisplayHumidityCalPoints(YHumidity fct)
-        {
-            List<double> ValuesRaw = new List<double>();
-            List<double> ValuesCal = new List<double>();
-
-            fct.loadCalibrationPoints(ValuesRaw, ValuesCal);
-            DisplayCalPoints(ValuesRaw, ValuesCal, fct.get_resolution());
-        }
-
-        private void DisplayLightSensorCalPoints(YLightSensor fct)
-        {
-            List<double> ValuesRaw = new List<double>();
-            List<double> ValuesCal = new List<double>();
-
-            fct.loadCalibrationPoints(ValuesRaw, ValuesCal);
-            DisplayCalPoints(ValuesRaw, ValuesCal, fct.get_resolution());
-        }
-
-        private void DisplayCarbonDioxideCalPoints(YCarbonDioxide fct)
-        {
-            List<double> ValuesRaw = new List<double>();
-            List<double> ValuesCal = new List<double>();
-
-            fct.loadCalibrationPoints(ValuesRaw, ValuesCal);
-            DisplayCalPoints(ValuesRaw, ValuesCal, fct.get_resolution());
-        }
-
-        private void DisplayVoltageCalPoints(YVoltage fct)
-        {
-            List<double> ValuesRaw = new List<double>();
-            List<double> ValuesCal = new List<double>();
-
-            fct.loadCalibrationPoints(ValuesRaw, ValuesCal);
-            DisplayCalPoints(ValuesRaw, ValuesCal, fct.get_resolution());
-        }
-
-        private void DisplayCurrentCalPoints(YCurrent fct)
-        {
-            List<double> ValuesRaw = new List<double>();
-            List<double> ValuesCal = new List<double>();
-
-            fct.loadCalibrationPoints(ValuesRaw, ValuesCal);
-            DisplayCalPoints(ValuesRaw, ValuesCal, fct.get_resolution());
         }
 
         private void cancelBtn_Click(object sender, EventArgs e)
@@ -375,39 +255,24 @@ namespace WindowsFormsApplication1
         {
             List<double> ValuesRaw = new List<double>();
             List<double> ValuesCal = new List<double>();
-            YFunction fct;
-            bool stop = false;
+            List<int> ParseRaw = new List<int>();
+            List<int> ParseCal = new List<int>();
             int i = 0, j;
 
             if (functionsList.SelectedIndex < 0) return;
 
-            while ((caledit[i].Text != "") && (rawedit[i].Text != "") && (i < 5) && (!stop))
+            while ((caledit[i].Text != "") && (rawedit[i].Text != "") && (i < 5))
             {
-                try
+                ParseRaw = YAPI._decodeFloats(rawedit[i].Text);
+                ParseCal = YAPI._decodeFloats(caledit[i].Text);
+                if (ParseRaw.Count != 1 || ParseCal.Count != 1) break;
+                if (i > 0)
                 {
-                    ValuesCal.Add(Convert.ToDouble(caledit[i].Text));
-                   
+                    if (ParseRaw[0] / 1000.0 <= ValuesRaw[i - 1]) break;
                 }
-                catch { stop = true;  }
-
-                if (!stop) try
-                {
-                    
-                    ValuesRaw.Add(Convert.ToDouble(rawedit[i].Text));
-                }
-                    catch { stop = true; ValuesCal.RemoveAt(ValuesCal.Count - 1); } 
-
-
-
-                if (!stop)
-                 { if (i > 0)
-                      if (ValuesRaw[i] <= ValuesRaw[i - 1])
-                     {
-                         stop = true;
-                         i--;
-                     }
-                  i++;
-                }  
+                ValuesRaw.Add(ParseRaw[0] / 1000.0);
+                ValuesCal.Add(ParseCal[0] / 1000.0);
+                i++;
             }
 
             // some ui cosmetics: correct values are turned to green
@@ -423,25 +288,13 @@ namespace WindowsFormsApplication1
             }
 
             // send the calibration point to the device
-            fct = (YFunction)functionsList.Items[functionsList.SelectedIndex];
-            if (fct.isOnline())
-            {
-                if (fct is YTemperature) ((YTemperature)fct).calibrateFromPoints(ValuesRaw, ValuesCal);
-                if (fct is YPressure) ((YHumidity)fct).calibrateFromPoints(ValuesRaw, ValuesCal);
-                if (fct is YLightSensor) ((YLightSensor)fct).calibrateFromPoints(ValuesRaw, ValuesCal);
-                if (fct is YCarbonDioxide) ((YCarbonDioxide)fct).calibrateFromPoints(ValuesRaw, ValuesCal);
-                if (fct is YVoltage) ((YVoltage)fct).calibrateFromPoints(ValuesRaw, ValuesCal);
-                if (fct is YCurrent) ((YCurrent)fct).calibrateFromPoints(ValuesRaw, ValuesCal);
-                if (fct is YHumidity) ((YHumidity)fct).calibrateFromPoints(ValuesRaw, ValuesCal);
-            }
-
-
+            YSensor fct = (YSensor)functionsList.Items[functionsList.SelectedIndex];
+            if (fct.isOnline()) fct.calibrateFromPoints(ValuesRaw, ValuesCal);
         }
 
         private void devicesList_SelectedIndexChanged(object sender, EventArgs e)
         {
             choosenDeviceChanged();
-
         }
 
         private void functionsList_SelectedIndexChanged(object sender, EventArgs e)

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_altitude.cs 16185 2014-05-12 16:00:20Z seb $
+ * $Id: yocto_altitude.cs 17354 2014-08-29 10:07:05Z seb $
  *
  * Implements yFindAltitude(), the high-level API for Altitude functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YAltitude return codes)
     //--- (end of YAltitude return codes)
+//--- (YAltitude dlldef)
+//--- (end of YAltitude dlldef)
 //--- (YAltitude class start)
 /**
  * <summary>
@@ -87,7 +89,7 @@ public class YAltitude : YSensor
     {
         if (member.name == "qnh")
         {
-            _qnh = member.ivalue / 65536.0;
+            _qnh = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         base._parseAttr(member);
@@ -118,7 +120,7 @@ public class YAltitude : YSensor
     public int set_currentValue(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval*65536.0).ToString();
+        rest_val = Math.Round(newval * 65536.0).ToString();
         return _setAttr("currentValue", rest_val);
     }
 
@@ -149,7 +151,7 @@ public class YAltitude : YSensor
     public int set_qnh(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval*65536.0).ToString();
+        rest_val = Math.Round(newval * 65536.0).ToString();
         return _setAttr("qnh", rest_val);
     }
 

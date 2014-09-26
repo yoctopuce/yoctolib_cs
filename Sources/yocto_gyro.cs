@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_gyro.cs 15334 2014-03-07 20:33:05Z mvuilleu $
+ * $Id: yocto_gyro.cs 17481 2014-09-03 09:38:35Z mvuilleu $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -394,17 +394,17 @@ public class YGyro : YSensor
     {
         if (member.name == "xValue")
         {
-            _xValue = member.ivalue / 65536.0;
+            _xValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         if (member.name == "yValue")
         {
-            _yValue = member.ivalue / 65536.0;
+            _yValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         if (member.name == "zValue")
         {
-            _zValue = member.ivalue / 65536.0;
+            _zValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         base._parseAttr(member);
@@ -629,8 +629,8 @@ public class YGyro : YSensor
 
     public virtual int _loadQuaternion()
     {
-        int now_stamp = 0;
-        int age_ms = 0;
+        int now_stamp;
+        int age_ms;
         
         now_stamp = (int) ((YAPI.GetTickCount()) & (0x7FFFFFFF));
         age_ms = (((now_stamp - this._qt_stamp)) & (0x7FFFFFFF));
@@ -667,12 +667,12 @@ public class YGyro : YSensor
 
     public virtual int _loadAngles()
     {
-        double sqw = 0;
-        double sqx = 0;
-        double sqy = 0;
-        double sqz = 0;
-        double norm = 0;
-        double delta = 0;
+        double sqw;
+        double sqx;
+        double sqy;
+        double sqz;
+        double norm;
+        double delta;
         // may throw an exception
         if (this._loadQuaternion() != YAPI.SUCCESS) {
             return YAPI.DEVICE_NOT_FOUND;

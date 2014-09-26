@@ -1,6 +1,6 @@
 /********************************************************************
  *
- * $Id: yocto_datalogger.cs 15131 2014-02-28 10:23:25Z seb $
+ * $Id: yocto_datalogger.cs 17672 2014-09-16 16:15:24Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -347,6 +347,10 @@ public class YDataLogger : YFunction
     public const int AUTOSTART_ON = 1;
     public const int AUTOSTART_INVALID = -1;
 
+    public const int BEACONDRIVEN_OFF = 0;
+    public const int BEACONDRIVEN_ON = 1;
+    public const int BEACONDRIVEN_INVALID = -1;
+
     public const int CLEARHISTORY_FALSE = 0;
     public const int CLEARHISTORY_TRUE = 1;
     public const int CLEARHISTORY_INVALID = -1;
@@ -355,6 +359,7 @@ public class YDataLogger : YFunction
     protected long _timeUTC = TIMEUTC_INVALID;
     protected int _recording = RECORDING_INVALID;
     protected int _autoStart = AUTOSTART_INVALID;
+    protected int _beaconDriven = BEACONDRIVEN_INVALID;
     protected int _clearHistory = CLEARHISTORY_INVALID;
     protected ValueCallback _valueCallbackDataLogger = null;
     //--- (end of generated code: YDataLogger definitions)
@@ -390,6 +395,11 @@ public class YDataLogger : YFunction
         if (member.name == "autoStart")
         {
             _autoStart = member.ivalue >0?1:0;
+            return;
+        }
+        if (member.name == "beaconDriven")
+        {
+            _beaconDriven = member.ivalue >0?1:0;
             return;
         }
         if (member.name == "clearHistory")
@@ -587,6 +597,61 @@ public class YDataLogger : YFunction
         string rest_val;
         rest_val = (newval > 0 ? "1" : "0");
         return _setAttr("autoStart", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Return true if the data logger is synchronised with the localization beacon.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   either <c>YDataLogger.BEACONDRIVEN_OFF</c> or <c>YDataLogger.BEACONDRIVEN_ON</c>
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YDataLogger.BEACONDRIVEN_INVALID</c>.
+     * </para>
+     */
+    public int get_beaconDriven()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BEACONDRIVEN_INVALID;
+            }
+        }
+        return this._beaconDriven;
+    }
+
+    /**
+     * <summary>
+     *   Changes the type of synchronisation of the data logger.
+     * <para>
+     *   Remember to call the <c>saveToFlash()</c> method of the module if the
+     *   modification must be kept.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   either <c>YDataLogger.BEACONDRIVEN_OFF</c> or <c>YDataLogger.BEACONDRIVEN_ON</c>, according to the
+     *   type of synchronisation of the data logger
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_beaconDriven(int newval)
+    {
+        string rest_val;
+        rest_val = (newval > 0 ? "1" : "0");
+        return _setAttr("beaconDriven", rest_val);
     }
 
     public int get_clearHistory()

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_compass.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_compass.cs 17354 2014-08-29 10:07:05Z seb $
  *
  * Implements yFindCompass(), the high-level API for Compass functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YCompass return codes)
     //--- (end of YCompass return codes)
+//--- (YCompass dlldef)
+//--- (end of YCompass dlldef)
 //--- (YCompass class start)
 /**
  * <summary>
@@ -98,7 +100,7 @@ public class YCompass : YSensor
         }
         if (member.name == "magneticHeading")
         {
-            _magneticHeading = member.ivalue / 65536.0;
+            _magneticHeading = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         base._parseAttr(member);

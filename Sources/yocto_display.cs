@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 16340 2014-05-30 10:41:54Z seb $
+ * $Id: yocto_display.cs 17498 2014-09-03 19:21:24Z mvuilleu $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -197,11 +197,11 @@ public enum   ALIGN
     /**
      * <summary>
      *   Selects an eraser instead of a pen for all subsequent drawing functions,
-     *   except for text drawing and bitmap copy functions.
+     *   except for bitmap copy functions.
      * <para>
-     *   Any point drawn
-     *   using the eraser becomes transparent (as when the layer is empty),
-     *   showing the other layers beneath it.
+     *   Any point drawn using the eraser
+     *   becomes transparent (as when the layer is empty), showing the other
+     *   layers beneath it.
      * </para>
      * </summary>
      * <returns>
@@ -1617,7 +1617,7 @@ public class YDisplay : YFunction
     {
         this.flushLayers();
         this._recording = false;
-        this._upload(sequenceName, this._sequence);
+        this._upload(sequenceName, YAPI.DefaultEncoding.GetBytes(this._sequence));
         //We need to use YPRINTF("") for Objective-C
         this._sequence = "";
         return YAPI.SUCCESS;

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_servo.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_servo.cs 17354 2014-08-29 10:07:05Z seb $
  *
  * Implements yFindServo(), the high-level API for Servo functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YServo return codes)
     //--- (end of YServo return codes)
+//--- (YServo dlldef)
+//--- (end of YServo dlldef)
 //--- (YServo class start)
 /**
  * <summary>

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorled.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_colorled.cs 17354 2014-08-29 10:07:05Z seb $
  *
  * Implements yFindColorLed(), the high-level API for ColorLed functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YColorLed return codes)
     //--- (end of YColorLed return codes)
+//--- (YColorLed dlldef)
+//--- (end of YColorLed dlldef)
 //--- (YColorLed class start)
 /**
  * <summary>

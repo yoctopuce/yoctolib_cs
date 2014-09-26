@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_accelerometer.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_accelerometer.cs 17354 2014-08-29 10:07:05Z seb $
  *
  * Implements yFindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YAccelerometer return codes)
     //--- (end of YAccelerometer return codes)
+//--- (YAccelerometer dlldef)
+//--- (end of YAccelerometer dlldef)
 //--- (YAccelerometer class start)
 /**
  * <summary>
@@ -70,9 +72,14 @@ public class YAccelerometer : YSensor
     public const double XVALUE_INVALID = YAPI.INVALID_DOUBLE;
     public const double YVALUE_INVALID = YAPI.INVALID_DOUBLE;
     public const double ZVALUE_INVALID = YAPI.INVALID_DOUBLE;
+    public const int GRAVITYCANCELLATION_OFF = 0;
+    public const int GRAVITYCANCELLATION_ON = 1;
+    public const int GRAVITYCANCELLATION_INVALID = -1;
+
     protected double _xValue = XVALUE_INVALID;
     protected double _yValue = YVALUE_INVALID;
     protected double _zValue = ZVALUE_INVALID;
+    protected int _gravityCancellation = GRAVITYCANCELLATION_INVALID;
     protected ValueCallback _valueCallbackAccelerometer = null;
     protected TimedReportCallback _timedReportCallbackAccelerometer = null;
     //--- (end of YAccelerometer definitions)
@@ -91,17 +98,22 @@ public class YAccelerometer : YSensor
     {
         if (member.name == "xValue")
         {
-            _xValue = member.ivalue / 65536.0;
+            _xValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         if (member.name == "yValue")
         {
-            _yValue = member.ivalue / 65536.0;
+            _yValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         if (member.name == "zValue")
         {
-            _zValue = member.ivalue / 65536.0;
+            _zValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
+            return;
+        }
+        if (member.name == "gravityCancellation")
+        {
+            _gravityCancellation = member.ivalue >0?1:0;
             return;
         }
         base._parseAttr(member);
@@ -180,6 +192,23 @@ public class YAccelerometer : YSensor
             }
         }
         return this._zValue;
+    }
+
+    public int get_gravityCancellation()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return GRAVITYCANCELLATION_INVALID;
+            }
+        }
+        return this._gravityCancellation;
+    }
+
+    public int set_gravityCancellation(int newval)
+    {
+        string rest_val;
+        rest_val = (newval > 0 ? "1" : "0");
+        return _setAttr("gravityCancellation", rest_val);
     }
 
     /**

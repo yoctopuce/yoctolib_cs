@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_power.cs 15251 2014-03-06 10:14:33Z seb $
+ * $Id: yocto_power.cs 17354 2014-08-29 10:07:05Z seb $
  *
  * Implements yFindPower(), the high-level API for Power functions
  *
@@ -49,6 +49,8 @@ using YFUN_DESCR = System.Int32;
 
     //--- (YPower return codes)
     //--- (end of YPower return codes)
+//--- (YPower dlldef)
+//--- (end of YPower dlldef)
 //--- (YPower class start)
 /**
  * <summary>
@@ -91,12 +93,12 @@ public class YPower : YSensor
     {
         if (member.name == "cosPhi")
         {
-            _cosPhi = member.ivalue / 65536.0;
+            _cosPhi = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         if (member.name == "meter")
         {
-            _meter = member.ivalue / 65536.0;
+            _meter = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
             return;
         }
         if (member.name == "meterTimer")
@@ -137,7 +139,7 @@ public class YPower : YSensor
     public int set_meter(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval*65536.0).ToString();
+        rest_val = Math.Round(newval * 65536.0).ToString();
         return _setAttr("meter", rest_val);
     }
 
