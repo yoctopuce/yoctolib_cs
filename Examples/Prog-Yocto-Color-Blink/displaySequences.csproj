@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1A54F6C6-13D4-4DCA-8A1C-DCCE30A0B2D5}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ConsoleApplication1</RootNamespace>
+    <AssemblyName>demo</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Sources\yocto_anbutton.cs">
+      <Link>yocto_api\yocto_anbutton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\sources\yocto_api.cs">
+      <Link>yocto_api\yocto_api.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_colorled.cs">
+      <Link>yocto_api\yocto_colorled.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_datalogger.cs">
+      <Link>yocto_api\yocto_datalogger.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_display.cs">
+      <Link>yocto_api\yocto_display.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_dualpower.cs">
+      <Link>yocto_api\yocto_dualpower.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_hubport.cs">
+      <Link>yocto_api\yocto_hubport.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_humidity.cs">
+      <Link>yocto_api\yocto_humidity.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_led.cs">
+      <Link>yocto_api\yocto_led.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_lightsensor.cs">
+      <Link>yocto_api\yocto_lightsensor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_pressure.cs">
+      <Link>yocto_api\yocto_pressure.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_power.cs">
+      <Link>yocto_api\yocto_power.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_relay.cs">
+      <Link>yocto_api\yocto_relay.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_servo.cs">
+      <Link>yocto_api\yocto_servo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_temperature.cs">
+      <Link>yocto_api\yocto_temperature.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_current.cs">
+      <Link>yocto_api\yocto_current.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_voltage.cs">
+      <Link>yocto_api\yocto_voltage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_carbondioxide.cs">
+      <Link>yocto_api\yocto_carbondioxide.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_voc.cs">
+      <Link>yocto_api\yocto_voc.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_watchdog.cs">
+      <Link>yocto_api\yocto_watchdog.cs</Link>
+    </Compile>
+    <Compile Include="main.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\Sources\dll\yapi.dll">
+      <Link>yapi.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

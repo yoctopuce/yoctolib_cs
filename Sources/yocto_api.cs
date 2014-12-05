@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 17816 2014-09-24 14:47:30Z seb $
+ * $Id: yocto_api.cs 18628 2014-12-03 16:18:53Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -760,7 +760,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "17849";
+    public const string YOCTO_API_BUILD_NO = "18640";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -860,7 +860,7 @@ public class YAPI
         public yFlashCallback progress;
         public IntPtr context;
     }
-    
+
     // --- (generated code: YFunction return codes)
 // Yoctopuce error codes, used by default as function return value
     public const int SUCCESS = 0;                   // everything worked all right
@@ -1071,7 +1071,7 @@ public class YAPI
 
             if (!(_subpathinit))
             {
-                res = YAPI._yapiGetDevicePath(_devdescr, root, null, 0, ref neededsize, errbuf);
+                    res = YAPI._yapiGetDevicePath(_devdescr, root, null, 0, ref neededsize, errbuf);
 
                 if (YAPI.YISERR(res))
                 {
@@ -1080,7 +1080,7 @@ public class YAPI
                 }
 
                 b = new StringBuilder(neededsize);
-                res = YAPI._yapiGetDevicePath(_devdescr, root, b, neededsize, ref tmp, errbuf);
+                    res = YAPI._yapiGetDevicePath(_devdescr, root, b, neededsize, ref tmp, errbuf);
                 if (YAPI.YISERR(res))
                 {
                     errmsg = errbuf.ToString();
@@ -1642,7 +1642,7 @@ public class YAPI
         int functionReturnValue = 0;
         StringBuilder buffer = new StringBuilder(YOCTO_ERRMSG_LEN);
         buffer.Length = 0;
-        functionReturnValue = _yapiLockDeviceCallBack(buffer);
+            functionReturnValue = _yapiLockDeviceCallBack(buffer);
         errmsg = buffer.ToString();
         return functionReturnValue;
     }
@@ -1652,7 +1652,7 @@ public class YAPI
         int functionReturnValue = 0;
         StringBuilder buffer = new StringBuilder(YOCTO_ERRMSG_LEN);
         buffer.Length = 0;
-        functionReturnValue = _yapiUnlockDeviceCallBack(buffer);
+            functionReturnValue = _yapiUnlockDeviceCallBack(buffer);
         errmsg = buffer.ToString();
         return functionReturnValue;
     }
@@ -1662,7 +1662,7 @@ public class YAPI
         int functionReturnValue = 0;
         StringBuilder buffer = new StringBuilder(YOCTO_ERRMSG_LEN);
         buffer.Length = 0;
-        functionReturnValue = _yapiLockFunctionCallBack(buffer);
+            functionReturnValue = _yapiLockFunctionCallBack(buffer);
         errmsg = buffer.ToString();
         return functionReturnValue;
     }
@@ -1672,7 +1672,7 @@ public class YAPI
         int functionReturnValue = 0;
         StringBuilder buffer = new StringBuilder(YOCTO_ERRMSG_LEN);
         buffer.Length = 0;
-        functionReturnValue = _yapiUnlockFunctionCallBack(buffer);
+            functionReturnValue = _yapiUnlockFunctionCallBack(buffer);
         errmsg = buffer.ToString();
         return functionReturnValue;
     }
@@ -1991,7 +1991,7 @@ public class YAPI
         csmodule_initialization();
 
         buffer.Length = 0;
-        res = _yapiInitAPI(mode, buffer);
+            res = _yapiInitAPI(mode, buffer);
         errmsg = buffer.ToString();
         if ((YISERR(res)))
         {
@@ -1999,14 +1999,14 @@ public class YAPI
             return functionReturnValue;
         }
 
-        _yapiRegisterDeviceArrivalCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceArrivalDelegate));
-        _yapiRegisterDeviceRemovalCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceRemovalDelegate));
-        _yapiRegisterDeviceChangeCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceChangeDelegate));
-        _yapiRegisterFunctionUpdateCallback(Marshal.GetFunctionPointerForDelegate(native_yFunctionUpdateDelegate));
-        _yapiRegisterTimedReportCallback(Marshal.GetFunctionPointerForDelegate(native_yTimedReportDelegate));
-        _yapiRegisterHubDiscoveryCallback(Marshal.GetFunctionPointerForDelegate(native_yapiHubDiscoveryDelegate));
-        _yapiRegisterDeviceLogCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceLogDelegate));
-        _yapiRegisterLogFunction(Marshal.GetFunctionPointerForDelegate(native_yLogFunctionDelegate));
+            _yapiRegisterDeviceArrivalCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceArrivalDelegate));
+            _yapiRegisterDeviceRemovalCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceRemovalDelegate));
+            _yapiRegisterDeviceChangeCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceChangeDelegate));
+            _yapiRegisterFunctionUpdateCallback(Marshal.GetFunctionPointerForDelegate(native_yFunctionUpdateDelegate));
+            _yapiRegisterTimedReportCallback(Marshal.GetFunctionPointerForDelegate(native_yTimedReportDelegate));
+            _yapiRegisterHubDiscoveryCallback(Marshal.GetFunctionPointerForDelegate(native_yapiHubDiscoveryDelegate));
+            _yapiRegisterDeviceLogCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceLogDelegate));
+            _yapiRegisterLogFunction(Marshal.GetFunctionPointerForDelegate(native_yLogFunctionDelegate));
         for (i = 1; i <= 20; i++)
             RegisterCalibrationHandler(i, yLinearCalibrationHandler);
         RegisterCalibrationHandler(30, yLinearCalibrationHandler);
@@ -2031,7 +2031,7 @@ public class YAPI
     {
         if (_apiInitialized)
         {
-            _yapiFreeAPI();
+                _yapiFreeAPI();
             csmodule_cleanup();
             _apiInitialized = false;
         }
@@ -2112,7 +2112,7 @@ public class YAPI
         }
 
         buffer.Length = 0;
-        res = _yapiRegisterHub(new StringBuilder(url), buffer);
+            res = _yapiRegisterHub(new StringBuilder(url), buffer);
         if (YISERR(res))
         {
             errmsg = buffer.ToString();
@@ -2160,7 +2160,7 @@ public class YAPI
         }
 
         buffer.Length = 0;
-        res = _yapiPreregisterHub(new StringBuilder(url), buffer);
+            res = _yapiPreregisterHub(new StringBuilder(url), buffer);
         if (YISERR(res))
         {
             errmsg = buffer.ToString();
@@ -2187,7 +2187,7 @@ public class YAPI
             return;
         }
 
-        _yapiUnregisterHub(new StringBuilder(url));
+            _yapiUnregisterHub(new StringBuilder(url));
     }
 
     /**
@@ -2229,7 +2229,7 @@ public class YAPI
         if (YISERR(res)) { return res; }
 
         errbuffer.Length = 0;
-        res = _yapiHandleEvents(errbuffer);
+            res = _yapiHandleEvents(errbuffer);
         if (YISERR(res))
         {
             errmsg = errbuffer.ToString();
@@ -2283,7 +2283,7 @@ public class YAPI
 
 
         errBuffer.Length = 0;
-        res = _yapiHandleEvents(errBuffer);
+            res = _yapiHandleEvents(errBuffer);
 
         if ((YISERR(res)))
         {
@@ -2360,7 +2360,7 @@ public class YAPI
             }
             if ((GetTickCount() < timeout))
             {
-                res = _yapiSleep(1, errBuffer);
+            res = _yapiSleep(2, errBuffer);
                 if ((YISERR(res)))
                 {
                     functionReturnValue = res;
@@ -2404,7 +2404,7 @@ public class YAPI
         }
 
         buffer.Length = 0;
-        res = _yapiTriggerHubDiscovery(buffer);
+            res = _yapiTriggerHubDiscovery(buffer);
         if (YISERR(res))
         {
             errmsg = buffer.ToString();
@@ -2426,7 +2426,7 @@ public class YAPI
      */
     public static ulong GetTickCount()
     {
-        return Convert.ToUInt64((ulong)_yapiGetTickCount());
+            return Convert.ToUInt64((ulong)_yapiGetTickCount());
     }
 
     /**
@@ -2476,7 +2476,7 @@ public class YAPI
         funcValBuffer.Length = 0;
         errBuffer.Length = 0;
 
-        functionReturnValue = _yapiGetFunctionInfo(fundesc, ref devdesc, serialBuffer, funcIdBuffer, funcNameBuffer, funcValBuffer, errBuffer);
+            functionReturnValue = _yapiGetFunctionInfo(fundesc, ref devdesc, serialBuffer, funcIdBuffer, funcNameBuffer, funcValBuffer, errBuffer);
         serial = serialBuffer.ToString();
         funcId = funcIdBuffer.ToString();
         funcName = funcNameBuffer.ToString();
@@ -2492,7 +2492,7 @@ public class YAPI
         YDEV_DESCR devdesc = default(YDEV_DESCR);
         int res = 0;
         errBuffer.Length = 0;
-        res = _yapiGetFunctionInfo(fundesc, ref devdesc, null, null, null, null, errBuffer);
+            res = _yapiGetFunctionInfo(fundesc, ref devdesc, null, null, null, null, errBuffer);
         errmsg = errBuffer.ToString();
         if ((res < 0))
         {
@@ -2534,27 +2534,17 @@ public class YAPI
         YDEV_DESCR functionReturnValue = default(YDEV_DESCR);
         StringBuilder buffer = new StringBuilder(YOCTO_ERRMSG_LEN);
         buffer.Length = 0;
-        functionReturnValue = _yapiGetDevice(new StringBuilder(device_str), buffer);
+            functionReturnValue = _yapiGetDevice(new StringBuilder(device_str), buffer);
         errmsg = buffer.ToString();
         return functionReturnValue;
     }
-    /* not used
-    protected static int yapiGetAllDevices(IntPtr dbuffer, int maxsize, ref int neededsize, ref string errmsg)
-    {
-      int functionReturnValue = 0;
-      StringBuilder buffer = new StringBuilder(YOCTO_ERRMSG_LEN);
-      buffer.Length = 0;
-      functionReturnValue = _yapiGetAllDevices(dbuffer, maxsize, ref neededsize, buffer);
-      errmsg = buffer.ToString();
-      return functionReturnValue;
-    }
-    */
+
     protected static int yapiGetDeviceInfo(YDEV_DESCR d, ref yDeviceSt infos, ref string errmsg)
     {
         int functionReturnValue = 0;
         StringBuilder buffer = new StringBuilder(YOCTO_ERRMSG_LEN);
         buffer.Length = 0;
-        functionReturnValue = _yapiGetDeviceInfo(d, ref infos, buffer);
+            functionReturnValue = _yapiGetDeviceInfo(d, ref infos, buffer);
         errmsg = buffer.ToString();
         return functionReturnValue;
     }
@@ -2564,7 +2554,7 @@ public class YAPI
         YFUN_DESCR functionReturnValue = default(YFUN_DESCR);
         StringBuilder buffer = new StringBuilder(YOCTO_ERRMSG_LEN);
         buffer.Length = 0;
-        functionReturnValue = _yapiGetFunction(new StringBuilder(class_str), new StringBuilder(function_str), buffer);
+            functionReturnValue = _yapiGetFunction(new StringBuilder(class_str), new StringBuilder(function_str), buffer);
         errmsg = buffer.ToString();
         return functionReturnValue;
     }
@@ -2574,7 +2564,7 @@ public class YAPI
         int functionReturnValue = 0;
         StringBuilder buffer = new StringBuilder(YOCTO_ERRMSG_LEN);
         buffer.Length = 0;
-        functionReturnValue = _yapiGetFunctionsByClass(new StringBuilder(class_str), precFuncDesc, dbuffer, maxsize, ref neededsize, buffer);
+            functionReturnValue = _yapiGetFunctionsByClass(new StringBuilder(class_str), precFuncDesc, dbuffer, maxsize, ref neededsize, buffer);
         errmsg = buffer.ToString();
         return functionReturnValue;
     }
@@ -2584,147 +2574,735 @@ public class YAPI
         int functionReturnValue = 0;
         StringBuilder buffer = new StringBuilder(YOCTO_ERRMSG_LEN);
         buffer.Length = 0;
-        functionReturnValue = _yapiGetFunctionsByDevice(devdesc, precFuncDesc, dbuffer, maxsize, ref neededsize, buffer);
+            functionReturnValue = _yapiGetFunctionsByDevice(devdesc, precFuncDesc, dbuffer, maxsize, ref neededsize, buffer);
         errmsg = buffer.ToString();
         return functionReturnValue;
     }
 
-    [DllImport("myDll.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static void DllCallTest(ref yDeviceSt data);
-
+    // 32 bits dll entry points
     [DllImport("yapi.dll", EntryPoint = "yapiInitAPI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiInitAPI(int mode, StringBuilder errmsg);
-
+    private extern static int _yapiInitAPI32(int mode, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiFreeAPI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static void _yapiFreeAPI();
-
+    private extern static void _yapiFreeAPI32();
     [DllImport("yapi.dll", EntryPoint = "yapiRegisterLogFunction", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static void _yapiRegisterLogFunction(IntPtr fct);
-
+    private extern static void _yapiRegisterLogFunction32(IntPtr fct);
     [DllImport("yapi.dll", EntryPoint = "yapiRegisterDeviceArrivalCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static void _yapiRegisterDeviceArrivalCallback(IntPtr fct);
-
+    private extern static void _yapiRegisterDeviceArrivalCallback32(IntPtr fct);
     [DllImport("yapi.dll", EntryPoint = "yapiRegisterDeviceRemovalCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static void _yapiRegisterDeviceRemovalCallback(IntPtr fct);
-
+    private extern static void _yapiRegisterDeviceRemovalCallback32(IntPtr fct);
     [DllImport("yapi.dll", EntryPoint = "yapiRegisterDeviceChangeCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static void _yapiRegisterDeviceChangeCallback(IntPtr fct);
-
+    private extern static void _yapiRegisterDeviceChangeCallback32(IntPtr fct);
     [DllImport("yapi.dll", EntryPoint = "yapiRegisterFunctionUpdateCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static void _yapiRegisterFunctionUpdateCallback(IntPtr fct);
-
+    private extern static void _yapiRegisterFunctionUpdateCallback32(IntPtr fct);
     [DllImport("yapi.dll", EntryPoint = "yapiRegisterTimedReportCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static void _yapiRegisterTimedReportCallback(IntPtr fct);
-
+    private extern static void _yapiRegisterTimedReportCallback32(IntPtr fct);
     [DllImport("yapi.dll", EntryPoint = "yapiLockDeviceCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiLockDeviceCallBack(StringBuilder errmsg);
-
+    private extern static int _yapiLockDeviceCallBack32(StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiUnlockDeviceCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiUnlockDeviceCallBack(StringBuilder errmsg);
-
+    private extern static int _yapiUnlockDeviceCallBack32(StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiLockFunctionCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiLockFunctionCallBack(StringBuilder errmsg);
-
+    private extern static int _yapiLockFunctionCallBack32(StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiUnlockFunctionCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiUnlockFunctionCallBack(StringBuilder errmsg);
-
+    private extern static int _yapiUnlockFunctionCallBack32(StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiRegisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiRegisterHub(StringBuilder rootUrl, StringBuilder errmsg);
-
+    private extern static int _yapiRegisterHub32(StringBuilder rootUrl, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiPreregisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiPreregisterHub(StringBuilder rootUrl, StringBuilder errmsg);
-
+    private extern static int _yapiPreregisterHub32(StringBuilder rootUrl, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiUnregisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static void _yapiUnregisterHub(StringBuilder rootUrl);
-
+    private extern static void _yapiUnregisterHub32(StringBuilder rootUrl);
     [DllImport("yapi.dll", EntryPoint = "yapiUpdateDeviceList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiUpdateDeviceList(uint force, StringBuilder errmsg);
-
+    private extern static int _yapiUpdateDeviceList32(uint force, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiHandleEvents", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiHandleEvents(StringBuilder errmsg);
-
+    private extern static int _yapiHandleEvents32(StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiGetTickCount", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static u64 _yapiGetTickCount();
-
+    private extern static u64 _yapiGetTickCount32();
     [DllImport("yapi.dll", EntryPoint = "yapiCheckLogicalName", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiCheckLogicalName(StringBuilder name);
-
+    private extern static int _yapiCheckLogicalName32(StringBuilder name);
     [DllImport("yapi.dll", EntryPoint = "yapiGetAPIVersion", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static u16 _yapiGetAPIVersion(ref IntPtr version, ref IntPtr date);
-
+    private extern static u16 _yapiGetAPIVersion32(ref IntPtr version, ref IntPtr date);
     [DllImport("yapi.dll", EntryPoint = "yapiGetDevice", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static YDEV_DESCR _yapiGetDevice(StringBuilder device_str, StringBuilder errmsg);
-
+    private extern static YDEV_DESCR _yapiGetDevice32(StringBuilder device_str, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiGetAllDevices", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiGetAllDevices(IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
-
+    private extern static int _yapiGetAllDevices32(IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiGetDeviceInfo", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiGetDeviceInfo(YDEV_DESCR d, ref yDeviceSt infos, StringBuilder errmsg);
-
+    private extern static int _yapiGetDeviceInfo32(YDEV_DESCR d, ref yDeviceSt infos, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiGetFunction", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static YFUN_DESCR _yapiGetFunction(StringBuilder class_str, StringBuilder function_str, StringBuilder errmsg);
-
+    private extern static YFUN_DESCR _yapiGetFunction32(StringBuilder class_str, StringBuilder function_str, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiGetFunctionsByClass", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiGetFunctionsByClass(StringBuilder class_str, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
-
+    private extern static int _yapiGetFunctionsByClass32(StringBuilder class_str, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiGetFunctionsByDevice", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiGetFunctionsByDevice(YDEV_DESCR device, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
-
+    private extern static int _yapiGetFunctionsByDevice32(YDEV_DESCR device, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiGetFunctionInfo", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    internal extern static int _yapiGetFunctionInfo(YFUN_DESCR fundesc, ref YDEV_DESCR devdesc, StringBuilder serial, StringBuilder funcId, StringBuilder funcName, StringBuilder funcVal, StringBuilder errmsg);
-
+    internal extern static int _yapiGetFunctionInfo32(YFUN_DESCR fundesc, ref YDEV_DESCR devdesc, StringBuilder serial, StringBuilder funcId, StringBuilder funcName, StringBuilder funcVal, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiGetErrorString", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiGetErrorString(int errorcode, StringBuilder buffer, int maxsize, StringBuilder errmsg);
-
+    private extern static int _yapiGetErrorString32(int errorcode, StringBuilder buffer, int maxsize, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequestSyncStart", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiHTTPRequestSyncStart(ref YIOHDL iohdl, StringBuilder device, IntPtr request, ref IntPtr reply, ref int replysize, StringBuilder errmsg);
-
+    private extern static int _yapiHTTPRequestSyncStart32(ref YIOHDL iohdl, StringBuilder device, IntPtr request, ref IntPtr reply, ref int replysize, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequestSyncStartEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiHTTPRequestSyncStartEx(ref YIOHDL iohdl, StringBuilder device, IntPtr request, int requestlen, ref IntPtr reply, ref int replysize, StringBuilder errmsg);
-
+    private extern static int _yapiHTTPRequestSyncStartEx32(ref YIOHDL iohdl, StringBuilder device, IntPtr request, int requestlen, ref IntPtr reply, ref int replysize, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequestSyncDone", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiHTTPRequestSyncDone(ref YIOHDL iohdl, StringBuilder errmsg);
-
+    private extern static int _yapiHTTPRequestSyncDone32(ref YIOHDL iohdl, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequestAsync", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiHTTPRequestAsync(StringBuilder device, IntPtr request, IntPtr callback, IntPtr context, StringBuilder errmsg);
-
+    private extern static int _yapiHTTPRequestAsync32(StringBuilder device, IntPtr request, IntPtr callback, IntPtr context, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequestAsyncEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiHTTPRequestAsyncEx(StringBuilder device, IntPtr request, int requestlen, IntPtr callback, IntPtr context, StringBuilder errmsg);
-
+    private extern static int _yapiHTTPRequestAsyncEx32(StringBuilder device, IntPtr request, int requestlen, IntPtr callback, IntPtr context, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequest", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiHTTPRequest(StringBuilder device, StringBuilder url, StringBuilder buffer, int buffsize, ref int fullsize, StringBuilder errmsg);
-
+    private extern static int _yapiHTTPRequest32(StringBuilder device, StringBuilder url, StringBuilder buffer, int buffsize, ref int fullsize, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiGetBootloadersDevs", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiGetBootloadersDevs(StringBuilder serials, u32 maxNbSerial, ref u32 totalBootladers, StringBuilder errmsg);
-
+    private extern static int _yapiGetBootloadersDevs32(StringBuilder serials, u32 maxNbSerial, ref u32 totalBootladers, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiGetDevicePath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiGetDevicePath(int devdesc, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg);
-
+    private extern static int _yapiGetDevicePath32(int devdesc, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiSleep", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiSleep(int duration_ms, StringBuilder errmsg);
-
+    private extern static int _yapiSleep32(int duration_ms, StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiRegisterHubDiscoveryCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static void _yapiRegisterHubDiscoveryCallback(IntPtr fct);
-
+    private extern static void _yapiRegisterHubDiscoveryCallback32(IntPtr fct);
     [DllImport("yapi.dll", EntryPoint = "yapiTriggerHubDiscovery", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    private extern static int _yapiTriggerHubDiscovery(StringBuilder errmsg);
-
+    private extern static int _yapiTriggerHubDiscovery32(StringBuilder errmsg);
     [DllImport("yapi.dll", EntryPoint = "yapiRegisterDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    internal extern static void _yapiRegisterDeviceLogCallback(IntPtr fct);
-
+    internal extern static void _yapiRegisterDeviceLogCallback32(IntPtr fct);
     [DllImport("yapi.dll", EntryPoint = "yapiStartStopDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    internal extern static int _yapiStartStopDeviceLogCallback(StringBuilder errmsg, int start_stop);
+    internal extern static int _yapiStartStopDeviceLogCallback32(StringBuilder errmsg, int start_stop);
+
+    // 64 bits dll entry points
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiInitAPI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiInitAPI64(int mode, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiFreeAPI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static void _yapiFreeAPI64();
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterLogFunction", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static void _yapiRegisterLogFunction64(IntPtr fct);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterDeviceArrivalCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static void _yapiRegisterDeviceArrivalCallback64(IntPtr fct);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterDeviceRemovalCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static void _yapiRegisterDeviceRemovalCallback64(IntPtr fct);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterDeviceChangeCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static void _yapiRegisterDeviceChangeCallback64(IntPtr fct);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterFunctionUpdateCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static void _yapiRegisterFunctionUpdateCallback64(IntPtr fct);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterTimedReportCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static void _yapiRegisterTimedReportCallback64(IntPtr fct);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiLockDeviceCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiLockDeviceCallBack64(StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiUnlockDeviceCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiUnlockDeviceCallBack64(StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiLockFunctionCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiLockFunctionCallBack64(StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiUnlockFunctionCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiUnlockFunctionCallBack64(StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiRegisterHub64(StringBuilder rootUrl, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiPreregisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiPreregisterHub64(StringBuilder rootUrl, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiUnregisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static void _yapiUnregisterHub64(StringBuilder rootUrl);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiUpdateDeviceList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiUpdateDeviceList64(uint force, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHandleEvents", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiHandleEvents64(StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetTickCount", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static u64 _yapiGetTickCount64();
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiCheckLogicalName", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiCheckLogicalName64(StringBuilder name);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetAPIVersion", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static u16 _yapiGetAPIVersion64(ref IntPtr version, ref IntPtr date);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetDevice", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static YDEV_DESCR _yapiGetDevice64(StringBuilder device_str, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetAllDevices", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiGetAllDevices64(IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetDeviceInfo", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiGetDeviceInfo64(YDEV_DESCR d, ref yDeviceSt infos, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetFunction", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static YFUN_DESCR _yapiGetFunction64(StringBuilder class_str, StringBuilder function_str, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetFunctionsByClass", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiGetFunctionsByClass64(StringBuilder class_str, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetFunctionsByDevice", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiGetFunctionsByDevice64(YDEV_DESCR device, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetFunctionInfo", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    internal extern static int _yapiGetFunctionInfo64(YFUN_DESCR fundesc, ref YDEV_DESCR devdesc, StringBuilder serial, StringBuilder funcId, StringBuilder funcName, StringBuilder funcVal, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetErrorString", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiGetErrorString64(int errorcode, StringBuilder buffer, int maxsize, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequestSyncStart", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiHTTPRequestSyncStart64(ref YIOHDL iohdl, StringBuilder device, IntPtr request, ref IntPtr reply, ref int replysize, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequestSyncStartEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiHTTPRequestSyncStartEx64(ref YIOHDL iohdl, StringBuilder device, IntPtr request, int requestlen, ref IntPtr reply, ref int replysize, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequestSyncDone", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiHTTPRequestSyncDone64(ref YIOHDL iohdl, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequestAsync", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiHTTPRequestAsync64(StringBuilder device, IntPtr request, IntPtr callback, IntPtr context, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequestAsyncEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiHTTPRequestAsyncEx64(StringBuilder device, IntPtr request, int requestlen, IntPtr callback, IntPtr context, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequest", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiHTTPRequest64(StringBuilder device, StringBuilder url, StringBuilder buffer, int buffsize, ref int fullsize, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetBootloadersDevs", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiGetBootloadersDevs64(StringBuilder serials, u32 maxNbSerial, ref u32 totalBootladers, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetDevicePath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiGetDevicePath64(int devdesc, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiSleep", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiSleep64(int duration_ms, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterHubDiscoveryCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static void _yapiRegisterHubDiscoveryCallback64(IntPtr fct);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiTriggerHubDiscovery", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static int _yapiTriggerHubDiscovery64(StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    internal extern static void _yapiRegisterDeviceLogCallback64(IntPtr fct);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiStartStopDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    internal extern static int _yapiStartStopDeviceLogCallback64(StringBuilder errmsg, int start_stop);
+
 
     //--- (generated code: YFunction dlldef)
     [DllImport("yapi.dll", EntryPoint = "yapiGetAllJsonKeys", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    internal extern static YRETCODE _yapiGetAllJsonKeys(StringBuilder jsonbuffer, StringBuilder out_buffer, int out_buffersize, ref int fullsize, StringBuilder errmsg);
+    internal extern static YRETCODE _yapiGetAllJsonKeys32(StringBuilder jsonbuffer, StringBuilder out_buffer, int out_buffersize, ref int fullsize, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetAllJsonKeys", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    internal extern static YRETCODE _yapiGetAllJsonKeys64(StringBuilder jsonbuffer, StringBuilder out_buffer, int out_buffersize, ref int fullsize, StringBuilder errmsg);
+    internal static YRETCODE _yapiGetAllJsonKeys(StringBuilder jsonbuffer, StringBuilder out_buffer, int out_buffersize, ref int fullsize, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+             return _yapiGetAllJsonKeys32(jsonbuffer, out_buffer, out_buffersize, ref fullsize, errmsg);
+        } else {
+             try {
+                 return _yapiGetAllJsonKeys64(jsonbuffer, out_buffer, out_buffersize, ref fullsize, errmsg);
+             } catch (System.DllNotFoundException) {
+                 return _yapiGetAllJsonKeys32(jsonbuffer, out_buffer, out_buffersize, ref fullsize, errmsg);
+             }
+        }
+    }
     [DllImport("yapi.dll", EntryPoint = "yapiCheckFirmware", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    internal extern static YRETCODE _yapiCheckFirmware(StringBuilder serial, StringBuilder rev, StringBuilder path, StringBuilder buffer, int buffersize, ref int fullsize, StringBuilder errmsg);
-    [DllImport("yapi.dll", EntryPoint = "yapiGetBootloadersDevs", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    internal extern static YRETCODE _yapiGetBootloadersDevs(StringBuilder serials, int maxNbSerial, ref int totalBootladers, StringBuilder errmsg);
+    internal extern static YRETCODE _yapiCheckFirmware32(StringBuilder serial, StringBuilder rev, StringBuilder path, StringBuilder buffer, int buffersize, ref int fullsize, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiCheckFirmware", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    internal extern static YRETCODE _yapiCheckFirmware64(StringBuilder serial, StringBuilder rev, StringBuilder path, StringBuilder buffer, int buffersize, ref int fullsize, StringBuilder errmsg);
+    internal static YRETCODE _yapiCheckFirmware(StringBuilder serial, StringBuilder rev, StringBuilder path, StringBuilder buffer, int buffersize, ref int fullsize, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+             return _yapiCheckFirmware32(serial, rev, path, buffer, buffersize, ref fullsize, errmsg);
+        } else {
+             try {
+                 return _yapiCheckFirmware64(serial, rev, path, buffer, buffersize, ref fullsize, errmsg);
+             } catch (System.DllNotFoundException) {
+                 return _yapiCheckFirmware32(serial, rev, path, buffer, buffersize, ref fullsize, errmsg);
+             }
+        }
+    }
+    [DllImport("yapi.dll", EntryPoint = "yapiGetBootloaders", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    internal extern static YRETCODE _yapiGetBootloaders32(StringBuilder buffer, int buffersize, ref int totalSize, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetBootloaders", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    internal extern static YRETCODE _yapiGetBootloaders64(StringBuilder buffer, int buffersize, ref int totalSize, StringBuilder errmsg);
+    internal static YRETCODE _yapiGetBootloaders(StringBuilder buffer, int buffersize, ref int totalSize, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+             return _yapiGetBootloaders32(buffer, buffersize, ref totalSize, errmsg);
+        } else {
+             try {
+                 return _yapiGetBootloaders64(buffer, buffersize, ref totalSize, errmsg);
+             } catch (System.DllNotFoundException) {
+                 return _yapiGetBootloaders32(buffer, buffersize, ref totalSize, errmsg);
+             }
+        }
+    }
     [DllImport("yapi.dll", EntryPoint = "yapiUpdateFirmware", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-    internal extern static YRETCODE _yapiUpdateFirmware(StringBuilder serial, StringBuilder firmwarePath, StringBuilder settings, int startUpdate, StringBuilder errmsg);
+    internal extern static YRETCODE _yapiUpdateFirmware32(StringBuilder serial, StringBuilder firmwarePath, StringBuilder settings, int startUpdate, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiUpdateFirmware", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    internal extern static YRETCODE _yapiUpdateFirmware64(StringBuilder serial, StringBuilder firmwarePath, StringBuilder settings, int startUpdate, StringBuilder errmsg);
+    internal static YRETCODE _yapiUpdateFirmware(StringBuilder serial, StringBuilder firmwarePath, StringBuilder settings, int startUpdate, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+             return _yapiUpdateFirmware32(serial, firmwarePath, settings, startUpdate, errmsg);
+        } else {
+             try {
+                 return _yapiUpdateFirmware64(serial, firmwarePath, settings, startUpdate, errmsg);
+             } catch (System.DllNotFoundException) {
+                 return _yapiUpdateFirmware32(serial, firmwarePath, settings, startUpdate, errmsg);
+             }
+        }
+    }
 //--- (end of generated code: YFunction dlldef)
+    private static int _yapiInitAPI(int mode, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiInitAPI32(mode, errmsg);
+        } else {
+            try {
+                return _yapiInitAPI64(mode, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiInitAPI32(mode, errmsg);
+            }
+        }
+    }
+
+    private static void _yapiFreeAPI() {
+        if (IntPtr.Size == 4) {
+            _yapiFreeAPI32();
+        } else {
+            try {
+                _yapiFreeAPI64();
+            } catch (System.DllNotFoundException) {
+                _yapiFreeAPI32();
+            }
+        }
+    }
+
+    private static void _yapiRegisterLogFunction(IntPtr fct) {
+        if (IntPtr.Size == 4) {
+            _yapiRegisterLogFunction32(fct);
+        } else {
+            try {
+                _yapiRegisterLogFunction64(fct);
+            } catch (System.DllNotFoundException) {
+                _yapiRegisterLogFunction32(fct);
+            }
+        }
+    }
+
+    private static void _yapiRegisterDeviceArrivalCallback(IntPtr fct) {
+        if (IntPtr.Size == 4) {
+            _yapiRegisterDeviceArrivalCallback32(fct);
+        } else {
+            try {
+                _yapiRegisterDeviceArrivalCallback64(fct);
+            } catch (System.DllNotFoundException) {
+                _yapiRegisterDeviceArrivalCallback32(fct);
+            }
+        }
+    }
+
+    private static void _yapiRegisterDeviceRemovalCallback(IntPtr fct) {
+        if (IntPtr.Size == 4) {
+            _yapiRegisterDeviceRemovalCallback32(fct);
+        } else {
+            try {
+                _yapiRegisterDeviceRemovalCallback64(fct);
+            } catch (System.DllNotFoundException) {
+                _yapiRegisterDeviceRemovalCallback32(fct);
+            }
+        }
+    }
+
+    private static void _yapiRegisterDeviceChangeCallback(IntPtr fct) {
+        if (IntPtr.Size == 4) {
+            _yapiRegisterDeviceChangeCallback32(fct);
+        } else {
+            try {
+                _yapiRegisterDeviceChangeCallback64(fct);
+            } catch (System.DllNotFoundException) {
+                _yapiRegisterDeviceChangeCallback32(fct);
+            }
+        }
+    }
+
+    private static void _yapiRegisterFunctionUpdateCallback(IntPtr fct) {
+        if (IntPtr.Size == 4) {
+            _yapiRegisterFunctionUpdateCallback32(fct);
+        } else {
+            try {
+                _yapiRegisterFunctionUpdateCallback64(fct);
+            } catch (System.DllNotFoundException) {
+                _yapiRegisterFunctionUpdateCallback32(fct);
+            }
+        }
+    }
+
+    private static void _yapiRegisterTimedReportCallback(IntPtr fct) {
+        if (IntPtr.Size == 4) {
+            _yapiRegisterTimedReportCallback32(fct);
+        } else {
+            try {
+                _yapiRegisterTimedReportCallback64(fct);
+            } catch (System.DllNotFoundException) {
+                _yapiRegisterTimedReportCallback32(fct);
+            }
+        }
+    }
+
+    private static int _yapiLockDeviceCallBack(StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiLockDeviceCallBack32(errmsg);
+        } else {
+            try {
+                return _yapiLockDeviceCallBack64(errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiLockDeviceCallBack32(errmsg);
+            }
+        }
+    }
+
+    private static int _yapiUnlockDeviceCallBack(StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiUnlockDeviceCallBack32(errmsg);
+        } else {
+            try {
+                return _yapiUnlockDeviceCallBack64(errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiUnlockDeviceCallBack32(errmsg);
+            }
+        }
+    }
+
+    private static int _yapiLockFunctionCallBack(StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiLockFunctionCallBack32(errmsg);
+        } else {
+            try {
+                return _yapiLockFunctionCallBack64(errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiLockFunctionCallBack32(errmsg);
+            }
+        }
+    }
+
+    private static int _yapiUnlockFunctionCallBack(StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiUnlockFunctionCallBack32(errmsg);
+        } else {
+            try {
+                return _yapiUnlockFunctionCallBack64(errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiUnlockFunctionCallBack32(errmsg);
+            }
+        }
+    }
+
+    private static int _yapiRegisterHub(StringBuilder rootUrl, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiRegisterHub32(rootUrl, errmsg);
+        } else {
+            try {
+                return _yapiRegisterHub64(rootUrl, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiRegisterHub32(rootUrl, errmsg);
+            }
+        }
+    }
+
+    private static int _yapiPreregisterHub(StringBuilder rootUrl, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiPreregisterHub32(rootUrl, errmsg);
+        } else {
+            try {
+                return _yapiPreregisterHub64(rootUrl, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiPreregisterHub32(rootUrl, errmsg);
+            }
+        }
+    }
+
+    private static void _yapiUnregisterHub(StringBuilder rootUrl) {
+        if (IntPtr.Size == 4) {
+            _yapiUnregisterHub32(rootUrl);
+        } else {
+            try {
+                _yapiUnregisterHub64(rootUrl);
+            } catch (System.DllNotFoundException) {
+                _yapiUnregisterHub32(rootUrl);
+            }
+        }
+    }
+
+    private static int _yapiUpdateDeviceList(uint force, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiUpdateDeviceList32(force, errmsg);
+        } else {
+            try {
+                return _yapiUpdateDeviceList64(force, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiUpdateDeviceList32(force, errmsg);
+            }
+        }
+    }
+
+    private static int _yapiHandleEvents(StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiHandleEvents32(errmsg);
+        } else {
+            try {
+                return _yapiHandleEvents64(errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiHandleEvents32(errmsg);
+            }
+        }
+    }
+
+    private static u64 _yapiGetTickCount() {
+        if (IntPtr.Size == 4) {
+            return _yapiGetTickCount32();
+        } else {
+            try {
+                return _yapiGetTickCount64();
+            } catch (System.DllNotFoundException) {
+                return _yapiGetTickCount32();
+            }
+        }
+    }
+
+    private static int _yapiCheckLogicalName(StringBuilder name) {
+        if (IntPtr.Size == 4) {
+            return _yapiCheckLogicalName32(name);
+        } else {
+            try {
+                return _yapiCheckLogicalName64(name);
+            } catch (System.DllNotFoundException) {
+                return _yapiCheckLogicalName32(name);
+            }
+        }
+    }
+
+    private static u16 _yapiGetAPIVersion(ref IntPtr version, ref IntPtr date) {
+        if (IntPtr.Size == 4) {
+            return _yapiGetAPIVersion32(ref version, ref date);
+        } else {
+            try {
+                return _yapiGetAPIVersion64(ref version, ref date);
+            } catch (System.DllNotFoundException) {
+                return _yapiGetAPIVersion32(ref version, ref date);
+            }
+        }
+    }
+
+    private static YDEV_DESCR _yapiGetDevice(StringBuilder device_str, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiGetDevice32(device_str, errmsg);
+        } else {
+            try {
+                return _yapiGetDevice64(device_str, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiGetDevice32(device_str, errmsg);
+            }
+        }
+    }
+
+    private static int _yapiGetAllDevices(IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiGetAllDevices32(buffer, maxsize, ref neededsize, errmsg);
+        } else {
+            try {
+                return _yapiGetAllDevices64(buffer, maxsize, ref neededsize, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiGetAllDevices32(buffer, maxsize, ref neededsize, errmsg);
+            }
+        }
+    }
+
+    private static int _yapiGetDeviceInfo(YDEV_DESCR d, ref yDeviceSt infos, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiGetDeviceInfo32(d, ref infos, errmsg);
+        } else {
+            try {
+                return _yapiGetDeviceInfo64(d, ref infos, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiGetDeviceInfo32(d, ref infos, errmsg);
+            }
+        }
+    }
+
+    private static YFUN_DESCR _yapiGetFunction(StringBuilder class_str, StringBuilder function_str, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiGetFunction32(class_str, function_str, errmsg);
+        } else {
+            try {
+                return _yapiGetFunction64(class_str, function_str, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiGetFunction32(class_str, function_str, errmsg);
+            }
+        }
+    }
+
+    private static int _yapiGetFunctionsByClass(StringBuilder class_str, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiGetFunctionsByClass32(class_str, precFuncDesc, buffer, maxsize, ref neededsize, errmsg);
+        } else {
+            try {
+                return _yapiGetFunctionsByClass64(class_str, precFuncDesc, buffer, maxsize, ref neededsize, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiGetFunctionsByClass32(class_str, precFuncDesc, buffer, maxsize, ref neededsize, errmsg);
+            }
+        }
+    }
+
+    private static int _yapiGetFunctionsByDevice(YDEV_DESCR device, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiGetFunctionsByDevice32(device, precFuncDesc, buffer, maxsize, ref neededsize, errmsg);
+        } else {
+            try {
+                return _yapiGetFunctionsByDevice64(device, precFuncDesc, buffer, maxsize, ref neededsize, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiGetFunctionsByDevice32(device, precFuncDesc, buffer, maxsize, ref neededsize, errmsg);
+            }
+        }
+    }
+
+    internal static int _yapiGetFunctionInfo(YFUN_DESCR fundesc, ref YDEV_DESCR devdesc, StringBuilder serial, StringBuilder funcId, StringBuilder funcName, StringBuilder funcVal, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiGetFunctionInfo32(fundesc, ref devdesc, serial, funcId, funcName, funcVal, errmsg);
+        } else {
+            try {
+                return _yapiGetFunctionInfo64(fundesc, ref devdesc, serial, funcId, funcName, funcVal, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiGetFunctionInfo32(fundesc, ref devdesc, serial, funcId, funcName, funcVal, errmsg);
+            }
+        }
+    }
+
+    private static int _yapiGetErrorString(int errorcode, StringBuilder buffer, int maxsize, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiGetErrorString32(errorcode, buffer, maxsize, errmsg);
+        } else {
+            try {
+                return _yapiGetErrorString64(errorcode, buffer, maxsize, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiGetErrorString32(errorcode, buffer, maxsize, errmsg);
+            }
+        }
+    }
+
+    private static int _yapiHTTPRequestSyncStart(ref YIOHDL iohdl, StringBuilder device, IntPtr request, ref IntPtr reply, ref int replysize, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiHTTPRequestSyncStart32(ref iohdl, device, request, ref reply, ref replysize, errmsg);
+        } else {
+            try {
+                return _yapiHTTPRequestSyncStart64(ref iohdl, device, request, ref reply, ref replysize, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiHTTPRequestSyncStart32(ref iohdl, device, request, ref reply, ref replysize, errmsg);
+            }
+        }
+    }
+
+    private static int _yapiHTTPRequestSyncStartEx(ref YIOHDL iohdl, StringBuilder device, IntPtr request, int requestlen, ref IntPtr reply, ref int replysize, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiHTTPRequestSyncStartEx32(ref iohdl, device, request, requestlen, ref reply, ref replysize, errmsg);
+        } else {
+            try {
+                return _yapiHTTPRequestSyncStartEx64(ref iohdl, device, request, requestlen, ref reply, ref replysize, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiHTTPRequestSyncStartEx32(ref iohdl, device, request, requestlen, ref reply, ref replysize, errmsg);
+            }
+        }
+    }
+
+    private static int _yapiHTTPRequestSyncDone(ref YIOHDL iohdl, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiHTTPRequestSyncDone32(ref iohdl, errmsg);
+        } else {
+            try {
+                return _yapiHTTPRequestSyncDone64(ref iohdl, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiHTTPRequestSyncDone32(ref iohdl, errmsg);
+            }
+        }
+    }
+
+    private static int _yapiHTTPRequestAsync(StringBuilder device, IntPtr request, IntPtr callback, IntPtr context, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiHTTPRequestAsync32(device, request, callback, context, errmsg);
+        } else {
+            try {
+                return _yapiHTTPRequestAsync64(device, request, callback, context, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiHTTPRequestAsync32(device, request, callback, context, errmsg);
+            }
+        }
+    }
+
+    private static int _yapiHTTPRequestAsyncEx(StringBuilder device, IntPtr request, int requestlen, IntPtr callback, IntPtr context, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiHTTPRequestAsyncEx32(device, request, requestlen, callback, context, errmsg);
+        } else {
+            try {
+                return _yapiHTTPRequestAsyncEx64(device, request, requestlen, callback, context, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiHTTPRequestAsyncEx32(device, request, requestlen, callback, context, errmsg);
+            }
+        }
+    }
+
+    private static int _yapiHTTPRequest(StringBuilder device, StringBuilder url, StringBuilder buffer, int buffsize, ref int fullsize, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiHTTPRequest32(device, url, buffer, buffsize, ref fullsize, errmsg);
+        } else {
+            try {
+                return _yapiHTTPRequest64(device, url, buffer, buffsize, ref fullsize, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiHTTPRequest32(device, url, buffer, buffsize, ref fullsize, errmsg);
+            }
+        }
+    }
+
+    private static int _yapiGetBootloadersDevs(StringBuilder serials, u32 maxNbSerial, ref u32 totalBootladers, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiGetBootloadersDevs32(serials, maxNbSerial, ref totalBootladers, errmsg);
+        } else {
+            try {
+                return _yapiGetBootloadersDevs64(serials, maxNbSerial, ref totalBootladers, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiGetBootloadersDevs32(serials, maxNbSerial, ref totalBootladers, errmsg);
+            }
+        }
+    }
+
+    private static int _yapiGetDevicePath(int devdesc, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiGetDevicePath32(devdesc, rootdevice, path, pathsize, ref neededsize, errmsg);
+        } else {
+            try {
+                return _yapiGetDevicePath64(devdesc, rootdevice, path, pathsize, ref neededsize, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiGetDevicePath32(devdesc, rootdevice, path, pathsize, ref neededsize, errmsg);
+            }
+        }
+    }
+
+    private static int _yapiSleep(int duration_ms, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiSleep32(duration_ms, errmsg);
+        } else {
+            try {
+                return _yapiSleep64(duration_ms, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiSleep32(duration_ms, errmsg);
+            }
+        }
+    }
+
+    private static void _yapiRegisterHubDiscoveryCallback(IntPtr fct) {
+        if (IntPtr.Size == 4) {
+            _yapiRegisterHubDiscoveryCallback32(fct);
+        } else {
+            try {
+                _yapiRegisterHubDiscoveryCallback64(fct);
+            } catch (System.DllNotFoundException) {
+                _yapiRegisterHubDiscoveryCallback32(fct);
+            }
+        }
+    }
+
+    private static int _yapiTriggerHubDiscovery(StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+            return _yapiTriggerHubDiscovery32(errmsg);
+        } else {
+            try {
+                return _yapiTriggerHubDiscovery64(errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiTriggerHubDiscovery32(errmsg);
+            }
+        }
+    }
+
+    internal static void _yapiRegisterDeviceLogCallback(IntPtr fct) {
+        if (IntPtr.Size == 4) {
+            _yapiRegisterDeviceLogCallback32(fct);
+        } else {
+            try {
+                _yapiRegisterDeviceLogCallback64(fct);
+            } catch (System.DllNotFoundException) {
+                _yapiRegisterDeviceLogCallback32(fct);
+            }
+        }
+    }
+
+    internal static int _yapiStartStopDeviceLogCallback(StringBuilder errmsg, int start_stop) {
+        if (IntPtr.Size == 4) {
+            return _yapiStartStopDeviceLogCallback32(errmsg, start_stop);
+        } else {
+            try {
+                return _yapiStartStopDeviceLogCallback64(errmsg, start_stop);
+            } catch (System.DllNotFoundException) {
+                return _yapiStartStopDeviceLogCallback32(errmsg, start_stop);
+            }
+        }
+    }
+
+
 
 
     private static void csmodule_initialization()
@@ -2783,7 +3361,9 @@ public class YFirmwareUpdate
     protected byte[] _settings;
     protected string _firmwarepath;
     protected string _progress_msg;
+    protected int _progress_c = 0;
     protected int _progress = 0;
+    protected int _restore_step = 0;
     //--- (end of generated code: YFirmwareUpdate definitions)
 
 
@@ -2804,30 +3384,184 @@ public class YFirmwareUpdate
     public virtual int _processMore(int newupdate)
     {
         StringBuilder errmsg = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
+        YModule m;
         int res;
         string serial;
         string firmwarepath;
         string settings;
-        serial = this._serial;
-        firmwarepath = this._firmwarepath;
-        settings = YAPI.DefaultEncoding.GetString(this._settings);
-        res = YAPI._yapiUpdateFirmware(new StringBuilder(serial), new StringBuilder(firmwarepath), new StringBuilder(settings), newupdate, errmsg);
-        this._progress = res;
-        this._progress_msg = errmsg.ToString();
-        return res;
-    }
-
-    public virtual int get_progress()
-    {
-        YModule m;
-        this._processMore(0);
-        if ((this._progress == 100) && ((this._settings).Length != 0)) {
-            m = YModule.FindModule(this._serial);
-            if (m.isOnline()) {
-                m.set_allSettings(this._settings);
-                this._settings = new byte[0];
+        string prod_prefix;
+        if (this._progress_c < 100) {
+            serial = this._serial;
+            firmwarepath = this._firmwarepath;
+            settings = YAPI.DefaultEncoding.GetString(this._settings);
+            res = YAPI._yapiUpdateFirmware(new StringBuilder(serial), new StringBuilder(firmwarepath), new StringBuilder(settings), newupdate, errmsg);
+            if (res < 0) {
+                this._progress = res;
+                this._progress_msg = errmsg.ToString();
+                return res;
+            }
+            this._progress_c = res;
+            this._progress = ((this._progress_c * 9) / (10));
+            this._progress_msg = errmsg.ToString();
+        } else {
+            if (((this._settings).Length != 0)) {
+                this._progress_msg = "restoring settings";
+                m = YModule.FindModule(this._serial + ".module");
+                if (!(m.isOnline())) {
+                    return this._progress;
+                }
+                if (this._progress < 95) {
+                    prod_prefix = (m.get_productName()).Substring( 0, 8);
+                    if (prod_prefix == "YoctoHub") {
+                        {string ignore=""; YAPI.Sleep(1000, ref ignore);};
+                        this._progress = this._progress + 1;
+                        return this._progress;
+                    } else {
+                        this._progress = 95;
+                    }
+                }
+                if (this._progress < 100) {
+                    m.set_allSettings(this._settings);
+                    this._settings = new byte[0];
+                    this._progress = 100;
+                    this._progress_msg = "success";
+                }
+            } else {
+                this._progress =  100;
+                this._progress_msg = "success";
             }
         }
+        return this._progress;
+    }
+
+    /**
+     * <summary>
+     *   Retrun a list of all modules in "update" mode.
+     * <para>
+     *   Only USB connected
+     *   devices are listed. If the module is connected to a YoctoHub, you have to
+     *   connect to the YoctoHub web interface.
+     * </para>
+     * </summary>
+     * <returns>
+     *   an array of strings containing the serial list of module in "update" mode.
+     * </returns>
+     */
+    public static List<string> GetAllBootLoaders()
+    {
+        StringBuilder errmsg = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
+        StringBuilder smallbuff = new StringBuilder(1024);
+        StringBuilder bigbuff = null;
+        int buffsize;
+        int fullsize;
+        int yapi_res;
+        string bootloader_list;
+        List<string> bootladers = new List<string>();
+        fullsize = 0;
+        yapi_res = YAPI._yapiGetBootloaders(smallbuff, 1024, ref fullsize, errmsg);
+        if (yapi_res < 0) {
+            bootloader_list = "error:" + errmsg.ToString();
+            return bootladers;
+        }
+        if (fullsize <= 1024) {
+            bootloader_list = smallbuff.ToString();
+        } else {
+            buffsize = fullsize;
+            bigbuff = new StringBuilder(buffsize);
+            yapi_res = YAPI._yapiGetBootloaders(bigbuff, buffsize, ref fullsize, errmsg);
+            if (yapi_res < 0) {
+                bigbuff = null;
+                return bootladers;
+            } else {
+                bootloader_list = bigbuff.ToString();
+            }
+            bigbuff = null;
+        }
+        bootladers = new List<string>(bootloader_list.Split(new Char[] {','}));
+        return bootladers;
+    }
+
+    /**
+     * <summary>
+     *   Test if the byn file is valid for this module.
+     * <para>
+     *   It's possible to pass an directory instead of a file.
+     *   In this case this method return the path of the most recent appropriate byn file. This method will
+     *   ignore firmware that are older than mintrelase.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="serial">
+     *   the serial number of the module to update
+     * </param>
+     * <param name="path">
+     *   the path of a byn file or a directory that contain byn files
+     * </param>
+     * <param name="minrelease">
+     *   an positif integer
+     * </param>
+     * <returns>
+     *   : the path of the byn file to use or a empty string if no byn files match the requirement
+     * </returns>
+     * <para>
+     *   On failure, returns a string that start with "error:".
+     * </para>
+     */
+    public static string CheckFirmware(string serial, string path, int minrelease)
+    {
+        StringBuilder errmsg = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
+        StringBuilder smallbuff = new StringBuilder(1024);
+        StringBuilder bigbuff = null;
+        int buffsize;
+        int fullsize;
+        int res;
+        string firmware_path;
+        string release;
+        fullsize = 0;
+        release = (minrelease).ToString();
+        res = YAPI._yapiCheckFirmware(new StringBuilder(serial), new StringBuilder(release), new StringBuilder(path), smallbuff, 1024, ref fullsize, errmsg);
+        if (res < 0) {
+            firmware_path = "error:" + errmsg.ToString();
+            return "error:" + errmsg.ToString();
+        }
+        if (fullsize <= 1024) {
+            firmware_path = smallbuff.ToString();
+        } else {
+            buffsize = fullsize;
+            bigbuff = new StringBuilder(buffsize);
+            res = YAPI._yapiCheckFirmware(new StringBuilder(serial), new StringBuilder(release), new StringBuilder(path), bigbuff, buffsize, ref fullsize, errmsg);
+            if (res < 0) {
+                firmware_path = "error:" + errmsg.ToString();
+            } else {
+                firmware_path = bigbuff.ToString();
+            }
+            bigbuff = null;
+        }
+        return firmware_path;
+    }
+
+    /**
+     * <summary>
+     *   Returns the progress of the firmware update, on a scale from 0 to 100.
+     * <para>
+     *   When the object is
+     *   instantiated the progress is zero. The value is updated During the firmware update process, until
+     *   the value of 100 is reached. The value of 100 mean that the firmware update is terminated with
+     *   success. If an error occur during the firmware update a negative value is returned, and the
+     *   error message can be retrieved with <c>get_progressMessage</c>.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer in the range 0 to 100 (percentage of completion) or
+     *   or a negative error code in case of failure.
+     * </returns>
+     */
+    public virtual int get_progress()
+    {
+        this._processMore(0);
         return this._progress;
     }
 
@@ -2871,6 +3605,8 @@ public class YFirmwareUpdate
      */
     public virtual int startUpdate()
     {
+        this._progress = 0;
+        this._progress_c = 0;
         this._processMore(1);
         return this._progress;
     }
@@ -4514,25 +5250,45 @@ public class YFunction
         return functionReturnValue;
     }
 
+    protected string _escapeAttr(string changeval)
+    {
+        string espcaped = "";
+        int i = 0;
+        char c = '\0';
+        string h = null;
+        for (i = 0; i <= changeval.Length - 1; i++)
+        {
+            c = changeval[i];
+            if (c <= ' ' || (c > 'z' && c != '~') || c == '"' || c == '%' || c == '&' ||
+                       c == '+' || c == '<' || c == '=' || c == '>' || c == '\\' || c == '^' || c == '`')
+            {
+                int hh = c;
+                h = hh.ToString("X");
+                if ((h.Length < 2))
+                    h = "0" + h;
+                espcaped += "%" + h;
+            }
+            else
+            {
+                espcaped +=c;
+            }
+        }
+        return espcaped;
+    }
+
+
     private YRETCODE _buildSetRequest(string changeattr, string changeval, ref string request, ref string errmsg)
     {
         YRETCODE functionReturnValue = default(YRETCODE);
 
         int res = 0;
-        int i = 0;
         YFUN_DESCR fundesc = default(YFUN_DESCR);
         StringBuilder funcid = new StringBuilder(YAPI.YOCTO_FUNCTION_LEN);
         StringBuilder errbuff = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
-
         string uchangeval = null;
-        string h = null;
-        char c = '\0';
         YDEV_DESCR devdesc = default(YDEV_DESCR);
-
         funcid.Length = 0;
         errbuff.Length = 0;
-
-
         // Resolve the function name
         res = _getDescriptor(ref fundesc, ref errmsg);
 
@@ -4541,7 +5297,6 @@ public class YFunction
             functionReturnValue = res;
             return functionReturnValue;
         }
-
         res = YAPI._yapiGetFunctionInfo(fundesc, ref devdesc, null, funcid, null, null, errbuff);
         if (YAPI.YISERR(res))
         {
@@ -4550,41 +5305,16 @@ public class YFunction
             functionReturnValue = res;
             return functionReturnValue;
         }
-
-
         request = "GET /api/" + funcid.ToString() + "/";
         uchangeval = "";
-
         if (changeattr != "")
         {
-            request = request + changeattr + "?" + changeattr + "=";
-            for (i = 0; i <= changeval.Length - 1; i++)
-            {
-                c = changeval[i];
-                if (c <= ' ' || (c > 'z' && c != '~') || c == '"' || c == '%' || c == '&' ||
-                           c == '+' || c == '<' || c == '=' || c == '>' || c == '\\' || c == '^' || c == '`')
-                {
-                    int hh = c;
-                    h = hh.ToString("X");
-                    if ((h.Length < 2))
-                        h = "0" + h;
-                    uchangeval = uchangeval + "%" + h;
-                }
-                else
-                {
-                    uchangeval = uchangeval + c;
-                }
-            }
+            request = request + changeattr + "?" + changeattr + "=" + _escapeAttr(changeval);
         }
-
         request = request + uchangeval + "&. \r\n\r\n";
         functionReturnValue = YAPI.SUCCESS;
         return functionReturnValue;
     }
-
-
-
-
 
 
     // Set an attribute in the function, and parse the resulting new function state
@@ -5712,12 +6442,10 @@ public class YModule : YFunction
     public const int PERSISTENTSETTINGS_SAVED = 1;
     public const int PERSISTENTSETTINGS_MODIFIED = 2;
     public const int PERSISTENTSETTINGS_INVALID = -1;
-
     public const int LUMINOSITY_INVALID = YAPI.INVALID_UINT;
     public const int BEACON_OFF = 0;
     public const int BEACON_ON = 1;
     public const int BEACON_INVALID = -1;
-
     public const long UPTIME_INVALID = YAPI.INVALID_LONG;
     public const int USBCURRENT_INVALID = YAPI.INVALID_UINT;
     public const int REBOOTCOUNTDOWN_INVALID = YAPI.INVALID_INT;
@@ -5819,7 +6547,7 @@ public class YModule : YFunction
         }
         if (member.name == "beacon")
         {
-            _beacon = member.ivalue >0?1:0;
+            _beacon = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "upTime")
@@ -6443,43 +7171,16 @@ public class YModule : YFunction
      */
     public virtual string checkFirmware(string path, bool onlynew)
     {
-        StringBuilder errmsg = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
-        StringBuilder smallbuff = new StringBuilder(1024);
-        StringBuilder bigbuff = null;
-        int buffsize;
-        int fullsize;
-        int res;
-        string firmware_path;
         string serial;
-        string release;
+        int release;
         if (onlynew) {
-            release = this.get_firmwareRelease();
+            release = Convert.ToInt32(this.get_firmwareRelease());
         } else {
-            release = "";
+            release = 0;
         }
         //may throw an exception
-        serial = this._serial;
-        fullsize = 0;
-        res = YAPI._yapiCheckFirmware(new StringBuilder(serial), new StringBuilder(release), new StringBuilder(path), smallbuff, 1024, ref fullsize, errmsg);
-        if (res < 0) {
-            firmware_path = "error:" + errmsg.ToString();
-            return "error:" + errmsg.ToString();
-        }
-        if (fullsize <= 1024) {
-            firmware_path = smallbuff.ToString();
-        } else {
-            buffsize = fullsize;
-            bigbuff = new StringBuilder(buffsize);
-            res = YAPI._yapiCheckFirmware(new StringBuilder(serial), new StringBuilder(release), new StringBuilder(path), bigbuff, buffsize, ref fullsize, errmsg);
-            if (res < 0) {
-                this._throw(YAPI.INVALID_ARGUMENT, errmsg.ToString());
-                firmware_path = "error:" + errmsg.ToString();
-            } else {
-                firmware_path = bigbuff.ToString();
-            }
-            bigbuff = null;
-        }
-        return firmware_path;
+        serial = this.get_serialNumber();
+        return YFirmwareUpdate.CheckFirmware(serial,path, release);
     }
 
     /**
@@ -6803,12 +7504,12 @@ public class YModule : YFunction
         List<string> old_dslist = new List<string>();
         List<string> old_jpath = new List<string>();
         List<int> old_jpath_len = new List<int>();
-        List<string> old_val = new List<string>();
+        List<string> old_val_arr = new List<string>();
         byte[] actualSettings;
         List<string> new_dslist = new List<string>();
         List<string> new_jpath = new List<string>();
         List<int> new_jpath_len = new List<int>();
-        List<string> new_val = new List<string>();
+        List<string> new_val_arr = new List<string>();
         int cpos;
         int eqpos;
         int leng;
@@ -6825,14 +7526,16 @@ public class YModule : YFunction
         string sensorType;
         string unit_name;
         string newval;
+        string oldval;
         string old_calib;
         bool do_update;
         bool found;
+        oldval = "";
+        newval = "";
         old_json_flat = this._flattenJsonStruct(settings);
         old_dslist = this._json_get_array(old_json_flat);
         for (int ii = 0; ii < old_dslist.Count; ii++) {
-            leng = (old_dslist[ii]).Length;
-            old_dslist[ii] = (old_dslist[ii]).Substring( 1, leng - 2);
+            old_dslist[ii] = this._json_get_string(YAPI.DefaultEncoding.GetBytes(old_dslist[ii]));
             leng = (old_dslist[ii]).Length;
             eqpos = (old_dslist[ii]).IndexOf("=");
             if ((eqpos < 0) || (leng == 0)) {
@@ -6844,15 +7547,14 @@ public class YModule : YFunction
             value = (old_dslist[ii]).Substring( eqpos, leng - eqpos);
             old_jpath.Add(jpath);
             old_jpath_len.Add((jpath).Length);
-            old_val.Add(value);;
+            old_val_arr.Add(value);;
         }
         // may throw an exception
         actualSettings = this._download("api.json");
         actualSettings = this._flattenJsonStruct(actualSettings);
         new_dslist = this._json_get_array(actualSettings);
         for (int ii = 0; ii < new_dslist.Count; ii++) {
-            leng = (new_dslist[ii]).Length;
-            new_dslist[ii] = (new_dslist[ii]).Substring( 1, leng - 2);
+            new_dslist[ii] = this._json_get_string(YAPI.DefaultEncoding.GetBytes(new_dslist[ii]));
             leng = (new_dslist[ii]).Length;
             eqpos = (new_dslist[ii]).IndexOf("=");
             if ((eqpos < 0) || (leng == 0)) {
@@ -6864,7 +7566,7 @@ public class YModule : YFunction
             value = (new_dslist[ii]).Substring( eqpos, leng - eqpos);
             new_jpath.Add(jpath);
             new_jpath_len.Add((jpath).Length);
-            new_val.Add(value);;
+            new_val_arr.Add(value);;
         }
         i = 0;
         while (i < new_jpath.Count) {
@@ -6990,17 +7692,33 @@ public class YModule : YFunction
                 do_update = false;
             }
             if (do_update) {
+                do_update = false;
+                newval = new_val_arr[i];
+                j = 0;
+                found = false;
+                while ((j < old_jpath.Count) && !(found)) {
+                    if ((new_jpath_len[i] == old_jpath_len[j]) && (new_jpath[i] == old_jpath[j])) {
+                        found = true;
+                        oldval = old_val_arr[j];
+                        if (!(newval == oldval)) {
+                            do_update = true;
+                        }
+                    }
+                    j = j + 1;
+                }
+            }
+            if (do_update) {
                 if (attr == "calibrationParam") {
                     old_calib = "";
                     unit_name = "";
                     sensorType = "";
-                    new_calib = new_val[i];
+                    new_calib = newval;
                     j = 0;
                     found = false;
                     while ((j < old_jpath.Count) && !(found)) {
                         if ((new_jpath_len[i] == old_jpath_len[j]) && (new_jpath[i] == old_jpath[j])) {
                             found = true;
-                            old_calib = old_val[j];
+                            old_calib = old_val_arr[j];
                         }
                         j = j + 1;
                     }
@@ -7024,23 +7742,15 @@ public class YModule : YFunction
                         }
                         j = j + 1;
                     }
-                    newval = this.calibConvert(new_val[i], old_calib, unit_name, sensorType);
-                    url = "api/" + fun + ".json?" + attr + "=" + newval;
+                    newval = this.calibConvert(new_val_arr[i], old_calib, unit_name, sensorType);
+                    url = "api/" + fun + ".json?" + attr + "=" + this._escapeAttr(newval);
                     this._download(url);
                 } else {
-                    j = 0;
-                    found = false;
-                    while ((j < old_jpath_len.Count) && !(found)) {
-                        if ((new_jpath_len[i] == old_jpath_len[j]) && (new_jpath[i] == old_jpath[j])) {
-                            found = true;
-                            url = "api/" + fun + ".json?" + attr + "=" + old_val[j];
-                            if (attr == "resolution") {
-                                restoreLast.Add(url);
-                            } else {
-                                this._download(url);
-                            }
-                        }
-                        j = j + 1;
+                    url = "api/" + fun + ".json?" + attr + "=" + this._escapeAttr(oldval);
+                    if (attr == "resolution") {
+                        restoreLast.Add(url);
+                    } else {
+                        this._download(url);
                     }
                 }
             }
@@ -8179,6 +8889,47 @@ public class YSensor : YFunction
 
     /**
      * <summary>
+     *   Starts the data logger on the device.
+     * <para>
+     *   Note that the data logger
+     *   will only save the measures on this sensor if the logFrequency
+     *   is not set to "OFF".
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     */
+    public virtual int startDataLogger()
+    {
+        byte[] res;
+        // may throw an exception
+        res = this._download("api/dataLogger/recording?recording=1");
+        if (!((res).Length>0)) { this._throw( YAPI.IO_ERROR, "unable to start datalogger"); return YAPI.IO_ERROR; }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
+     *   Stops the datalogger on the device.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     */
+    public virtual int stopDataLogger()
+    {
+        byte[] res;
+        // may throw an exception
+        res = this._download("api/dataLogger/recording?recording=0");
+        if (!((res).Length>0)) { this._throw( YAPI.IO_ERROR, "unable to stop datalogger"); return YAPI.IO_ERROR; }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
      *   Retrieves a DataSet object holding historical data for this
      *   sensor, for a specified time interval.
      * <para>
@@ -8494,7 +9245,7 @@ public class YSensor : YFunction
                 difRaw = 0;
                 while ((sublen > 0) && (i < report.Count)) {
                     byteVal = report[i];
-                    difRaw = avgRaw + poww * byteVal;
+                    difRaw = difRaw + poww * byteVal;
                     poww = poww * 0x100;
                     i = i + 1;
                     sublen = sublen - 1;
@@ -8505,7 +9256,7 @@ public class YSensor : YFunction
                 difRaw = 0;
                 while ((sublen > 0) && (i < report.Count)) {
                     byteVal = report[i];
-                    difRaw = avgRaw + poww * byteVal;
+                    difRaw = difRaw + poww * byteVal;
                     poww = poww * 0x100;
                     i = i + 1;
                     sublen = sublen - 1;

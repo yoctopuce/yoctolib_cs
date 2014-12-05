@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_lightsensor.cs 17655 2014-09-16 12:24:27Z mvuilleu $
+ * $Id: yocto_lightsensor.cs 18323 2014-11-10 10:50:32Z seb $
  *
  * Implements yFindLightSensor(), the high-level API for LightSensor functions
  *
@@ -75,7 +75,6 @@ public class YLightSensor : YSensor
     public const int MEASURETYPE_HIGH_RATE = 3;
     public const int MEASURETYPE_HIGH_ENERGY = 4;
     public const int MEASURETYPE_INVALID = -1;
-
     protected int _measureType = MEASURETYPE_INVALID;
     protected ValueCallback _valueCallbackLightSensor = null;
     protected TimedReportCallback _timedReportCallbackLightSensor = null;

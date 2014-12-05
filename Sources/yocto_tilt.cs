@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_tilt.cs 17354 2014-08-29 10:07:05Z seb $
+ * $Id: yocto_tilt.cs 18323 2014-11-10 10:50:32Z seb $
  *
  * Implements yFindTilt(), the high-level API for Tilt functions
  *
@@ -73,7 +73,6 @@ public class YTilt : YSensor
     public const int AXIS_Y = 1;
     public const int AXIS_Z = 2;
     public const int AXIS_INVALID = -1;
-
     protected int _axis = AXIS_INVALID;
     protected ValueCallback _valueCallbackTilt = null;
     protected TimedReportCallback _timedReportCallbackTilt = null;

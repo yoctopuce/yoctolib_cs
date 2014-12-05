@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pwmpowersource.cs 17354 2014-08-29 10:07:05Z seb $
+ * $Id: yocto_pwmpowersource.cs 18323 2014-11-10 10:50:32Z seb $
  *
  * Implements yFindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *
@@ -74,7 +74,6 @@ public class YPwmPowerSource : YFunction
     public const int POWERMODE_EXT_V = 2;
     public const int POWERMODE_OPNDRN = 3;
     public const int POWERMODE_INVALID = -1;
-
     protected int _powerMode = POWERMODE_INVALID;
     protected ValueCallback _valueCallbackPwmPowerSource = null;
     //--- (end of YPwmPowerSource definitions)

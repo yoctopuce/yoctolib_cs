@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_digitalio.cs 17481 2014-09-03 09:38:35Z mvuilleu $
+ * $Id: yocto_digitalio.cs 18323 2014-11-10 10:50:32Z seb $
  *
  * Implements yFindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -81,7 +81,6 @@ public class YDigitalIO : YFunction
     public const int OUTPUTVOLTAGE_USB_3V = 1;
     public const int OUTPUTVOLTAGE_EXT_V = 2;
     public const int OUTPUTVOLTAGE_INVALID = -1;
-
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _portState = PORTSTATE_INVALID;
     protected int _portDirection = PORTDIRECTION_INVALID;

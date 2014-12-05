@@ -18,7 +18,7 @@ namespace ConsoleApplication1
                 string current = module.get_firmwareRelease();
 
                 // check if a new firmare is available on yoctopuce.com
-                string newfirm = module.checkFirmware("www.yoctopuce.com", false);
+                string newfirm = module.checkFirmware("www.yoctopuce.com", true);
                 if (newfirm == "")
                 {
                     Console.WriteLine(product + " " + serial + "(rev=" + current + ") is up to date");
@@ -91,13 +91,13 @@ namespace ConsoleApplication1
             {
                 string product = module.get_productName();
                 string serial = module.get_serialNumber();
-                if (product == "YoctoHub-Ethernet" || product == "YoctoHub-Wireless" || product == "YoctoHub-Wireless-SR")
-                {
-                    hubs.Add(serial);
-                }
-                else if (product == "YoctoHub-Shield")
+                if (product == "YoctoHub-Shield")
                 {
                     shield.Add(serial);
+                }
+                else if (product.StartsWith("YoctoHub"))
+                {
+                    hubs.Add(serial);
                 }
                 else if (product != "VirtualHub")
                 {

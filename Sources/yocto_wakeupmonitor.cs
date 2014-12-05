@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wakeupmonitor.cs 17481 2014-09-03 09:38:35Z mvuilleu $
+ * $Id: yocto_wakeupmonitor.cs 18323 2014-11-10 10:50:32Z seb $
  *
  * Implements yFindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -79,11 +79,9 @@ public class YWakeUpMonitor : YFunction
     public const int WAKEUPREASON_SCHEDULE1 = 4;
     public const int WAKEUPREASON_SCHEDULE2 = 5;
     public const int WAKEUPREASON_INVALID = -1;
-
     public const int WAKEUPSTATE_SLEEPING = 0;
     public const int WAKEUPSTATE_AWAKE = 1;
     public const int WAKEUPSTATE_INVALID = -1;
-
     public const long RTCTIME_INVALID = YAPI.INVALID_LONG;
     protected int _powerDuration = POWERDURATION_INVALID;
     protected int _sleepCountdown = SLEEPCOUNTDOWN_INVALID;

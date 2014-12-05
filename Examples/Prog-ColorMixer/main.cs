@@ -22,7 +22,7 @@ namespace ConsoleApplication1
 
         static void redCallback(YAnButton button, String calibratedValue)
         {
-            // calculate the red component by scaling the calibratedValue 
+            // calculate the red component by scaling the calibratedValue
             // from 0..1000 to 0..255
 
             uint value = uint.Parse(calibratedValue);
@@ -35,7 +35,7 @@ namespace ConsoleApplication1
 
         static void greenCallback(YAnButton button, String calibratedValue)
         {
-            // calculate the green component by scaling the calibratedValue 
+            // calculate the green component by scaling the calibratedValue
             // from 0..1000 to 0..255
             uint value = uint.Parse(calibratedValue);
             byte green = (byte)((value * 255 / 1000) & 0xff);
@@ -47,7 +47,7 @@ namespace ConsoleApplication1
 
         static void blueCallback(YAnButton button, String calibratedValue)
         {
-            // calculate the blue component by scaling the calibratedValue 
+            // calculate the blue component by scaling the calibratedValue
             // from 0..1000 to 0..255
             uint value = uint.Parse(calibratedValue);
             byte blue = (byte)((value * 255 / 1000) & 0xff);
@@ -68,21 +68,21 @@ namespace ConsoleApplication1
         public void addLED(YColorLed led)
         { _leds.Add(led); }
 
-        // update only red component 
+        // update only red component
         public void changeRed(byte red)
         {
             _color = (_color & 0xffff) | (red << 16);
             refreshColor();
         }
 
-        // update only geen component 
+        // update only geen component
         public void changeGreen(byte green)
         {
             _color = (_color & 0xff00ff) | (green << 8);
             refreshColor();
         }
 
-        // update only blue component     
+        // update only blue component
         public void changeBlue(byte blue)
         {
             _color = (_color & 0xffff00) | blue;
@@ -157,12 +157,11 @@ namespace ConsoleApplication1
                 }
             }
 
-            //fixme YAPI.DisableExceptions();
             // create our ColorMixer Object
             ColorMixer mixer = new ColorMixer();
 
-            // get our pointer on our 3 knob 
-            // we use will reference the 3 knob by the logical name 
+            // get our pointer on our 3 knob
+            // we use will reference the 3 knob by the logical name
             // that we have configured using the VirtualHub
             YAnButton knobRed = YAnButton.FindAnButton("Red");
             YAnButton knobGreen = YAnButton.FindAnButton("Green");

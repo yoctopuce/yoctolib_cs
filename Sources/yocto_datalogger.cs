@@ -1,6 +1,6 @@
 /********************************************************************
  *
- * $Id: yocto_datalogger.cs 17672 2014-09-16 16:15:24Z seb $
+ * $Id: yocto_datalogger.cs 18330 2014-11-11 16:26:36Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -342,19 +342,15 @@ public class YDataLogger : YFunction
     public const int RECORDING_OFF = 0;
     public const int RECORDING_ON = 1;
     public const int RECORDING_INVALID = -1;
-
     public const int AUTOSTART_OFF = 0;
     public const int AUTOSTART_ON = 1;
     public const int AUTOSTART_INVALID = -1;
-
     public const int BEACONDRIVEN_OFF = 0;
     public const int BEACONDRIVEN_ON = 1;
     public const int BEACONDRIVEN_INVALID = -1;
-
     public const int CLEARHISTORY_FALSE = 0;
     public const int CLEARHISTORY_TRUE = 1;
     public const int CLEARHISTORY_INVALID = -1;
-
     protected int _currentRunIndex = CURRENTRUNINDEX_INVALID;
     protected long _timeUTC = TIMEUTC_INVALID;
     protected int _recording = RECORDING_INVALID;
@@ -389,22 +385,22 @@ public class YDataLogger : YFunction
         }
         if (member.name == "recording")
         {
-            _recording = member.ivalue >0?1:0;
+            _recording = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "autoStart")
         {
-            _autoStart = member.ivalue >0?1:0;
+            _autoStart = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "beaconDriven")
         {
-            _beaconDriven = member.ivalue >0?1:0;
+            _beaconDriven = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "clearHistory")
         {
-            _clearHistory = member.ivalue >0?1:0;
+            _clearHistory = member.ivalue > 0 ? 1 : 0;
             return;
         }
         base._parseAttr(member);

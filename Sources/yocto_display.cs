@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 17498 2014-09-03 19:21:24Z mvuilleu $
+ * $Id: yocto_display.cs 18330 2014-11-11 16:26:36Z mvuilleu $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -85,7 +85,6 @@ public enum   ALIGN
         BASELINE_RIGHT = 14,
         BOTTOM_RIGHT = 15
      };
-
     //--- (end of generated code: YDisplayLayer definitions)
 
   public YDisplayLayer(YDisplay parent, string id)
@@ -929,7 +928,6 @@ public class YDisplay : YFunction
     public const int ENABLED_FALSE = 0;
     public const int ENABLED_TRUE = 1;
     public const int ENABLED_INVALID = -1;
-
     public const string STARTUPSEQ_INVALID = YAPI.INVALID_STRING;
     public const int BRIGHTNESS_INVALID = YAPI.INVALID_UINT;
     public const int ORIENTATION_LEFT = 0;
@@ -937,14 +935,12 @@ public class YDisplay : YFunction
     public const int ORIENTATION_RIGHT = 2;
     public const int ORIENTATION_DOWN = 3;
     public const int ORIENTATION_INVALID = -1;
-
     public const int DISPLAYWIDTH_INVALID = YAPI.INVALID_UINT;
     public const int DISPLAYHEIGHT_INVALID = YAPI.INVALID_UINT;
     public const int DISPLAYTYPE_MONO = 0;
     public const int DISPLAYTYPE_GRAY = 1;
     public const int DISPLAYTYPE_RGB = 2;
     public const int DISPLAYTYPE_INVALID = -1;
-
     public const int LAYERWIDTH_INVALID = YAPI.INVALID_UINT;
     public const int LAYERHEIGHT_INVALID = YAPI.INVALID_UINT;
     public const int LAYERCOUNT_INVALID = YAPI.INVALID_UINT;
@@ -977,7 +973,7 @@ public class YDisplay : YFunction
     {
         if (member.name == "enabled")
         {
-            _enabled = member.ivalue >0?1:0;
+            _enabled = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "startupSeq")

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_watchdog.cs 17354 2014-08-29 10:07:05Z seb $
+ * $Id: yocto_watchdog.cs 18330 2014-11-11 16:26:36Z mvuilleu $
  *
  * Implements yFindWatchdog(), the high-level API for Watchdog functions
  *
@@ -84,28 +84,23 @@ public class YWatchdog : YFunction
     public const int STATE_A = 0;
     public const int STATE_B = 1;
     public const int STATE_INVALID = -1;
-
     public const int STATEATPOWERON_UNCHANGED = 0;
     public const int STATEATPOWERON_A = 1;
     public const int STATEATPOWERON_B = 2;
     public const int STATEATPOWERON_INVALID = -1;
-
     public const long MAXTIMEONSTATEA_INVALID = YAPI.INVALID_LONG;
     public const long MAXTIMEONSTATEB_INVALID = YAPI.INVALID_LONG;
     public const int OUTPUT_OFF = 0;
     public const int OUTPUT_ON = 1;
     public const int OUTPUT_INVALID = -1;
-
     public const long PULSETIMER_INVALID = YAPI.INVALID_LONG;
     public const long COUNTDOWN_INVALID = YAPI.INVALID_LONG;
     public const int AUTOSTART_OFF = 0;
     public const int AUTOSTART_ON = 1;
     public const int AUTOSTART_INVALID = -1;
-
     public const int RUNNING_OFF = 0;
     public const int RUNNING_ON = 1;
     public const int RUNNING_INVALID = -1;
-
     public const long TRIGGERDELAY_INVALID = YAPI.INVALID_LONG;
     public const long TRIGGERDURATION_INVALID = YAPI.INVALID_LONG;
     public static readonly YWatchdogDelayedPulse DELAYEDPULSETIMER_INVALID = null;
@@ -138,7 +133,7 @@ public class YWatchdog : YFunction
     {
         if (member.name == "state")
         {
-            _state = member.ivalue >0?1:0;
+            _state = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "stateAtPowerOn")
@@ -158,7 +153,7 @@ public class YWatchdog : YFunction
         }
         if (member.name == "output")
         {
-            _output = member.ivalue >0?1:0;
+            _output = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "pulseTimer")
@@ -189,12 +184,12 @@ public class YWatchdog : YFunction
         }
         if (member.name == "autoStart")
         {
-            _autoStart = member.ivalue >0?1:0;
+            _autoStart = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "running")
         {
-            _running = member.ivalue >0?1:0;
+            _running = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "triggerDelay")

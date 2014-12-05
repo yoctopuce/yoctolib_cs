@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_temperature.cs 17354 2014-08-29 10:07:05Z seb $
+ * $Id: yocto_temperature.cs 18323 2014-11-10 10:50:32Z seb $
  *
  * Implements yFindTemperature(), the high-level API for Temperature functions
  *
@@ -80,9 +80,13 @@ public class YTemperature : YSensor
     public const int SENSORTYPE_PT100_4WIRES = 8;
     public const int SENSORTYPE_PT100_3WIRES = 9;
     public const int SENSORTYPE_PT100_2WIRES = 10;
+    public const int SENSORTYPE_RES_OHM = 11;
+    public const int SENSORTYPE_RES_NTC = 12;
+    public const int SENSORTYPE_RES_LINEAR = 13;
     public const int SENSORTYPE_INVALID = -1;
-
+    public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _sensorType = SENSORTYPE_INVALID;
+    protected string _command = COMMAND_INVALID;
     protected ValueCallback _valueCallbackTemperature = null;
     protected TimedReportCallback _timedReportCallbackTemperature = null;
     //--- (end of YTemperature definitions)
@@ -104,6 +108,11 @@ public class YTemperature : YSensor
             _sensorType = (int)member.ivalue;
             return;
         }
+        if (member.name == "command")
+        {
+            _command = member.svalue;
+            return;
+        }
         base._parseAttr(member);
     }
 
@@ -120,8 +129,10 @@ public class YTemperature : YSensor
      *   <c>YTemperature.SENSORTYPE_TYPE_E</c>, <c>YTemperature.SENSORTYPE_TYPE_J</c>,
      *   <c>YTemperature.SENSORTYPE_TYPE_N</c>, <c>YTemperature.SENSORTYPE_TYPE_R</c>,
      *   <c>YTemperature.SENSORTYPE_TYPE_S</c>, <c>YTemperature.SENSORTYPE_TYPE_T</c>,
-     *   <c>YTemperature.SENSORTYPE_PT100_4WIRES</c>, <c>YTemperature.SENSORTYPE_PT100_3WIRES</c> and
-     *   <c>YTemperature.SENSORTYPE_PT100_2WIRES</c> corresponding to the temperature sensor type
+     *   <c>YTemperature.SENSORTYPE_PT100_4WIRES</c>, <c>YTemperature.SENSORTYPE_PT100_3WIRES</c>,
+     *   <c>YTemperature.SENSORTYPE_PT100_2WIRES</c>, <c>YTemperature.SENSORTYPE_RES_OHM</c>,
+     *   <c>YTemperature.SENSORTYPE_RES_NTC</c> and <c>YTemperature.SENSORTYPE_RES_LINEAR</c> corresponding
+     *   to the temperature sensor type
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YTemperature.SENSORTYPE_INVALID</c>.
@@ -155,8 +166,9 @@ public class YTemperature : YSensor
      *   <c>YTemperature.SENSORTYPE_TYPE_E</c>, <c>YTemperature.SENSORTYPE_TYPE_J</c>,
      *   <c>YTemperature.SENSORTYPE_TYPE_N</c>, <c>YTemperature.SENSORTYPE_TYPE_R</c>,
      *   <c>YTemperature.SENSORTYPE_TYPE_S</c>, <c>YTemperature.SENSORTYPE_TYPE_T</c>,
-     *   <c>YTemperature.SENSORTYPE_PT100_4WIRES</c>, <c>YTemperature.SENSORTYPE_PT100_3WIRES</c> and
-     *   <c>YTemperature.SENSORTYPE_PT100_2WIRES</c>
+     *   <c>YTemperature.SENSORTYPE_PT100_4WIRES</c>, <c>YTemperature.SENSORTYPE_PT100_3WIRES</c>,
+     *   <c>YTemperature.SENSORTYPE_PT100_2WIRES</c>, <c>YTemperature.SENSORTYPE_RES_OHM</c>,
+     *   <c>YTemperature.SENSORTYPE_RES_NTC</c> and <c>YTemperature.SENSORTYPE_RES_LINEAR</c>
      * </param>
      * <para>
      * </para>
@@ -172,6 +184,23 @@ public class YTemperature : YSensor
         string rest_val;
         rest_val = (newval).ToString();
         return _setAttr("sensorType", rest_val);
+    }
+
+    public string get_command()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return COMMAND_INVALID;
+            }
+        }
+        return this._command;
+    }
+
+    public int set_command(string newval)
+    {
+        string rest_val;
+        rest_val = newval;
+        return _setAttr("command", rest_val);
     }
 
     /**
@@ -311,6 +340,166 @@ public class YTemperature : YSensor
             base._invokeTimedReportCallback(value);
         }
         return 0;
+    }
+
+    /**
+     * <summary>
+     *   Record a thermistor response table, for interpolating the temperature from
+     *   the measured resistance.
+     * <para>
+     *   This function can only be used with temperature
+     *   sensor based on thermistors.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="tempValues">
+     *   array of floating point numbers, corresponding to all
+     *   temperatures (in degrees Celcius) for which the resistance of the
+     *   thermistor is specified.
+     * </param>
+     * <param name="resValues">
+     *   array of floating point numbers, corresponding to the resistance
+     *   values (in Ohms) for each of the temperature included in the first
+     *   argument, index by index.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int set_thermistorResponseTable(List<double> tempValues, List<double> resValues)
+    {
+        int siz;
+        int res;
+        int idx;
+        int found;
+        double prev;
+        double curr;
+        double currTemp;
+        double idxres;
+        siz = tempValues.Count;
+        if (!(siz >= 2)) { this._throw( YAPI.INVALID_ARGUMENT, "thermistor response table must have at least two points"); return YAPI.INVALID_ARGUMENT; }
+        if (!(siz == resValues.Count)) { this._throw( YAPI.INVALID_ARGUMENT, "table sizes mismatch"); return YAPI.INVALID_ARGUMENT; }
+        
+        // may throw an exception
+        res = this.set_command("Z");
+        if (!(res==YAPI.SUCCESS)) { this._throw( YAPI.IO_ERROR, "unable to reset thermistor parameters"); return YAPI.IO_ERROR; }
+        
+        // add records in growing resistance value
+        found = 1;
+        prev = 0.0;
+        while (found > 0) {
+            found = 0;
+            curr = 99999999.0;
+            currTemp = -999999.0;
+            idx = 0;
+            while (idx < siz) {
+                idxres = resValues[idx];
+                if ((idxres > prev) && (idxres < curr)) {
+                    curr = idxres;
+                    currTemp = tempValues[idx];
+                    found = 1;
+                }
+                idx = idx + 1;
+            }
+            if (found > 0) {
+                res = this.set_command("m"+Convert.ToString( (int) Math.Round(1000*curr))+":"+Convert.ToString((int) Math.Round(1000*currTemp)));
+                if (!(res==YAPI.SUCCESS)) { this._throw( YAPI.IO_ERROR, "unable to reset thermistor parameters"); return YAPI.IO_ERROR; }
+                prev = curr;
+            }
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
+     *   Retrieves the thermistor response table previously configured using function
+     *   <c>set_thermistorResponseTable</c>.
+     * <para>
+     *   This function can only be used with
+     *   temperature sensor based on thermistors.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="tempValues">
+     *   array of floating point numbers, that will be filled by the function
+     *   with all temperatures (in degrees Celcius) for which the resistance
+     *   of the thermistor is specified.
+     * </param>
+     * <param name="resValues">
+     *   array of floating point numbers, that will be filled by the function
+     *   with the value (in Ohms) for each of the temperature included in the
+     *   first argument, index by index.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int loadThermistorResponseTable(List<double> tempValues, List<double> resValues)
+    {
+        string id;
+        byte[] bin_json;
+        List<string> paramlist = new List<string>();
+        List<double> templist = new List<double>();
+        int siz;
+        int idx;
+        double temp;
+        int found;
+        double prev;
+        double curr;
+        double currRes;
+        
+        tempValues.Clear();
+        resValues.Clear();
+        
+        // may throw an exception
+        id = this.get_functionId();
+        id = (id).Substring( 11, (id).Length-1);
+        bin_json = this._download("extra.json?page="+id);
+        paramlist = this._json_get_array(bin_json);
+        // first convert all temperatures to float
+        siz = ((paramlist.Count) >> (1));
+        templist.Clear();
+        idx = 0;
+        while (idx < siz) {
+            temp = Double.Parse(paramlist[2*idx+1])/1000.0;
+            templist.Add(temp);
+            idx = idx + 1;
+        }
+        // then add records in growing temperature value
+        tempValues.Clear();
+        resValues.Clear();
+        found = 1;
+        prev = -999999.0;
+        while (found > 0) {
+            found = 0;
+            curr = 999999.0;
+            currRes = -999999.0;
+            idx = 0;
+            while (idx < siz) {
+                temp = templist[idx];
+                if ((temp > prev) && (temp < curr)) {
+                    curr = temp;
+                    currRes = Double.Parse(paramlist[2*idx])/1000.0;
+                    found = 1;
+                }
+                idx = idx + 1;
+            }
+            if (found > 0) {
+                tempValues.Add(curr);
+                resValues.Add(currRes);
+                prev = curr;
+            }
+        }
+        
+        return YAPI.SUCCESS;
     }
 
     /**

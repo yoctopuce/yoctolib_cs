@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_dualpower.cs 17354 2014-08-29 10:07:05Z seb $
+ * $Id: yocto_dualpower.cs 18323 2014-11-10 10:50:32Z seb $
  *
  * Implements yFindDualPower(), the high-level API for DualPower functions
  *
@@ -76,13 +76,11 @@ public class YDualPower : YFunction
     public const int POWERSTATE_FROM_USB = 1;
     public const int POWERSTATE_FROM_EXT = 2;
     public const int POWERSTATE_INVALID = -1;
-
     public const int POWERCONTROL_AUTO = 0;
     public const int POWERCONTROL_FROM_USB = 1;
     public const int POWERCONTROL_FROM_EXT = 2;
     public const int POWERCONTROL_OFF = 3;
     public const int POWERCONTROL_INVALID = -1;
-
     public const int EXTVOLTAGE_INVALID = YAPI.INVALID_UINT;
     protected int _powerState = POWERSTATE_INVALID;
     protected int _powerControl = POWERCONTROL_INVALID;

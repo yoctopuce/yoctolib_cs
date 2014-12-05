@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_realtimeclock.cs 17354 2014-08-29 10:07:05Z seb $
+ * $Id: yocto_realtimeclock.cs 18330 2014-11-11 16:26:36Z mvuilleu $
  *
  * Implements yFindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -78,7 +78,6 @@ public class YRealTimeClock : YFunction
     public const int TIMESET_FALSE = 0;
     public const int TIMESET_TRUE = 1;
     public const int TIMESET_INVALID = -1;
-
     protected long _unixTime = UNIXTIME_INVALID;
     protected string _dateTime = DATETIME_INVALID;
     protected int _utcOffset = UTCOFFSET_INVALID;
@@ -115,7 +114,7 @@ public class YRealTimeClock : YFunction
         }
         if (member.name == "timeSet")
         {
-            _timeSet = member.ivalue >0?1:0;
+            _timeSet = member.ivalue > 0 ? 1 : 0;
             return;
         }
         base._parseAttr(member);

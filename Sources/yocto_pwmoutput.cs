@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pwmoutput.cs 17481 2014-09-03 09:38:35Z mvuilleu $
+ * $Id: yocto_pwmoutput.cs 18330 2014-11-11 16:26:36Z mvuilleu $
  *
  * Implements yFindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -71,7 +71,6 @@ public class YPwmOutput : YFunction
     public const int ENABLED_FALSE = 0;
     public const int ENABLED_TRUE = 1;
     public const int ENABLED_INVALID = -1;
-
     public const double FREQUENCY_INVALID = YAPI.INVALID_DOUBLE;
     public const double PERIOD_INVALID = YAPI.INVALID_DOUBLE;
     public const double DUTYCYCLE_INVALID = YAPI.INVALID_DOUBLE;
@@ -80,7 +79,6 @@ public class YPwmOutput : YFunction
     public const int ENABLEDATPOWERON_FALSE = 0;
     public const int ENABLEDATPOWERON_TRUE = 1;
     public const int ENABLEDATPOWERON_INVALID = -1;
-
     public const double DUTYCYCLEATPOWERON_INVALID = YAPI.INVALID_DOUBLE;
     protected int _enabled = ENABLED_INVALID;
     protected double _frequency = FREQUENCY_INVALID;
@@ -107,7 +105,7 @@ public class YPwmOutput : YFunction
     {
         if (member.name == "enabled")
         {
-            _enabled = member.ivalue >0?1:0;
+            _enabled = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "frequency")
@@ -137,7 +135,7 @@ public class YPwmOutput : YFunction
         }
         if (member.name == "enabledAtPowerOn")
         {
-            _enabledAtPowerOn = member.ivalue >0?1:0;
+            _enabledAtPowerOn = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "dutyCycleAtPowerOn")

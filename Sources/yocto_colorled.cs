@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorled.cs 17354 2014-08-29 10:07:05Z seb $
+ * $Id: yocto_colorled.cs 18524 2014-11-25 17:09:56Z seb $
  *
  * Implements yFindColorLed(), the high-level API for ColorLed functions
  *
@@ -54,7 +54,7 @@ using YFUN_DESCR = System.Int32;
 //--- (YColorLed class start)
 /**
  * <summary>
- *   Yoctopuce application programming interface
+ *   The Yoctopuce application programming interface
  *   allows you to drive a color led using RGB coordinates as well as HSL coordinates.
  * <para>
  *   The module performs all conversions form RGB to HSL automatically. It is then
@@ -83,6 +83,10 @@ public class YColorLed : YFunction
     public const int RGBCOLOR_INVALID = YAPI.INVALID_UINT;
     public const int HSLCOLOR_INVALID = YAPI.INVALID_UINT;
     public const int RGBCOLORATPOWERON_INVALID = YAPI.INVALID_UINT;
+    public const int BLINKSEQSIZE_INVALID = YAPI.INVALID_UINT;
+    public const int BLINKSEQMAXSIZE_INVALID = YAPI.INVALID_UINT;
+    public const int BLINKSEQSIGNATURE_INVALID = YAPI.INVALID_UINT;
+    public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     public static readonly YColorLedMove RGBMOVE_INVALID = null;
     public static readonly YColorLedMove HSLMOVE_INVALID = null;
     protected int _rgbColor = RGBCOLOR_INVALID;
@@ -90,6 +94,10 @@ public class YColorLed : YFunction
     protected YColorLedMove _rgbMove = new YColorLedMove();
     protected YColorLedMove _hslMove = new YColorLedMove();
     protected int _rgbColorAtPowerOn = RGBCOLORATPOWERON_INVALID;
+    protected int _blinkSeqSize = BLINKSEQSIZE_INVALID;
+    protected int _blinkSeqMaxSize = BLINKSEQMAXSIZE_INVALID;
+    protected int _blinkSeqSignature = BLINKSEQSIGNATURE_INVALID;
+    protected string _command = COMMAND_INVALID;
     protected ValueCallback _valueCallbackColorLed = null;
     //--- (end of YColorLed definitions)
 
@@ -150,6 +158,26 @@ public class YColorLed : YFunction
         if (member.name == "rgbColorAtPowerOn")
         {
             _rgbColorAtPowerOn = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "blinkSeqSize")
+        {
+            _blinkSeqSize = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "blinkSeqMaxSize")
+        {
+            _blinkSeqMaxSize = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "blinkSeqSignature")
+        {
+            _blinkSeqSignature = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "command")
+        {
+            _command = member.svalue;
             return;
         }
         base._parseAttr(member);
@@ -384,9 +412,6 @@ public class YColorLed : YFunction
      * <summary>
      *   Changes the color that the led will display by default when the module is turned on.
      * <para>
-     *   This color will be displayed as soon as the module is powered on.
-     *   Remember to call the <c>saveToFlash()</c> method of the module if the
-     *   change should be kept.
      * </para>
      * <para>
      * </para>
@@ -408,6 +433,98 @@ public class YColorLed : YFunction
         string rest_val;
         rest_val = "0x"+(newval).ToString("X");
         return _setAttr("rgbColorAtPowerOn", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the current length of the blinking sequence
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the current length of the blinking sequence
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YColorLed.BLINKSEQSIZE_INVALID</c>.
+     * </para>
+     */
+    public int get_blinkSeqSize()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BLINKSEQSIZE_INVALID;
+            }
+        }
+        return this._blinkSeqSize;
+    }
+
+    /**
+     * <summary>
+     *   Returns the maximum length of the blinking sequence
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the maximum length of the blinking sequence
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YColorLed.BLINKSEQMAXSIZE_INVALID</c>.
+     * </para>
+     */
+    public int get_blinkSeqMaxSize()
+    {
+        if (this._cacheExpiration == 0) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BLINKSEQMAXSIZE_INVALID;
+            }
+        }
+        return this._blinkSeqMaxSize;
+    }
+
+    /**
+     * <summary>
+     *   Return the blinking sequence signature.
+     * <para>
+     *   Since blinking
+     *   sequences cannot be read from the device, this can be used
+     *   to detect if a specific blinking sequence is already
+     *   programmed.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YColorLed.BLINKSEQSIGNATURE_INVALID</c>.
+     * </para>
+     */
+    public int get_blinkSeqSignature()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BLINKSEQSIGNATURE_INVALID;
+            }
+        }
+        return this._blinkSeqSignature;
+    }
+
+    public string get_command()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return COMMAND_INVALID;
+            }
+        }
+        return this._command;
+    }
+
+    public int set_command(string newval)
+    {
+        string rest_val;
+        rest_val = newval;
+        return _setAttr("command", rest_val);
     }
 
     /**
@@ -508,6 +625,108 @@ public class YColorLed : YFunction
             base._invokeValueCallback(value);
         }
         return 0;
+    }
+
+    public virtual int sendCommand(string command)
+    {
+        return this.set_command(command);
+    }
+
+    /**
+     * <summary>
+     *   Add a new transition to the blinking sequence, the move will
+     *   be performed in the HSL space.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="HSLcolor">
+     *   desired HSL color when the traisntion is completed
+     * </param>
+     * <param name="msDelay">
+     *   duration of the color transition, in milliseconds.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     *   On failure, throws an exception or returns a negative error code.
+     * </returns>
+     */
+    public virtual int addHslMoveToBlinkSeq(int HSLcolor, int msDelay)
+    {
+        return this.sendCommand("H"+Convert.ToString(HSLcolor)+","+Convert.ToString(msDelay));
+    }
+
+    /**
+     * <summary>
+     *   Add a new transition to the blinking sequence, the move will
+     *   be performed in the RGB space.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="RGBcolor">
+     *   desired RGB color when the transition is completed
+     * </param>
+     * <param name="msDelay">
+     *   duration of the color transition, in milliseconds.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     *   On failure, throws an exception or returns a negative error code.
+     * </returns>
+     */
+    public virtual int addRgbMoveToBlinkSeq(int RGBcolor, int msDelay)
+    {
+        return this.sendCommand("R"+Convert.ToString(RGBcolor)+","+Convert.ToString(msDelay));
+    }
+
+    /**
+     * <summary>
+     *   Starts the preprogrammed blinking sequence.
+     * <para>
+     *   The sequence will
+     *   run in loop until it is stopped by stopBlinkSeq or an explicit
+     *   change.
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     *   On failure, throws an exception or returns a negative error code.
+     * </returns>
+     */
+    public virtual int startBlinkSeq()
+    {
+        return this.sendCommand("S");
+    }
+
+    /**
+     * <summary>
+     *   Stops the preprogrammed blinking sequence.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     *   On failure, throws an exception or returns a negative error code.
+     * </returns>
+     */
+    public virtual int stopBlinkSeq()
+    {
+        return this.sendCommand("X");
+    }
+
+    /**
+     * <summary>
+     *   Resets the preprogrammed blinking sequence.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     *   On failure, throws an exception or returns a negative error code.
+     * </returns>
+     */
+    public virtual int resetBlinkSeq()
+    {
+        return this.sendCommand("Z");
     }
 
     /**

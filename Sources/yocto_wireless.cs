@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wireless.cs 17594 2014-09-10 21:15:55Z mvuilleu $
+ * $Id: yocto_wireless.cs 18323 2014-11-10 10:50:32Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -132,7 +132,6 @@ public class YWireless : YFunction
     public const int SECURITY_WPA = 3;
     public const int SECURITY_WPA2 = 4;
     public const int SECURITY_INVALID = -1;
-
     public const string MESSAGE_INVALID = YAPI.INVALID_STRING;
     public const string WLANCONFIG_INVALID = YAPI.INVALID_STRING;
     protected int _linkQuality = LINKQUALITY_INVALID;

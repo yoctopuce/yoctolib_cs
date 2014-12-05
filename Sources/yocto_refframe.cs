@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_refframe.cs 17481 2014-09-03 09:38:35Z mvuilleu $
+ * $Id: yocto_refframe.cs 18323 2014-11-10 10:50:32Z seb $
  *
  * Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -81,14 +81,12 @@ public enum   MOUNTPOSITION
         REAR = 4,
         LEFT = 5
      };
-
 public enum   MOUNTORIENTATION
     {   TWELVE = 0,
         THREE = 1,
         SIX = 2,
         NINE = 3
      };
-
     public const int MOUNTPOS_INVALID = YAPI.INVALID_UINT;
     public const double BEARING_INVALID = YAPI.INVALID_DOUBLE;
     public const string CALIBRATIONPARAM_INVALID = YAPI.INVALID_STRING;

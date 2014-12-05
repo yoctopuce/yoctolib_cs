@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_genericsensor.cs 17481 2014-09-03 09:38:35Z mvuilleu $
+ * $Id: yocto_genericsensor.cs 18323 2014-11-10 10:50:32Z seb $
  *
  * Implements yFindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -74,11 +74,17 @@ public class YGenericSensor : YSensor
     public const string SIGNALRANGE_INVALID = YAPI.INVALID_STRING;
     public const string VALUERANGE_INVALID = YAPI.INVALID_STRING;
     public const double SIGNALBIAS_INVALID = YAPI.INVALID_DOUBLE;
+    public const int SIGNALSAMPLING_HIGH_RATE = 0;
+    public const int SIGNALSAMPLING_HIGH_RATE_FILTERED = 1;
+    public const int SIGNALSAMPLING_LOW_NOISE = 2;
+    public const int SIGNALSAMPLING_LOW_NOISE_FILTERED = 3;
+    public const int SIGNALSAMPLING_INVALID = -1;
     protected double _signalValue = SIGNALVALUE_INVALID;
     protected string _signalUnit = SIGNALUNIT_INVALID;
     protected string _signalRange = SIGNALRANGE_INVALID;
     protected string _valueRange = VALUERANGE_INVALID;
     protected double _signalBias = SIGNALBIAS_INVALID;
+    protected int _signalSampling = SIGNALSAMPLING_INVALID;
     protected ValueCallback _valueCallbackGenericSensor = null;
     protected TimedReportCallback _timedReportCallbackGenericSensor = null;
     //--- (end of YGenericSensor definitions)
@@ -118,6 +124,11 @@ public class YGenericSensor : YSensor
         if (member.name == "signalBias")
         {
             _signalBias = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
+            return;
+        }
+        if (member.name == "signalSampling")
+        {
+            _signalSampling = (int)member.ivalue;
             return;
         }
         base._parseAttr(member);
@@ -362,6 +373,74 @@ public class YGenericSensor : YSensor
             }
         }
         return this._signalBias;
+    }
+
+    /**
+     * <summary>
+     *   Returns the electric signal sampling method to use.
+     * <para>
+     *   The <c>HIGH_RATE</c> method uses the highest sampling frequency, without any filtering.
+     *   The <c>HIGH_RATE_FILTERED</c> method adds a windowed 7-sample median filter.
+     *   The <c>LOW_NOISE</c> method uses a reduced acquisition frequency to reduce noise.
+     *   The <c>LOW_NOISE_FILTERED</c> method combines a reduced frequency with the median filter
+     *   to get measures as stable as possible when working on a noisy signal.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among <c>YGenericSensor.SIGNALSAMPLING_HIGH_RATE</c>,
+     *   <c>YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED</c>, <c>YGenericSensor.SIGNALSAMPLING_LOW_NOISE</c>
+     *   and <c>YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED</c> corresponding to the electric signal
+     *   sampling method to use
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YGenericSensor.SIGNALSAMPLING_INVALID</c>.
+     * </para>
+     */
+    public int get_signalSampling()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SIGNALSAMPLING_INVALID;
+            }
+        }
+        return this._signalSampling;
+    }
+
+    /**
+     * <summary>
+     *   Changes the electric signal sampling method to use.
+     * <para>
+     *   The <c>HIGH_RATE</c> method uses the highest sampling frequency, without any filtering.
+     *   The <c>HIGH_RATE_FILTERED</c> method adds a windowed 7-sample median filter.
+     *   The <c>LOW_NOISE</c> method uses a reduced acquisition frequency to reduce noise.
+     *   The <c>LOW_NOISE_FILTERED</c> method combines a reduced frequency with the median filter
+     *   to get measures as stable as possible when working on a noisy signal.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a value among <c>YGenericSensor.SIGNALSAMPLING_HIGH_RATE</c>,
+     *   <c>YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED</c>, <c>YGenericSensor.SIGNALSAMPLING_LOW_NOISE</c>
+     *   and <c>YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED</c> corresponding to the electric signal
+     *   sampling method to use
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_signalSampling(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("signalSampling", rest_val);
     }
 
     /**

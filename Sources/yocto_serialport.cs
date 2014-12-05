@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 17610 2014-09-13 11:30:24Z mvuilleu $
+ * $Id: yocto_serialport.cs 18262 2014-11-05 14:22:14Z seb $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
@@ -77,16 +77,20 @@ public class YSerialPort : YFunction
     public const int RXCOUNT_INVALID = YAPI.INVALID_UINT;
     public const int TXCOUNT_INVALID = YAPI.INVALID_UINT;
     public const int ERRCOUNT_INVALID = YAPI.INVALID_UINT;
-    public const int MSGCOUNT_INVALID = YAPI.INVALID_UINT;
+    public const int RXMSGCOUNT_INVALID = YAPI.INVALID_UINT;
+    public const int TXMSGCOUNT_INVALID = YAPI.INVALID_UINT;
     public const string LASTMSG_INVALID = YAPI.INVALID_STRING;
+    public const string STARTUPJOB_INVALID = YAPI.INVALID_STRING;
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected string _serialMode = SERIALMODE_INVALID;
     protected string _protocol = PROTOCOL_INVALID;
     protected int _rxCount = RXCOUNT_INVALID;
     protected int _txCount = TXCOUNT_INVALID;
     protected int _errCount = ERRCOUNT_INVALID;
-    protected int _msgCount = MSGCOUNT_INVALID;
+    protected int _rxMsgCount = RXMSGCOUNT_INVALID;
+    protected int _txMsgCount = TXMSGCOUNT_INVALID;
     protected string _lastMsg = LASTMSG_INVALID;
+    protected string _startupJob = STARTUPJOB_INVALID;
     protected string _command = COMMAND_INVALID;
     protected ValueCallback _valueCallbackSerialPort = null;
     protected int _rxptr = 0;
@@ -129,14 +133,24 @@ public class YSerialPort : YFunction
             _errCount = (int)member.ivalue;
             return;
         }
-        if (member.name == "msgCount")
+        if (member.name == "rxMsgCount")
         {
-            _msgCount = (int)member.ivalue;
+            _rxMsgCount = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "txMsgCount")
+        {
+            _txMsgCount = (int)member.ivalue;
             return;
         }
         if (member.name == "lastMsg")
         {
             _lastMsg = member.svalue;
+            return;
+        }
+        if (member.name == "startupJob")
+        {
+            _startupJob = member.svalue;
             return;
         }
         if (member.name == "command")
@@ -364,17 +378,42 @@ public class YSerialPort : YFunction
      *   an integer corresponding to the total number of messages received since last reset
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns <c>YSerialPort.MSGCOUNT_INVALID</c>.
+     *   On failure, throws an exception or returns <c>YSerialPort.RXMSGCOUNT_INVALID</c>.
      * </para>
      */
-    public int get_msgCount()
+    public int get_rxMsgCount()
     {
         if (this._cacheExpiration <= YAPI.GetTickCount()) {
             if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MSGCOUNT_INVALID;
+                return RXMSGCOUNT_INVALID;
             }
         }
-        return this._msgCount;
+        return this._rxMsgCount;
+    }
+
+    /**
+     * <summary>
+     *   Returns the total number of messages send since last reset.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the total number of messages send since last reset
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSerialPort.TXMSGCOUNT_INVALID</c>.
+     * </para>
+     */
+    public int get_txMsgCount()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return TXMSGCOUNT_INVALID;
+            }
+        }
+        return this._txMsgCount;
     }
 
     /**
@@ -400,6 +439,60 @@ public class YSerialPort : YFunction
             }
         }
         return this._lastMsg;
+    }
+
+    /**
+     * <summary>
+     *   Returns the job file to use when the device is powered on.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to the job file to use when the device is powered on
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSerialPort.STARTUPJOB_INVALID</c>.
+     * </para>
+     */
+    public string get_startupJob()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return STARTUPJOB_INVALID;
+            }
+        }
+        return this._startupJob;
+    }
+
+    /**
+     * <summary>
+     *   Changes the job to use when the device is powered on.
+     * <para>
+     *   Remember to call the <c>saveToFlash()</c> method of the module if the
+     *   modification must be kept.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a string corresponding to the job to use when the device is powered on
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_startupJob(string newval)
+    {
+        string rest_val;
+        rest_val = newval;
+        return _setAttr("startupJob", rest_val);
     }
 
     public string get_command()
@@ -592,7 +685,6 @@ public class YSerialPort : YFunction
     {
         byte[] buff;
         int res;
-        
         // may throw an exception
         buff = this._download("cts.txt");
         if (!((buff).Length == 1)) { this._throw( YAPI.IO_ERROR, "invalid CTS reply"); return YAPI.IO_ERROR; }
@@ -622,7 +714,6 @@ public class YSerialPort : YFunction
         int bufflen;
         int idx;
         int ch;
-        
         buff = YAPI.DefaultEncoding.GetBytes(text);
         bufflen = (buff).Length;
         if (bufflen < 100) {
@@ -763,7 +854,6 @@ public class YSerialPort : YFunction
         int bufflen;
         int idx;
         int ch;
-        
         buff = YAPI.DefaultEncoding.GetBytes(""+text+"\r\n");
         bufflen = (buff).Length-2;
         if (bufflen < 100) {
@@ -861,7 +951,7 @@ public class YSerialPort : YFunction
         if (nChars > bufflen) {
             nChars = bufflen;
         }
-        this._rxptr = this._rxptr + nChars;
+        this._rxptr = endpos - (bufflen - nChars);
         res = (YAPI.DefaultEncoding.GetString(buff)).Substring( 0, nChars);
         return res;
     }
@@ -920,7 +1010,7 @@ public class YSerialPort : YFunction
         if (nBytes > bufflen) {
             nBytes = bufflen;
         }
-        this._rxptr = this._rxptr + nBytes;
+        this._rxptr = endpos - (bufflen - nBytes);
         res = "";
         ofs = 0;
         while (ofs+3 < nBytes) {
@@ -938,8 +1028,8 @@ public class YSerialPort : YFunction
      * <summary>
      *   Reads a single line (or message) from the receive buffer, starting at current stream position.
      * <para>
-     *   This function can only be used when the serial port is configured for a message protocol,
-     *   such as 'Line' mode or MODBUS protocols. It does not  work in plain stream modes, eg. 'Char' or 'Byte').
+     *   This function is intended to be used when the serial port is configured for a message protocol,
+     *   such as 'Line' mode or MODBUS protocols.
      * </para>
      * <para>
      *   If data at current stream position is not available anymore in the receive buffer,
@@ -984,9 +1074,8 @@ public class YSerialPort : YFunction
      *   Searches for incoming messages in the serial port receive buffer matching a given pattern,
      *   starting at current position.
      * <para>
-     *   This function can only be used when the serial port is
-     *   configured for a message protocol, such as 'Line' mode or MODBUS protocols.
-     *   It does not work in plain stream modes, eg. 'Char' or 'Byte', for which there is no "start" of message.
+     *   This function will only compare and return printable characters
+     *   in the message strings. Binary protocols are handled as hexadecimal strings.
      * </para>
      * <para>
      *   The search returns all messages matching the expression provided as argument in the buffer.
@@ -1048,24 +1137,39 @@ public class YSerialPort : YFunction
      *   for the next read operations.
      * </para>
      * </summary>
-     * <param name="rxCountVal">
-     *   the absolute position index (value of rxCount) for next read operations.
+     * <param name="absPos">
+     *   the absolute position index for next read operations.
      * </param>
      * <returns>
      *   nothing.
      * </returns>
      */
-    public virtual int read_seek(int rxCountVal)
+    public virtual int read_seek(int absPos)
     {
-        this._rxptr = rxCountVal;
+        this._rxptr = absPos;
         return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
+     *   Returns the current absolute stream position pointer of the YSerialPort object.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   the absolute position index for next read operations.
+     * </returns>
+     */
+    public virtual int read_tell()
+    {
+        return this._rxptr;
     }
 
     /**
      * <summary>
      *   Sends a text line query to the serial port, and reads the reply, if any.
      * <para>
-     *   This function can only be used when the serial port is configured for 'Line' protocol.
+     *   This function is intended to be used when the serial port is configured for 'Line' protocol.
      * </para>
      * </summary>
      * <param name="query">
@@ -1736,6 +1840,58 @@ public class YSerialPort : YFunction
             regpos = regpos + 1;
         }
         return res;
+    }
+
+    /**
+     * <summary>
+     *   Saves the job definition string (JSON data) into a job file.
+     * <para>
+     *   The job file can be later enabled using <c>selectJob()</c>.
+     * </para>
+     * </summary>
+     * <param name="jobfile">
+     *   name of the job file to save on the device filesystem
+     * </param>
+     * <param name="jsonDef">
+     *   a string containing a JSON definition of the job
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int uploadJob(string jobfile, string jsonDef)
+    {
+        this._upload(jobfile, YAPI.DefaultEncoding.GetBytes(jsonDef));
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
+     *   Load and start processing the specified job file.
+     * <para>
+     *   The file must have
+     *   been previously created using the user interface or uploaded on the
+     *   device filesystem using the <c>uploadJob()</c> function.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="jobfile">
+     *   name of the job file (on the device filesystem)
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int selectJob(string jobfile)
+    {
+        return this.sendCommand("J"+jobfile);
     }
 
     /**

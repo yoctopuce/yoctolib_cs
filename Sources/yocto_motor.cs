@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_motor.cs 17354 2014-08-29 10:07:05Z seb $
+ * $Id: yocto_motor.cs 18323 2014-11-10 10:50:32Z seb $
  *
  * Implements yFindMotor(), the high-level API for Motor functions
  *
@@ -82,7 +82,6 @@ public class YMotor : YFunction
     public const int MOTORSTATUS_HIHEAT = 6;
     public const int MOTORSTATUS_FAILSF = 7;
     public const int MOTORSTATUS_INVALID = -1;
-
     public const double DRIVINGFORCE_INVALID = YAPI.INVALID_DOUBLE;
     public const double BRAKINGFORCE_INVALID = YAPI.INVALID_DOUBLE;
     public const double CUTOFFVOLTAGE_INVALID = YAPI.INVALID_DOUBLE;

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_hubport.cs 17354 2014-08-29 10:07:05Z seb $
+ * $Id: yocto_hubport.cs 18330 2014-11-11 16:26:36Z mvuilleu $
  *
  * Implements yFindHubPort(), the high-level API for HubPort functions
  *
@@ -74,14 +74,12 @@ public class YHubPort : YFunction
     public const int ENABLED_FALSE = 0;
     public const int ENABLED_TRUE = 1;
     public const int ENABLED_INVALID = -1;
-
     public const int PORTSTATE_OFF = 0;
     public const int PORTSTATE_OVRLD = 1;
     public const int PORTSTATE_ON = 2;
     public const int PORTSTATE_RUN = 3;
     public const int PORTSTATE_PROG = 4;
     public const int PORTSTATE_INVALID = -1;
-
     public const int BAUDRATE_INVALID = YAPI.INVALID_UINT;
     protected int _enabled = ENABLED_INVALID;
     protected int _portState = PORTSTATE_INVALID;
@@ -103,7 +101,7 @@ public class YHubPort : YFunction
     {
         if (member.name == "enabled")
         {
-            _enabled = member.ivalue >0?1:0;
+            _enabled = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "portState")

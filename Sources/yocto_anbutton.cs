@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_anbutton.cs 17672 2014-09-16 16:15:24Z seb $
+ * $Id: yocto_anbutton.cs 18361 2014-11-13 08:06:41Z mvuilleu $
  *
  * Implements yFindAnButton(), the high-level API for AnButton functions
  *
@@ -78,14 +78,12 @@ public class YAnButton : YFunction
     public const int ANALOGCALIBRATION_OFF = 0;
     public const int ANALOGCALIBRATION_ON = 1;
     public const int ANALOGCALIBRATION_INVALID = -1;
-
     public const int CALIBRATIONMAX_INVALID = YAPI.INVALID_UINT;
     public const int CALIBRATIONMIN_INVALID = YAPI.INVALID_UINT;
     public const int SENSITIVITY_INVALID = YAPI.INVALID_UINT;
     public const int ISPRESSED_FALSE = 0;
     public const int ISPRESSED_TRUE = 1;
     public const int ISPRESSED_INVALID = -1;
-
     public const long LASTTIMEPRESSED_INVALID = YAPI.INVALID_LONG;
     public const long LASTTIMERELEASED_INVALID = YAPI.INVALID_LONG;
     public const long PULSECOUNTER_INVALID = YAPI.INVALID_LONG;
@@ -128,7 +126,7 @@ public class YAnButton : YFunction
         }
         if (member.name == "analogCalibration")
         {
-            _analogCalibration = member.ivalue >0?1:0;
+            _analogCalibration = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "calibrationMax")
@@ -148,7 +146,7 @@ public class YAnButton : YFunction
         }
         if (member.name == "isPressed")
         {
-            _isPressed = member.ivalue >0?1:0;
+            _isPressed = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "lastTimePressed")
@@ -684,7 +682,9 @@ public class YAnButton : YFunction
 
     /**
      * <summary>
-     *   Returns the pulse counter value as well as his timer
+     *   Returns the pulse counter value as well as its timer.
+     * <para>
+     * </para>
      * </summary>
      * <returns>
      *   <c>YAPI.SUCCESS</c> if the call succeeds.

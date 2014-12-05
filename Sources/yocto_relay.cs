@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_relay.cs 17354 2014-08-29 10:07:05Z seb $
+ * $Id: yocto_relay.cs 18323 2014-11-10 10:50:32Z seb $
  *
  * Implements yFindRelay(), the high-level API for Relay functions
  *
@@ -84,18 +84,15 @@ public class YRelay : YFunction
     public const int STATE_A = 0;
     public const int STATE_B = 1;
     public const int STATE_INVALID = -1;
-
     public const int STATEATPOWERON_UNCHANGED = 0;
     public const int STATEATPOWERON_A = 1;
     public const int STATEATPOWERON_B = 2;
     public const int STATEATPOWERON_INVALID = -1;
-
     public const long MAXTIMEONSTATEA_INVALID = YAPI.INVALID_LONG;
     public const long MAXTIMEONSTATEB_INVALID = YAPI.INVALID_LONG;
     public const int OUTPUT_OFF = 0;
     public const int OUTPUT_ON = 1;
     public const int OUTPUT_INVALID = -1;
-
     public const long PULSETIMER_INVALID = YAPI.INVALID_LONG;
     public const long COUNTDOWN_INVALID = YAPI.INVALID_LONG;
     public static readonly YRelayDelayedPulse DELAYEDPULSETIMER_INVALID = null;
@@ -124,7 +121,7 @@ public class YRelay : YFunction
     {
         if (member.name == "state")
         {
-            _state = member.ivalue >0?1:0;
+            _state = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "stateAtPowerOn")
@@ -144,7 +141,7 @@ public class YRelay : YFunction
         }
         if (member.name == "output")
         {
-            _output = member.ivalue >0?1:0;
+            _output = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "pulseTimer")

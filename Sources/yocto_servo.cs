@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_servo.cs 17354 2014-08-29 10:07:05Z seb $
+ * $Id: yocto_servo.cs 18330 2014-11-11 16:26:36Z mvuilleu $
  *
  * Implements yFindServo(), the high-level API for Servo functions
  *
@@ -83,14 +83,12 @@ public class YServo : YFunction
     public const int ENABLED_FALSE = 0;
     public const int ENABLED_TRUE = 1;
     public const int ENABLED_INVALID = -1;
-
     public const int RANGE_INVALID = YAPI.INVALID_UINT;
     public const int NEUTRAL_INVALID = YAPI.INVALID_UINT;
     public const int POSITIONATPOWERON_INVALID = YAPI.INVALID_INT;
     public const int ENABLEDATPOWERON_FALSE = 0;
     public const int ENABLEDATPOWERON_TRUE = 1;
     public const int ENABLEDATPOWERON_INVALID = -1;
-
     public static readonly YServoMove MOVE_INVALID = null;
     protected int _position = POSITION_INVALID;
     protected int _enabled = ENABLED_INVALID;
@@ -121,7 +119,7 @@ public class YServo : YFunction
         }
         if (member.name == "enabled")
         {
-            _enabled = member.ivalue >0?1:0;
+            _enabled = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "range")
@@ -157,7 +155,7 @@ public class YServo : YFunction
         }
         if (member.name == "enabledAtPowerOn")
         {
-            _enabledAtPowerOn = member.ivalue >0?1:0;
+            _enabledAtPowerOn = member.ivalue > 0 ? 1 : 0;
             return;
         }
         base._parseAttr(member);

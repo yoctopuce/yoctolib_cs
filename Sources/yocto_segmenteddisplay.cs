@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: yocto_led.cs 18330 2014-11-11 16:26:36Z mvuilleu $
+ * $Id: pic24config.php 18250 2014-11-03 16:54:15Z mvuilleu $
  *
- * Implements yFindLed(), the high-level API for Led functions
+ * Implements yFindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -47,71 +47,58 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
-    //--- (YLed return codes)
-    //--- (end of YLed return codes)
-//--- (YLed dlldef)
-//--- (end of YLed dlldef)
-//--- (YLed class start)
+    //--- (YSegmentedDisplay return codes)
+    //--- (end of YSegmentedDisplay return codes)
+//--- (YSegmentedDisplay dlldef)
+//--- (end of YSegmentedDisplay dlldef)
+//--- (YSegmentedDisplay class start)
 /**
  * <summary>
- *   Yoctopuce application programming interface
- *   allows you not only to drive the intensity of the led, but also to
- *   have it blink at various preset frequencies.
+ *   The SegmentedDisplay class allows you to drive segmented displays.
  * <para>
  * </para>
  * <para>
  * </para>
  * </summary>
  */
-public class YLed : YFunction
+public class YSegmentedDisplay : YFunction
 {
-//--- (end of YLed class start)
-    //--- (YLed definitions)
-    public new delegate void ValueCallback(YLed func, string value);
-    public new delegate void TimedReportCallback(YLed func, YMeasure measure);
+//--- (end of YSegmentedDisplay class start)
+    //--- (YSegmentedDisplay definitions)
+    public new delegate void ValueCallback(YSegmentedDisplay func, string value);
+    public new delegate void TimedReportCallback(YSegmentedDisplay func, YMeasure measure);
 
-    public const int POWER_OFF = 0;
-    public const int POWER_ON = 1;
-    public const int POWER_INVALID = -1;
-    public const int LUMINOSITY_INVALID = YAPI.INVALID_UINT;
-    public const int BLINKING_STILL = 0;
-    public const int BLINKING_RELAX = 1;
-    public const int BLINKING_AWARE = 2;
-    public const int BLINKING_RUN = 3;
-    public const int BLINKING_CALL = 4;
-    public const int BLINKING_PANIC = 5;
-    public const int BLINKING_INVALID = -1;
-    protected int _power = POWER_INVALID;
-    protected int _luminosity = LUMINOSITY_INVALID;
-    protected int _blinking = BLINKING_INVALID;
-    protected ValueCallback _valueCallbackLed = null;
-    //--- (end of YLed definitions)
+    public const string DISPLAYEDTEXT_INVALID = YAPI.INVALID_STRING;
+    public const int DISPLAYMODE_DISCONNECTED = 0;
+    public const int DISPLAYMODE_MANUAL = 1;
+    public const int DISPLAYMODE_AUTO1 = 2;
+    public const int DISPLAYMODE_AUTO60 = 3;
+    public const int DISPLAYMODE_INVALID = -1;
+    protected string _displayedText = DISPLAYEDTEXT_INVALID;
+    protected int _displayMode = DISPLAYMODE_INVALID;
+    protected ValueCallback _valueCallbackSegmentedDisplay = null;
+    //--- (end of YSegmentedDisplay definitions)
 
-    public YLed(string func)
+    public YSegmentedDisplay(string func)
         : base(func)
     {
-        _className = "Led";
-        //--- (YLed attributes initialization)
-        //--- (end of YLed attributes initialization)
+        _className = "SegmentedDisplay";
+        //--- (YSegmentedDisplay attributes initialization)
+        //--- (end of YSegmentedDisplay attributes initialization)
     }
 
-    //--- (YLed implementation)
+    //--- (YSegmentedDisplay implementation)
 
     protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
-        if (member.name == "power")
+        if (member.name == "displayedText")
         {
-            _power = member.ivalue > 0 ? 1 : 0;
+            _displayedText = member.svalue;
             return;
         }
-        if (member.name == "luminosity")
+        if (member.name == "displayMode")
         {
-            _luminosity = (int)member.ivalue;
-            return;
-        }
-        if (member.name == "blinking")
-        {
-            _blinking = (int)member.ivalue;
+            _displayMode = (int)member.ivalue;
             return;
         }
         base._parseAttr(member);
@@ -119,39 +106,39 @@ public class YLed : YFunction
 
     /**
      * <summary>
-     *   Returns the current led state.
+     *   Returns the text currently displayed on the screen.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   either <c>YLed.POWER_OFF</c> or <c>YLed.POWER_ON</c>, according to the current led state
+     *   a string corresponding to the text currently displayed on the screen
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns <c>YLed.POWER_INVALID</c>.
+     *   On failure, throws an exception or returns <c>YSegmentedDisplay.DISPLAYEDTEXT_INVALID</c>.
      * </para>
      */
-    public int get_power()
+    public string get_displayedText()
     {
         if (this._cacheExpiration <= YAPI.GetTickCount()) {
             if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return POWER_INVALID;
+                return DISPLAYEDTEXT_INVALID;
             }
         }
-        return this._power;
+        return this._displayedText;
     }
 
     /**
      * <summary>
-     *   Changes the state of the led.
+     *   Changes the text currently displayed on the screen.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="newval">
-     *   either <c>YLed.POWER_OFF</c> or <c>YLed.POWER_ON</c>, according to the state of the led
+     *   a string corresponding to the text currently displayed on the screen
      * </param>
      * <para>
      * </para>
@@ -162,124 +149,33 @@ public class YLed : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public int set_power(int newval)
+    public int set_displayedText(string newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("power", rest_val);
+        rest_val = newval;
+        return _setAttr("displayedText", rest_val);
     }
 
-    /**
-     * <summary>
-     *   Returns the current led intensity (in per cent).
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   an integer corresponding to the current led intensity (in per cent)
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns <c>YLed.LUMINOSITY_INVALID</c>.
-     * </para>
-     */
-    public int get_luminosity()
+    public int get_displayMode()
     {
         if (this._cacheExpiration <= YAPI.GetTickCount()) {
             if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LUMINOSITY_INVALID;
+                return DISPLAYMODE_INVALID;
             }
         }
-        return this._luminosity;
+        return this._displayMode;
     }
 
-    /**
-     * <summary>
-     *   Changes the current led intensity (in per cent).
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="newval">
-     *   an integer corresponding to the current led intensity (in per cent)
-     * </param>
-     * <para>
-     * </para>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public int set_luminosity(int newval)
+    public int set_displayMode(int newval)
     {
         string rest_val;
         rest_val = (newval).ToString();
-        return _setAttr("luminosity", rest_val);
+        return _setAttr("displayMode", rest_val);
     }
 
     /**
      * <summary>
-     *   Returns the current led signaling mode.
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   a value among <c>YLed.BLINKING_STILL</c>, <c>YLed.BLINKING_RELAX</c>, <c>YLed.BLINKING_AWARE</c>,
-     *   <c>YLed.BLINKING_RUN</c>, <c>YLed.BLINKING_CALL</c> and <c>YLed.BLINKING_PANIC</c> corresponding to
-     *   the current led signaling mode
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns <c>YLed.BLINKING_INVALID</c>.
-     * </para>
-     */
-    public int get_blinking()
-    {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BLINKING_INVALID;
-            }
-        }
-        return this._blinking;
-    }
-
-    /**
-     * <summary>
-     *   Changes the current led signaling mode.
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="newval">
-     *   a value among <c>YLed.BLINKING_STILL</c>, <c>YLed.BLINKING_RELAX</c>, <c>YLed.BLINKING_AWARE</c>,
-     *   <c>YLed.BLINKING_RUN</c>, <c>YLed.BLINKING_CALL</c> and <c>YLed.BLINKING_PANIC</c> corresponding to
-     *   the current led signaling mode
-     * </param>
-     * <para>
-     * </para>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public int set_blinking(int newval)
-    {
-        string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("blinking", rest_val);
-    }
-
-    /**
-     * <summary>
-     *   Retrieves a led for a given identifier.
+     *   Retrieves a segmented display for a given identifier.
      * <para>
      *   The identifier can be specified using several formats:
      * </para>
@@ -303,29 +199,29 @@ public class YLed : YFunction
      * <para>
      * </para>
      * <para>
-     *   This function does not require that the led is online at the time
+     *   This function does not require that the segmented displays is online at the time
      *   it is invoked. The returned object is nevertheless valid.
-     *   Use the method <c>YLed.isOnline()</c> to test if the led is
+     *   Use the method <c>YSegmentedDisplay.isOnline()</c> to test if the segmented displays is
      *   indeed online at a given time. In case of ambiguity when looking for
-     *   a led by logical name, no error is notified: the first instance
+     *   a segmented display by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
      * </para>
      * </summary>
      * <param name="func">
-     *   a string that uniquely characterizes the led
+     *   a string that uniquely characterizes the segmented displays
      * </param>
      * <returns>
-     *   a <c>YLed</c> object allowing you to drive the led.
+     *   a <c>YSegmentedDisplay</c> object allowing you to drive the segmented displays.
      * </returns>
      */
-    public static YLed FindLed(string func)
+    public static YSegmentedDisplay FindSegmentedDisplay(string func)
     {
-        YLed obj;
-        obj = (YLed) YFunction._FindFromCache("Led", func);
+        YSegmentedDisplay obj;
+        obj = (YSegmentedDisplay) YFunction._FindFromCache("SegmentedDisplay", func);
         if (obj == null) {
-            obj = new YLed(func);
-            YFunction._AddToCache("Led", func, obj);
+            obj = new YSegmentedDisplay(func);
+            YFunction._AddToCache("SegmentedDisplay", func, obj);
         }
         return obj;
     }
@@ -356,7 +252,7 @@ public class YLed : YFunction
         } else {
             YFunction._UpdateValueCallbackList(this, false);
         }
-        this._valueCallbackLed = callback;
+        this._valueCallbackSegmentedDisplay = callback;
         // Immediately invoke value callback with current value
         if (callback != null && this.isOnline()) {
             val = this._advertisedValue;
@@ -369,8 +265,8 @@ public class YLed : YFunction
 
     public override int _invokeValueCallback(string value)
     {
-        if (this._valueCallbackLed != null) {
-            this._valueCallbackLed(this, value);
+        if (this._valueCallbackSegmentedDisplay != null) {
+            this._valueCallbackSegmentedDisplay(this, value);
         } else {
             base._invokeValueCallback(value);
         }
@@ -379,45 +275,45 @@ public class YLed : YFunction
 
     /**
      * <summary>
-     *   Continues the enumeration of leds started using <c>yFirstLed()</c>.
+     *   Continues the enumeration of segmented displays started using <c>yFirstSegmentedDisplay()</c>.
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   a pointer to a <c>YLed</c> object, corresponding to
-     *   a led currently online, or a <c>null</c> pointer
-     *   if there are no more leds to enumerate.
+     *   a pointer to a <c>YSegmentedDisplay</c> object, corresponding to
+     *   a segmented display currently online, or a <c>null</c> pointer
+     *   if there are no more segmented displays to enumerate.
      * </returns>
      */
-    public YLed nextLed()
+    public YSegmentedDisplay nextSegmentedDisplay()
     {
         string hwid = "";
         if (YAPI.YISERR(_nextFunction(ref hwid)))
             return null;
         if (hwid == "")
             return null;
-        return FindLed(hwid);
+        return FindSegmentedDisplay(hwid);
     }
 
-    //--- (end of YLed implementation)
+    //--- (end of YSegmentedDisplay implementation)
 
-    //--- (Led functions)
+    //--- (SegmentedDisplay functions)
 
     /**
      * <summary>
-     *   Starts the enumeration of leds currently accessible.
+     *   Starts the enumeration of segmented displays currently accessible.
      * <para>
-     *   Use the method <c>YLed.nextLed()</c> to iterate on
-     *   next leds.
+     *   Use the method <c>YSegmentedDisplay.nextSegmentedDisplay()</c> to iterate on
+     *   next segmented displays.
      * </para>
      * </summary>
      * <returns>
-     *   a pointer to a <c>YLed</c> object, corresponding to
-     *   the first led currently online, or a <c>null</c> pointer
+     *   a pointer to a <c>YSegmentedDisplay</c> object, corresponding to
+     *   the first segmented displays currently online, or a <c>null</c> pointer
      *   if there are none.
      * </returns>
      */
-    public static YLed FirstLed()
+    public static YSegmentedDisplay FirstSegmentedDisplay()
     {
         YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
         YDEV_DESCR dev = default(YDEV_DESCR);
@@ -430,7 +326,7 @@ public class YLed : YFunction
         string errmsg = "";
         int size = Marshal.SizeOf(v_fundescr[0]);
         IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
-        err = YAPI.apiGetFunctionsByClass("Led", 0, p, size, ref neededsize, ref errmsg);
+        err = YAPI.apiGetFunctionsByClass("SegmentedDisplay", 0, p, size, ref neededsize, ref errmsg);
         Marshal.Copy(p, v_fundescr, 0, 1);
         Marshal.FreeHGlobal(p);
         if ((YAPI.YISERR(err) | (neededsize == 0)))
@@ -442,10 +338,10 @@ public class YLed : YFunction
         errmsg = "";
         if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
             return null;
-        return FindLed(serial + "." + funcId);
+        return FindSegmentedDisplay(serial + "." + funcId);
     }
 
 
 
-    //--- (end of Led functions)
+    //--- (end of SegmentedDisplay functions)
 }

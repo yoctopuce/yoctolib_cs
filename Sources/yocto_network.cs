@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_network.cs 17582 2014-09-10 17:12:40Z mvuilleu $
+ * $Id: yocto_network.cs 18330 2014-11-11 16:26:36Z mvuilleu $
  *
  * Implements yFindNetwork(), the high-level API for Network functions
  *
@@ -75,7 +75,6 @@ public class YNetwork : YFunction
     public const int READINESS_LAN_OK = 3;
     public const int READINESS_WWW_OK = 4;
     public const int READINESS_INVALID = -1;
-
     public const string MACADDRESS_INVALID = YAPI.INVALID_STRING;
     public const string IPADDRESS_INVALID = YAPI.INVALID_STRING;
     public const string SUBNETMASK_INVALID = YAPI.INVALID_STRING;
@@ -88,21 +87,18 @@ public class YNetwork : YFunction
     public const int DISCOVERABLE_FALSE = 0;
     public const int DISCOVERABLE_TRUE = 1;
     public const int DISCOVERABLE_INVALID = -1;
-
     public const int WWWWATCHDOGDELAY_INVALID = YAPI.INVALID_UINT;
     public const string CALLBACKURL_INVALID = YAPI.INVALID_STRING;
     public const int CALLBACKMETHOD_POST = 0;
     public const int CALLBACKMETHOD_GET = 1;
     public const int CALLBACKMETHOD_PUT = 2;
     public const int CALLBACKMETHOD_INVALID = -1;
-
     public const int CALLBACKENCODING_FORM = 0;
     public const int CALLBACKENCODING_JSON = 1;
     public const int CALLBACKENCODING_JSON_ARRAY = 2;
     public const int CALLBACKENCODING_CSV = 3;
     public const int CALLBACKENCODING_YOCTO_API = 4;
     public const int CALLBACKENCODING_INVALID = -1;
-
     public const string CALLBACKCREDENTIALS_INVALID = YAPI.INVALID_STRING;
     public const int CALLBACKMINDELAY_INVALID = YAPI.INVALID_UINT;
     public const int CALLBACKMAXDELAY_INVALID = YAPI.INVALID_UINT;
@@ -193,7 +189,7 @@ public class YNetwork : YFunction
         }
         if (member.name == "discoverable")
         {
-            _discoverable = member.ivalue >0?1:0;
+            _discoverable = member.ivalue > 0 ? 1 : 0;
             return;
         }
         if (member.name == "wwwWatchdogDelay")

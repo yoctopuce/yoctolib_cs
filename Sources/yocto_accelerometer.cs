@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_accelerometer.cs 17354 2014-08-29 10:07:05Z seb $
+ * $Id: yocto_accelerometer.cs 18330 2014-11-11 16:26:36Z mvuilleu $
  *
  * Implements yFindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -75,7 +75,6 @@ public class YAccelerometer : YSensor
     public const int GRAVITYCANCELLATION_OFF = 0;
     public const int GRAVITYCANCELLATION_ON = 1;
     public const int GRAVITYCANCELLATION_INVALID = -1;
-
     protected double _xValue = XVALUE_INVALID;
     protected double _yValue = YVALUE_INVALID;
     protected double _zValue = ZVALUE_INVALID;
@@ -113,7 +112,7 @@ public class YAccelerometer : YSensor
         }
         if (member.name == "gravityCancellation")
         {
-            _gravityCancellation = member.ivalue >0?1:0;
+            _gravityCancellation = member.ivalue > 0 ? 1 : 0;
             return;
         }
         base._parseAttr(member);
