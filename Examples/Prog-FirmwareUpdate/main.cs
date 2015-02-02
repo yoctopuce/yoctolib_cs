@@ -34,13 +34,13 @@ namespace ConsoleApplication1
                     {
                         int newstatus = update.get_progress();
                         if (newstatus != status)
-                            Console.WriteLine(status + "% " + update.get_progressMessage());
+                            Console.WriteLine(newstatus + "% " + update.get_progressMessage());
                         YAPI.Sleep(500, ref errmsg);
                         status = newstatus;
                     } while (status < 100 && status >= 0);
                     if (status < 0)
                     {
-                        Console.WriteLine("    " + status + " Firmware Update failed: " + update.get_progressMessage());
+                        Console.WriteLine("Firmware Update failed: " + update.get_progressMessage());
                         Environment.Exit(1);
                     }
                     else

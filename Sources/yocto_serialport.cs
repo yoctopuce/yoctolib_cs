@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 18262 2014-11-05 14:22:14Z seb $
+ * $Id: yocto_serialport.cs 19192 2015-01-30 16:30:16Z mvuilleu $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
@@ -74,22 +74,33 @@ public class YSerialPort : YFunction
 
     public const string SERIALMODE_INVALID = YAPI.INVALID_STRING;
     public const string PROTOCOL_INVALID = YAPI.INVALID_STRING;
+    public const int VOLTAGELEVEL_OFF = 0;
+    public const int VOLTAGELEVEL_TTL3V = 1;
+    public const int VOLTAGELEVEL_TTL3VR = 2;
+    public const int VOLTAGELEVEL_TTL5V = 3;
+    public const int VOLTAGELEVEL_TTL5VR = 4;
+    public const int VOLTAGELEVEL_RS232 = 5;
+    public const int VOLTAGELEVEL_RS485 = 6;
+    public const int VOLTAGELEVEL_INVALID = -1;
     public const int RXCOUNT_INVALID = YAPI.INVALID_UINT;
     public const int TXCOUNT_INVALID = YAPI.INVALID_UINT;
     public const int ERRCOUNT_INVALID = YAPI.INVALID_UINT;
     public const int RXMSGCOUNT_INVALID = YAPI.INVALID_UINT;
     public const int TXMSGCOUNT_INVALID = YAPI.INVALID_UINT;
     public const string LASTMSG_INVALID = YAPI.INVALID_STRING;
+    public const string CURRENTJOB_INVALID = YAPI.INVALID_STRING;
     public const string STARTUPJOB_INVALID = YAPI.INVALID_STRING;
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected string _serialMode = SERIALMODE_INVALID;
     protected string _protocol = PROTOCOL_INVALID;
+    protected int _voltageLevel = VOLTAGELEVEL_INVALID;
     protected int _rxCount = RXCOUNT_INVALID;
     protected int _txCount = TXCOUNT_INVALID;
     protected int _errCount = ERRCOUNT_INVALID;
     protected int _rxMsgCount = RXMSGCOUNT_INVALID;
     protected int _txMsgCount = TXMSGCOUNT_INVALID;
     protected string _lastMsg = LASTMSG_INVALID;
+    protected string _currentJob = CURRENTJOB_INVALID;
     protected string _startupJob = STARTUPJOB_INVALID;
     protected string _command = COMMAND_INVALID;
     protected ValueCallback _valueCallbackSerialPort = null;
@@ -116,6 +127,11 @@ public class YSerialPort : YFunction
         if (member.name == "protocol")
         {
             _protocol = member.svalue;
+            return;
+        }
+        if (member.name == "voltageLevel")
+        {
+            _voltageLevel = (int)member.ivalue;
             return;
         }
         if (member.name == "rxCount")
@@ -146,6 +162,11 @@ public class YSerialPort : YFunction
         if (member.name == "lastMsg")
         {
             _lastMsg = member.svalue;
+            return;
+        }
+        if (member.name == "currentJob")
+        {
+            _currentJob = member.svalue;
             return;
         }
         if (member.name == "startupJob")
@@ -289,6 +310,69 @@ public class YSerialPort : YFunction
         string rest_val;
         rest_val = newval;
         return _setAttr("protocol", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the voltage level used on the serial line.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among <c>YSerialPort.VOLTAGELEVEL_OFF</c>, <c>YSerialPort.VOLTAGELEVEL_TTL3V</c>,
+     *   <c>YSerialPort.VOLTAGELEVEL_TTL3VR</c>, <c>YSerialPort.VOLTAGELEVEL_TTL5V</c>,
+     *   <c>YSerialPort.VOLTAGELEVEL_TTL5VR</c>, <c>YSerialPort.VOLTAGELEVEL_RS232</c> and
+     *   <c>YSerialPort.VOLTAGELEVEL_RS485</c> corresponding to the voltage level used on the serial line
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSerialPort.VOLTAGELEVEL_INVALID</c>.
+     * </para>
+     */
+    public int get_voltageLevel()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return VOLTAGELEVEL_INVALID;
+            }
+        }
+        return this._voltageLevel;
+    }
+
+    /**
+     * <summary>
+     *   Changes the voltage type used on the serial line.
+     * <para>
+     *   Valid
+     *   values  will depend on the Yoctopuce device model featuring
+     *   the serial port feature.  Check your device documentation
+     *   to find out which values are valid for that specific model.
+     *   Trying to set an invalid value will have no effect.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a value among <c>YSerialPort.VOLTAGELEVEL_OFF</c>, <c>YSerialPort.VOLTAGELEVEL_TTL3V</c>,
+     *   <c>YSerialPort.VOLTAGELEVEL_TTL3VR</c>, <c>YSerialPort.VOLTAGELEVEL_TTL5V</c>,
+     *   <c>YSerialPort.VOLTAGELEVEL_TTL5VR</c>, <c>YSerialPort.VOLTAGELEVEL_RS232</c> and
+     *   <c>YSerialPort.VOLTAGELEVEL_RS485</c> corresponding to the voltage type used on the serial line
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_voltageLevel(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("voltageLevel", rest_val);
     }
 
     /**
@@ -439,6 +523,60 @@ public class YSerialPort : YFunction
             }
         }
         return this._lastMsg;
+    }
+
+    /**
+     * <summary>
+     *   Returns the name of the job file currently in use.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to the name of the job file currently in use
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSerialPort.CURRENTJOB_INVALID</c>.
+     * </para>
+     */
+    public string get_currentJob()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return CURRENTJOB_INVALID;
+            }
+        }
+        return this._currentJob;
+    }
+
+    /**
+     * <summary>
+     *   Changes the job to use when the device is powered on.
+     * <para>
+     *   Remember to call the <c>saveToFlash()</c> method of the module if the
+     *   modification must be kept.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a string corresponding to the job to use when the device is powered on
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_currentJob(string newval)
+    {
+        string rest_val;
+        rest_val = newval;
+        return _setAttr("currentJob", rest_val);
     }
 
     /**
@@ -666,7 +804,7 @@ public class YSerialPort : YFunction
 
     /**
      * <summary>
-     *   Read the level of the CTS line.
+     *   Reads the level of the CTS line.
      * <para>
      *   The CTS line is usually driven by
      *   the RTS signal of the connected serial device.
@@ -1891,7 +2029,7 @@ public class YSerialPort : YFunction
      */
     public virtual int selectJob(string jobfile)
     {
-        return this.sendCommand("J"+jobfile);
+        return this.set_currentJob(jobfile);
     }
 
     /**

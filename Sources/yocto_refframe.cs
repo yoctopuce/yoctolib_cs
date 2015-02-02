@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_refframe.cs 18323 2014-11-10 10:50:32Z seb $
+ * $Id: yocto_refframe.cs 19211 2015-02-02 13:18:41Z mvuilleu $
  *
  * Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -77,8 +77,8 @@ public enum   MOUNTPOSITION
     {   BOTTOM = 0,
         TOP = 1,
         FRONT = 2,
-        RIGHT = 3,
-        REAR = 4,
+        REAR = 3,
+        RIGHT = 4,
         LEFT = 5
      };
 public enum   MOUNTORIENTATION

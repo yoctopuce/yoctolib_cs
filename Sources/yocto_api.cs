@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 18628 2014-12-03 16:18:53Z seb $
+ * $Id: yocto_api.cs 19007 2015-01-19 08:22:45Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -760,7 +760,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "18640";
+    public const string YOCTO_API_BUILD_NO = "19218";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -976,6 +976,22 @@ public class YAPI
 
         }
 
+        public static void PlugDevice(YDEV_DESCR devdescr)
+        {
+            int idx = 0;
+            YDevice dev = null;
+            for (idx = 0; idx <= YAPI.YDevice_devCache.Count - 1; idx++)
+            {
+                dev = YAPI.YDevice_devCache[idx];
+                if (dev._devdescr == devdescr)
+                {
+                    dev._cacheStamp = 0;
+                    dev._subpathinit = false;
+                    break;
+                }
+            }
+        }
+
         public static YDevice getDevice(YDEV_DESCR devdescr)
         {
             int idx = 0;
@@ -1030,7 +1046,10 @@ public class YAPI
                 return res;
             }
             reply = new byte[replysize];
-            Marshal.Copy(preply, reply, 0, replysize);
+            if (reply.Length > 0 && preply!=null)
+            {
+                Marshal.Copy(preply, reply, 0, replysize);
+            }
             res = _yapiHTTPRequestSyncDone(ref iohdl, buffer);
             errmsg = buffer.ToString();
             return res;
@@ -1448,6 +1467,7 @@ public class YAPI
         {
             return;
         }
+        YDevice.PlugDevice(d);
         YModule modul = YModule.FindModule(infos.serial + ".module");
         modul.setImmutableAttributes(ref infos);
         ev = new PlugEvent(PlugEvent.EVTYPE.ARRIVAL, modul);
@@ -1697,8 +1717,8 @@ public class YAPI
     {
         bool negate = false;
         double res;
-
-        if (val == 0)
+        int mantis = val & 2047;
+        if (mantis == 0)
             return 0.0;
         if (val > 32767)
         {
@@ -1711,7 +1731,7 @@ public class YAPI
             val = -val;
         }
         int exp = val >> 11;
-        res = (double)(val & 2047) * decExp[exp];
+        res = (double)(mantis) * decExp[exp];
         return (negate ? -res : res);
     }
 
@@ -3436,11 +3456,11 @@ public class YFirmwareUpdate
 
     /**
      * <summary>
-     *   Retrun a list of all modules in "update" mode.
+     *   Retruns a list of all the modules in "update" mode.
      * <para>
      *   Only USB connected
-     *   devices are listed. If the module is connected to a YoctoHub, you have to
-     *   connect to the YoctoHub web interface.
+     *   devices are listed. For modules connected to a YoctoHub, you must
+     *   connect yourself to the YoctoHub web interface.
      * </para>
      * </summary>
      * <returns>
@@ -3546,16 +3566,16 @@ public class YFirmwareUpdate
      *   Returns the progress of the firmware update, on a scale from 0 to 100.
      * <para>
      *   When the object is
-     *   instantiated the progress is zero. The value is updated During the firmware update process, until
-     *   the value of 100 is reached. The value of 100 mean that the firmware update is terminated with
-     *   success. If an error occur during the firmware update a negative value is returned, and the
+     *   instantiated, the progress is zero. The value is updated during the firmware update process until
+     *   the value of 100 is reached. The 100 value means that the firmware update was completed
+     *   successfully. If an error occurs during the firmware update, a negative value is returned, and the
      *   error message can be retrieved with <c>get_progressMessage</c>.
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer in the range 0 to 100 (percentage of completion) or
+     *   an integer in the range 0 to 100 (percentage of completion)
      *   or a negative error code in case of failure.
      * </returns>
      */
@@ -3569,14 +3589,14 @@ public class YFirmwareUpdate
      * <summary>
      *   Returns the last progress message of the firmware update process.
      * <para>
-     *   If an error occur during the
-     *   firmware update process the error message is returned
+     *   If an error occurs during the
+     *   firmware update process, the error message is returned
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an string  with the last progress message, or the error message.
+     *   a string  with the latest progress message, or the error message.
      * </returns>
      */
     public virtual string get_progressMessage()
@@ -3586,11 +3606,11 @@ public class YFirmwareUpdate
 
     /**
      * <summary>
-     *   Start the firmware update process.
+     *   Starts the firmware update process.
      * <para>
-     *   This method start the firmware update process in background. This method
-     *   return immediately. The progress of the firmware update can be monitored with methods <c>get_progress()</c>
-     *   and <c>get_progressMessage()</c>.
+     *   This method starts the firmware update process in background. This method
+     *   returns immediately. You can monitor the progress of the firmware update with the <c>get_progress()</c>
+     *   and <c>get_progressMessage()</c> methods.
      * </para>
      * <para>
      * </para>
@@ -7142,12 +7162,12 @@ public class YModule : YFunction
 
     /**
      * <summary>
-     *   Test if the byn file is valid for this module.
+     *   Tests whether the byn file is valid for this module.
      * <para>
-     *   This method is useful to test if the module need to be updated.
-     *   It's possible to pass an directory instead of a file. In this case this method return the path of
-     *   the most recent
-     *   appropriate byn file. If the parameter onlynew is true the function will discard firmware that are
+     *   This method is useful to test if the module needs to be updated.
+     *   It is possible to pass a directory as argument instead of a file. In this case, this method returns
+     *   the path of the most recent
+     *   appropriate byn file. If the parameter onlynew is true, the function discards firmware that are
      *   older or equal to
      *   the installed firmware.
      * </para>
@@ -7155,15 +7175,15 @@ public class YModule : YFunction
      * </para>
      * </summary>
      * <param name="path">
-     *   the path of a byn file or a directory that contain byn files
+     *   the path of a byn file or a directory that contains byn files
      * </param>
      * <param name="onlynew">
-     *   return only files that are strictly newer
+     *   returns only files that are strictly newer
      * </param>
      * <para>
      * </para>
      * <returns>
-     *   : the path of the byn file to use or a empty string if no byn files match the requirement
+     *   : the path of the byn file to use or a empty string if no byn files matches the requirement
      * </returns>
      * <para>
      *   On failure, throws an exception or returns a string that start with "error:".
@@ -7173,6 +7193,7 @@ public class YModule : YFunction
     {
         string serial;
         int release;
+        string tmp_res;
         if (onlynew) {
             release = Convert.ToInt32(this.get_firmwareRelease());
         } else {
@@ -7180,15 +7201,19 @@ public class YModule : YFunction
         }
         //may throw an exception
         serial = this.get_serialNumber();
-        return YFirmwareUpdate.CheckFirmware(serial,path, release);
+        tmp_res = YFirmwareUpdate.CheckFirmware(serial,path, release);
+        if ((tmp_res).IndexOf("error:") == 0) {
+            this._throw(YAPI.INVALID_ARGUMENT, tmp_res);
+        }
+        return tmp_res;
     }
 
     /**
      * <summary>
-     *   Prepare a firmware upgrade of the module.
+     *   Prepares a firmware update of the module.
      * <para>
-     *   This method return a object <c>YFirmwareUpdate</c> which
-     *   will handle the firmware upgrade process.
+     *   This method returns a <c>YFirmwareUpdate</c> object which
+     *   handles the firmware update process.
      * </para>
      * <para>
      * </para>
@@ -7197,7 +7222,7 @@ public class YModule : YFunction
      *   the path of the byn file to use.
      * </param>
      * <returns>
-     *   : A object <c>YFirmwareUpdate</c>.
+     *   : A <c>YFirmwareUpdate</c> object.
      * </returns>
      */
     public virtual YFirmwareUpdate updateFirmware(string path)
@@ -7212,16 +7237,16 @@ public class YModule : YFunction
 
     /**
      * <summary>
-     *   Returns all the setting of the module.
+     *   Returns all the settings of the module.
      * <para>
-     *   Useful to backup all the logical name and calibrations parameters
+     *   Useful to backup all the logical names and calibrations parameters
      *   of a connected module.
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   a binary buffer with all settings.
+     *   a binary buffer with all the settings.
      * </returns>
      * <para>
      *   On failure, throws an exception or returns  <c>YAPI_INVALID_STRING</c>.
@@ -7479,16 +7504,16 @@ public class YModule : YFunction
 
     /**
      * <summary>
-     *   Restore all the setting of the module.
+     *   Restores all the settings of the module.
      * <para>
-     *   Useful to restore all the logical name and calibrations parameters
+     *   Useful to restore all the logical names and calibrations parameters
      *   of a module from a backup.
      * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="settings">
-     *   a binary buffer with all settings.
+     *   a binary buffer with all the settings.
      * </param>
      * <returns>
      *   <c>YAPI.SUCCESS</c> when the call succeeds.
