@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 19854 2015-03-26 10:17:46Z seb $
+ * $Id: yocto_api.cs 19900 2015-03-31 13:11:09Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -767,7 +767,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "19854";
+    public const string YOCTO_API_BUILD_NO = "19938";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -3488,7 +3488,6 @@ public class YFirmwareUpdate
         fullsize = 0;
         yapi_res = YAPI._yapiGetBootloaders(smallbuff, 1024, ref fullsize, errmsg);
         if (yapi_res < 0) {
-            bootloader_list = "error:" + errmsg.ToString();
             return bootladers;
         }
         if (fullsize <= 1024) {
