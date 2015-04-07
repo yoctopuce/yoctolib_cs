@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_realtimeclock.cs 18330 2014-11-11 16:26:36Z mvuilleu $
+ * $Id: yocto_realtimeclock.cs 19324 2015-02-17 17:22:36Z seb $
  *
  * Implements yFindRealTimeClock(), the high-level API for RealTimeClock functions
  *

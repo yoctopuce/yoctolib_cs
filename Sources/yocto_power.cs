@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_power.cs 17354 2014-08-29 10:07:05Z seb $
+ * $Id: yocto_power.cs 19579 2015-03-04 10:56:48Z seb $
  *
  * Implements yFindPower(), the high-level API for Power functions
  *
@@ -54,9 +54,12 @@ using YFUN_DESCR = System.Int32;
 //--- (YPower class start)
 /**
  * <summary>
- *   The Yoctopuce application programming interface allows you to read an instant
- *   measure of the sensor, as well as the minimal and maximal values observed.
+ *   The Yoctopuce class YPower allows you to read and configure Yoctopuce power
+ *   sensors.
  * <para>
+ *   It inherits from YSensor class the core functions to read measurements,
+ *   register callback functions, access to the autonomous datalogger.
+ *   This class adds the ability to access the energy counter and the power factor.
  * </para>
  * <para>
  * </para>

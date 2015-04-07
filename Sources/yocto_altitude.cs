@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_altitude.cs 17354 2014-08-29 10:07:05Z seb $
+ * $Id: yocto_altitude.cs 19746 2015-03-17 10:34:00Z seb $
  *
  * Implements yFindAltitude(), the high-level API for Altitude functions
  *
@@ -54,9 +54,13 @@ using YFUN_DESCR = System.Int32;
 //--- (YAltitude class start)
 /**
  * <summary>
- *   The Yoctopuce application programming interface allows you to read an instant
- *   measure of the sensor, as well as the minimal and maximal values observed.
+ *   The Yoctopuce class YAltitude allows you to read and configure Yoctopuce altitude
+ *   sensors.
  * <para>
+ *   It inherits from the YSensor class the core functions to read measurements,
+ *   register callback functions, access to the autonomous datalogger.
+ *   This class adds the ability to configure the barometric pressure adjusted to
+ *   sea level (QNH) for barometric sensors.
  * </para>
  * <para>
  * </para>
@@ -70,7 +74,9 @@ public class YAltitude : YSensor
     public new delegate void TimedReportCallback(YAltitude func, YMeasure measure);
 
     public const double QNH_INVALID = YAPI.INVALID_DOUBLE;
+    public const string TECHNOLOGY_INVALID = YAPI.INVALID_STRING;
     protected double _qnh = QNH_INVALID;
+    protected string _technology = TECHNOLOGY_INVALID;
     protected ValueCallback _valueCallbackAltitude = null;
     protected TimedReportCallback _timedReportCallbackAltitude = null;
     //--- (end of YAltitude definitions)
@@ -90,6 +96,11 @@ public class YAltitude : YSensor
         if (member.name == "qnh")
         {
             _qnh = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
+            return;
+        }
+        if (member.name == "technology")
+        {
+            _technology = member.svalue;
             return;
         }
         base._parseAttr(member);
@@ -180,6 +191,34 @@ public class YAltitude : YSensor
             }
         }
         return this._qnh;
+    }
+
+    /**
+     * <summary>
+     *   Returns the technology used by the sesnor to compute
+     *   altitude.
+     * <para>
+     *   Possibles values are  "barometric" and "gps"
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to the technology used by the sesnor to compute
+     *   altitude
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YAltitude.TECHNOLOGY_INVALID</c>.
+     * </para>
+     */
+    public string get_technology()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return TECHNOLOGY_INVALID;
+            }
+        }
+        return this._technology;
     }
 
     /**

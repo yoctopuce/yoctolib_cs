@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_accelerometer.cs 18330 2014-11-11 16:26:36Z mvuilleu $
+ * $Id: yocto_accelerometer.cs 19579 2015-03-04 10:56:48Z seb $
  *
  * Implements yFindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -54,9 +54,17 @@ using YFUN_DESCR = System.Int32;
 //--- (YAccelerometer class start)
 /**
  * <summary>
- *   The Yoctopuce application programming interface allows you to read an instant
- *   measure of the sensor, as well as the minimal and maximal values observed.
+ *   The YSensor class is the parent class for all Yoctopuce sensors.
  * <para>
+ *   It can be
+ *   used to read the current value and unit of any sensor, read the min/max
+ *   value, configure autonomous recording frequency and access recorded data.
+ *   It also provide a function to register a callback invoked each time the
+ *   observed value changes, or at a predefined interval. Using this class rather
+ *   than a specific subclass makes it possible to create generic applications
+ *   that work with any Yoctopuce sensor, even those that do not yet exist.
+ *   Note: The YAnButton class is the only analog input which does not inherit
+ *   from YSensor.
  * </para>
  * <para>
  * </para>

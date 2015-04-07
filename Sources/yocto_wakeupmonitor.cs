@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wakeupmonitor.cs 18323 2014-11-10 10:50:32Z seb $
+ * $Id: yocto_wakeupmonitor.cs 19324 2015-02-17 17:22:36Z seb $
  *
  * Implements yFindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *

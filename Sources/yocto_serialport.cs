@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 19192 2015-01-30 16:30:16Z mvuilleu $
+ * $Id: yocto_serialport.cs 19817 2015-03-23 16:49:57Z seb $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
@@ -289,6 +289,8 @@ public class YSerialPort : YFunction
      *   "Modbus-RTU" for MODBUS messages in RTU mode,
      *   "Char" for a continuous ASCII stream or
      *   "Byte" for a continuous binary stream.
+     *   The suffix "/[wait]ms" can be added to reduce the transmit rate so that there
+     *   is always at lest the specified number of milliseconds between each bytes sent.
      * </para>
      * <para>
      * </para>
@@ -832,6 +834,27 @@ public class YSerialPort : YFunction
 
     /**
      * <summary>
+     *   Sends a single byte to the serial port.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="code">
+     *   the byte to send
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int writeByte(int code)
+    {
+        return this.sendCommand("$"+String.Format("{0:X02}",code));
+    }
+
+    /**
+     * <summary>
      *   Sends an ASCII string to the serial port, as is.
      * <para>
      * </para>
@@ -1038,6 +1061,46 @@ public class YSerialPort : YFunction
 
     /**
      * <summary>
+     *   Reads one byte from the receive buffer, starting at current stream position.
+     * <para>
+     *   If data at current stream position is not available anymore in the receive buffer,
+     *   or if there is no data available yet, the function returns YAPI.NO_MORE_DATA.
+     * </para>
+     * </summary>
+     * <returns>
+     *   the next byte
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int readByte()
+    {
+        byte[] buff;
+        int bufflen;
+        int mult;
+        int endpos;
+        int res;
+        // may throw an exception
+        buff = this._download("rxdata.bin?pos="+Convert.ToString(this._rxptr)+"&len=1");
+        bufflen = (buff).Length - 1;
+        endpos = 0;
+        mult = 1;
+        while ((bufflen > 0) && (buff[bufflen] != 64)) {
+            endpos = endpos + mult * (buff[bufflen] - 48);
+            mult = mult * 10;
+            bufflen = bufflen - 1;
+        }
+        this._rxptr = endpos;
+        if (bufflen == 0) {
+            return YAPI.NO_MORE_DATA;
+        }
+        res = buff[0];
+        return res;
+    }
+
+    /**
+     * <summary>
      *   Reads data from the receive buffer as a string, starting at current stream position.
      * <para>
      *   If data at current stream position is not available anymore in the receive buffer, the
@@ -1060,8 +1123,6 @@ public class YSerialPort : YFunction
         int bufflen;
         int mult;
         int endpos;
-        int startpos;
-        int missing;
         string res;
         if (nChars > 65535) {
             nChars = 65535;
@@ -1076,21 +1137,108 @@ public class YSerialPort : YFunction
             mult = mult * 10;
             bufflen = bufflen - 1;
         }
-        startpos = ((endpos - bufflen) & (0x7fffffff));
-        if (startpos != this._rxptr) {
-            missing = ((startpos - this._rxptr) & (0x7fffffff));
-            if (missing > nChars) {
-                nChars = 0;
-                this._rxptr = startpos;
-            } else {
-                nChars = nChars - missing;
-            }
+        this._rxptr = endpos;
+        res = (YAPI.DefaultEncoding.GetString(buff)).Substring( 0, bufflen);
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Reads data from the receive buffer as a binary buffer, starting at current stream position.
+     * <para>
+     *   If data at current stream position is not available anymore in the receive buffer, the
+     *   function performs a short read.
+     * </para>
+     * </summary>
+     * <param name="nChars">
+     *   the maximum number of bytes to read
+     * </param>
+     * <returns>
+     *   a binary object with receive buffer contents
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual byte[] readBin(int nChars)
+    {
+        byte[] buff;
+        int bufflen;
+        int mult;
+        int endpos;
+        int idx;
+        byte[] res;
+        if (nChars > 65535) {
+            nChars = 65535;
         }
-        if (nChars > bufflen) {
-            nChars = bufflen;
+        // may throw an exception
+        buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nChars));
+        bufflen = (buff).Length - 1;
+        endpos = 0;
+        mult = 1;
+        while ((bufflen > 0) && (buff[bufflen] != 64)) {
+            endpos = endpos + mult * (buff[bufflen] - 48);
+            mult = mult * 10;
+            bufflen = bufflen - 1;
         }
-        this._rxptr = endpos - (bufflen - nChars);
-        res = (YAPI.DefaultEncoding.GetString(buff)).Substring( 0, nChars);
+        this._rxptr = endpos;
+        res = new byte[bufflen];
+        idx = 0;
+        while (idx < bufflen) {
+            res[idx] = (byte)(buff[idx] & 0xff);
+            idx = idx + 1;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Reads data from the receive buffer as a list of bytes, starting at current stream position.
+     * <para>
+     *   If data at current stream position is not available anymore in the receive buffer, the
+     *   function performs a short read.
+     * </para>
+     * </summary>
+     * <param name="nChars">
+     *   the maximum number of bytes to read
+     * </param>
+     * <returns>
+     *   a sequence of bytes with receive buffer contents
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual List<int> readArray(int nChars)
+    {
+        byte[] buff;
+        int bufflen;
+        int mult;
+        int endpos;
+        int idx;
+        int b;
+        List<int> res = new List<int>();
+        if (nChars > 65535) {
+            nChars = 65535;
+        }
+        // may throw an exception
+        buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nChars));
+        bufflen = (buff).Length - 1;
+        endpos = 0;
+        mult = 1;
+        while ((bufflen > 0) && (buff[bufflen] != 64)) {
+            endpos = endpos + mult * (buff[bufflen] - 48);
+            mult = mult * 10;
+            bufflen = bufflen - 1;
+        }
+        this._rxptr = endpos;
+        res.Clear();
+        idx = 0;
+        while (idx < bufflen) {
+            b = buff[idx];
+            res.Add(b);
+            idx = idx + 1;
+        }
         return res;
     }
 
@@ -1118,8 +1266,6 @@ public class YSerialPort : YFunction
         int bufflen;
         int mult;
         int endpos;
-        int startpos;
-        int missing;
         int ofs;
         string res;
         if (nBytes > 65535) {
@@ -1127,7 +1273,7 @@ public class YSerialPort : YFunction
         }
         // may throw an exception
         buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nBytes));
-        bufflen = (buff).Length-1;
+        bufflen = (buff).Length - 1;
         endpos = 0;
         mult = 1;
         while ((bufflen > 0) && (buff[bufflen] != 64)) {
@@ -1135,27 +1281,14 @@ public class YSerialPort : YFunction
             mult = mult * 10;
             bufflen = bufflen - 1;
         }
-        startpos = ((endpos - bufflen) & (0x7fffffff));
-        if (startpos != this._rxptr) {
-            missing = ((startpos - this._rxptr) & (0x7fffffff));
-            if (missing > nBytes) {
-                nBytes = 0;
-                this._rxptr = startpos;
-            } else {
-                nBytes = nBytes - missing;
-            }
-        }
-        if (nBytes > bufflen) {
-            nBytes = bufflen;
-        }
-        this._rxptr = endpos - (bufflen - nBytes);
+        this._rxptr = endpos;
         res = "";
         ofs = 0;
-        while (ofs+3 < nBytes) {
-            res = ""+ res+""+String.Format("{0:X02}", buff[ofs])+""+String.Format("{0:X02}", buff[ofs+1])+""+String.Format("{0:X02}", buff[ofs+2])+""+String.Format("{0:X02}",buff[ofs+3]);
+        while (ofs + 3 < bufflen) {
+            res = ""+ res+""+String.Format("{0:X02}", buff[ofs])+""+String.Format("{0:X02}", buff[ofs + 1])+""+String.Format("{0:X02}", buff[ofs + 2])+""+String.Format("{0:X02}",buff[ofs + 3]);
             ofs = ofs + 4;
         }
-        while (ofs < nBytes) {
+        while (ofs < bufflen) {
             res = ""+ res+""+String.Format("{0:X02}",buff[ofs]);
             ofs = ofs + 1;
         }
@@ -1301,6 +1434,32 @@ public class YSerialPort : YFunction
     public virtual int read_tell()
     {
         return this._rxptr;
+    }
+
+    /**
+     * <summary>
+     *   Returns the number of bytes available to read in the input buffer starting from the
+     *   current absolute stream position pointer of the YSerialPort object.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   the number of bytes available to read
+     * </returns>
+     */
+    public virtual int read_avail()
+    {
+        byte[] buff;
+        int bufflen;
+        int res;
+        // may throw an exception
+        buff = this._download("rxcnt.bin?pos="+Convert.ToString(this._rxptr));
+        bufflen = (buff).Length - 1;
+        while ((bufflen > 0) && (buff[bufflen] != 64)) {
+            bufflen = bufflen - 1;
+        }
+        res = Convert.ToInt32((YAPI.DefaultEncoding.GetString(buff)).Substring( 0, bufflen));
+        return res;
     }
 
     /**

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_carbondioxide.cs 17354 2014-08-29 10:07:05Z seb $
+ * $Id: yocto_carbondioxide.cs 19619 2015-03-05 18:11:23Z mvuilleu $
  *
  * Implements yFindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -54,9 +54,12 @@ using YFUN_DESCR = System.Int32;
 //--- (YCarbonDioxide class start)
 /**
  * <summary>
- *   The Yoctopuce application programming interface allows you to read an instant
- *   measure of the sensor, as well as the minimal and maximal values observed.
+ *   The Yoctopuce class YCarbonDioxide allows you to read and configure Yoctopuce CO2
+ *   sensors.
  * <para>
+ *   It inherits from YSensor class the core functions to read measurements,
+ *   register callback functions, access to the autonomous datalogger.
+ *   This class adds the ability to perform manual calibration if reuired.
  * </para>
  * <para>
  * </para>
@@ -69,6 +72,10 @@ public class YCarbonDioxide : YSensor
     public new delegate void ValueCallback(YCarbonDioxide func, string value);
     public new delegate void TimedReportCallback(YCarbonDioxide func, YMeasure measure);
 
+    public const int ABCPERIOD_INVALID = YAPI.INVALID_INT;
+    public const string COMMAND_INVALID = YAPI.INVALID_STRING;
+    protected int _abcPeriod = ABCPERIOD_INVALID;
+    protected string _command = COMMAND_INVALID;
     protected ValueCallback _valueCallbackCarbonDioxide = null;
     protected TimedReportCallback _timedReportCallbackCarbonDioxide = null;
     //--- (end of YCarbonDioxide definitions)
@@ -85,7 +92,93 @@ public class YCarbonDioxide : YSensor
 
     protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
+        if (member.name == "abcPeriod")
+        {
+            _abcPeriod = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "command")
+        {
+            _command = member.svalue;
+            return;
+        }
         base._parseAttr(member);
+    }
+
+    /**
+     * <summary>
+     *   Returns the Automatic Baseline Calibration period, in hours.
+     * <para>
+     *   A negative value
+     *   means that automatic baseline calibration is disabled.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the Automatic Baseline Calibration period, in hours
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YCarbonDioxide.ABCPERIOD_INVALID</c>.
+     * </para>
+     */
+    public int get_abcPeriod()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return ABCPERIOD_INVALID;
+            }
+        }
+        return this._abcPeriod;
+    }
+
+    /**
+     * <summary>
+     *   Modifies Automatic Baseline Calibration period, in hours.
+     * <para>
+     *   If you need
+     *   to disable automatic baseline calibration (for instance when using the
+     *   sensor in an environment that is constantly above 400ppm CO2), set the
+     *   period to -1. Remember to call the <c>saveToFlash()</c> method of the
+     *   module if the modification must be kept.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_abcPeriod(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("abcPeriod", rest_val);
+    }
+
+    public string get_command()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return COMMAND_INVALID;
+            }
+        }
+        return this._command;
+    }
+
+    public int set_command(string newval)
+    {
+        string rest_val;
+        rest_val = newval;
+        return _setAttr("command", rest_val);
     }
 
     /**
@@ -225,6 +318,62 @@ public class YCarbonDioxide : YSensor
             base._invokeTimedReportCallback(value);
         }
         return 0;
+    }
+
+    /**
+     * <summary>
+     *   Triggers a baseline calibration at standard CO2 ambiant level (400ppm).
+     * <para>
+     *   It is normally not necessary to manually calibrate the sensor, because
+     *   the built-in automatic baseline calibration procedure will automatically
+     *   fix any long-term drift based on the lowest level of CO2 observed over the
+     *   automatic calibration period. However, if you disable automatic baseline
+     *   calibration, you may want to manually trigger a calibration from time to
+     *   time. Before starting a baseline calibration, make sure to put the sensor
+     *   in a standard environment (e.g. outside in fresh air) at around 400ppm.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int triggetBaselineCalibration()
+    {
+        return this.set_command("BC");
+    }
+
+    /**
+     * <summary>
+     *   Triggers a zero calibration of the sensor on carbon dioxide-free air.
+     * <para>
+     *   It is normally not necessary to manually calibrate the sensor, because
+     *   the built-in automatic baseline calibration procedure will automatically
+     *   fix any long-term drift based on the lowest level of CO2 observed over the
+     *   automatic calibration period. However, if you disable automatic baseline
+     *   calibration, you may want to manually trigger a calibration from time to
+     *   time. Before starting a zero calibration, you should circulate carbon
+     *   dioxide-free air within the sensor for a minute or two, using a small pipe
+     *   connected to the sensor. Please contact support@yoctopuce.com for more details
+     *   on the zero calibration procedure.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int triggetZeroCalibration()
+    {
+        return this.set_command("ZC");
     }
 
     /**

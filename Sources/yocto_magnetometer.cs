@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_magnetometer.cs 17354 2014-08-29 10:07:05Z seb $
+ * $Id: yocto_magnetometer.cs 19579 2015-03-04 10:56:48Z seb $
  *
  * Implements yFindMagnetometer(), the high-level API for Magnetometer functions
  *
@@ -54,9 +54,17 @@ using YFUN_DESCR = System.Int32;
 //--- (YMagnetometer class start)
 /**
  * <summary>
- *   The Yoctopuce application programming interface allows you to read an instant
- *   measure of the sensor, as well as the minimal and maximal values observed.
+ *   The YSensor class is the parent class for all Yoctopuce sensors.
  * <para>
+ *   It can be
+ *   used to read the current value and unit of any sensor, read the min/max
+ *   value, configure autonomous recording frequency and access recorded data.
+ *   It also provide a function to register a callback invoked each time the
+ *   observed value changes, or at a predefined interval. Using this class rather
+ *   than a specific subclass makes it possible to create generic applications
+ *   that work with any Yoctopuce sensor, even those that do not yet exist.
+ *   Note: The YAnButton class is the only analog input which does not inherit
+ *   from YSensor.
  * </para>
  * <para>
  * </para>

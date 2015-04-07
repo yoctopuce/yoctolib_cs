@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pressure.cs 17354 2014-08-29 10:07:05Z seb $
+ * $Id: yocto_pressure.cs 19579 2015-03-04 10:56:48Z seb $
  *
  * Implements yFindPressure(), the high-level API for Pressure functions
  *
@@ -54,9 +54,11 @@ using YFUN_DESCR = System.Int32;
 //--- (YPressure class start)
 /**
  * <summary>
- *   The Yoctopuce application programming interface allows you to read an instant
- *   measure of the sensor, as well as the minimal and maximal values observed.
+ *   The Yoctopuce class YPressure allows you to read and configure Yoctopuce pressure
+ *   sensors.
  * <para>
+ *   It inherits from YSensor class the core functions to read measurements,
+ *   register callback functions, access to the autonomous datalogger.
  * </para>
  * <para>
  * </para>

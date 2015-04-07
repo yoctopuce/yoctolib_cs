@@ -91,11 +91,14 @@
     <Compile Include="..\..\Sources\yocto_anbutton.cs">
       <Link>yocto_api\yocto_anbutton.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\yocto_buzzer.cs">
+      <Link>yocto_api\yocto_anbutton.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_carbondioxide.cs">
       <Link>yocto_api\yocto_carbondioxide.cs</Link>
     </Compile>
-    <Compile Include="..\..\Sources\yocto_buzzer.cs">
-      <Link>yocto_api\yocto_buzzer.cs</Link>
+    <Compile Include="..\..\Sources\yocto_cellular.cs">
+      <Link>yocto_api\yocto_cellular.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_compass.cs">
       <Link>yocto_api\yocto_compass.cs</Link>
@@ -124,6 +127,12 @@
     <Compile Include="..\..\Sources\yocto_genericsensor.cs">
       <Link>yocto_api\yocto_genericsensor.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\yocto_gps.cs">
+      <Link>yocto_api\yocto_gps.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_groundspeed.cs">
+      <Link>yocto_api\yocto_groundspeed.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_gyro.cs">
       <Link>yocto_api\yocto_gyro.cs</Link>
     </Compile>
@@ -132,6 +141,12 @@
     </Compile>
     <Compile Include="..\..\Sources\yocto_humidity.cs">
       <Link>yocto_api\yocto_humidity.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_latitude.cs">
+      <Link>yocto_api\yocto_latitude.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_longitude.cs">
+      <Link>yocto_api\yocto_longitude.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_led.cs">
       <Link>yocto_api\yocto_led.cs</Link>
@@ -153,6 +168,9 @@
     </Compile>
     <Compile Include="..\..\Sources\yocto_power.cs">
       <Link>yocto_api\yocto_power.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_poweroutput.cs">
+      <Link>yocto_api\yocto_poweroutput.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_pressure.cs">
       <Link>yocto_api\yocto_pressure.cs</Link>

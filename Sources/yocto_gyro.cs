@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_gyro.cs 17481 2014-09-03 09:38:35Z mvuilleu $
+ * $Id: yocto_gyro.cs 19704 2015-03-13 06:10:37Z mvuilleu $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -321,9 +321,17 @@ public class YQt : YSensor
 //--- (generated code: YGyro class start)
 /**
  * <summary>
- *   The Yoctopuce application programming interface allows you to read an instant
- *   measure of the sensor, as well as the minimal and maximal values observed.
+ *   The YSensor class is the parent class for all Yoctopuce sensors.
  * <para>
+ *   It can be
+ *   used to read the current value and unit of any sensor, read the min/max
+ *   value, configure autonomous recording frequency and access recorded data.
+ *   It also provide a function to register a callback invoked each time the
+ *   observed value changes, or at a predefined interval. Using this class rather
+ *   than a specific subclass makes it possible to create generic applications
+ *   that work with any Yoctopuce sensor, even those that do not yet exist.
+ *   Note: The YAnButton class is the only analog input which does not inherit
+ *   from YSensor.
  * </para>
  * <para>
  * </para>
@@ -816,6 +824,7 @@ public class YGyro : YSensor
      */
     public virtual double get_quaternionX()
     {
+        this._loadQuaternion();
         return this._x;
     }
 
@@ -839,6 +848,7 @@ public class YGyro : YSensor
      */
     public virtual double get_quaternionY()
     {
+        this._loadQuaternion();
         return this._y;
     }
 
@@ -862,6 +872,7 @@ public class YGyro : YSensor
      */
     public virtual double get_quaternionZ()
     {
+        this._loadQuaternion();
         return this._z;
     }
 

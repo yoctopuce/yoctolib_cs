@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_refframe.cs 19211 2015-02-02 13:18:41Z mvuilleu $
+ * $Id: yocto_refframe.cs 19324 2015-02-17 17:22:36Z seb $
  *
  * Implements yFindRefFrame(), the high-level API for RefFrame functions
  *

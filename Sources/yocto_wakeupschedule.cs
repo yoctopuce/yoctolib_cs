@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wakeupschedule.cs 17481 2014-09-03 09:38:35Z mvuilleu $
+ * $Id: yocto_wakeupschedule.cs 19324 2015-02-17 17:22:36Z seb $
  *
  * Implements yFindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *

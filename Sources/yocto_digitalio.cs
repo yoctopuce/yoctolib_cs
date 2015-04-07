@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_digitalio.cs 18323 2014-11-10 10:50:32Z seb $
+ * $Id: yocto_digitalio.cs 19325 2015-02-17 17:28:16Z seb $
  *
  * Implements yFindDigitalIO(), the high-level API for DigitalIO functions
  *

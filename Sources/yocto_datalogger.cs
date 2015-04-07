@@ -1,6 +1,6 @@
 /********************************************************************
  *
- * $Id: yocto_datalogger.cs 18330 2014-11-11 16:26:36Z mvuilleu $
+ * $Id: yocto_datalogger.cs 19325 2015-02-17 17:28:16Z seb $
  *
  * High-level programming interface, common to all modules
  *

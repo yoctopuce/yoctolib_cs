@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 19007 2015-01-19 08:22:45Z mvuilleu $
+ * $Id: yocto_api.cs 19854 2015-03-26 10:17:46Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -414,7 +414,8 @@ public class YAPI
 
                         break;
                     case Tjstate.JWAITFORENDOFNAME:
-                        if (sti == '"')
+
+                       if (sti == '"')
                         {
                             state = Tjstate.JWAITFORCOLON;
                         }
@@ -477,7 +478,13 @@ public class YAPI
                         }
                         break;
                     case Tjstate.JWAITFORSTRINGVALUE:
-                        if (sti == '"')
+                        if ((sti == '\\') && (i+1 < st.Length))
+                        {
+                          svalue = svalue + st[i+1];
+                          i+=1;
+                         }
+                        else
+                       if (sti == '"')
                         {
                             state = Tjstate.JSCOMPLETED;
                             res = createStrRecord(name, svalue);
@@ -760,7 +767,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "19218";
+    public const string YOCTO_API_BUILD_NO = "19854";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -3442,6 +3449,7 @@ public class YFirmwareUpdate
                 }
                 if (this._progress < 100) {
                     m.set_allSettings(this._settings);
+                    m.saveToFlash();
                     this._settings = new byte[0];
                     this._progress = 100;
                     this._progress_msg = "success";
@@ -3497,7 +3505,9 @@ public class YFirmwareUpdate
             }
             bigbuff = null;
         }
-        bootladers = new List<string>(bootloader_list.Split(new Char[] {','}));
+        if (!(bootloader_list == "")) {
+            bootladers = new List<string>(bootloader_list.Split(new Char[] {','}));
+        }
         return bootladers;
     }
 
@@ -5276,13 +5286,20 @@ public class YFunction
         int i = 0;
         char c = '\0';
         string h = null;
-        for (i = 0; i <= changeval.Length - 1; i++)
+        for (i = 0; i < changeval.Length; i++)
         {
             c = changeval[i];
             if (c <= ' ' || (c > 'z' && c != '~') || c == '"' || c == '%' || c == '&' ||
-                       c == '+' || c == '<' || c == '=' || c == '>' || c == '\\' || c == '^' || c == '`')
-            {
-                int hh = c;
+                       c == '+' || c == '<' || c == '=' || c == '>' || c == '\\' || c == '^' || c == '`') {
+                int hh;
+                if ((c == 0xc2 || c == 0xc3) && (i + 1 < changeval.Length) && (changeval[i + 1] & 0xc0) == 0x80) {
+                    // UTF8-encoded ISO-8859-1 character: translate to plain ISO-8859-1
+                    hh = (c & 1) * 0x40;
+                    i++;
+                    hh +=changeval[i];
+                } else {
+                    hh = c;
+                }
                 h = hh.ToString("X");
                 if ((h.Length < 2))
                     h = "0" + h;
@@ -5637,14 +5654,14 @@ public class YFunction
 
     /**
      * <summary>
-     *   Returns the current value of the function (no more than 6 characters).
+     *   Returns a short string representing the current state of the function.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   a string corresponding to the current value of the function (no more than 6 characters)
+     *   a string corresponding to a short string representing the current state of the function
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YFunction.ADVERTISEDVALUE_INVALID</c>.
@@ -7343,7 +7360,7 @@ public class YModule : YFunction
         return 32767;
     }
 
-    public virtual string calibConvert(string param, string calibrationParam, string unit_name, string sensorType)
+    public virtual string calibConvert(string param, string currentFuncValue, string unit_name, string sensorType)
     {
         int paramVer;
         int funVer;
@@ -7363,14 +7380,14 @@ public class YModule : YFunction
         double wordVal;
         // Initial guess for parameter encoding
         paramVer = this.calibVersion(param);
-        funVer = this.calibVersion(calibrationParam);
+        funVer = this.calibVersion(currentFuncValue);
         funScale = this.calibScale(unit_name, sensorType);
         funOffset = this.calibOffset(unit_name);
         paramScale = funScale;
         paramOffset = funOffset;
         if (funVer < 3) {
             if (funVer == 2) {
-                words = YAPI._decodeWords(calibrationParam);
+                words = YAPI._decodeWords(currentFuncValue);
                 if ((words[0] == 1366) && (words[1] == 12500)) {
                     funScale = 1;
                     funOffset = 0;
@@ -7380,7 +7397,7 @@ public class YModule : YFunction
                 }
             } else {
                 if (funVer == 1) {
-                    if (calibrationParam == "" || (Convert.ToInt32(calibrationParam) > 10)) {
+                    if (currentFuncValue == "" || (Convert.ToInt32(currentFuncValue) > 10)) {
                         funScale = 0;
                     }
                 }
@@ -7507,7 +7524,8 @@ public class YModule : YFunction
      *   Restores all the settings of the module.
      * <para>
      *   Useful to restore all the logical names and calibrations parameters
-     *   of a module from a backup.
+     *   of a module from a backup.Remember to call the <c>saveToFlash()</c> method of the module if the
+     *   modifications must be kept.
      * </para>
      * <para>
      * </para>
@@ -7553,6 +7571,7 @@ public class YModule : YFunction
         string newval;
         string oldval;
         string old_calib;
+        string each_str;
         bool do_update;
         bool found;
         oldval = "";
@@ -7560,16 +7579,16 @@ public class YModule : YFunction
         old_json_flat = this._flattenJsonStruct(settings);
         old_dslist = this._json_get_array(old_json_flat);
         for (int ii = 0; ii < old_dslist.Count; ii++) {
-            old_dslist[ii] = this._json_get_string(YAPI.DefaultEncoding.GetBytes(old_dslist[ii]));
-            leng = (old_dslist[ii]).Length;
-            eqpos = (old_dslist[ii]).IndexOf("=");
+            each_str = this._json_get_string(YAPI.DefaultEncoding.GetBytes(old_dslist[ii]));
+            leng = (each_str).Length;
+            eqpos = (each_str).IndexOf("=");
             if ((eqpos < 0) || (leng == 0)) {
                 this._throw(YAPI.INVALID_ARGUMENT, "Invalid settings");
                 return YAPI.INVALID_ARGUMENT;
             }
-            jpath = (old_dslist[ii]).Substring( 0, eqpos);
+            jpath = (each_str).Substring( 0, eqpos);
             eqpos = eqpos + 1;
-            value = (old_dslist[ii]).Substring( eqpos, leng - eqpos);
+            value = (each_str).Substring( eqpos, leng - eqpos);
             old_jpath.Add(jpath);
             old_jpath_len.Add((jpath).Length);
             old_val_arr.Add(value);;
@@ -7579,16 +7598,16 @@ public class YModule : YFunction
         actualSettings = this._flattenJsonStruct(actualSettings);
         new_dslist = this._json_get_array(actualSettings);
         for (int ii = 0; ii < new_dslist.Count; ii++) {
-            new_dslist[ii] = this._json_get_string(YAPI.DefaultEncoding.GetBytes(new_dslist[ii]));
-            leng = (new_dslist[ii]).Length;
-            eqpos = (new_dslist[ii]).IndexOf("=");
+            each_str = this._json_get_string(YAPI.DefaultEncoding.GetBytes(new_dslist[ii]));
+            leng = (each_str).Length;
+            eqpos = (each_str).IndexOf("=");
             if ((eqpos < 0) || (leng == 0)) {
                 this._throw(YAPI.INVALID_ARGUMENT, "Invalid settings");
                 return YAPI.INVALID_ARGUMENT;
             }
-            jpath = (new_dslist[ii]).Substring( 0, eqpos);
+            jpath = (each_str).Substring( 0, eqpos);
             eqpos = eqpos + 1;
-            value = (new_dslist[ii]).Substring( eqpos, leng - eqpos);
+            value = (each_str).Substring( eqpos, leng - eqpos);
             new_jpath.Add(jpath);
             new_jpath_len.Add((jpath).Length);
             new_val_arr.Add(value);;
@@ -7753,7 +7772,7 @@ public class YModule : YFunction
                     while ((j < new_jpath.Count) && !(found)) {
                         if (tmp == new_jpath[j]) {
                             found = true;
-                            unit_name = new_jpath[j];
+                            unit_name = new_val_arr[j];
                         }
                         j = j + 1;
                     }
@@ -7763,11 +7782,11 @@ public class YModule : YFunction
                     while ((j < new_jpath.Count) && !(found)) {
                         if (tmp == new_jpath[j]) {
                             found = true;
-                            sensorType = new_jpath[j];
+                            sensorType = new_val_arr[j];
                         }
                         j = j + 1;
                     }
-                    newval = this.calibConvert(new_val_arr[i], old_calib, unit_name, sensorType);
+                    newval = this.calibConvert(old_calib, new_val_arr[i], unit_name, sensorType);
                     url = "api/" + fun + ".json?" + attr + "=" + this._escapeAttr(newval);
                     this._download(url);
                 } else {
@@ -8189,9 +8208,17 @@ public class YModule : YFunction
 //--- (generated code: YSensor class start)
 /**
  * <summary>
- *   The Yoctopuce application programming interface allows you to read an instant
- *   measure of the sensor, as well as the minimal and maximal values observed.
+ *   The YSensor class is the parent class for all Yoctopuce sensors.
  * <para>
+ *   It can be
+ *   used to read the current value and unit of any sensor, read the min/max
+ *   value, configure autonomous recording frequency and access recorded data.
+ *   It also provide a function to register a callback invoked each time the
+ *   observed value changes, or at a predefined interval. Using this class rather
+ *   than a specific subclass makes it possible to create generic applications
+ *   that work with any Yoctopuce sensor, even those that do not yet exist.
+ *   Note: The YAnButton class is the only analog input which does not inherit
+ *   from YSensor.
  * </para>
  * <para>
  * </para>

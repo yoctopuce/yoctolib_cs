@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wireless.cs 18323 2014-11-10 10:50:32Z seb $
+ * $Id: yocto_wireless.cs 19324 2015-02-17 17:22:36Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *

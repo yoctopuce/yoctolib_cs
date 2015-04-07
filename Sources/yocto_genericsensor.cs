@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_genericsensor.cs 18323 2014-11-10 10:50:32Z seb $
+ * $Id: yocto_genericsensor.cs 19579 2015-03-04 10:56:48Z seb $
  *
  * Implements yFindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -54,9 +54,13 @@ using YFUN_DESCR = System.Int32;
 //--- (YGenericSensor class start)
 /**
  * <summary>
- *   The Yoctopuce application programming interface allows you to read an instant
- *   measure of the sensor, as well as the minimal and maximal values observed.
+ *   The YGenericSensor class allows you to read and configure Yoctopuce signal
+ *   transducers.
  * <para>
+ *   It inherits from YSensor class the core functions to read measurements,
+ *   register callback functions, access to the autonomous datalogger.
+ *   This class adds the ability to configure the automatic conversion between the
+ *   measured signal and the corresponding engineering unit.
  * </para>
  * <para>
  * </para>
