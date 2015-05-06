@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 19900 2015-03-31 13:11:09Z seb $
+ * $Id: yocto_api.cs 20183 2015-04-29 14:41:00Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -767,7 +767,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "19938";
+    public const string YOCTO_API_BUILD_NO = "20255";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -2197,6 +2197,50 @@ public class YAPI
 
     /**
      * <summary>
+     *   Test if the hub is reachable.
+     * <para>
+     *   This method do not register the hub, it only test if the
+     *   hub is usable. The url parameter follow the same convention as the <c>RegisterHub</c>
+     *   method. This method is useful to verify the authentication parameters for a hub. It
+     *   is possible to force this method to return after mstimeout milliseconds.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="url">
+     *   a string containing either <c>"usb"</c>,<c>"callback"</c> or the
+     *   root URL of the hub to monitor
+     * </param>
+     * <param name="mstimeout">
+     *   the number of millisecond available to test the connection.
+     * </param>
+     * <param name="errmsg">
+     *   a string passed by reference to receive any error message.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure returns a negative error code.
+     * </para>
+     */
+    public static int TestHub(string url, int mstimeout, ref string errmsg)
+    {
+        StringBuilder buffer = new StringBuilder(YOCTO_ERRMSG_LEN);
+        YRETCODE res;
+
+        buffer.Length = 0;
+        res = _yapiTestHub(new StringBuilder(url), mstimeout, buffer);
+        if (YISERR(res))
+        {
+            errmsg = buffer.ToString();
+        }
+        return res;
+    }
+
+
+    /**
+     * <summary>
      *   Setup the Yoctopuce library to no more use modules connected on a previously
      *   registered machine with RegisterHub.
      * <para>
@@ -2833,6 +2877,21 @@ public class YAPI
                  return _yapiUpdateFirmware64(serial, firmwarePath, settings, startUpdate, errmsg);
              } catch (System.DllNotFoundException) {
                  return _yapiUpdateFirmware32(serial, firmwarePath, settings, startUpdate, errmsg);
+             }
+        }
+    }
+    [DllImport("yapi.dll", EntryPoint = "yapiTestHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    internal extern static YRETCODE _yapiTestHub32(StringBuilder url, int mstimeout, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiTestHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    internal extern static YRETCODE _yapiTestHub64(StringBuilder url, int mstimeout, StringBuilder errmsg);
+    internal static YRETCODE _yapiTestHub(StringBuilder url, int mstimeout, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+             return _yapiTestHub32(url, mstimeout, errmsg);
+        } else {
+             try {
+                 return _yapiTestHub64(url, mstimeout, errmsg);
+             } catch (System.DllNotFoundException) {
+                 return _yapiTestHub32(url, mstimeout, errmsg);
              }
         }
     }
@@ -7294,6 +7353,7 @@ public class YModule : YFunction
         if (fullsize <= 1024) {
             jsonflat = smallbuff.ToString();
         } else {
+            fullsize = fullsize * 2;
             buffsize = fullsize;
             bigbuff = new StringBuilder(buffsize);
             res = YAPI._yapiGetAllJsonKeys(new StringBuilder(jsoncomplexstr), bigbuff, buffsize, ref fullsize, errmsg);

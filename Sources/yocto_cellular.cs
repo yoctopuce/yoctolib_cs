@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 19727 2015-03-13 16:22:10Z mvuilleu $
+ * $Id: yocto_cellular.cs 20167 2015-04-27 14:24:03Z seb $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *
@@ -152,6 +152,7 @@ public class YCellular : YFunction
 
     public const int LINKQUALITY_INVALID = YAPI.INVALID_UINT;
     public const string CELLOPERATOR_INVALID = YAPI.INVALID_STRING;
+    public const string IMSI_INVALID = YAPI.INVALID_STRING;
     public const string MESSAGE_INVALID = YAPI.INVALID_STRING;
     public const string PIN_INVALID = YAPI.INVALID_STRING;
     public const string LOCKEDOPERATOR_INVALID = YAPI.INVALID_STRING;
@@ -164,6 +165,7 @@ public class YCellular : YFunction
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _linkQuality = LINKQUALITY_INVALID;
     protected string _cellOperator = CELLOPERATOR_INVALID;
+    protected string _imsi = IMSI_INVALID;
     protected string _message = MESSAGE_INVALID;
     protected string _pin = PIN_INVALID;
     protected string _lockedOperator = LOCKEDOPERATOR_INVALID;
@@ -194,6 +196,11 @@ public class YCellular : YFunction
         if (member.name == "cellOperator")
         {
             _cellOperator = member.svalue;
+            return;
+        }
+        if (member.name == "imsi")
+        {
+            _imsi = member.svalue;
             return;
         }
         if (member.name == "message")
@@ -282,6 +289,35 @@ public class YCellular : YFunction
             }
         }
         return this._cellOperator;
+    }
+
+    /**
+     * <summary>
+     *   Returns an opaque string if a PIN code has been configured in the device to access
+     *   the SIM card, or an empty string if none has been configured or if the code provided
+     *   was rejected by the SIM card.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to an opaque string if a PIN code has been configured in the device to access
+     *   the SIM card, or an empty string if none has been configured or if the code provided
+     *   was rejected by the SIM card
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YCellular.IMSI_INVALID</c>.
+     * </para>
+     */
+    public string get_imsi()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return IMSI_INVALID;
+            }
+        }
+        return this._imsi;
     }
 
     /**
