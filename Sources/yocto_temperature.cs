@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_temperature.cs 19619 2015-03-05 18:11:23Z mvuilleu $
+ * $Id: yocto_temperature.cs 20383 2015-05-19 23:44:31Z mvuilleu $
  *
  * Implements yFindTemperature(), the high-level API for Temperature functions
  *
@@ -380,6 +380,52 @@ public class YTemperature : YSensor
             base._invokeTimedReportCallback(value);
         }
         return 0;
+    }
+
+    /**
+     * <summary>
+     *   Configure NTC thermistor parameters in order to properly compute the temperature from
+     *   the measured resistance.
+     * <para>
+     *   For increased precision, you can enter a complete mapping
+     *   table using set_thermistorResponseTable. This function can only be used with a
+     *   temperature sensor based on thermistors.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="res25">
+     *   thermistor resistance at 25 degrees Celsius
+     * </param>
+     * <param name="beta">
+     *   Beta value
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int set_ntcParameters(double res25, double beta)
+    {
+        double t0;
+        double t1;
+        double res100;
+        List<double> tempValues = new List<double>();
+        List<double> resValues = new List<double>();
+        t0 = 25.0+275.15;
+        t1 = 100.0+275.15;
+        res100 = res25 * Math.Exp(beta*(1.0/t1 - 1.0/t0));
+        tempValues.Clear();
+        resValues.Clear();
+        tempValues.Add(25.0);
+        resValues.Add(res25);
+        tempValues.Add(100.0);
+        resValues.Add(res100);
+        
+        
+        return this.set_thermistorResponseTable(tempValues, resValues);
     }
 
     /**

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 20183 2015-04-29 14:41:00Z seb $
+ * $Id: yocto_api.cs 20380 2015-05-19 16:28:16Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -761,13 +761,15 @@ public class YAPI
     public const int Y_DETECT_NONE = 0;
     public const int Y_DETECT_USB = 1;
     public const int Y_DETECT_NET = 2;
+    public const int Y_RESEND_MISSING_PKT = 4;
+
 
     public const int Y_DETECT_ALL = Y_DETECT_USB | Y_DETECT_NET;
 
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "20255";
+    public const string YOCTO_API_BUILD_NO = "20384";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
