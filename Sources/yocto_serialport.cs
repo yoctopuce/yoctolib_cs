@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 19817 2015-03-23 16:49:57Z seb $
+ * $Id: yocto_serialport.cs 20464 2015-05-29 08:55:45Z seb $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
@@ -1332,7 +1332,7 @@ public class YSerialPort : YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        this._rxptr = Convert.ToInt32(msgarr[msglen]);
+        this._rxptr = YAPI._atoi(msgarr[msglen]);
         if (msglen == 0) {
             return "";
         }
@@ -1390,7 +1390,7 @@ public class YSerialPort : YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        this._rxptr = Convert.ToInt32(msgarr[msglen]);
+        this._rxptr = YAPI._atoi(msgarr[msglen]);
         idx = 0;
         while (idx < msglen) {
             res.Add(this._json_get_string(YAPI.DefaultEncoding.GetBytes(msgarr[idx])));
@@ -1458,7 +1458,7 @@ public class YSerialPort : YFunction
         while ((bufflen > 0) && (buff[bufflen] != 64)) {
             bufflen = bufflen - 1;
         }
-        res = Convert.ToInt32((YAPI.DefaultEncoding.GetString(buff)).Substring( 0, bufflen));
+        res = YAPI._atoi((YAPI.DefaultEncoding.GetString(buff)).Substring( 0, bufflen));
         return res;
     }
 
@@ -1500,7 +1500,7 @@ public class YSerialPort : YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        this._rxptr = Convert.ToInt32(msgarr[msglen]);
+        this._rxptr = YAPI._atoi(msgarr[msglen]);
         if (msglen == 0) {
             return "";
         }

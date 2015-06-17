@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_bluetoothlink.cs 20326 2015-05-12 15:35:18Z seb $
+ * $Id: yocto_bluetoothlink.cs 20644 2015-06-12 16:04:33Z seb $
  *
  * Implements yFindBluetoothLink(), the high-level API for BluetoothLink functions
  *
@@ -72,12 +72,30 @@ public class YBluetoothLink : YFunction
     public const string OWNADDRESS_INVALID = YAPI.INVALID_STRING;
     public const string PAIRINGPIN_INVALID = YAPI.INVALID_STRING;
     public const string REMOTEADDRESS_INVALID = YAPI.INVALID_STRING;
-    public const string MESSAGE_INVALID = YAPI.INVALID_STRING;
+    public const string REMOTENAME_INVALID = YAPI.INVALID_STRING;
+    public const int MUTE_FALSE = 0;
+    public const int MUTE_TRUE = 1;
+    public const int MUTE_INVALID = -1;
+    public const int PREAMPLIFIER_INVALID = YAPI.INVALID_UINT;
+    public const int VOLUME_INVALID = YAPI.INVALID_UINT;
+    public const int LINKSTATE_DOWN = 0;
+    public const int LINKSTATE_FREE = 1;
+    public const int LINKSTATE_SEARCH = 2;
+    public const int LINKSTATE_EXISTS = 3;
+    public const int LINKSTATE_LINKED = 4;
+    public const int LINKSTATE_PLAY = 5;
+    public const int LINKSTATE_INVALID = -1;
+    public const int LINKQUALITY_INVALID = YAPI.INVALID_UINT;
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected string _ownAddress = OWNADDRESS_INVALID;
     protected string _pairingPin = PAIRINGPIN_INVALID;
     protected string _remoteAddress = REMOTEADDRESS_INVALID;
-    protected string _message = MESSAGE_INVALID;
+    protected string _remoteName = REMOTENAME_INVALID;
+    protected int _mute = MUTE_INVALID;
+    protected int _preAmplifier = PREAMPLIFIER_INVALID;
+    protected int _volume = VOLUME_INVALID;
+    protected int _linkState = LINKSTATE_INVALID;
+    protected int _linkQuality = LINKQUALITY_INVALID;
     protected string _command = COMMAND_INVALID;
     protected ValueCallback _valueCallbackBluetoothLink = null;
     //--- (end of YBluetoothLink definitions)
@@ -109,9 +127,34 @@ public class YBluetoothLink : YFunction
             _remoteAddress = member.svalue;
             return;
         }
-        if (member.name == "message")
+        if (member.name == "remoteName")
         {
-            _message = member.svalue;
+            _remoteName = member.svalue;
+            return;
+        }
+        if (member.name == "mute")
+        {
+            _mute = member.ivalue > 0 ? 1 : 0;
+            return;
+        }
+        if (member.name == "preAmplifier")
+        {
+            _preAmplifier = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "volume")
+        {
+            _volume = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "linkState")
+        {
+            _linkState = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "linkQuality")
+        {
+            _linkQuality = (int)member.ivalue;
             return;
         }
         if (member.name == "command")
@@ -260,27 +303,241 @@ public class YBluetoothLink : YFunction
 
     /**
      * <summary>
-     *   Returns the latest status message from the bluetooth interface.
+     *   Returns the bluetooth name the remote device, if found on the bluetooth network.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   a string corresponding to the latest status message from the bluetooth interface
+     *   a string corresponding to the bluetooth name the remote device, if found on the bluetooth network
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns <c>YBluetoothLink.MESSAGE_INVALID</c>.
+     *   On failure, throws an exception or returns <c>YBluetoothLink.REMOTENAME_INVALID</c>.
      * </para>
      */
-    public string get_message()
+    public string get_remoteName()
     {
         if (this._cacheExpiration <= YAPI.GetTickCount()) {
             if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MESSAGE_INVALID;
+                return REMOTENAME_INVALID;
             }
         }
-        return this._message;
+        return this._remoteName;
+    }
+
+    /**
+     * <summary>
+     *   Returns the state of the mute function.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   either <c>YBluetoothLink.MUTE_FALSE</c> or <c>YBluetoothLink.MUTE_TRUE</c>, according to the state
+     *   of the mute function
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YBluetoothLink.MUTE_INVALID</c>.
+     * </para>
+     */
+    public int get_mute()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return MUTE_INVALID;
+            }
+        }
+        return this._mute;
+    }
+
+    /**
+     * <summary>
+     *   Changes the state of the mute function.
+     * <para>
+     *   Remember to call the matching module
+     *   <c>saveToFlash()</c> method to save the setting permanently.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   either <c>YBluetoothLink.MUTE_FALSE</c> or <c>YBluetoothLink.MUTE_TRUE</c>, according to the state
+     *   of the mute function
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_mute(int newval)
+    {
+        string rest_val;
+        rest_val = (newval > 0 ? "1" : "0");
+        return _setAttr("mute", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the audio pre-amplifier volume, in per cents.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the audio pre-amplifier volume, in per cents
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YBluetoothLink.PREAMPLIFIER_INVALID</c>.
+     * </para>
+     */
+    public int get_preAmplifier()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PREAMPLIFIER_INVALID;
+            }
+        }
+        return this._preAmplifier;
+    }
+
+    /**
+     * <summary>
+     *   Changes the audio pre-amplifier volume, in per cents.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the audio pre-amplifier volume, in per cents
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_preAmplifier(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("preAmplifier", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the connected headset volume, in per cents.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the connected headset volume, in per cents
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YBluetoothLink.VOLUME_INVALID</c>.
+     * </para>
+     */
+    public int get_volume()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return VOLUME_INVALID;
+            }
+        }
+        return this._volume;
+    }
+
+    /**
+     * <summary>
+     *   Changes the connected headset volume, in per cents.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the connected headset volume, in per cents
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_volume(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("volume", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the bluetooth link state.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among <c>YBluetoothLink.LINKSTATE_DOWN</c>, <c>YBluetoothLink.LINKSTATE_FREE</c>,
+     *   <c>YBluetoothLink.LINKSTATE_SEARCH</c>, <c>YBluetoothLink.LINKSTATE_EXISTS</c>,
+     *   <c>YBluetoothLink.LINKSTATE_LINKED</c> and <c>YBluetoothLink.LINKSTATE_PLAY</c> corresponding to
+     *   the bluetooth link state
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YBluetoothLink.LINKSTATE_INVALID</c>.
+     * </para>
+     */
+    public int get_linkState()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return LINKSTATE_INVALID;
+            }
+        }
+        return this._linkState;
+    }
+
+    /**
+     * <summary>
+     *   Returns the bluetooth receiver signal strength, in pourcents, or 0 if no connection is established.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the bluetooth receiver signal strength, in pourcents, or 0 if no
+     *   connection is established
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YBluetoothLink.LINKQUALITY_INVALID</c>.
+     * </para>
+     */
+    public int get_linkQuality()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return LINKQUALITY_INVALID;
+            }
+        }
+        return this._linkQuality;
     }
 
     public string get_command()

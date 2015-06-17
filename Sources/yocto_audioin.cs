@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: yocto_audioout.cs 20565 2015-06-04 09:59:10Z seb $
+ * $Id: pic24config.php 20612 2015-06-09 01:27:02Z mvuilleu $
  *
- * Implements yFindAudioOut(), the high-level API for AudioOut functions
+ * Implements yFindAudioIn(), the high-level API for AudioIn functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -47,26 +47,26 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
-    //--- (YAudioOut return codes)
-    //--- (end of YAudioOut return codes)
-//--- (YAudioOut dlldef)
-//--- (end of YAudioOut dlldef)
-//--- (YAudioOut class start)
+    //--- (YAudioIn return codes)
+    //--- (end of YAudioIn return codes)
+//--- (YAudioIn dlldef)
+//--- (end of YAudioIn dlldef)
+//--- (YAudioIn class start)
 /**
  * <summary>
- *   The Yoctopuce application programming interface allows you to configure the volume of the outout.
+ *   The Yoctopuce application programming interface allows you to configure the volume of the input channel.
  * <para>
  * </para>
  * <para>
  * </para>
  * </summary>
  */
-public class YAudioOut : YFunction
+public class YAudioIn : YFunction
 {
-//--- (end of YAudioOut class start)
-    //--- (YAudioOut definitions)
-    public new delegate void ValueCallback(YAudioOut func, string value);
-    public new delegate void TimedReportCallback(YAudioOut func, YMeasure measure);
+//--- (end of YAudioIn class start)
+    //--- (YAudioIn definitions)
+    public new delegate void ValueCallback(YAudioIn func, string value);
+    public new delegate void TimedReportCallback(YAudioIn func, YMeasure measure);
 
     public const int VOLUME_INVALID = YAPI.INVALID_UINT;
     public const int MUTE_FALSE = 0;
@@ -78,18 +78,18 @@ public class YAudioOut : YFunction
     protected int _mute = MUTE_INVALID;
     protected int _signal = SIGNAL_INVALID;
     protected int _noSignalFor = NOSIGNALFOR_INVALID;
-    protected ValueCallback _valueCallbackAudioOut = null;
-    //--- (end of YAudioOut definitions)
+    protected ValueCallback _valueCallbackAudioIn = null;
+    //--- (end of YAudioIn definitions)
 
-    public YAudioOut(string func)
+    public YAudioIn(string func)
         : base(func)
     {
-        _className = "AudioOut";
-        //--- (YAudioOut attributes initialization)
-        //--- (end of YAudioOut attributes initialization)
+        _className = "AudioIn";
+        //--- (YAudioIn attributes initialization)
+        //--- (end of YAudioIn attributes initialization)
     }
 
-    //--- (YAudioOut implementation)
+    //--- (YAudioIn implementation)
 
     protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
@@ -118,17 +118,17 @@ public class YAudioOut : YFunction
 
     /**
      * <summary>
-     *   Returns audio output volume, in per cents.
+     *   Returns audio input gain, in per cents.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to audio output volume, in per cents
+     *   an integer corresponding to audio input gain, in per cents
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns <c>YAudioOut.VOLUME_INVALID</c>.
+     *   On failure, throws an exception or returns <c>YAudioIn.VOLUME_INVALID</c>.
      * </para>
      */
     public int get_volume()
@@ -143,14 +143,14 @@ public class YAudioOut : YFunction
 
     /**
      * <summary>
-     *   Changes audio output volume, in per cents.
+     *   Changes audio input gain, in per cents.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to audio output volume, in per cents
+     *   an integer corresponding to audio input gain, in per cents
      * </param>
      * <para>
      * </para>
@@ -177,10 +177,10 @@ public class YAudioOut : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   either <c>YAudioOut.MUTE_FALSE</c> or <c>YAudioOut.MUTE_TRUE</c>, according to the state of the mute function
+     *   either <c>YAudioIn.MUTE_FALSE</c> or <c>YAudioIn.MUTE_TRUE</c>, according to the state of the mute function
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns <c>YAudioOut.MUTE_INVALID</c>.
+     *   On failure, throws an exception or returns <c>YAudioIn.MUTE_INVALID</c>.
      * </para>
      */
     public int get_mute()
@@ -204,7 +204,7 @@ public class YAudioOut : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   either <c>YAudioOut.MUTE_FALSE</c> or <c>YAudioOut.MUTE_TRUE</c>, according to the state of the mute function
+     *   either <c>YAudioIn.MUTE_FALSE</c> or <c>YAudioIn.MUTE_TRUE</c>, according to the state of the mute function
      * </param>
      * <para>
      * </para>
@@ -224,17 +224,17 @@ public class YAudioOut : YFunction
 
     /**
      * <summary>
-     *   Returns the detected output current level.
+     *   Returns the detected input signal level.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the detected output current level
+     *   an integer corresponding to the detected input signal level
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns <c>YAudioOut.SIGNAL_INVALID</c>.
+     *   On failure, throws an exception or returns <c>YAudioIn.SIGNAL_INVALID</c>.
      * </para>
      */
     public int get_signal()
@@ -257,7 +257,7 @@ public class YAudioOut : YFunction
      *   an integer corresponding to the number of seconds elapsed without detecting a signal
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns <c>YAudioOut.NOSIGNALFOR_INVALID</c>.
+     *   On failure, throws an exception or returns <c>YAudioIn.NOSIGNALFOR_INVALID</c>.
      * </para>
      */
     public int get_noSignalFor()
@@ -272,7 +272,7 @@ public class YAudioOut : YFunction
 
     /**
      * <summary>
-     *   Retrieves an audio output for a given identifier.
+     *   Retrieves an audio input for a given identifier.
      * <para>
      *   The identifier can be specified using several formats:
      * </para>
@@ -296,29 +296,29 @@ public class YAudioOut : YFunction
      * <para>
      * </para>
      * <para>
-     *   This function does not require that the audio output is online at the time
+     *   This function does not require that the audio input is online at the time
      *   it is invoked. The returned object is nevertheless valid.
-     *   Use the method <c>YAudioOut.isOnline()</c> to test if the audio output is
+     *   Use the method <c>YAudioIn.isOnline()</c> to test if the audio input is
      *   indeed online at a given time. In case of ambiguity when looking for
-     *   an audio output by logical name, no error is notified: the first instance
+     *   an audio input by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
      * </para>
      * </summary>
      * <param name="func">
-     *   a string that uniquely characterizes the audio output
+     *   a string that uniquely characterizes the audio input
      * </param>
      * <returns>
-     *   a <c>YAudioOut</c> object allowing you to drive the audio output.
+     *   a <c>YAudioIn</c> object allowing you to drive the audio input.
      * </returns>
      */
-    public static YAudioOut FindAudioOut(string func)
+    public static YAudioIn FindAudioIn(string func)
     {
-        YAudioOut obj;
-        obj = (YAudioOut) YFunction._FindFromCache("AudioOut", func);
+        YAudioIn obj;
+        obj = (YAudioIn) YFunction._FindFromCache("AudioIn", func);
         if (obj == null) {
-            obj = new YAudioOut(func);
-            YFunction._AddToCache("AudioOut", func, obj);
+            obj = new YAudioIn(func);
+            YFunction._AddToCache("AudioIn", func, obj);
         }
         return obj;
     }
@@ -349,7 +349,7 @@ public class YAudioOut : YFunction
         } else {
             YFunction._UpdateValueCallbackList(this, false);
         }
-        this._valueCallbackAudioOut = callback;
+        this._valueCallbackAudioIn = callback;
         // Immediately invoke value callback with current value
         if (callback != null && this.isOnline()) {
             val = this._advertisedValue;
@@ -362,8 +362,8 @@ public class YAudioOut : YFunction
 
     public override int _invokeValueCallback(string value)
     {
-        if (this._valueCallbackAudioOut != null) {
-            this._valueCallbackAudioOut(this, value);
+        if (this._valueCallbackAudioIn != null) {
+            this._valueCallbackAudioIn(this, value);
         } else {
             base._invokeValueCallback(value);
         }
@@ -372,45 +372,45 @@ public class YAudioOut : YFunction
 
     /**
      * <summary>
-     *   Continues the enumeration of audio outputs started using <c>yFirstAudioOut()</c>.
+     *   Continues the enumeration of audio inputs started using <c>yFirstAudioIn()</c>.
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   a pointer to a <c>YAudioOut</c> object, corresponding to
-     *   an audio output currently online, or a <c>null</c> pointer
-     *   if there are no more audio outputs to enumerate.
+     *   a pointer to a <c>YAudioIn</c> object, corresponding to
+     *   an audio input currently online, or a <c>null</c> pointer
+     *   if there are no more audio inputs to enumerate.
      * </returns>
      */
-    public YAudioOut nextAudioOut()
+    public YAudioIn nextAudioIn()
     {
         string hwid = "";
         if (YAPI.YISERR(_nextFunction(ref hwid)))
             return null;
         if (hwid == "")
             return null;
-        return FindAudioOut(hwid);
+        return FindAudioIn(hwid);
     }
 
-    //--- (end of YAudioOut implementation)
+    //--- (end of YAudioIn implementation)
 
-    //--- (AudioOut functions)
+    //--- (AudioIn functions)
 
     /**
      * <summary>
-     *   Starts the enumeration of audio outputs currently accessible.
+     *   Starts the enumeration of audio inputs currently accessible.
      * <para>
-     *   Use the method <c>YAudioOut.nextAudioOut()</c> to iterate on
-     *   next audio outputs.
+     *   Use the method <c>YAudioIn.nextAudioIn()</c> to iterate on
+     *   next audio inputs.
      * </para>
      * </summary>
      * <returns>
-     *   a pointer to a <c>YAudioOut</c> object, corresponding to
-     *   the first audio output currently online, or a <c>null</c> pointer
+     *   a pointer to a <c>YAudioIn</c> object, corresponding to
+     *   the first audio input currently online, or a <c>null</c> pointer
      *   if there are none.
      * </returns>
      */
-    public static YAudioOut FirstAudioOut()
+    public static YAudioIn FirstAudioIn()
     {
         YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
         YDEV_DESCR dev = default(YDEV_DESCR);
@@ -423,7 +423,7 @@ public class YAudioOut : YFunction
         string errmsg = "";
         int size = Marshal.SizeOf(v_fundescr[0]);
         IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
-        err = YAPI.apiGetFunctionsByClass("AudioOut", 0, p, size, ref neededsize, ref errmsg);
+        err = YAPI.apiGetFunctionsByClass("AudioIn", 0, p, size, ref neededsize, ref errmsg);
         Marshal.Copy(p, v_fundescr, 0, 1);
         Marshal.FreeHGlobal(p);
         if ((YAPI.YISERR(err) | (neededsize == 0)))
@@ -435,10 +435,10 @@ public class YAudioOut : YFunction
         errmsg = "";
         if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
             return null;
-        return FindAudioOut(serial + "." + funcId);
+        return FindAudioIn(serial + "." + funcId);
     }
 
 
 
-    //--- (end of AudioOut functions)
+    //--- (end of AudioIn functions)
 }

@@ -70,6 +70,10 @@ namespace ConsoleApplication1
             string errmsg = "";
 
 
+            string res = YModule.test_atoi();
+            Console.WriteLine(res);
+
+
             if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS)
             {
                 Console.WriteLine("RegisterHub error : " + errmsg);

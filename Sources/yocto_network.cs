@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_network.cs 19324 2015-02-17 17:22:36Z seb $
+ * $Id: yocto_network.cs 20599 2015-06-08 12:16:39Z seb $
  *
  * Implements yFindNetwork(), the high-level API for Network functions
  *
@@ -82,8 +82,11 @@ public class YNetwork : YFunction
     public const string IPCONFIG_INVALID = YAPI.INVALID_STRING;
     public const string PRIMARYDNS_INVALID = YAPI.INVALID_STRING;
     public const string SECONDARYDNS_INVALID = YAPI.INVALID_STRING;
+    public const string NTPSERVER_INVALID = YAPI.INVALID_STRING;
     public const string USERPASSWORD_INVALID = YAPI.INVALID_STRING;
     public const string ADMINPASSWORD_INVALID = YAPI.INVALID_STRING;
+    public const int HTTPPORT_INVALID = YAPI.INVALID_UINT;
+    public const string DEFAULTPAGE_INVALID = YAPI.INVALID_STRING;
     public const int DISCOVERABLE_FALSE = 0;
     public const int DISCOVERABLE_TRUE = 1;
     public const int DISCOVERABLE_INVALID = -1;
@@ -98,6 +101,8 @@ public class YNetwork : YFunction
     public const int CALLBACKENCODING_JSON_ARRAY = 2;
     public const int CALLBACKENCODING_CSV = 3;
     public const int CALLBACKENCODING_YOCTO_API = 4;
+    public const int CALLBACKENCODING_JSON_NUM = 5;
+    public const int CALLBACKENCODING_EMONCMS = 6;
     public const int CALLBACKENCODING_INVALID = -1;
     public const string CALLBACKCREDENTIALS_INVALID = YAPI.INVALID_STRING;
     public const int CALLBACKMINDELAY_INVALID = YAPI.INVALID_UINT;
@@ -111,8 +116,11 @@ public class YNetwork : YFunction
     protected string _ipConfig = IPCONFIG_INVALID;
     protected string _primaryDNS = PRIMARYDNS_INVALID;
     protected string _secondaryDNS = SECONDARYDNS_INVALID;
+    protected string _ntpServer = NTPSERVER_INVALID;
     protected string _userPassword = USERPASSWORD_INVALID;
     protected string _adminPassword = ADMINPASSWORD_INVALID;
+    protected int _httpPort = HTTPPORT_INVALID;
+    protected string _defaultPage = DEFAULTPAGE_INVALID;
     protected int _discoverable = DISCOVERABLE_INVALID;
     protected int _wwwWatchdogDelay = WWWWATCHDOGDELAY_INVALID;
     protected string _callbackUrl = CALLBACKURL_INVALID;
@@ -177,6 +185,11 @@ public class YNetwork : YFunction
             _secondaryDNS = member.svalue;
             return;
         }
+        if (member.name == "ntpServer")
+        {
+            _ntpServer = member.svalue;
+            return;
+        }
         if (member.name == "userPassword")
         {
             _userPassword = member.svalue;
@@ -185,6 +198,16 @@ public class YNetwork : YFunction
         if (member.name == "adminPassword")
         {
             _adminPassword = member.svalue;
+            return;
+        }
+        if (member.name == "httpPort")
+        {
+            _httpPort = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "defaultPage")
+        {
+            _defaultPage = member.svalue;
             return;
         }
         if (member.name == "discoverable")
@@ -506,6 +529,59 @@ public class YNetwork : YFunction
 
     /**
      * <summary>
+     *   Returns the IP address of the NTP server to be used by the device.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to the IP address of the NTP server to be used by the device
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YNetwork.NTPSERVER_INVALID</c>.
+     * </para>
+     */
+    public string get_ntpServer()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return NTPSERVER_INVALID;
+            }
+        }
+        return this._ntpServer;
+    }
+
+    /**
+     * <summary>
+     *   Changes the IP address of the NTP server to be used by the module.
+     * <para>
+     *   Remember to call the <c>saveToFlash()</c> method and then to reboot the module to apply this setting.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a string corresponding to the IP address of the NTP server to be used by the module
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_ntpServer(string newval)
+    {
+        string rest_val;
+        rest_val = newval;
+        return _setAttr("ntpServer", rest_val);
+    }
+
+    /**
+     * <summary>
      *   Returns a hash string if a password has been set for "user" user,
      *   or an empty string otherwise.
      * <para>
@@ -620,6 +696,116 @@ public class YNetwork : YFunction
         string rest_val;
         rest_val = newval;
         return _setAttr("adminPassword", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the HTML page to serve for the URL "/"" of the hub.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the HTML page to serve for the URL "/"" of the hub
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YNetwork.HTTPPORT_INVALID</c>.
+     * </para>
+     */
+    public int get_httpPort()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return HTTPPORT_INVALID;
+            }
+        }
+        return this._httpPort;
+    }
+
+    /**
+     * <summary>
+     *   Changes the default HTML page returned by the hub.
+     * <para>
+     *   If not value are set the hub return
+     *   "index.html" which is the web interface of the hub. It is possible de change this page
+     *   for file that has been uploaded on the hub.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the default HTML page returned by the hub
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_httpPort(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("httpPort", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the HTML page to serve for the URL "/"" of the hub.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to the HTML page to serve for the URL "/"" of the hub
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YNetwork.DEFAULTPAGE_INVALID</c>.
+     * </para>
+     */
+    public string get_defaultPage()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return DEFAULTPAGE_INVALID;
+            }
+        }
+        return this._defaultPage;
+    }
+
+    /**
+     * <summary>
+     *   Changes the default HTML page returned by the hub.
+     * <para>
+     *   If not value are set the hub return
+     *   "index.html" which is the web interface of the hub. It is possible de change this page
+     *   for file that has been uploaded on the hub.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a string corresponding to the default HTML page returned by the hub
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_defaultPage(string newval)
+    {
+        string rest_val;
+        rest_val = newval;
+        return _setAttr("defaultPage", rest_val);
     }
 
     /**
@@ -861,8 +1047,9 @@ public class YNetwork : YFunction
      * </summary>
      * <returns>
      *   a value among <c>YNetwork.CALLBACKENCODING_FORM</c>, <c>YNetwork.CALLBACKENCODING_JSON</c>,
-     *   <c>YNetwork.CALLBACKENCODING_JSON_ARRAY</c>, <c>YNetwork.CALLBACKENCODING_CSV</c> and
-     *   <c>YNetwork.CALLBACKENCODING_YOCTO_API</c> corresponding to the encoding standard to use for
+     *   <c>YNetwork.CALLBACKENCODING_JSON_ARRAY</c>, <c>YNetwork.CALLBACKENCODING_CSV</c>,
+     *   <c>YNetwork.CALLBACKENCODING_YOCTO_API</c>, <c>YNetwork.CALLBACKENCODING_JSON_NUM</c> and
+     *   <c>YNetwork.CALLBACKENCODING_EMONCMS</c> corresponding to the encoding standard to use for
      *   representing notification values
      * </returns>
      * <para>
@@ -889,8 +1076,9 @@ public class YNetwork : YFunction
      * </summary>
      * <param name="newval">
      *   a value among <c>YNetwork.CALLBACKENCODING_FORM</c>, <c>YNetwork.CALLBACKENCODING_JSON</c>,
-     *   <c>YNetwork.CALLBACKENCODING_JSON_ARRAY</c>, <c>YNetwork.CALLBACKENCODING_CSV</c> and
-     *   <c>YNetwork.CALLBACKENCODING_YOCTO_API</c> corresponding to the encoding standard to use for
+     *   <c>YNetwork.CALLBACKENCODING_JSON_ARRAY</c>, <c>YNetwork.CALLBACKENCODING_CSV</c>,
+     *   <c>YNetwork.CALLBACKENCODING_YOCTO_API</c>, <c>YNetwork.CALLBACKENCODING_JSON_NUM</c> and
+     *   <c>YNetwork.CALLBACKENCODING_EMONCMS</c> corresponding to the encoding standard to use for
      *   representing notification values
      * </param>
      * <para>

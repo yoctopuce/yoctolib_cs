@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_refframe.cs 19324 2015-02-17 17:22:36Z seb $
+ * $Id: yocto_refframe.cs 20464 2015-05-29 08:55:45Z seb $
  *
  * Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -591,9 +591,9 @@ public enum   MOUNTORIENTATION
         this._calibStageHint = "Set down the device on a steady horizontal surface";
         this._calibPrevTick = ((currTick + 500) & (0x7FFFFFFF));
         jsonData = this._download("api/accelerometer.json");
-        xVal = Convert.ToInt32(this._json_get_key(jsonData, "xValue")) / 65536.0;
-        yVal = Convert.ToInt32(this._json_get_key(jsonData, "yValue")) / 65536.0;
-        zVal = Convert.ToInt32(this._json_get_key(jsonData, "zValue")) / 65536.0;
+        xVal = YAPI._atoi(this._json_get_key(jsonData, "xValue")) / 65536.0;
+        yVal = YAPI._atoi(this._json_get_key(jsonData, "yValue")) / 65536.0;
+        zVal = YAPI._atoi(this._json_get_key(jsonData, "zValue")) / 65536.0;
         xSq = xVal * xVal;
         if (xSq >= 0.04 && xSq < 0.64) {
             return YAPI.SUCCESS;

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 20167 2015-04-27 14:24:03Z seb $
+ * $Id: yocto_cellular.cs 20464 2015-05-29 08:55:45Z seb $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *
@@ -767,7 +767,6 @@ public class YCellular : YFunction
     public virtual int sendPUK(string puk, string newPin)
     {
         string gsmMsg;
-        
         gsmMsg = this.get_message();
         if (!(gsmMsg == "Enter SIM PUK")) { this._throw(YAPI.INVALID_ARGUMENT, "PUK not expected at this time"); return YAPI.INVALID_ARGUMENT; }
         if (newPin == "") {
@@ -848,7 +847,6 @@ public class YCellular : YFunction
             cmdLen = cmdLen + 2;
             chrPos = (cmd).IndexOf("=");
         }
-        
         // may throw an exception
         content = this._download("at.txt?cmd="+cmd);
         return YAPI.DefaultEncoding.GetString(content);
@@ -894,7 +892,7 @@ public class YCellular : YFunction
         if ((mccs).Substring(0, 1) == "0") {
             mccs = (mccs).Substring(1, 1);
         }
-        mcc = Convert.ToInt32(mccs);
+        mcc = YAPI._atoi(mccs);
         mncs = (moni).Substring(11, 3);
         if ((mncs).Substring(2, 1) == ",") {
             mncs = (mncs).Substring(0, 2);
@@ -902,7 +900,7 @@ public class YCellular : YFunction
         if ((mncs).Substring(0, 1) == "0") {
             mncs = (mncs).Substring(1, (mncs).Length-1);
         }
-        mnc = Convert.ToInt32(mncs);
+        mnc = YAPI._atoi(mncs);
         recs = new List<string>(moni.Split(new Char[] {'#'}));
         // process each line in turn
         res.Clear();
@@ -916,13 +914,13 @@ public class YCellular : YFunction
                     if ((dbms).Substring(0, 1) == " ") {
                         dbms = (dbms).Substring(1, 3);
                     }
-                    dbm = Convert.ToInt32(dbms);
+                    dbm = YAPI._atoi(dbms);
                     if (llen > 66) {
                         tads = (recs[ii]).Substring(54, 2);
                         if ((tads).Substring(0, 1) == " ") {
                             tads = (tads).Substring(1, 3);
                         }
-                        tad = Convert.ToInt32(tads);
+                        tad = YAPI._atoi(tads);
                         oper = (recs[ii]).Substring(66, llen-66);
                     } else {
                         tad = -1;

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 20380 2015-05-19 16:28:16Z seb $
+ * $Id: yocto_api.cs 20508 2015-06-01 16:32:48Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -769,7 +769,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "20384";
+    public const string YOCTO_API_BUILD_NO = "20652";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -1905,6 +1905,24 @@ public class YAPI
             res += Convert.ToString(decim);
         }
         return res;
+    }
+
+    public static int _atoi(string val)
+    {
+        int p = 0;
+        while(p < val.Length && Char.IsWhiteSpace(val[p])) {
+            p++;
+        }
+        int start = p;
+        if (p < val.Length && (val[p] == '-' || val[p] == '+'))
+            p++;
+        while (p < val.Length && Char.IsDigit(val[p])) {
+            p++;
+        }
+        if (start < p) {
+            return int.Parse(val.Substring(start, p-start));
+        }
+        return 0;
     }
 
     // - Delegate object for our internal callback, protected from GC
@@ -3789,7 +3807,7 @@ public class YDataStream
         this._parent   = parent;
         //--- (generated code: YDataStream attributes initialization)
         //--- (end of generated code: YDataStream attributes initialization)
-    	this._initFromDataSet(dataset, encoded);
+        this._initFromDataSet(dataset, encoded);
 
     }
 
@@ -7272,7 +7290,7 @@ public class YModule : YFunction
         int release;
         string tmp_res;
         if (onlynew) {
-            release = Convert.ToInt32(this.get_firmwareRelease());
+            release = YAPI._atoi(this.get_firmwareRelease());
         } else {
             release = 0;
         }
@@ -7401,7 +7419,7 @@ public class YModule : YFunction
             if (sensorType == "") {
                 return 16;
             }
-            if (Convert.ToInt32(sensorType) < 8) {
+            if (YAPI._atoi(sensorType) < 8) {
                 return 16;
             } else {
                 return 100;
@@ -7458,7 +7476,7 @@ public class YModule : YFunction
                 }
             } else {
                 if (funVer == 1) {
-                    if (currentFuncValue == "" || (Convert.ToInt32(currentFuncValue) > 10)) {
+                    if (currentFuncValue == "" || (YAPI._atoi(currentFuncValue) > 10)) {
                         funScale = 0;
                     }
                 }
@@ -7491,7 +7509,7 @@ public class YModule : YFunction
                 if (paramVer == 1) {
                     words_str = new List<string>(param.Split(new Char[] {','}));
                     for (int ii = 0; ii < words_str.Count; ii++) {
-                        words.Add(Convert.ToInt32(words_str[ii]));
+                        words.Add(YAPI._atoi(words_str[ii]));
                     }
                     if (param == "" || (words[0] > 10)) {
                         paramScale = 0;
@@ -8301,6 +8319,7 @@ public class YSensor : YFunction
     public const string REPORTFREQUENCY_INVALID = YAPI.INVALID_STRING;
     public const string CALIBRATIONPARAM_INVALID = YAPI.INVALID_STRING;
     public const double RESOLUTION_INVALID = YAPI.INVALID_DOUBLE;
+    public const int SENSORSTATE_INVALID = YAPI.INVALID_INT;
     protected string _unit = UNIT_INVALID;
     protected double _currentValue = CURRENTVALUE_INVALID;
     protected double _lowestValue = LOWESTVALUE_INVALID;
@@ -8310,6 +8329,7 @@ public class YSensor : YFunction
     protected string _reportFrequency = REPORTFREQUENCY_INVALID;
     protected string _calibrationParam = CALIBRATIONPARAM_INVALID;
     protected double _resolution = RESOLUTION_INVALID;
+    protected int _sensorState = SENSORSTATE_INVALID;
     protected ValueCallback _valueCallbackSensor = null;
     protected TimedReportCallback _timedReportCallbackSensor = null;
     protected double _prevTimedReport = 0;
@@ -8382,6 +8402,11 @@ public class YSensor : YFunction
         if (member.name == "resolution")
         {
             _resolution = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
+            return;
+        }
+        if (member.name == "sensorState")
+        {
+            _sensorState = (int)member.ivalue;
             return;
         }
         base._parseAttr(member);
@@ -8769,6 +8794,33 @@ public class YSensor : YFunction
 
     /**
      * <summary>
+     *   Returns the sensor health state code, which is zero when there is an up-to-date measure
+     *   available or a positive code if the sensor is not able to provide a measure right now.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the sensor health state code, which is zero when there is an up-to-date measure
+     *   available or a positive code if the sensor is not able to provide a measure right now
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSensor.SENSORSTATE_INVALID</c>.
+     * </para>
+     */
+    public int get_sensorState()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SENSORSTATE_INVALID;
+            }
+        }
+        return this._sensorState;
+    }
+
+    /**
+     * <summary>
      *   Retrieves a sensor for a given identifier.
      * <para>
      *   The identifier can be specified using several formats:
@@ -8998,6 +9050,32 @@ public class YSensor : YFunction
             }
         }
         return 0;
+    }
+
+    /**
+     * <summary>
+     *   Checks if the sensor is currently able to provide an up-to-date measure.
+     * <para>
+     *   Returns false if the device is unreachable, or if the sensor does not have
+     *   a current measure to transmit. No exception is raised if there is an error
+     *   while trying to contact the device hosting $THEFUNCTION$.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>true</c> if the sensor can provide an up-to-date measure, and <c>false</c> otherwise
+     * </returns>
+     */
+    public virtual bool isSensorReady()
+    {
+        if (!(this.isOnline())) {
+            return false;
+        }
+        if (!(this._sensorState == 0)) {
+            return false;
+        }
+        return true;
     }
 
     /**
