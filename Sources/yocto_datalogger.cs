@@ -1,6 +1,6 @@
 /********************************************************************
  *
- * $Id: yocto_datalogger.cs 19325 2015-02-17 17:28:16Z seb $
+ * $Id: yocto_datalogger.cs 20704 2015-06-20 19:43:34Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -341,6 +341,7 @@ public class YDataLogger : YFunction
     public const long TIMEUTC_INVALID = YAPI.INVALID_LONG;
     public const int RECORDING_OFF = 0;
     public const int RECORDING_ON = 1;
+    public const int RECORDING_PENDING = 2;
     public const int RECORDING_INVALID = -1;
     public const int AUTOSTART_OFF = 0;
     public const int AUTOSTART_ON = 1;
@@ -385,7 +386,7 @@ public class YDataLogger : YFunction
         }
         if (member.name == "recording")
         {
-            _recording = member.ivalue > 0 ? 1 : 0;
+            _recording = (int)member.ivalue;
             return;
         }
         if (member.name == "autoStart")
@@ -494,8 +495,8 @@ public class YDataLogger : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   either <c>YDataLogger.RECORDING_OFF</c> or <c>YDataLogger.RECORDING_ON</c>, according to the
-     *   current activation state of the data logger
+     *   a value among <c>YDataLogger.RECORDING_OFF</c>, <c>YDataLogger.RECORDING_ON</c> and
+     *   <c>YDataLogger.RECORDING_PENDING</c> corresponding to the current activation state of the data logger
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YDataLogger.RECORDING_INVALID</c>.
@@ -520,8 +521,9 @@ public class YDataLogger : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   either <c>YDataLogger.RECORDING_OFF</c> or <c>YDataLogger.RECORDING_ON</c>, according to the
-     *   activation state of the data logger to start/stop recording data
+     *   a value among <c>YDataLogger.RECORDING_OFF</c>, <c>YDataLogger.RECORDING_ON</c> and
+     *   <c>YDataLogger.RECORDING_PENDING</c> corresponding to the activation state of the data logger to
+     *   start/stop recording data
      * </param>
      * <para>
      * </para>
@@ -535,7 +537,7 @@ public class YDataLogger : YFunction
     public int set_recording(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
+        rest_val = (newval).ToString();
         return _setAttr("recording", rest_val);
     }
 

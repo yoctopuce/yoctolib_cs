@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 20508 2015-06-01 16:32:48Z seb $
+ * $Id: yocto_api.cs 20716 2015-06-22 17:14:15Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -769,7 +769,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "20652";
+    public const string YOCTO_API_BUILD_NO = "20773";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -4647,6 +4647,10 @@ public class YDataSet
 
         Nullable<YAPI.TJSONRECORD> node, arr;
         YDataStream stream;
+        long streamStartTime;
+        long streamEndTime;
+        long startTime = 0x7fffffff;
+        long endTime = 0;
         double summaryMinVal = Double.MaxValue;
         double summaryMaxVal = -Double.MaxValue;
         double summaryTotalTime = 0;
@@ -4674,7 +4678,9 @@ public class YDataSet
         for (int i = 0; i < arr.Value.itemcount; i++)
         {
             stream = _parent._findDataStream(this, arr.Value.items[i].svalue);
-            if (_startTime > 0 && stream.get_startTimeUTC() + stream.get_duration() <= _startTime)
+            streamStartTime = stream.get_startTimeUTC() - stream.get_dataSamplesIntervalMs() / 1000;
+            streamEndTime = stream.get_startTimeUTC() + stream.get_duration();
+            if (_startTime > 0 && streamEndTime <= _startTime)
             {
                 // this stream is too early, drop it
             }
@@ -4685,8 +4691,16 @@ public class YDataSet
             else
             {
                 _streams.Add(stream);
+                if (startTime > streamStartTime)
+                {
+                    startTime = streamStartTime;
+                }
+                if (endTime < streamEndTime)
+                {
+                    endTime = streamEndTime;
+                }
                 if (stream.isClosed() && stream.get_startTimeUTC() >= this._startTime &&
-                   (this._endTime == 0 || stream.get_startTimeUTC() + stream.get_duration() <= this._endTime))
+                   (this._endTime == 0 || streamEndTime <= this._endTime))
                 {
                     if (summaryMinVal > stream.get_minValue()) {
                         summaryMinVal = stream.get_minValue();
@@ -4699,7 +4713,7 @@ public class YDataSet
 
                     YMeasure rec = new YMeasure(
                                         stream.get_startTimeUTC(),
-                                        stream.get_startTimeUTC() + stream.get_duration(),
+                                        streamEndTime,
                                         stream.get_minValue(),
                                         stream.get_averageValue(),
                                         stream.get_maxValue());
@@ -4710,16 +4724,13 @@ public class YDataSet
         if ((this._streams.Count > 0) && (summaryTotalTime>0))
         {
             // update time boundaries with actual data
-            stream = this._streams[this._streams.Count - 1];
-            long endtime = stream.get_startTimeUTC() + stream.get_duration();
-            long startTime = _streams[0].get_startTimeUTC() - stream.get_dataSamplesIntervalMs() / 1000;
             if (this._startTime < startTime)
             {
                 this._startTime = startTime;
             }
-            if (this._endTime == 0 || this._endTime > endtime)
+            if (this._endTime == 0 || this._endTime > endTime)
             {
-                this._endTime = endtime;
+                this._endTime = endTime;
             }
             this._summary = new YMeasure(
                                         _startTime,
