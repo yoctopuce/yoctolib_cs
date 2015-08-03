@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 20716 2015-06-22 17:14:15Z mvuilleu $
+ * $Id: yocto_api.cs 20916 2015-07-23 08:54:20Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -225,7 +225,7 @@ public class YAPI
         }
 
 
-            public void Dispose()
+        public void Dispose()
         {
             freestructure(ref data);
         }
@@ -769,7 +769,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "20773";
+    public const string YOCTO_API_BUILD_NO = "20975";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -1924,6 +1924,54 @@ public class YAPI
         }
         return 0;
     }
+
+    protected const string _hexArray = "0123456789ABCDEF";
+
+    public static string _bytesToHexStr(byte[] bytes, int offset, int len)
+    {
+        char[] hexChars = new char[len * 2];
+        for (int j = 0; j < len; j++) {
+            int v = bytes[offset + j] & 0xFF;
+            hexChars[j * 2] = _hexArray[v >> 4];
+            hexChars[j * 2 + 1] = _hexArray[v & 0x0F];
+        }
+        return new string(hexChars);
+    }
+
+    public static byte[] _hexStrToBin(string hex_str)
+    {
+        int len = hex_str.Length / 2;
+        byte[] res = new byte[len];
+        for (int i = 0; i < len; i++) {
+            int val = 0;
+            for(int n = 0; n < 2; n++){
+                char c = hex_str[i * 2 + n];
+                val <<= 4;
+                if (c <= '9') {
+                    val += c - '0';
+                } else if (c <= 'F') {
+                    val += c - 'A' + 10;
+                } else {
+                    val += c - 'a'+ 10;
+
+                }
+
+            }
+            res[i] = (byte)val;
+        }
+        return res;
+    }
+
+    public static byte[] _bytesMerge(byte[] array_a, byte[] array_b)
+    {
+        byte[] res = new byte[array_a.Length + array_b.Length];
+        System.Buffer.BlockCopy(array_a, 0, res, 0, array_a.Length);
+        System.Buffer.BlockCopy(array_b, 0, res, array_a.Length, array_b.Length);
+        return res;
+    }
+
+
+
 
     // - Delegate object for our internal callback, protected from GC
     public static _yapiLogFunc native_yLogFunctionDelegate = native_yLogFunction;
@@ -3944,6 +3992,10 @@ public class YDataStream
         int idx;
         List<int> udat = new List<int>();
         List<double> dat = new List<double>();
+        if ((sdata).Length == 0) {
+            this._nRows = 0;
+            return YAPI.SUCCESS;
+        }
         // may throw an exception
         udat = YAPI._decodeWords(this._parent._json_get_string(sdata));
         this._values.Clear();
@@ -4642,7 +4694,7 @@ public class YDataSet
         catch
         {
 
-            return YAPI.NOT_SUPPORTED;
+            return YAPI.IO_ERROR;
         }
 
         Nullable<YAPI.TJSONRECORD> node, arr;
@@ -5052,6 +5104,83 @@ public class YDataSet
     public virtual List<YMeasure> get_preview()
     {
         return this._preview;
+    }
+
+    /**
+     * <summary>
+     *   Returns the detailed set of measures for the time interval corresponding
+     *   to a given condensed measures previously returned by <c>get_preview()</c>.
+     * <para>
+     *   The result is provided as a list of YMeasure objects.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="measure">
+     *   condensed measure from the list previously returned by
+     *   <c>get_preview()</c>.
+     * </param>
+     * <returns>
+     *   a table of records, where each record depicts the
+     *   measured values during a time interval
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
+     */
+    public virtual List<YMeasure> get_measuresAt(YMeasure measure)
+    {
+        long startUtc;
+        YDataStream stream;
+        List<List<double>> dataRows = new List<List<double>>();
+        List<YMeasure> measures = new List<YMeasure>();
+        double tim;
+        double itv;
+        int nCols;
+        int minCol;
+        int avgCol;
+        int maxCol;
+        // may throw an exception
+        startUtc = (long) Math.Round(measure.get_startTimeUTC());
+        stream = null;
+        for (int ii = 0; ii < this._streams.Count; ii++) {
+            if (this._streams[ii].get_startTimeUTC() == startUtc) {
+                stream = this._streams[ii];
+            }
+            ;;
+        }
+        if (stream == null) {
+            return measures;
+        }
+        dataRows = stream.get_dataRows();
+        if (dataRows.Count == 0) {
+            return measures;
+        }
+        tim = (double) stream.get_startTimeUTC();
+        itv = stream.get_dataSamplesInterval();
+        if (tim < itv) {
+            tim = itv;
+        }
+        nCols = dataRows[0].Count;
+        minCol = 0;
+        if (nCols > 2) {
+            avgCol = 1;
+        } else {
+            avgCol = 0;
+        }
+        if (nCols > 2) {
+            maxCol = 2;
+        } else {
+            maxCol = 0;
+        }
+        
+        for (int ii = 0; ii < dataRows.Count; ii++) {
+            if ((tim >= this._startTime) && ((this._endTime == 0) || (tim <= this._endTime))) {
+                measures.Add(new YMeasure(tim - itv, tim, dataRows[ii][minCol], dataRows[ii][avgCol], dataRows[ii][maxCol]));
+            }
+            tim = tim + itv;;
+        }
+        return measures;
     }
 
     /**
@@ -5558,7 +5687,6 @@ public class YFunction
         int found, body;
         request = "GET /" + path + " HTTP/1.1\r\n\r\n";
         buffer = _request(request);
-        if (buffer.Length == 0) return buffer;
         for (found = 0; found < buffer.Length - 4; found++)
         {
             if (buffer[found] == 13 && buffer[found + 1] == 10 && buffer[found + 2] == 13 && buffer[found + 3] == 10)
@@ -7363,6 +7491,43 @@ public class YModule : YFunction
         return this._download("api.json");
     }
 
+    public virtual bool hasFunction(string funcId)
+    {
+        int count;
+        int i;
+        string fid;
+        // may throw an exception
+        count  = this.functionCount();
+        i = 0;
+        while (i < count) {
+            fid  = this.functionId(i);
+            if (fid == funcId) {
+                return true;
+            }
+            i = i + 1;
+        }
+        return false;
+    }
+
+    public virtual List<string> get_functionIds(string funType)
+    {
+        int count;
+        int i;
+        string ftype;
+        List<string> res = new List<string>();
+        // may throw an exception
+        count = this.functionCount();
+        i = 0;
+        while (i < count) {
+            ftype  = this.functionType(i);
+            if (ftype == funType) {
+                res.Add(this.functionId(i));
+            }
+            i = i + 1;
+        }
+        return res;
+    }
+
     public virtual byte[] _flattenJsonStruct(byte[] jsoncomplex)
     {
         StringBuilder errmsg = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
@@ -8105,18 +8270,16 @@ public class YModule : YFunction
      */
     public int functionCount()
     {
-        int functionReturnValue = 0;
         List<u32> functions = null;
         YAPI.YDevice dev = null;
         string errmsg = "";
-        int res = 0;
+        int res;
 
         res = _getDevice(ref dev, ref errmsg);
         if ((YAPI.YISERR(res)))
         {
             _throw(res, errmsg);
-            functionReturnValue = res;
-            return functionReturnValue;
+            return res;
         }
 
         res = dev.getFunctions(ref functions, ref errmsg);
@@ -8124,13 +8287,10 @@ public class YModule : YFunction
         {
             functions = null;
             _throw(res, errmsg);
-            functionReturnValue = res;
-            return functionReturnValue;
+            return res;
         }
 
-        functionReturnValue = functions.Count;
-        return functionReturnValue;
-
+        return functions.Count;
     }
 
     /**
@@ -8151,7 +8311,6 @@ public class YModule : YFunction
      */
     public string functionId(int functionIndex)
     {
-        string functionReturnValue = null;
         string serial = "";
         string funcId = "";
         string funcName = "";
@@ -8162,12 +8321,53 @@ public class YModule : YFunction
         if ((YAPI.YISERR(res)))
         {
             _throw(res, errmsg);
-            functionReturnValue = YAPI.INVALID_STRING;
-            return functionReturnValue;
+            return YAPI.INVALID_STRING;
         }
-        functionReturnValue = funcId;
-        return functionReturnValue;
+        return funcId;
     }
+
+    /**
+     * <summary>
+     *   Retrieves the type of the <i>n</i>th function on the module.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="functionIndex">
+     *   the index of the function for which the information is desired, starting at 0 for the first function.
+     * </param>
+     * <returns>
+     *   a the type of the function
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty string.
+     * </para>
+     */
+    public string functionType(int functionIndex)
+    {
+        string serial = "";
+        string funcId = "";
+        string funcName = "";
+        string funcVal = "";
+        string errmsg = "";
+        int res = 0;
+        res = _getFunction(functionIndex, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg);
+        if ((YAPI.YISERR(res)))
+        {
+            _throw(res, errmsg);
+            return YAPI.INVALID_STRING;         
+        }
+        char first = funcId[0];
+        int i;
+        for (i = 1; i < funcId.Length; i++)
+        {
+            if (!Char.IsLetter(funcId[i]))
+            {
+                break;
+            }
+        }
+        return Char.ToUpper(first)+ funcId.Substring(1, i - 1);
+    }
+
 
     /**
      * <summary>
@@ -8187,7 +8387,6 @@ public class YModule : YFunction
      */
     public string functionName(int functionIndex)
     {
-        string functionReturnValue = null;
         string serial = "";
         string funcId = "";
         string funcName = "";
@@ -8199,12 +8398,10 @@ public class YModule : YFunction
         if ((YAPI.YISERR(res)))
         {
             _throw(res, errmsg);
-            functionReturnValue = YAPI.INVALID_STRING;
-            return functionReturnValue;
+            return YAPI.INVALID_STRING;
         }
 
-        functionReturnValue = funcName;
-        return functionReturnValue;
+        return funcName;
     }
 
     /**
@@ -8225,7 +8422,6 @@ public class YModule : YFunction
      */
     public string functionValue(int functionIndex)
     {
-        string functionReturnValue = null;
         string serial = "";
         string funcId = "";
         string funcName = "";
@@ -8237,11 +8433,9 @@ public class YModule : YFunction
         if ((YAPI.YISERR(res)))
         {
             _throw(res, errmsg);
-            functionReturnValue = YAPI.INVALID_STRING;
-            return functionReturnValue;
+            return YAPI.INVALID_STRING;
         }
-        functionReturnValue = funcVal;
-        return functionReturnValue;
+        return funcVal;
     }
 
     //--- (generated code: Module functions)

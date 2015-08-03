@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_audioout.cs 20565 2015-06-04 09:59:10Z seb $
+ * $Id: yocto_audioout.cs 20797 2015-07-06 16:49:40Z mvuilleu $
  *
  * Implements yFindAudioOut(), the high-level API for AudioOut functions
  *
@@ -72,10 +72,12 @@ public class YAudioOut : YFunction
     public const int MUTE_FALSE = 0;
     public const int MUTE_TRUE = 1;
     public const int MUTE_INVALID = -1;
+    public const string VOLUMERANGE_INVALID = YAPI.INVALID_STRING;
     public const int SIGNAL_INVALID = YAPI.INVALID_INT;
     public const int NOSIGNALFOR_INVALID = YAPI.INVALID_INT;
     protected int _volume = VOLUME_INVALID;
     protected int _mute = MUTE_INVALID;
+    protected string _volumeRange = VOLUMERANGE_INVALID;
     protected int _signal = SIGNAL_INVALID;
     protected int _noSignalFor = NOSIGNALFOR_INVALID;
     protected ValueCallback _valueCallbackAudioOut = null;
@@ -101,6 +103,11 @@ public class YAudioOut : YFunction
         if (member.name == "mute")
         {
             _mute = member.ivalue > 0 ? 1 : 0;
+            return;
+        }
+        if (member.name == "volumeRange")
+        {
+            _volumeRange = member.svalue;
             return;
         }
         if (member.name == "signal")
@@ -220,6 +227,35 @@ public class YAudioOut : YFunction
         string rest_val;
         rest_val = (newval > 0 ? "1" : "0");
         return _setAttr("mute", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the supported volume range.
+     * <para>
+     *   The low value of the
+     *   range corresponds to the minimal audible value. To
+     *   completely mute the sound, use <c>set_mute()</c>
+     *   instead of the <c>set_volume()</c>.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to the supported volume range
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YAudioOut.VOLUMERANGE_INVALID</c>.
+     * </para>
+     */
+    public string get_volumeRange()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return VOLUMERANGE_INVALID;
+            }
+        }
+        return this._volumeRange;
     }
 
     /**
