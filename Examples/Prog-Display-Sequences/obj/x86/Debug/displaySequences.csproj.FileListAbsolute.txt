@@ -1,0 +1,1 @@
+c:\tmp\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Prog-Display-Sequences\obj\x86\Debug\displaySequences.csprojResolveAssemblyReference.cache

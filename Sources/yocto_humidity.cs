@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_humidity.cs 19579 2015-03-04 10:56:48Z seb $
+ * $Id: yocto_humidity.cs 21211 2015-08-19 16:03:29Z seb $
  *
  * Implements yFindHumidity(), the high-level API for Humidity functions
  *
@@ -71,6 +71,10 @@ public class YHumidity : YSensor
     public new delegate void ValueCallback(YHumidity func, string value);
     public new delegate void TimedReportCallback(YHumidity func, YMeasure measure);
 
+    public const double RELHUM_INVALID = YAPI.INVALID_DOUBLE;
+    public const double ABSHUM_INVALID = YAPI.INVALID_DOUBLE;
+    protected double _relHum = RELHUM_INVALID;
+    protected double _absHum = ABSHUM_INVALID;
     protected ValueCallback _valueCallbackHumidity = null;
     protected TimedReportCallback _timedReportCallbackHumidity = null;
     //--- (end of YHumidity definitions)
@@ -87,7 +91,102 @@ public class YHumidity : YSensor
 
     protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
+        if (member.name == "relHum")
+        {
+            _relHum = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
+            return;
+        }
+        if (member.name == "absHum")
+        {
+            _absHum = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
+            return;
+        }
         base._parseAttr(member);
+    }
+
+    /**
+     * <summary>
+     *   Changes the primary unit for measuring humidity.
+     * <para>
+     *   That unit is a string.
+     *   If that strings starts with the letter 'g', the primary measured value is the absolute
+     *   humidity, in g/m3. Otherwise, the primary measured value will be the relative humidity
+     *   (RH), in per cents.
+     * </para>
+     * <para>
+     *   Remember to call the <c>saveToFlash()</c> method of the module if the modification
+     *   must be kept.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a string corresponding to the primary unit for measuring humidity
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_unit(string newval)
+    {
+        string rest_val;
+        rest_val = newval;
+        return _setAttr("unit", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the current relative humidity, in per cents.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a floating point number corresponding to the current relative humidity, in per cents
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YHumidity.RELHUM_INVALID</c>.
+     * </para>
+     */
+    public double get_relHum()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return RELHUM_INVALID;
+            }
+        }
+        return this._relHum;
+    }
+
+    /**
+     * <summary>
+     *   Returns the current absolute humidity, in grams per cubic meter of air.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a floating point number corresponding to the current absolute humidity, in grams per cubic meter of air
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YHumidity.ABSHUM_INVALID</c>.
+     * </para>
+     */
+    public double get_absHum()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return ABSHUM_INVALID;
+            }
+        }
+        return this._absHum;
     }
 
     /**

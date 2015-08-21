@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 20916 2015-07-23 08:54:20Z seb $
+ * $Id: yocto_api.cs 21200 2015-08-19 13:09:00Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -70,7 +70,15 @@ using yUrlRef = System.Int16;
 using System.Runtime.InteropServices;
 using System.Text;
 
-
+public class YAPI_Exception : ApplicationException
+{
+    public YRETCODE errorType;
+    public YAPI_Exception(YRETCODE errType, string errMsg)
+        : base(errMsg)
+    {
+        errorType = errType;
+    }
+}
 
 public class YAPI
 {
@@ -746,7 +754,7 @@ public class YAPI
     // Default cache validity (in [ms]) before reloading data from device. This saves a lots of trafic.
     // Note that a value undger 2 ms makes little sense since a USB bus itself has a 2ms roundtrip period
 
-    public const int DefaultCacheValidity = 5;
+    public int DefaultCacheValidity = 5;
     public const string INVALID_STRING = "!INVALID!";
     public const double INVALID_DOUBLE = -1.79769313486231E+308;
     public const int INVALID_INT = -2147483648;
@@ -769,7 +777,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "20983";
+    public const string YOCTO_API_BUILD_NO = "21242";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -889,14 +897,8 @@ public class YAPI
     public const int FILE_NOT_FOUND = -14;          // the file is not found
     //--- (end of generated code: YFunction return codes)
 
-    public class YAPI_Exception : ApplicationException
-    {
-        public YRETCODE errorType;
-        public YAPI_Exception(YRETCODE errType, string errMsg)
-        {
-        }
-        // New
-    }
+
+
 
 
     static List<YDevice> YDevice_devCache;
@@ -2963,6 +2965,36 @@ public class YAPI
              }
         }
     }
+    [DllImport("yapi.dll", EntryPoint = "yapiJsonGetPath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    internal extern static int _yapiJsonGetPath32(StringBuilder path, StringBuilder json_data, int json_len, ref IntPtr result, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiJsonGetPath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    internal extern static int _yapiJsonGetPath64(StringBuilder path, StringBuilder json_data, int json_len, ref IntPtr result, StringBuilder errmsg);
+    internal static int _yapiJsonGetPath(StringBuilder path, StringBuilder json_data, int json_len, ref IntPtr result, StringBuilder errmsg) {
+        if (IntPtr.Size == 4) {
+             return _yapiJsonGetPath32(path, json_data, json_len, ref result, errmsg);
+        } else {
+             try {
+                 return _yapiJsonGetPath64(path, json_data, json_len, ref result, errmsg);
+             } catch (System.DllNotFoundException) {
+                 return _yapiJsonGetPath32(path, json_data, json_len, ref result, errmsg);
+             }
+        }
+    }
+    [DllImport("yapi.dll", EntryPoint = "yapiJsonDecodeString", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    internal extern static int _yapiJsonDecodeString32(StringBuilder json_data, StringBuilder output);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiJsonDecodeString", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    internal extern static int _yapiJsonDecodeString64(StringBuilder json_data, StringBuilder output);
+    internal static int _yapiJsonDecodeString(StringBuilder json_data, StringBuilder output) {
+        if (IntPtr.Size == 4) {
+             return _yapiJsonDecodeString32(json_data, output);
+        } else {
+             try {
+                 return _yapiJsonDecodeString64(json_data, output);
+             } catch (System.DllNotFoundException) {
+                 return _yapiJsonDecodeString32(json_data, output);
+             }
+        }
+    }
 //--- (end of generated code: YFunction dlldef)
     private static int _yapiInitAPI(int mode, StringBuilder errmsg) {
         if (IntPtr.Size == 4) {
@@ -3486,8 +3518,6 @@ public class YAPI
 public class yAPI : YAPI
 {
 }
-
-
 
 //--- (generated code: YFirmwareUpdate class start)
 /**
@@ -4729,7 +4759,7 @@ public class YDataSet
         this._measures = new List<YMeasure>();
         for (int i = 0; i < arr.Value.itemcount; i++)
         {
-            stream = _parent._findDataStream(this, arr.Value.items[i].svalue);
+            stream = _parent.f(this, arr.Value.items[i].svalue);
             streamStartTime = stream.get_startTimeUTC() - stream.get_dataSamplesIntervalMs() / 1000;
             streamEndTime = stream.get_startTimeUTC() + stream.get_duration();
             if (_startTime > 0 && streamEndTime <= _startTime)
@@ -5321,7 +5351,7 @@ public class YFunction
         _lastErrorMsg = errMsg;
         if (!(YAPI.ExceptionsDisabled))
         {
-            throw new YAPI.YAPI_Exception(errType, "YoctoApi error : " + errMsg);
+            throw new YAPI_Exception(errType, "YoctoApi error : " + errMsg);
         }
     }
 
@@ -5779,6 +5809,11 @@ public class YFunction
         return newDataStream;
     }
 
+    // Method used to clear cache of DataStream object (undocumented)
+    public void _clearDataStreamCache()
+    {
+        _dataStreams.Clear();
+    }
 
     protected int _parse(YAPI.TJSONRECORD j)
     {
@@ -6457,6 +6492,32 @@ public class YFunction
         node = p.GetRootNode();
         return node.Value.items[0].svalue;
     }
+
+    public string _get_json_path(string json, string path)
+    {
+
+        StringBuilder errbuff = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
+        IntPtr p = default(IntPtr);
+        int dllres = 0;
+        string result = "";
+        dllres = YAPI._yapiJsonGetPath(new StringBuilder(path), new StringBuilder(json), json.Length, ref p, errbuff);
+        if (dllres > 0)
+        {
+            byte[] reply = new byte[dllres];
+            Marshal.Copy(p, reply, 0, dllres);
+            result = YAPI.DefaultEncoding.GetString(reply);
+        }
+        return result;
+    }
+
+    public string _decode_json_string(string json)
+    {
+        int len = json.Length;
+        StringBuilder buffer = new StringBuilder(len);
+        int decoded_len = YAPI._yapiJsonDecodeString(new StringBuilder(json), buffer);
+        return buffer.ToString();
+    }
+
 
     /**
      * <summary>
@@ -7491,6 +7552,109 @@ public class YModule : YFunction
         return this._download("api.json");
     }
 
+    public virtual byte[] get_allSettings_dev()
+    {
+        byte[] settings;
+        byte[] json;
+        byte[] res;
+        string sep;
+        string name;
+        string file_data;
+        byte[] file_data_bin;
+        string all_file_data;
+        List<string> filelist = new List<string>();
+        // may throw an exception
+        settings = this._download("api.json");
+        all_file_data = ", \"files\":[";
+        if (this.hasFunction("files")) {
+            json = this._download("files.json?a=dir&f=");
+            filelist = this._json_get_array(json);
+            sep = "";
+            for (int ii = 0; ii <  filelist.Count; ii++) {
+                name = this._json_get_key(YAPI.DefaultEncoding.GetBytes( filelist[ii]), "name");
+                file_data_bin = this._download(this._escapeAttr(name));
+                file_data = YAPI._bytesToHexStr(file_data_bin, 0, file_data_bin.Length);
+                file_data = ""+ sep+"{\"name\":\""+ name+"\", \"data\":\""+file_data+"\"}\n";
+                sep = ",";
+                all_file_data = all_file_data + file_data;;
+            }
+        }
+        all_file_data = all_file_data + "]}";
+        res = YAPI._bytesMerge(YAPI.DefaultEncoding.GetBytes("{ \"api\":"), YAPI._bytesMerge(settings, YAPI.DefaultEncoding.GetBytes(all_file_data)));
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Restores all the settings of the module.
+     * <para>
+     *   Useful to restore all the logical names and calibrations parameters
+     *   of a module from a backup.Remember to call the <c>saveToFlash()</c> method of the module if the
+     *   modifications must be kept.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="settings">
+     *   a binary buffer with all the settings.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int set_allSettings_dev(byte[] settings)
+    {
+        byte[] down;
+        string json;
+        string json_api;
+        string json_files;
+        json = YAPI.DefaultEncoding.GetString(settings);
+        json_api = this._get_json_path(json, "api");
+        this.set_allSettings(YAPI.DefaultEncoding.GetBytes(json_api));
+        if (this.hasFunction("files")) {
+            List<string> files = new List<string>();
+            string res;
+            string name;
+            string data;
+            down = this._download("files.json?a=format");
+            res = this._get_json_path(YAPI.DefaultEncoding.GetString(down), "res");
+            res = this._decode_json_string(res);
+            if (!(res == "ok")) { this._throw( YAPI.IO_ERROR, "format failed"); return YAPI.IO_ERROR; }
+            json_files = this._get_json_path(json, "files");
+            files = this._json_get_array(YAPI.DefaultEncoding.GetBytes(json_files));
+            for (int ii = 0; ii <  files.Count; ii++) {
+                name = this._get_json_path( files[ii], "name");
+                name = this._decode_json_string(name);
+                data = this._get_json_path( files[ii], "data");
+                data = this._decode_json_string(data);
+                this._upload(name, YAPI._hexStrToBin(data));;
+            }
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
+     *   Test if the device has a specific function.
+     * <para>
+     *   This method took an function identifier
+     *   and return a boolean.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="funcId">
+     *   the requested function identifier
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   : true if the device has the function identifier
+     * </returns>
+     */
     public virtual bool hasFunction(string funcId)
     {
         int count;
@@ -7509,6 +7673,23 @@ public class YModule : YFunction
         return false;
     }
 
+    /**
+     * <summary>
+     *   Retrieve all hardware identifier that match the type passed in argument.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="funType">
+     *   The type of function (Relay, LightSensor, Voltage,...)
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   : A array of string.
+     * </returns>
+     */
     public virtual List<string> get_functionIds(string funType)
     {
         int count;
@@ -8354,7 +8535,7 @@ public class YModule : YFunction
         if ((YAPI.YISERR(res)))
         {
             _throw(res, errmsg);
-            return YAPI.INVALID_STRING;         
+            return YAPI.INVALID_STRING;
         }
         char first = funcId[0];
         int i;
