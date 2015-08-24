@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 21200 2015-08-19 13:09:00Z seb $
+ * $Id: yocto_api.cs 21276 2015-08-21 15:51:32Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -754,7 +754,7 @@ public class YAPI
     // Default cache validity (in [ms]) before reloading data from device. This saves a lots of trafic.
     // Note that a value undger 2 ms makes little sense since a USB bus itself has a 2ms roundtrip period
 
-    public int DefaultCacheValidity = 5;
+    public static ulong DefaultCacheValidity = 5;
     public const string INVALID_STRING = "!INVALID!";
     public const double INVALID_DOUBLE = -1.79769313486231E+308;
     public const int INVALID_INT = -2147483648;
@@ -777,7 +777,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "21249";
+    public const string YOCTO_API_BUILD_NO = "21312";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -4759,7 +4759,7 @@ public class YDataSet
         this._measures = new List<YMeasure>();
         for (int i = 0; i < arr.Value.itemcount; i++)
         {
-            stream = _parent.f(this, arr.Value.items[i].svalue);
+            stream = _parent._findDataStream(this, arr.Value.items[i].svalue);
             streamStartTime = stream.get_startTimeUTC() - stream.get_dataSamplesIntervalMs() / 1000;
             streamEndTime = stream.get_startTimeUTC() + stream.get_duration();
             if (_startTime > 0 && streamEndTime <= _startTime)
@@ -6542,7 +6542,7 @@ public class YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public YRETCODE load(int msValidity)
+    public YRETCODE load(ulong msValidity)
     {
         YRETCODE functionReturnValue = default(YRETCODE);
 

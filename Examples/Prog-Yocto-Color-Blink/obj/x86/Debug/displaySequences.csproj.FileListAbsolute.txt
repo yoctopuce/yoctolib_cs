@@ -1,1 +1,0 @@
-c:\tmp\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Prog-Yocto-Color-Blink\obj\x86\Debug\displaySequences.csprojResolveAssemblyReference.cache

@@ -1,1 +1,0 @@
-c:\tmp\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Prog-HubDiscovery-method1\obj\x86\Debug\demo.csprojResolveAssemblyReference.cache

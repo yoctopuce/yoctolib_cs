@@ -1,1 +1,0 @@
-c:\tmp\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Prog-YFiles-Example\obj\x86\Debug\yfilesdemo.csprojResolveAssemblyReference.cache

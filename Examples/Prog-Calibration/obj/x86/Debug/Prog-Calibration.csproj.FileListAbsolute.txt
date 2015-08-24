@@ -1,4 +1,0 @@
-c:\tmp\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Prog-Calibration\obj\x86\Debug\Prog-Calibration.csprojResolveAssemblyReference.cache
-c:\tmp\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Prog-Calibration\obj\x86\Debug\WindowsFormsApplication1.Form1.resources
-c:\tmp\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Prog-Calibration\obj\x86\Debug\CalibrationDemo.Properties.Resources.resources
-c:\tmp\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Prog-Calibration\obj\x86\Debug\Prog-Calibration.csproj.GenerateResource.Cache

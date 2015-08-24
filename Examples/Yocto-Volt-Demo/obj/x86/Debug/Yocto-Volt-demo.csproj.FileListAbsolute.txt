@@ -1,4 +1,0 @@
-c:\tmp\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Yocto-Volt-Demo\obj\x86\Debug\Yocto-Volt-demo.csprojResolveAssemblyReference.cache
-c:\tmp\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Yocto-Volt-Demo\obj\x86\Debug\WindowsFormsApplication1.Form1.resources
-c:\tmp\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Yocto-Volt-Demo\obj\x86\Debug\WindowsFormsApplication1.Properties.Resources.resources
-c:\tmp\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Yocto-Volt-Demo\obj\x86\Debug\Yocto-Volt-demo.csproj.GenerateResource.Cache
