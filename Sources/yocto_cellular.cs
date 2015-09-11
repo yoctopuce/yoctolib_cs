@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 20464 2015-05-29 08:55:45Z seb $
+ * $Id: yocto_cellular.cs 21485 2015-09-11 14:10:22Z seb $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *
@@ -152,6 +152,7 @@ public class YCellular : YFunction
 
     public const int LINKQUALITY_INVALID = YAPI.INVALID_UINT;
     public const string CELLOPERATOR_INVALID = YAPI.INVALID_STRING;
+    public const string CELLIDENTIFIER_INVALID = YAPI.INVALID_STRING;
     public const string IMSI_INVALID = YAPI.INVALID_STRING;
     public const string MESSAGE_INVALID = YAPI.INVALID_STRING;
     public const string PIN_INVALID = YAPI.INVALID_STRING;
@@ -165,6 +166,7 @@ public class YCellular : YFunction
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _linkQuality = LINKQUALITY_INVALID;
     protected string _cellOperator = CELLOPERATOR_INVALID;
+    protected string _cellIdentifier = CELLIDENTIFIER_INVALID;
     protected string _imsi = IMSI_INVALID;
     protected string _message = MESSAGE_INVALID;
     protected string _pin = PIN_INVALID;
@@ -196,6 +198,11 @@ public class YCellular : YFunction
         if (member.name == "cellOperator")
         {
             _cellOperator = member.svalue;
+            return;
+        }
+        if (member.name == "cellIdentifier")
+        {
+            _cellIdentifier = member.svalue;
             return;
         }
         if (member.name == "imsi")
@@ -289,6 +296,31 @@ public class YCellular : YFunction
             }
         }
         return this._cellOperator;
+    }
+
+    /**
+     * <summary>
+     *   Returns the unique identifier of the cellular antenna in use: MCC, MNC, LAC and Cell ID.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to the unique identifier of the cellular antenna in use: MCC, MNC, LAC and Cell ID
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YCellular.CELLIDENTIFIER_INVALID</c>.
+     * </para>
+     */
+    public string get_cellIdentifier()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return CELLIDENTIFIER_INVALID;
+            }
+        }
+        return this._cellIdentifier;
     }
 
     /**

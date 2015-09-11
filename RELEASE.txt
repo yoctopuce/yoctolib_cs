@@ -1,3 +1,6 @@
+- Add new methods set_allSettingsAndFiles() that restore settings and files
 - Add compiler sanity check on library initialization
+- Minor changes to support Unity 5
 - Fix YAPI_Exception that have no message
+- Fix occasional Exception during isOnline()
 - Fix potential crash if YAPI.RegisterHUB("usb") is called after YAPI.UnregisterHub("usb")
