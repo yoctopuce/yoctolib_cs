@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_temperature.cs 21211 2015-08-19 16:03:29Z seb $
+ * $Id: yocto_temperature.cs 21576 2015-09-21 13:17:28Z seb $
  *
  * Implements yFindTemperature(), the high-level API for Temperature functions
  *
@@ -541,7 +541,7 @@ public class YTemperature : YSensor
         resValues.Clear();
         // may throw an exception
         id = this.get_functionId();
-        id = (id).Substring( 11, (id).Length-1);
+        id = (id).Substring( 11, (id).Length - 11);
         bin_json = this._download("extra.json?page="+id);
         paramlist = this._json_get_array(bin_json);
         // first convert all temperatures to float

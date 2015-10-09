@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 21482 2015-09-11 14:07:15Z seb $
+ * $Id: yocto_api.cs 21680 2015-10-02 13:42:44Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -777,7 +777,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "21486";
+    public const string YOCTO_API_BUILD_NO = "21701";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -1208,6 +1208,15 @@ public class YAPI
 
             return YAPI.SUCCESS;
         }
+
+        public void clearCache()
+        {
+            if (_cacheJson != null)
+                _cacheJson.Dispose();
+            _cacheJson = null;
+            _cacheStamp = 0;
+        }
+
 
         public YRETCODE getFunctions(ref List<u32> functions, ref string errmsg)
         {
@@ -3750,7 +3759,9 @@ public class YFirmwareUpdate
      */
     public virtual int get_progress()
     {
-        this._processMore(0);
+        if (this._progress >= 0) {
+            this._processMore(0);
+        }
         return this._progress;
     }
 
@@ -3794,9 +3805,18 @@ public class YFirmwareUpdate
      */
     public virtual int startUpdate()
     {
-        this._progress = 0;
-        this._progress_c = 0;
-        this._processMore(1);
+        string err;
+        int leng;
+        err = YAPI.DefaultEncoding.GetString(this._settings);
+        leng = (err).Length;
+        if (( leng >= 6) && ("error:" == (err).Substring(0, 6))) {
+            this._progress = -1;
+            this._progress_msg = (err).Substring( 6, leng - 6);
+        } else {
+            this._progress = 0;
+            this._progress_c = 0;
+            this._processMore(1);
+        }
         return this._progress;
     }
 
@@ -5646,6 +5666,7 @@ public class YFunction
                 return res;
             }
         }
+        dev.clearCache();
         if (_cacheExpiration != 0) {
            _cacheExpiration = YAPI.GetTickCount();
         }
@@ -6616,6 +6637,38 @@ public class YFunction
 
     /**
      * <summary>
+     *   Invalidate the cache.
+     * <para>
+     *   Invalidate the cache of the function attributes. Force the
+     *   next call to get_xxx() or loadxxx() to use value that come from the device..
+     * </para>
+     * <para>
+     * @noreturn
+     * </para>
+     * </summary>
+     */
+    public void clearCache()
+    {
+        int res = 0;
+        YAPI.YDevice dev = null;
+        string errmsg = "";
+
+        // Resolve our reference to our device, load REST API
+        res = _getDevice(ref dev, ref errmsg);
+        if ((YAPI.YISERR(res)))
+        {
+            return;
+        }
+        dev.clearCache();
+        if (_cacheExpiration != 0)
+        {
+            _cacheExpiration = YAPI.GetTickCount();
+        }
+    }
+
+
+    /**
+     * <summary>
      *   Gets the <c>YModule</c> object for the device on which the function is located.
      * <para>
      *   If the function cannot be located on any module, the returned instance of
@@ -6639,12 +6692,11 @@ public class YFunction
         string funcValue = "";
 
         fundescr = YAPI.yapiGetFunction(_className, _func, ref errmsg);
-        if ((!(YAPI.YISERR(fundescr))))
+        if (!YAPI.YISERR(fundescr))
         {
-            if ((!(YAPI.YISERR(YAPI.yapiGetFunctionInfo(fundescr, ref devdescr, ref serial, ref funcId, ref funcName, ref funcValue, ref errmsg)))))
+            if (!YAPI.YISERR(YAPI.yapiGetFunctionInfo(fundescr, ref devdescr, ref serial, ref funcId, ref funcName, ref funcValue, ref errmsg)))
             {
                 return YModule.FindModule(serial + ".module");
-
             }
         }
 
@@ -7520,7 +7572,7 @@ public class YModule : YFunction
      *   the path of the byn file to use.
      * </param>
      * <returns>
-     *   : A <c>YFirmwareUpdate</c> object.
+     *   : A <c>YFirmwareUpdate</c> object or NULL on error.
      * </returns>
      */
     public virtual YFirmwareUpdate updateFirmware(string path)
@@ -7530,6 +7582,10 @@ public class YModule : YFunction
         // may throw an exception
         serial = this.get_serialNumber();
         settings = this.get_allSettings();
+        if ((settings).Length == 0) {
+            this._throw(YAPI.IO_ERROR, "Unable to get device settings");
+            settings = YAPI.DefaultEncoding.GetBytes("error:Unable to get device settings");
+        }
         return new YFirmwareUpdate(serial, path, settings);
     }
 
@@ -7547,7 +7603,7 @@ public class YModule : YFunction
      *   a binary buffer with all the settings.
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns  <c>YAPI_INVALID_STRING</c>.
+     *   On failure, throws an exception or returns an binary object of size 0.
      * </para>
      */
     public virtual byte[] get_allSettings()
@@ -7557,29 +7613,105 @@ public class YModule : YFunction
         byte[] res;
         string sep;
         string name;
+        string item;
+        string t_type;
+        string id;
+        string url;
         string file_data;
         byte[] file_data_bin;
-        string all_file_data;
+        byte[] temp_data_bin;
+        string ext_settings;
         List<string> filelist = new List<string>();
+        List<string> templist = new List<string>();
         // may throw an exception
         settings = this._download("api.json");
-        all_file_data = ", \"files\":[";
+        if ((settings).Length == 0) {
+            return settings;
+        }
+        ext_settings = ", \"extras\":[";
+        templist = this.get_functionIds("Temperature");
+        sep = "";
+        for (int ii = 0; ii <  templist.Count; ii++) {
+            if (YAPI._atoi(this.get_firmwareRelease()) > 9000) {
+                url = "api/"+ templist[ii]+"/sensorType";
+                t_type = YAPI.DefaultEncoding.GetString(this._download(url));
+                if (t_type == "RES_NTC") {
+                    id = ( templist[ii]).Substring( 11, ( templist[ii]).Length - 11);
+                    temp_data_bin = this._download("extra.json?page="+id);
+                    if ((temp_data_bin).Length == 0) {
+                        return temp_data_bin;
+                    }
+                    item = ""+ sep+"{\"fid\":\""+  templist[ii]+"\", \"json\":"+YAPI.DefaultEncoding.GetString(temp_data_bin)+"}\n";
+                    ext_settings = ext_settings + item;
+                    sep = ",";
+                }
+            };
+        }
+        ext_settings =  ext_settings + "],\n\"files\":[";
         if (this.hasFunction("files")) {
             json = this._download("files.json?a=dir&f=");
+            if ((json).Length == 0) {
+                return json;
+            }
             filelist = this._json_get_array(json);
             sep = "";
             for (int ii = 0; ii <  filelist.Count; ii++) {
                 name = this._json_get_key(YAPI.DefaultEncoding.GetBytes( filelist[ii]), "name");
+                if ((name).Length == 0) {
+                    return YAPI.DefaultEncoding.GetBytes(name);
+                }
                 file_data_bin = this._download(this._escapeAttr(name));
                 file_data = YAPI._bytesToHexStr(file_data_bin, 0, file_data_bin.Length);
-                file_data = ""+ sep+"{\"name\":\""+ name+"\", \"data\":\""+file_data+"\"}\n";
-                sep = ",";
-                all_file_data = all_file_data + file_data;;
+                item = ""+ sep+"{\"name\":\""+ name+"\", \"data\":\""+file_data+"\"}\n";
+                ext_settings = ext_settings + item;
+                sep = ",";;
             }
         }
-        all_file_data = all_file_data + "]}";
-        res = YAPI._bytesMerge(YAPI.DefaultEncoding.GetBytes("{ \"api\":"), YAPI._bytesMerge(settings, YAPI.DefaultEncoding.GetBytes(all_file_data)));
+        ext_settings = ext_settings + "]}";
+        res = YAPI._bytesMerge(YAPI.DefaultEncoding.GetBytes("{ \"api\":"), YAPI._bytesMerge(settings, YAPI.DefaultEncoding.GetBytes(ext_settings)));
         return res;
+    }
+
+    public virtual int loadThermistorExtra(string funcId, string jsonExtra)
+    {
+        List<string> values = new List<string>();
+        string url;
+        string curr;
+        string currTemp;
+        int ofs;
+        int size;
+        url = "api/" + funcId + ".json?command=Z";
+        // may throw an exception
+        this._download(url);
+        // add records in growing resistance value
+        values = this._json_get_array(YAPI.DefaultEncoding.GetBytes(jsonExtra));
+        ofs = 0;
+        size = values.Count;
+        while (ofs + 1 < size) {
+            curr = values[ofs];
+            currTemp = values[ofs + 1];
+            url = "api/"+  funcId+"/.json?command=m"+ curr+":"+currTemp;
+            this._download(url);
+            ofs = ofs + 2;
+        }
+        return YAPI.SUCCESS;
+    }
+
+    public virtual int set_extraSettings(string jsonExtra)
+    {
+        List<string> extras = new List<string>();
+        string functionId;
+        string data;
+        extras = this._json_get_array(YAPI.DefaultEncoding.GetBytes(jsonExtra));
+        for (int ii = 0; ii <  extras.Count; ii++) {
+            functionId = this._get_json_path( extras[ii], "fid");
+            functionId = this._decode_json_string(functionId);
+            data = this._get_json_path( extras[ii], "json");
+            if (this.hasFunction(functionId)) {
+                this.loadThermistorExtra(functionId, data);
+            };
+        }
+        return YAPI.SUCCESS;
     }
 
     /**
@@ -7609,10 +7741,15 @@ public class YModule : YFunction
         string json;
         string json_api;
         string json_files;
+        string json_extra;
         json = YAPI.DefaultEncoding.GetString(settings);
         json_api = this._get_json_path(json, "api");
         if (json_api == "") {
             return this.set_allSettings(settings);
+        }
+        json_extra = this._get_json_path(json, "extras");
+        if (!(json_extra == "")) {
+            this.set_extraSettings(json_extra);
         }
         this.set_allSettings(YAPI.DefaultEncoding.GetBytes(json_api));
         if (this.hasFunction("files")) {

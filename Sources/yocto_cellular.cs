@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 21485 2015-09-11 14:10:22Z seb $
+ * $Id: yocto_cellular.cs 21511 2015-09-14 16:25:19Z seb $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *
@@ -858,7 +858,14 @@ public class YCellular : YFunction
     {
         int chrPos;
         int cmdLen;
-        byte[] content;
+        int waitMore;
+        string res;
+        byte[] buff;
+        int bufflen;
+        string buffstr;
+        int buffstrlen;
+        int idx;
+        int suffixlen;
         // quote dangerous characters used in AT commands
         cmdLen = (cmd).Length;
         chrPos = (cmd).IndexOf("#");
@@ -879,9 +886,72 @@ public class YCellular : YFunction
             cmdLen = cmdLen + 2;
             chrPos = (cmd).IndexOf("=");
         }
+        cmd = "at.txt?cmd="+cmd;
+        res = "";
+        // max 2 minutes (each iteration may take up to 5 seconds if waiting)
+        waitMore = 24;
+        while (waitMore > 0) {
+            buff = this._download(cmd);
+            bufflen = (buff).Length;
+            buffstr = YAPI.DefaultEncoding.GetString(buff);
+            buffstrlen = (buffstr).Length;
+            idx = bufflen - 1;
+            while ((idx > 0) && (buff[idx] != 64) && (buff[idx] != 10) && (buff[idx] != 13)) {
+                idx = idx - 1;
+            }
+            if (buff[idx] == 64) {
+                suffixlen = bufflen - idx;
+                cmd = "at.txt?cmd="+(buffstr).Substring( buffstrlen - suffixlen, suffixlen);
+                buffstr = (buffstr).Substring( 0, buffstrlen - suffixlen);
+                waitMore = waitMore - 1;
+            } else {
+                waitMore = 0;
+            }
+            res = ""+ res+""+buffstr;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Returns the list detected cell operators in the neighborhood.
+     * <para>
+     *   This function will typically take between 30 seconds to 1 minute to
+     *   return. Note that any SIM card can usually only connect to specific
+     *   operators. All networks returned by this function might therefore
+     *   not be available for connection.
+     * </para>
+     * </summary>
+     * <returns>
+     *   a list of string (cell operator names).
+     * </returns>
+     */
+    public virtual List<string> get_availableOperators()
+    {
+        string cops;
+        int idx;
+        int slen;
+        List<string> res = new List<string>();
         // may throw an exception
-        content = this._download("at.txt?cmd="+cmd);
-        return YAPI.DefaultEncoding.GetString(content);
+        cops = this._AT("+COPS=?");
+        slen = (cops).Length;
+        res.Clear();
+        idx = (cops).IndexOf("(");
+        while (idx >= 0) {
+            slen = slen - (idx+1);
+            cops = (cops).Substring( idx+1, slen);
+            idx = (cops).IndexOf("\"");
+            if (idx > 0) {
+                slen = slen - (idx+1);
+                cops = (cops).Substring( idx+1, slen);
+                idx = (cops).IndexOf("\"");
+                if (idx > 0) {
+                    res.Add((cops).Substring( 0, idx));
+                }
+            }
+            idx = (cops).IndexOf("(");
+        }
+        return res;
     }
 
     /**
