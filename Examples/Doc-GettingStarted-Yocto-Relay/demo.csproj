@@ -184,6 +184,9 @@
     <Compile Include="..\..\Sources\yocto_pwmpowersource.cs">
       <Link>yocto_api\yocto_pwmpowersource.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\yocto_quadraturedecoder.cs">
+      <Link>yocto_api\yocto_quadraturedecoder.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_realtimeclock.cs">
       <Link>yocto_api\yocto_realtimeclock.cs</Link>
     </Compile>

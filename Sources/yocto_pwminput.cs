@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pwminput.cs 19579 2015-03-04 10:56:48Z seb $
+ * $Id: yocto_pwminput.cs 21776 2015-10-15 16:57:56Z mvuilleu $
  *
  * Implements yFindPwmInput(), the high-level API for PwmInput functions
  *
@@ -60,7 +60,7 @@ using YFUN_DESCR = System.Int32;
  *   It inherits from YSensor class the core functions to read measurements,
  *   register callback functions, access to the autonomous datalogger.
  *   This class adds the ability to configure the signal parameter used to transmit
- *   information: the duty cacle, the frequency or the pulse width.
+ *   information: the duty cycle, the frequency or the pulse width.
  * </para>
  * <para>
  * </para>
