@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_network.cs 20815 2015-07-09 17:23:30Z mvuilleu $
+ * $Id: yocto_network.cs 22194 2015-12-02 10:50:41Z mvuilleu $
  *
  * Implements yFindNetwork(), the high-level API for Network functions
  *
@@ -104,6 +104,7 @@ public class YNetwork : YFunction
     public const int CALLBACKENCODING_JSON_NUM = 5;
     public const int CALLBACKENCODING_EMONCMS = 6;
     public const int CALLBACKENCODING_AZURE = 7;
+    public const int CALLBACKENCODING_INFLUXDB = 8;
     public const int CALLBACKENCODING_INVALID = -1;
     public const string CALLBACKCREDENTIALS_INVALID = YAPI.INVALID_STRING;
     public const int CALLBACKMINDELAY_INVALID = YAPI.INVALID_UINT;
@@ -1050,8 +1051,9 @@ public class YNetwork : YFunction
      *   a value among <c>YNetwork.CALLBACKENCODING_FORM</c>, <c>YNetwork.CALLBACKENCODING_JSON</c>,
      *   <c>YNetwork.CALLBACKENCODING_JSON_ARRAY</c>, <c>YNetwork.CALLBACKENCODING_CSV</c>,
      *   <c>YNetwork.CALLBACKENCODING_YOCTO_API</c>, <c>YNetwork.CALLBACKENCODING_JSON_NUM</c>,
-     *   <c>YNetwork.CALLBACKENCODING_EMONCMS</c> and <c>YNetwork.CALLBACKENCODING_AZURE</c> corresponding
-     *   to the encoding standard to use for representing notification values
+     *   <c>YNetwork.CALLBACKENCODING_EMONCMS</c>, <c>YNetwork.CALLBACKENCODING_AZURE</c> and
+     *   <c>YNetwork.CALLBACKENCODING_INFLUXDB</c> corresponding to the encoding standard to use for
+     *   representing notification values
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YNetwork.CALLBACKENCODING_INVALID</c>.
@@ -1079,8 +1081,9 @@ public class YNetwork : YFunction
      *   a value among <c>YNetwork.CALLBACKENCODING_FORM</c>, <c>YNetwork.CALLBACKENCODING_JSON</c>,
      *   <c>YNetwork.CALLBACKENCODING_JSON_ARRAY</c>, <c>YNetwork.CALLBACKENCODING_CSV</c>,
      *   <c>YNetwork.CALLBACKENCODING_YOCTO_API</c>, <c>YNetwork.CALLBACKENCODING_JSON_NUM</c>,
-     *   <c>YNetwork.CALLBACKENCODING_EMONCMS</c> and <c>YNetwork.CALLBACKENCODING_AZURE</c> corresponding
-     *   to the encoding standard to use for representing notification values
+     *   <c>YNetwork.CALLBACKENCODING_EMONCMS</c>, <c>YNetwork.CALLBACKENCODING_AZURE</c> and
+     *   <c>YNetwork.CALLBACKENCODING_INFLUXDB</c> corresponding to the encoding standard to use for
+     *   representing notification values
      * </param>
      * <para>
      * </para>

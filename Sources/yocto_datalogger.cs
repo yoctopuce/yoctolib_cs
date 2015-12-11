@@ -1,6 +1,6 @@
 /********************************************************************
  *
- * $Id: yocto_datalogger.cs 20704 2015-06-20 19:43:34Z mvuilleu $
+ * $Id: yocto_datalogger.cs 22197 2015-12-02 12:58:24Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -817,12 +817,15 @@ public class YDataLogger : YFunction
     public virtual List<YDataSet> parse_dataSets(byte[] json)
     {
         List<string> dslist = new List<string>();
+        YDataSet dataset;
         List<YDataSet> res = new List<YDataSet>();
         // may throw an exception
         dslist = this._json_get_array(json);
         res.Clear();
         for (int ii = 0; ii < dslist.Count; ii++) {
-            res.Add(new YDataSet(this, dslist[ii]));
+            dataset = new YDataSet(this);
+            dataset._parse(dslist[ii]);
+            res.Add(dataset);;
         }
         return res;
     }
