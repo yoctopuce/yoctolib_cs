@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_gyro.cs 19704 2015-03-13 06:10:37Z mvuilleu $
+ * $Id: yocto_gyro.cs 22693 2016-01-12 23:10:50Z seb $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -211,10 +211,12 @@ public class YQt : YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         this._timedReportCallbackQt = callback;
         return 0;
@@ -616,10 +618,12 @@ public class YGyro : YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         this._timedReportCallbackGyro = callback;
         return 0;
@@ -639,7 +643,6 @@ public class YGyro : YSensor
     {
         int now_stamp;
         int age_ms;
-        
         now_stamp = (int) ((YAPI.GetTickCount()) & (0x7FFFFFFF));
         age_ms = (((now_stamp - this._qt_stamp)) & (0x7FFFFFFF));
         if ((age_ms >= 10) || (this._qt_stamp == 0)) {

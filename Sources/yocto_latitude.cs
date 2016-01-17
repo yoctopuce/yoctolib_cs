@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_latitude.cs 19746 2015-03-17 10:34:00Z seb $
+ * $Id: yocto_latitude.cs 22693 2016-01-12 23:10:50Z seb $
  *
  * Implements yFindLatitude(), the high-level API for Latitude functions
  *
@@ -211,10 +211,12 @@ public class YLatitude : YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         this._timedReportCallbackLatitude = callback;
         return 0;

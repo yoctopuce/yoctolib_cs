@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 22207 2015-12-02 18:07:57Z seb $
+ * $Id: yocto_api.cs 22785 2016-01-15 14:51:07Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -964,6 +964,38 @@ internal static class SafeNativeMethods
              }
         }
     }
+    [DllImport("yapi", EntryPoint = "yapiGetSubdevices", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetSubdevices32(StringBuilder serial, StringBuilder buffer, int buffersize, ref int totalSize, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetSubdevices", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetSubdevices64(StringBuilder serial, StringBuilder buffer, int buffersize, ref int totalSize, StringBuilder errmsg);
+    internal static YRETCODE _yapiGetSubdevices(StringBuilder serial, StringBuilder buffer, int buffersize, ref int totalSize, StringBuilder errmsg)
+    {
+        if (IntPtr.Size == 4) {
+             return _yapiGetSubdevices32(serial, buffer, buffersize, ref totalSize, errmsg);
+        } else {
+             try {
+                 return _yapiGetSubdevices64(serial, buffer, buffersize, ref totalSize, errmsg);
+             } catch (System.DllNotFoundException) {
+                 return _yapiGetSubdevices32(serial, buffer, buffersize, ref totalSize, errmsg);
+             }
+        }
+    }
+    [DllImport("yapi", EntryPoint = "yapiGetDevicePathEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetDevicePathEx32(StringBuilder serial, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetDevicePathEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetDevicePathEx64(StringBuilder serial, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg);
+    internal static YRETCODE _yapiGetDevicePathEx(StringBuilder serial, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg)
+    {
+        if (IntPtr.Size == 4) {
+             return _yapiGetDevicePathEx32(serial, rootdevice, path, pathsize, ref neededsize, errmsg);
+        } else {
+             try {
+                 return _yapiGetDevicePathEx64(serial, rootdevice, path, pathsize, ref neededsize, errmsg);
+             } catch (System.DllNotFoundException) {
+                 return _yapiGetDevicePathEx32(serial, rootdevice, path, pathsize, ref neededsize, errmsg);
+             }
+        }
+    }
 //--- (end of generated code: YFunction dlldef)
 }
 
@@ -1665,7 +1697,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "22324";
+    public const string YOCTO_API_BUILD_NO = "22835";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -3754,13 +3786,13 @@ public class YFirmwareUpdate
      *   the serial number of the module to update
      * </param>
      * <param name="path">
-     *   the path of a byn file or a directory that contain byn files
+     *   the path of a byn file or a directory that contains byn files
      * </param>
      * <param name="minrelease">
-     *   an positif integer
+     *   a positive integer
      * </param>
      * <returns>
-     *   : the path of the byn file to use or a empty string if no byn files match the requirement
+     *   : the path of the byn file to use or an empty string if no byn files match the requirement
      * </returns>
      * <para>
      *   On failure, returns a string that start with "error:".
@@ -4146,7 +4178,7 @@ public class YDataStream
                 }
             }
         }
-        
+
         this._nRows = this._values.Count;
         return YAPI.SUCCESS;
     }
@@ -4962,14 +4994,14 @@ public class YDataSet
         } else {
             maxCol = 0;
         }
-        
+
         for (int ii = 0; ii < dataRows.Count; ii++) {
             if ((tim >= this._startTime) && ((this._endTime == 0) || (tim <= this._endTime))) {
                 this._measures.Add(new YMeasure(tim - itv, tim, dataRows[ii][minCol], dataRows[ii][avgCol], dataRows[ii][maxCol]));
             }
             tim = tim + itv;
         }
-        
+
         return this.get_progress();
     }
 
@@ -5285,7 +5317,7 @@ public class YDataSet
         } else {
             maxCol = 0;
         }
-        
+
         for (int ii = 0; ii < dataRows.Count; ii++) {
             if ((tim >= this._startTime) && ((this._endTime == 0) || (tim <= this._endTime))) {
                 measures.Add(new YMeasure(tim - itv, tim, dataRows[ii][minCol], dataRows[ii][avgCol], dataRows[ii][maxCol]));
@@ -5422,7 +5454,6 @@ public class YFunction
         _func = func;
         _lastErrorType = YAPI.SUCCESS;
         _lastErrorMsg = "";
-        _cacheExpiration = 0;
         _fundescr = FUNCTIONDESCRIPTOR_INVALID;
         _userData = null;
     }
@@ -7144,7 +7175,7 @@ public class YModule : YFunction
      */
     public int get_productRelease()
     {
-        if (this._cacheExpiration == 0) {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
             if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PRODUCTRELEASE_INVALID;
             }
@@ -8512,7 +8543,7 @@ public class YModule : YFunction
      *   a binary buffer with the file content
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns  <c>YAPI_INVALID_STRING</c>.
+     *   On failure, throws an exception or returns  <c>YAPI.INVALID_STRING</c>.
      * </para>
      */
     public virtual byte[] download(string pathname)
@@ -8532,7 +8563,7 @@ public class YModule : YFunction
      * </summary>
      * <returns>
      *   a binary buffer with module icon, in png format.
-     *   On failure, throws an exception or returns  <c>YAPI_INVALID_STRING</c>.
+     *   On failure, throws an exception or returns  <c>YAPI.INVALID_STRING</c>.
      * </returns>
      */
     public virtual byte[] get_icon2d()
@@ -8561,6 +8592,118 @@ public class YModule : YFunction
         // may throw an exception
         content = this._download("logs.txt");
         return YAPI.DefaultEncoding.GetString(content);
+    }
+
+    /**
+     * <summary>
+     *   Returns a list of all the modules that are plugged into the current module.
+     * <para>
+     *   This
+     *   method is only useful on a YoctoHub/VirtualHub. This method return the serial number of all
+     *   module connected to a YoctoHub. Calling this method on a standard device is not an
+     *   error, and an empty array will be returned.
+     * </para>
+     * </summary>
+     * <returns>
+     *   an array of strings containing the sub modules.
+     * </returns>
+     */
+    public virtual List<string> get_subDevices()
+    {
+        StringBuilder errmsg = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
+        StringBuilder smallbuff = new StringBuilder(1024);
+        StringBuilder bigbuff = null;
+        int buffsize;
+        int fullsize;
+        int yapi_res;
+        string subdevice_list;
+        List<string> subdevices = new List<string>();
+        string serial;
+        // may throw an exception
+        serial = this.get_serialNumber();
+        fullsize = 0;
+        yapi_res = SafeNativeMethods._yapiGetSubdevices(new StringBuilder(serial), smallbuff, 1024, ref fullsize, errmsg);
+        if (yapi_res < 0) {
+            return subdevices;
+        }
+        if (fullsize <= 1024) {
+            subdevice_list = smallbuff.ToString();
+        } else {
+            buffsize = fullsize;
+            bigbuff = new StringBuilder(buffsize);
+            yapi_res = SafeNativeMethods._yapiGetSubdevices(new StringBuilder(serial), bigbuff, buffsize, ref fullsize, errmsg);
+            if (yapi_res < 0) {
+                bigbuff = null;
+                return subdevices;
+            } else {
+                subdevice_list = bigbuff.ToString();
+            }
+            bigbuff = null;
+        }
+        if (!(subdevice_list == "")) {
+            subdevices = new List<string>(subdevice_list.Split(new Char[] {','}));
+        }
+        return subdevices;
+    }
+
+    /**
+     * <summary>
+     *   Returns the serial number of the YoctoHub on which this module is connected.
+     * <para>
+     *   If the module is connected by USB or if the module is the root YoctoHub an
+     *   empty string is returned.
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string with the serial number of the YoctoHub or an empty string
+     * </returns>
+     */
+    public virtual string get_parentHub()
+    {
+        StringBuilder errmsg = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
+        StringBuilder hubserial = new StringBuilder(YAPI.YOCTO_SERIAL_LEN);
+        int pathsize;
+        int yapi_res;
+        string serial;
+        // may throw an exception
+        serial = this.get_serialNumber();
+        // retrieve device object
+        pathsize = 0;
+        yapi_res = SafeNativeMethods._yapiGetDevicePathEx(new StringBuilder(serial), hubserial, null, 0, ref pathsize, errmsg);
+        if (yapi_res < 0) {
+            return "";
+        }
+        return hubserial.ToString();
+    }
+
+    /**
+     * <summary>
+     *   Returns the URL used to access the module.
+     * <para>
+     *   If the module is connected by USB the
+     *   string 'usb' is returned.
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string with the URL of the module.
+     * </returns>
+     */
+    public virtual string get_url()
+    {
+        StringBuilder errmsg = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
+        StringBuilder path = new StringBuilder(1024);
+        int pathsize;
+        int yapi_res;
+        string serial;
+        // may throw an exception
+        serial = this.get_serialNumber();
+        // retrieve device object
+        pathsize = 0;
+        yapi_res = SafeNativeMethods._yapiGetDevicePathEx(new StringBuilder(serial), null, path, 1024, ref pathsize, errmsg);
+        if (yapi_res < 0) {
+            return "";
+        }
+        return path.ToString();
     }
 
     /**
@@ -8640,13 +8783,12 @@ public class YModule : YFunction
         return snum;
     }
 
-
-
     internal void setImmutableAttributes(SafeNativeMethods.yDeviceSt infos)
     {
         _serialNumber = infos.serial;
         _productName = infos.productname;
         _productId = infos.deviceid;
+        _cacheExpiration = YAPI.GetTickCount();
     }
 
     // Return the properties of the nth function of our device
@@ -9869,10 +10011,12 @@ public class YSensor : YFunction
      */
     public virtual int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         this._timedReportCallbackSensor = callback;
         return 0;

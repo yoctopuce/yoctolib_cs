@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_accelerometer.cs 19579 2015-03-04 10:56:48Z seb $
+ * $Id: yocto_accelerometer.cs 22693 2016-01-12 23:10:50Z seb $
  *
  * Implements yFindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -338,10 +338,12 @@ public class YAccelerometer : YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         this._timedReportCallbackAccelerometer = callback;
         return 0;

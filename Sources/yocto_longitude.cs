@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_longitude.cs 19746 2015-03-17 10:34:00Z seb $
+ * $Id: yocto_longitude.cs 22693 2016-01-12 23:10:50Z seb $
  *
  * Implements yFindLongitude(), the high-level API for Longitude functions
  *
@@ -211,10 +211,12 @@ public class YLongitude : YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         this._timedReportCallbackLongitude = callback;
         return 0;

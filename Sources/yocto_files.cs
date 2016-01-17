@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs 19325 2015-02-17 17:28:16Z seb $
+ * $Id: yocto_files.cs 22693 2016-01-12 23:10:50Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -363,6 +363,37 @@ public class YFiles : YFunction
             res.Add(new YFileRecord(filelist[ii]));
         }
         return res;
+    }
+
+    /**
+     * <summary>
+     *   Test if a file exist on the filesystem of the module.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="filename">
+     *   the file name to test.
+     * </param>
+     * <returns>
+     *   a true if the file existe, false ortherwise.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception.
+     * </para>
+     */
+    public virtual bool fileExist(string filename)
+    {
+        byte[] json;
+        List<string> filelist = new List<string>();
+        if ((filename).Length == 0) {
+            return false;
+        }
+        json = this.sendCommand("dir&f="+filename);
+        filelist = this._json_get_array(json);
+        if (filelist.Count > 0) {
+            return true;
+        }
+        return false;
     }
 
     /**

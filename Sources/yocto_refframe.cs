@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_refframe.cs 20464 2015-05-29 08:55:45Z seb $
+ * $Id: yocto_refframe.cs 22360 2015-12-15 13:31:40Z seb $
  *
  * Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -462,7 +462,6 @@ public enum   MOUNTORIENTATION
         double b;
         double xa;
         double xb;
-        
         // bubble sort is good since we will re-sort again after offset adjustment
         changed = 1;
         while (changed > 0) {
@@ -580,7 +579,6 @@ public enum   MOUNTORIENTATION
         if (this._calibProgress == 100) {
             return YAPI.SUCCESS;
         }
-        
         // make sure we leave at least 160ms between samples
         currTick =  (int) ((YAPI.GetTickCount()) & (0x7FFFFFFF));
         if (((currTick - this._calibPrevTick) & (0x7FFFFFFF)) < 160) {
@@ -620,7 +618,6 @@ public enum   MOUNTORIENTATION
             return YAPI.SUCCESS;
         }
         this._calibPrevTick = currTick;
-        
         // Determine the device orientation index
         orient = 0;
         if (zSq > 0.5) {
@@ -644,7 +641,6 @@ public enum   MOUNTORIENTATION
                 orient = 5;
             }
         }
-        
         // Discard measures that are not in the proper orientation
         if (this._calibStageProgress == 0) {
             idx = 0;
@@ -666,7 +662,6 @@ public enum   MOUNTORIENTATION
                 return YAPI.SUCCESS;
             }
         }
-        
         // Save measure
         this._calibStageHint = "calibrating..";
         this._calibDataAccX.Add(xVal);
@@ -679,7 +674,6 @@ public enum   MOUNTORIENTATION
             this._calibStageProgress = 1 + ((99 * this._calibInternalPos) / (this._calibCount));
             return YAPI.SUCCESS;
         }
-        
         // Stage done, compute preliminary result
         intpos = (this._calibStage - 1) * this._calibCount;
         this._calibSort(intpos, intpos + this._calibCount);
@@ -687,7 +681,6 @@ public enum   MOUNTORIENTATION
         this._calibLogMsg = "Stage "+Convert.ToString( this._calibStage)+": median is "+Convert.ToString(
         (int) Math.Round(1000*this._calibDataAccX[intpos]))+","+Convert.ToString(
         (int) Math.Round(1000*this._calibDataAccY[intpos]))+","+Convert.ToString((int) Math.Round(1000*this._calibDataAccZ[intpos]));
-        
         // move to next stage
         this._calibStage = this._calibStage + 1;
         if (this._calibStage < 7) {
@@ -719,7 +712,6 @@ public enum   MOUNTORIENTATION
         this._calibAccXOfs = xVal / 2.0;
         this._calibAccYOfs = yVal / 2.0;
         this._calibAccZOfs = zVal / 2.0;
-        
         // Recompute all norms, taking into account the computed shift, and re-sort
         intpos = 0;
         while (intpos < this._calibDataAcc.Count) {
@@ -736,7 +728,6 @@ public enum   MOUNTORIENTATION
             this._calibSort(intpos, intpos + this._calibCount);
             idx = idx + 1;
         }
-        
         // Compute the scaling factor for each axis
         xVal = 0;
         yVal = 0;
@@ -759,7 +750,6 @@ public enum   MOUNTORIENTATION
         this._calibAccXScale = xVal / 2.0;
         this._calibAccYScale = yVal / 2.0;
         this._calibAccZScale = zVal / 2.0;
-        
         // Report completion
         this._calibProgress = 100;
         this._calibStageHint = "Calibration data ready for saving";
@@ -876,7 +866,6 @@ public enum   MOUNTORIENTATION
         if (this._calibProgress != 100) {
             return YAPI.INVALID_ARGUMENT;
         }
-        
         // Compute integer values (correction unit is 732ug/count)
         shiftX = -(int) Math.Round(this._calibAccXOfs / 0.000732);
         if (shiftX < 0) {
@@ -922,7 +911,6 @@ public enum   MOUNTORIENTATION
         }
         scaleLo = ((((scaleY) & (15))) << (12)) + ((scaleX) << (2)) + scaleExp;
         scaleHi = ((scaleZ) << (6)) + ((scaleY) >> (4));
-        
         // Save calibration parameters
         newcalib = "5,"+Convert.ToString( shiftX)+","+Convert.ToString( shiftY)+","+Convert.ToString( shiftZ)+","+Convert.ToString( scaleLo)+","+Convert.ToString(scaleHi);
         this._calibStage = 0;

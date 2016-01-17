@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_carbondioxide.cs 19619 2015-03-05 18:11:23Z mvuilleu $
+ * $Id: yocto_carbondioxide.cs 22693 2016-01-12 23:10:50Z seb $
  *
  * Implements yFindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -301,10 +301,12 @@ public class YCarbonDioxide : YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         this._timedReportCallbackCarbonDioxide = callback;
         return 0;

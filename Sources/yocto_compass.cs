@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_compass.cs 19579 2015-03-04 10:56:48Z seb $
+ * $Id: yocto_compass.cs 22693 2016-01-12 23:10:50Z seb $
  *
  * Implements yFindCompass(), the high-level API for Compass functions
  *
@@ -268,10 +268,12 @@ public class YCompass : YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         this._timedReportCallbackCompass = callback;
         return 0;

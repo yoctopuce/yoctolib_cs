@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_temperature.cs 21576 2015-09-21 13:17:28Z seb $
+ * $Id: yocto_temperature.cs 22693 2016-01-12 23:10:50Z seb $
  *
  * Implements yFindTemperature(), the high-level API for Temperature functions
  *
@@ -363,10 +363,12 @@ public class YTemperature : YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         this._timedReportCallbackTemperature = callback;
         return 0;

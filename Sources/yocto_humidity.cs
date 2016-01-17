@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_humidity.cs 21211 2015-08-19 16:03:29Z seb $
+ * $Id: yocto_humidity.cs 22693 2016-01-12 23:10:50Z seb $
  *
  * Implements yFindHumidity(), the high-level API for Humidity functions
  *
@@ -309,10 +309,12 @@ public class YHumidity : YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         this._timedReportCallbackHumidity = callback;
         return 0;

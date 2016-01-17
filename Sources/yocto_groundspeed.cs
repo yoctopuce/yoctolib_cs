@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_groundspeed.cs 19746 2015-03-17 10:34:00Z seb $
+ * $Id: yocto_groundspeed.cs 22693 2016-01-12 23:10:50Z seb $
  *
  * Implements yFindGroundSpeed(), the high-level API for GroundSpeed functions
  *
@@ -211,10 +211,12 @@ public class YGroundSpeed : YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         this._timedReportCallbackGroundSpeed = callback;
         return 0;

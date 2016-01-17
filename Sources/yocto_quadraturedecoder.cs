@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_quadraturedecoder.cs 21782 2015-10-16 07:53:41Z seb $
+ * $Id: yocto_quadraturedecoder.cs 22693 2016-01-12 23:10:50Z seb $
  *
  * Implements yFindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -333,10 +333,12 @@ public class YQuadratureDecoder : YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         this._timedReportCallbackQuadratureDecoder = callback;
         return 0;
