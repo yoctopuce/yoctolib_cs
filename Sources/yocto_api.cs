@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 22785 2016-01-15 14:51:07Z seb $
+ * $Id: yocto_api.cs 22933 2016-01-27 17:20:24Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1697,7 +1697,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "22835";
+    public const string YOCTO_API_BUILD_NO = "22936";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -4178,7 +4178,7 @@ public class YDataStream
                 }
             }
         }
-
+        
         this._nRows = this._values.Count;
         return YAPI.SUCCESS;
     }
@@ -4994,14 +4994,14 @@ public class YDataSet
         } else {
             maxCol = 0;
         }
-
+        
         for (int ii = 0; ii < dataRows.Count; ii++) {
             if ((tim >= this._startTime) && ((this._endTime == 0) || (tim <= this._endTime))) {
                 this._measures.Add(new YMeasure(tim - itv, tim, dataRows[ii][minCol], dataRows[ii][avgCol], dataRows[ii][maxCol]));
             }
             tim = tim + itv;
         }
-
+        
         return this.get_progress();
     }
 
@@ -5317,7 +5317,7 @@ public class YDataSet
         } else {
             maxCol = 0;
         }
-
+        
         for (int ii = 0; ii < dataRows.Count; ii++) {
             if ((tim >= this._startTime) && ((this._endTime == 0) || (tim <= this._endTime))) {
                 measures.Add(new YMeasure(tim - itv, tim, dataRows[ii][minCol], dataRows[ii][avgCol], dataRows[ii][maxCol]));
