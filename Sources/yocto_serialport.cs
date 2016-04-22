@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 20464 2015-05-29 08:55:45Z seb $
+ * $Id: yocto_serialport.cs 23780 2016-04-06 10:27:21Z seb $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
@@ -28,8 +28,8 @@
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
  *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
+ *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
  *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
  *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
  *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
@@ -72,16 +72,6 @@ public class YSerialPort : YFunction
     public new delegate void ValueCallback(YSerialPort func, string value);
     public new delegate void TimedReportCallback(YSerialPort func, YMeasure measure);
 
-    public const string SERIALMODE_INVALID = YAPI.INVALID_STRING;
-    public const string PROTOCOL_INVALID = YAPI.INVALID_STRING;
-    public const int VOLTAGELEVEL_OFF = 0;
-    public const int VOLTAGELEVEL_TTL3V = 1;
-    public const int VOLTAGELEVEL_TTL3VR = 2;
-    public const int VOLTAGELEVEL_TTL5V = 3;
-    public const int VOLTAGELEVEL_TTL5VR = 4;
-    public const int VOLTAGELEVEL_RS232 = 5;
-    public const int VOLTAGELEVEL_RS485 = 6;
-    public const int VOLTAGELEVEL_INVALID = -1;
     public const int RXCOUNT_INVALID = YAPI.INVALID_UINT;
     public const int TXCOUNT_INVALID = YAPI.INVALID_UINT;
     public const int ERRCOUNT_INVALID = YAPI.INVALID_UINT;
@@ -91,9 +81,16 @@ public class YSerialPort : YFunction
     public const string CURRENTJOB_INVALID = YAPI.INVALID_STRING;
     public const string STARTUPJOB_INVALID = YAPI.INVALID_STRING;
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
-    protected string _serialMode = SERIALMODE_INVALID;
-    protected string _protocol = PROTOCOL_INVALID;
-    protected int _voltageLevel = VOLTAGELEVEL_INVALID;
+    public const int VOLTAGELEVEL_OFF = 0;
+    public const int VOLTAGELEVEL_TTL3V = 1;
+    public const int VOLTAGELEVEL_TTL3VR = 2;
+    public const int VOLTAGELEVEL_TTL5V = 3;
+    public const int VOLTAGELEVEL_TTL5VR = 4;
+    public const int VOLTAGELEVEL_RS232 = 5;
+    public const int VOLTAGELEVEL_RS485 = 6;
+    public const int VOLTAGELEVEL_INVALID = -1;
+    public const string PROTOCOL_INVALID = YAPI.INVALID_STRING;
+    public const string SERIALMODE_INVALID = YAPI.INVALID_STRING;
     protected int _rxCount = RXCOUNT_INVALID;
     protected int _txCount = TXCOUNT_INVALID;
     protected int _errCount = ERRCOUNT_INVALID;
@@ -103,6 +100,9 @@ public class YSerialPort : YFunction
     protected string _currentJob = CURRENTJOB_INVALID;
     protected string _startupJob = STARTUPJOB_INVALID;
     protected string _command = COMMAND_INVALID;
+    protected int _voltageLevel = VOLTAGELEVEL_INVALID;
+    protected string _protocol = PROTOCOL_INVALID;
+    protected string _serialMode = SERIALMODE_INVALID;
     protected ValueCallback _valueCallbackSerialPort = null;
     protected int _rxptr = 0;
     //--- (end of YSerialPort definitions)
@@ -119,21 +119,6 @@ public class YSerialPort : YFunction
 
     protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
-        if (member.name == "serialMode")
-        {
-            _serialMode = member.svalue;
-            return;
-        }
-        if (member.name == "protocol")
-        {
-            _protocol = member.svalue;
-            return;
-        }
-        if (member.name == "voltageLevel")
-        {
-            _voltageLevel = (int)member.ivalue;
-            return;
-        }
         if (member.name == "rxCount")
         {
             _rxCount = (int)member.ivalue;
@@ -179,202 +164,22 @@ public class YSerialPort : YFunction
             _command = member.svalue;
             return;
         }
+        if (member.name == "voltageLevel")
+        {
+            _voltageLevel = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "protocol")
+        {
+            _protocol = member.svalue;
+            return;
+        }
+        if (member.name == "serialMode")
+        {
+            _serialMode = member.svalue;
+            return;
+        }
         base._parseAttr(member);
-    }
-
-    /**
-     * <summary>
-     *   Returns the serial port communication parameters, as a string such as
-     *   "9600,8N1".
-     * <para>
-     *   The string includes the baud rate, the number of data bits,
-     *   the parity, and the number of stop bits. An optional suffix is included
-     *   if flow control is active: "CtsRts" for hardware handshake, "XOnXOff"
-     *   for logical flow control and "Simplex" for acquiring a shared bus using
-     *   the RTS line (as used by some RS485 adapters for instance).
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   a string corresponding to the serial port communication parameters, as a string such as
-     *   "9600,8N1"
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns <c>YSerialPort.SERIALMODE_INVALID</c>.
-     * </para>
-     */
-    public string get_serialMode()
-    {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SERIALMODE_INVALID;
-            }
-        }
-        return this._serialMode;
-    }
-
-    /**
-     * <summary>
-     *   Changes the serial port communication parameters, with a string such as
-     *   "9600,8N1".
-     * <para>
-     *   The string includes the baud rate, the number of data bits,
-     *   the parity, and the number of stop bits. An optional suffix can be added
-     *   to enable flow control: "CtsRts" for hardware handshake, "XOnXOff"
-     *   for logical flow control and "Simplex" for acquiring a shared bus using
-     *   the RTS line (as used by some RS485 adapters for instance).
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="newval">
-     *   a string corresponding to the serial port communication parameters, with a string such as
-     *   "9600,8N1"
-     * </param>
-     * <para>
-     * </para>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public int set_serialMode(string newval)
-    {
-        string rest_val;
-        rest_val = newval;
-        return _setAttr("serialMode", rest_val);
-    }
-
-    /**
-     * <summary>
-     *   Returns the type of protocol used over the serial line, as a string.
-     * <para>
-     *   Possible values are "Line" for ASCII messages separated by CR and/or LF,
-     *   "Frame:[timeout]ms" for binary messages separated by a delay time,
-     *   "Modbus-ASCII" for MODBUS messages in ASCII mode,
-     *   "Modbus-RTU" for MODBUS messages in RTU mode,
-     *   "Char" for a continuous ASCII stream or
-     *   "Byte" for a continuous binary stream.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   a string corresponding to the type of protocol used over the serial line, as a string
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns <c>YSerialPort.PROTOCOL_INVALID</c>.
-     * </para>
-     */
-    public string get_protocol()
-    {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PROTOCOL_INVALID;
-            }
-        }
-        return this._protocol;
-    }
-
-    /**
-     * <summary>
-     *   Changes the type of protocol used over the serial line.
-     * <para>
-     *   Possible values are "Line" for ASCII messages separated by CR and/or LF,
-     *   "Frame:[timeout]ms" for binary messages separated by a delay time,
-     *   "Modbus-ASCII" for MODBUS messages in ASCII mode,
-     *   "Modbus-RTU" for MODBUS messages in RTU mode,
-     *   "Char" for a continuous ASCII stream or
-     *   "Byte" for a continuous binary stream.
-     *   The suffix "/[wait]ms" can be added to reduce the transmit rate so that there
-     *   is always at lest the specified number of milliseconds between each bytes sent.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="newval">
-     *   a string corresponding to the type of protocol used over the serial line
-     * </param>
-     * <para>
-     * </para>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public int set_protocol(string newval)
-    {
-        string rest_val;
-        rest_val = newval;
-        return _setAttr("protocol", rest_val);
-    }
-
-    /**
-     * <summary>
-     *   Returns the voltage level used on the serial line.
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   a value among <c>YSerialPort.VOLTAGELEVEL_OFF</c>, <c>YSerialPort.VOLTAGELEVEL_TTL3V</c>,
-     *   <c>YSerialPort.VOLTAGELEVEL_TTL3VR</c>, <c>YSerialPort.VOLTAGELEVEL_TTL5V</c>,
-     *   <c>YSerialPort.VOLTAGELEVEL_TTL5VR</c>, <c>YSerialPort.VOLTAGELEVEL_RS232</c> and
-     *   <c>YSerialPort.VOLTAGELEVEL_RS485</c> corresponding to the voltage level used on the serial line
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns <c>YSerialPort.VOLTAGELEVEL_INVALID</c>.
-     * </para>
-     */
-    public int get_voltageLevel()
-    {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return VOLTAGELEVEL_INVALID;
-            }
-        }
-        return this._voltageLevel;
-    }
-
-    /**
-     * <summary>
-     *   Changes the voltage type used on the serial line.
-     * <para>
-     *   Valid
-     *   values  will depend on the Yoctopuce device model featuring
-     *   the serial port feature.  Check your device documentation
-     *   to find out which values are valid for that specific model.
-     *   Trying to set an invalid value will have no effect.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="newval">
-     *   a value among <c>YSerialPort.VOLTAGELEVEL_OFF</c>, <c>YSerialPort.VOLTAGELEVEL_TTL3V</c>,
-     *   <c>YSerialPort.VOLTAGELEVEL_TTL3VR</c>, <c>YSerialPort.VOLTAGELEVEL_TTL5V</c>,
-     *   <c>YSerialPort.VOLTAGELEVEL_TTL5VR</c>, <c>YSerialPort.VOLTAGELEVEL_RS232</c> and
-     *   <c>YSerialPort.VOLTAGELEVEL_RS485</c> corresponding to the voltage type used on the serial line
-     * </param>
-     * <para>
-     * </para>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public int set_voltageLevel(int newval)
-    {
-        string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("voltageLevel", rest_val);
     }
 
     /**
@@ -654,6 +459,201 @@ public class YSerialPort : YFunction
 
     /**
      * <summary>
+     *   Returns the voltage level used on the serial line.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among <c>YSerialPort.VOLTAGELEVEL_OFF</c>, <c>YSerialPort.VOLTAGELEVEL_TTL3V</c>,
+     *   <c>YSerialPort.VOLTAGELEVEL_TTL3VR</c>, <c>YSerialPort.VOLTAGELEVEL_TTL5V</c>,
+     *   <c>YSerialPort.VOLTAGELEVEL_TTL5VR</c>, <c>YSerialPort.VOLTAGELEVEL_RS232</c> and
+     *   <c>YSerialPort.VOLTAGELEVEL_RS485</c> corresponding to the voltage level used on the serial line
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSerialPort.VOLTAGELEVEL_INVALID</c>.
+     * </para>
+     */
+    public int get_voltageLevel()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return VOLTAGELEVEL_INVALID;
+            }
+        }
+        return this._voltageLevel;
+    }
+
+    /**
+     * <summary>
+     *   Changes the voltage type used on the serial line.
+     * <para>
+     *   Valid
+     *   values  will depend on the Yoctopuce device model featuring
+     *   the serial port feature.  Check your device documentation
+     *   to find out which values are valid for that specific model.
+     *   Trying to set an invalid value will have no effect.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a value among <c>YSerialPort.VOLTAGELEVEL_OFF</c>, <c>YSerialPort.VOLTAGELEVEL_TTL3V</c>,
+     *   <c>YSerialPort.VOLTAGELEVEL_TTL3VR</c>, <c>YSerialPort.VOLTAGELEVEL_TTL5V</c>,
+     *   <c>YSerialPort.VOLTAGELEVEL_TTL5VR</c>, <c>YSerialPort.VOLTAGELEVEL_RS232</c> and
+     *   <c>YSerialPort.VOLTAGELEVEL_RS485</c> corresponding to the voltage type used on the serial line
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_voltageLevel(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("voltageLevel", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the type of protocol used over the serial line, as a string.
+     * <para>
+     *   Possible values are "Line" for ASCII messages separated by CR and/or LF,
+     *   "Frame:[timeout]ms" for binary messages separated by a delay time,
+     *   "Modbus-ASCII" for MODBUS messages in ASCII mode,
+     *   "Modbus-RTU" for MODBUS messages in RTU mode,
+     *   "Char" for a continuous ASCII stream or
+     *   "Byte" for a continuous binary stream.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to the type of protocol used over the serial line, as a string
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSerialPort.PROTOCOL_INVALID</c>.
+     * </para>
+     */
+    public string get_protocol()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PROTOCOL_INVALID;
+            }
+        }
+        return this._protocol;
+    }
+
+    /**
+     * <summary>
+     *   Changes the type of protocol used over the serial line.
+     * <para>
+     *   Possible values are "Line" for ASCII messages separated by CR and/or LF,
+     *   "Frame:[timeout]ms" for binary messages separated by a delay time,
+     *   "Modbus-ASCII" for MODBUS messages in ASCII mode,
+     *   "Modbus-RTU" for MODBUS messages in RTU mode,
+     *   "Char" for a continuous ASCII stream or
+     *   "Byte" for a continuous binary stream.
+     *   The suffix "/[wait]ms" can be added to reduce the transmit rate so that there
+     *   is always at lest the specified number of milliseconds between each bytes sent.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a string corresponding to the type of protocol used over the serial line
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_protocol(string newval)
+    {
+        string rest_val;
+        rest_val = newval;
+        return _setAttr("protocol", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the serial port communication parameters, as a string such as
+     *   "9600,8N1".
+     * <para>
+     *   The string includes the baud rate, the number of data bits,
+     *   the parity, and the number of stop bits. An optional suffix is included
+     *   if flow control is active: "CtsRts" for hardware handshake, "XOnXOff"
+     *   for logical flow control and "Simplex" for acquiring a shared bus using
+     *   the RTS line (as used by some RS485 adapters for instance).
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to the serial port communication parameters, as a string such as
+     *   "9600,8N1"
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSerialPort.SERIALMODE_INVALID</c>.
+     * </para>
+     */
+    public string get_serialMode()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SERIALMODE_INVALID;
+            }
+        }
+        return this._serialMode;
+    }
+
+    /**
+     * <summary>
+     *   Changes the serial port communication parameters, with a string such as
+     *   "9600,8N1".
+     * <para>
+     *   The string includes the baud rate, the number of data bits,
+     *   the parity, and the number of stop bits. An optional suffix can be added
+     *   to enable flow control: "CtsRts" for hardware handshake, "XOnXOff"
+     *   for logical flow control and "Simplex" for acquiring a shared bus using
+     *   the RTS line (as used by some RS485 adapters for instance).
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a string corresponding to the serial port communication parameters, with a string such as
+     *   "9600,8N1"
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_serialMode(string newval)
+    {
+        string rest_val;
+        rest_val = newval;
+        return _setAttr("serialMode", rest_val);
+    }
+
+    /**
+     * <summary>
      *   Retrieves a serial port for a given identifier.
      * <para>
      *   The identifier can be specified using several formats:
@@ -777,59 +777,6 @@ public class YSerialPort : YFunction
         this._rxptr = 0;
         // may throw an exception
         return this.sendCommand("Z");
-    }
-
-    /**
-     * <summary>
-     *   Manually sets the state of the RTS line.
-     * <para>
-     *   This function has no effect when
-     *   hardware handshake is enabled, as the RTS line is driven automatically.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="val">
-     *   1 to turn RTS on, 0 to turn RTS off
-     * </param>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public virtual int set_RTS(int val)
-    {
-        return this.sendCommand("R"+Convert.ToString(val));
-    }
-
-    /**
-     * <summary>
-     *   Reads the level of the CTS line.
-     * <para>
-     *   The CTS line is usually driven by
-     *   the RTS signal of the connected serial device.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   1 if the CTS line is high, 0 if the CTS line is low.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public virtual int get_CTS()
-    {
-        byte[] buff;
-        int res;
-        // may throw an exception
-        buff = this._download("cts.txt");
-        if (!((buff).Length == 1)) { this._throw( YAPI.IO_ERROR, "invalid CTS reply"); return YAPI.IO_ERROR; }
-        res = buff[0] - 48;
-        return res;
     }
 
     /**
@@ -1034,29 +981,6 @@ public class YSerialPort : YFunction
         }
         // send string using file upload
         return this._upload("txdata", buff);
-    }
-
-    /**
-     * <summary>
-     *   Sends a MODBUS message (provided as a hexadecimal string) to the serial port.
-     * <para>
-     *   The message must start with the slave address. The MODBUS CRC/LRC is
-     *   automatically added by the function. This function does not wait for a reply.
-     * </para>
-     * </summary>
-     * <param name="hexString">
-     *   a hexadecimal message string, including device address but no CRC/LRC
-     * </param>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public virtual int writeMODBUS(string hexString)
-    {
-        return this.sendCommand(":"+hexString);
     }
 
     /**
@@ -1300,7 +1224,7 @@ public class YSerialPort : YFunction
      *   Reads a single line (or message) from the receive buffer, starting at current stream position.
      * <para>
      *   This function is intended to be used when the serial port is configured for a message protocol,
-     *   such as 'Line' mode or MODBUS protocols.
+     *   such as 'Line' mode or frame protocols.
      * </para>
      * <para>
      *   If data at current stream position is not available anymore in the receive buffer,
@@ -1404,7 +1328,7 @@ public class YSerialPort : YFunction
      *   Changes the current internal stream position to the specified value.
      * <para>
      *   This function
-     *   does not affect the device, it only changes the value stored in the YSerialPort object
+     *   does not affect the device, it only changes the value stored in the API object
      *   for the next read operations.
      * </para>
      * </summary>
@@ -1423,7 +1347,7 @@ public class YSerialPort : YFunction
 
     /**
      * <summary>
-     *   Returns the current absolute stream position pointer of the YSerialPort object.
+     *   Returns the current absolute stream position pointer of the API object.
      * <para>
      * </para>
      * </summary>
@@ -1439,7 +1363,7 @@ public class YSerialPort : YFunction
     /**
      * <summary>
      *   Returns the number of bytes available to read in the input buffer starting from the
-     *   current absolute stream position pointer of the YSerialPort object.
+     *   current absolute stream position pointer of the API object.
      * <para>
      * </para>
      * </summary>
@@ -1506,6 +1430,134 @@ public class YSerialPort : YFunction
         }
         res = this._json_get_string(YAPI.DefaultEncoding.GetBytes(msgarr[0]));
         return res;
+    }
+
+    /**
+     * <summary>
+     *   Saves the job definition string (JSON data) into a job file.
+     * <para>
+     *   The job file can be later enabled using <c>selectJob()</c>.
+     * </para>
+     * </summary>
+     * <param name="jobfile">
+     *   name of the job file to save on the device filesystem
+     * </param>
+     * <param name="jsonDef">
+     *   a string containing a JSON definition of the job
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int uploadJob(string jobfile, string jsonDef)
+    {
+        this._upload(jobfile, YAPI.DefaultEncoding.GetBytes(jsonDef));
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
+     *   Load and start processing the specified job file.
+     * <para>
+     *   The file must have
+     *   been previously created using the user interface or uploaded on the
+     *   device filesystem using the <c>uploadJob()</c> function.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="jobfile">
+     *   name of the job file (on the device filesystem)
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int selectJob(string jobfile)
+    {
+        return this.set_currentJob(jobfile);
+    }
+
+    /**
+     * <summary>
+     *   Manually sets the state of the RTS line.
+     * <para>
+     *   This function has no effect when
+     *   hardware handshake is enabled, as the RTS line is driven automatically.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="val">
+     *   1 to turn RTS on, 0 to turn RTS off
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int set_RTS(int val)
+    {
+        return this.sendCommand("R"+Convert.ToString(val));
+    }
+
+    /**
+     * <summary>
+     *   Reads the level of the CTS line.
+     * <para>
+     *   The CTS line is usually driven by
+     *   the RTS signal of the connected serial device.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   1 if the CTS line is high, 0 if the CTS line is low.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int get_CTS()
+    {
+        byte[] buff;
+        int res;
+        // may throw an exception
+        buff = this._download("cts.txt");
+        if (!((buff).Length == 1)) { this._throw( YAPI.IO_ERROR, "invalid CTS reply"); return YAPI.IO_ERROR; }
+        res = buff[0] - 48;
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Sends a MODBUS message (provided as a hexadecimal string) to the serial port.
+     * <para>
+     *   The message must start with the slave address. The MODBUS CRC/LRC is
+     *   automatically added by the function. This function does not wait for a reply.
+     * </para>
+     * </summary>
+     * <param name="hexString">
+     *   a hexadecimal message string, including device address but no CRC/LRC
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int writeMODBUS(string hexString)
+    {
+        return this.sendCommand(":"+hexString);
     }
 
     /**
@@ -2137,58 +2189,6 @@ public class YSerialPort : YFunction
             regpos = regpos + 1;
         }
         return res;
-    }
-
-    /**
-     * <summary>
-     *   Saves the job definition string (JSON data) into a job file.
-     * <para>
-     *   The job file can be later enabled using <c>selectJob()</c>.
-     * </para>
-     * </summary>
-     * <param name="jobfile">
-     *   name of the job file to save on the device filesystem
-     * </param>
-     * <param name="jsonDef">
-     *   a string containing a JSON definition of the job
-     * </param>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public virtual int uploadJob(string jobfile, string jsonDef)
-    {
-        this._upload(jobfile, YAPI.DefaultEncoding.GetBytes(jsonDef));
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * <summary>
-     *   Load and start processing the specified job file.
-     * <para>
-     *   The file must have
-     *   been previously created using the user interface or uploaded on the
-     *   device filesystem using the <c>uploadJob()</c> function.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="jobfile">
-     *   name of the job file (on the device filesystem)
-     * </param>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public virtual int selectJob(string jobfile)
-    {
-        return this.set_currentJob(jobfile);
     }
 
     /**

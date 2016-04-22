@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorled.cs 19325 2015-02-17 17:28:16Z seb $
+ * $Id: yocto_colorled.cs 23577 2016-03-22 22:59:53Z mvuilleu $
  *
  * Implements yFindColorLed(), the high-level API for ColorLed functions
  *
@@ -28,8 +28,8 @@
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
  *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
+ *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
  *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
  *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
  *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
@@ -55,10 +55,10 @@ using YFUN_DESCR = System.Int32;
 /**
  * <summary>
  *   The Yoctopuce application programming interface
- *   allows you to drive a color led using RGB coordinates as well as HSL coordinates.
+ *   allows you to drive a color LED using RGB coordinates as well as HSL coordinates.
  * <para>
  *   The module performs all conversions form RGB to HSL automatically. It is then
- *   self-evident to turn on a led with a given hue and to progressively vary its
+ *   self-evident to turn on a LED with a given hue and to progressively vary its
  *   saturation or lightness. If needed, you can find more information on the
  *   difference between RGB and HSL in the section following this one.
  * </para>
@@ -185,14 +185,14 @@ public class YColorLed : YFunction
 
     /**
      * <summary>
-     *   Returns the current RGB color of the led.
+     *   Returns the current RGB color of the LED.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the current RGB color of the led
+     *   an integer corresponding to the current RGB color of the LED
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YColorLed.RGBCOLOR_INVALID</c>.
@@ -210,7 +210,7 @@ public class YColorLed : YFunction
 
     /**
      * <summary>
-     *   Changes the current color of the led, using a RGB color.
+     *   Changes the current color of the LED, using a RGB color.
      * <para>
      *   Encoding is done as follows: 0xRRGGBB.
      * </para>
@@ -218,7 +218,7 @@ public class YColorLed : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to the current color of the led, using a RGB color
+     *   an integer corresponding to the current color of the LED, using a RGB color
      * </param>
      * <para>
      * </para>
@@ -238,14 +238,14 @@ public class YColorLed : YFunction
 
     /**
      * <summary>
-     *   Returns the current HSL color of the led.
+     *   Returns the current HSL color of the LED.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the current HSL color of the led
+     *   an integer corresponding to the current HSL color of the LED
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YColorLed.HSLCOLOR_INVALID</c>.
@@ -263,7 +263,7 @@ public class YColorLed : YFunction
 
     /**
      * <summary>
-     *   Changes the current color of the led, using a color HSL.
+     *   Changes the current color of the LED, using a color HSL.
      * <para>
      *   Encoding is done as follows: 0xHHSSLL.
      * </para>
@@ -271,7 +271,7 @@ public class YColorLed : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to the current color of the led, using a color HSL
+     *   an integer corresponding to the current color of the LED, using a color HSL
      * </param>
      * <para>
      * </para>
@@ -410,14 +410,14 @@ public class YColorLed : YFunction
 
     /**
      * <summary>
-     *   Changes the color that the led will display by default when the module is turned on.
+     *   Changes the color that the LED will display by default when the module is turned on.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to the color that the led will display by default when the module is turned on
+     *   an integer corresponding to the color that the LED will display by default when the module is turned on
      * </param>
      * <para>
      * </para>
@@ -437,7 +437,9 @@ public class YColorLed : YFunction
 
     /**
      * <summary>
-     *   Returns the current length of the blinking sequence
+     *   Returns the current length of the blinking sequence.
+     * <para>
+     * </para>
      * <para>
      * </para>
      * </summary>
@@ -460,7 +462,9 @@ public class YColorLed : YFunction
 
     /**
      * <summary>
-     *   Returns the maximum length of the blinking sequence
+     *   Returns the maximum length of the blinking sequence.
+     * <para>
+     * </para>
      * <para>
      * </para>
      * </summary>
@@ -529,7 +533,7 @@ public class YColorLed : YFunction
 
     /**
      * <summary>
-     *   Retrieves an RGB led for a given identifier.
+     *   Retrieves an RGB LED for a given identifier.
      * <para>
      *   The identifier can be specified using several formats:
      * </para>
@@ -553,20 +557,20 @@ public class YColorLed : YFunction
      * <para>
      * </para>
      * <para>
-     *   This function does not require that the RGB led is online at the time
+     *   This function does not require that the RGB LED is online at the time
      *   it is invoked. The returned object is nevertheless valid.
-     *   Use the method <c>YColorLed.isOnline()</c> to test if the RGB led is
+     *   Use the method <c>YColorLed.isOnline()</c> to test if the RGB LED is
      *   indeed online at a given time. In case of ambiguity when looking for
-     *   an RGB led by logical name, no error is notified: the first instance
+     *   an RGB LED by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
      * </para>
      * </summary>
      * <param name="func">
-     *   a string that uniquely characterizes the RGB led
+     *   a string that uniquely characterizes the RGB LED
      * </param>
      * <returns>
-     *   a <c>YColorLed</c> object allowing you to drive the RGB led.
+     *   a <c>YColorLed</c> object allowing you to drive the RGB LED.
      * </returns>
      */
     public static YColorLed FindColorLed(string func)
@@ -731,14 +735,14 @@ public class YColorLed : YFunction
 
     /**
      * <summary>
-     *   Continues the enumeration of RGB leds started using <c>yFirstColorLed()</c>.
+     *   Continues the enumeration of RGB LEDs started using <c>yFirstColorLed()</c>.
      * <para>
      * </para>
      * </summary>
      * <returns>
      *   a pointer to a <c>YColorLed</c> object, corresponding to
-     *   an RGB led currently online, or a <c>null</c> pointer
-     *   if there are no more RGB leds to enumerate.
+     *   an RGB LED currently online, or a <c>null</c> pointer
+     *   if there are no more RGB LEDs to enumerate.
      * </returns>
      */
     public YColorLed nextColorLed()
@@ -757,15 +761,15 @@ public class YColorLed : YFunction
 
     /**
      * <summary>
-     *   Starts the enumeration of RGB leds currently accessible.
+     *   Starts the enumeration of RGB LEDs currently accessible.
      * <para>
      *   Use the method <c>YColorLed.nextColorLed()</c> to iterate on
-     *   next RGB leds.
+     *   next RGB LEDs.
      * </para>
      * </summary>
      * <returns>
      *   a pointer to a <c>YColorLed</c> object, corresponding to
-     *   the first RGB led currently online, or a <c>null</c> pointer
+     *   the first RGB LED currently online, or a <c>null</c> pointer
      *   if there are none.
      * </returns>
      */

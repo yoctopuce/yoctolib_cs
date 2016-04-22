@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_temperature.cs 22693 2016-01-12 23:10:50Z seb $
+ * $Id: yocto_temperature.cs 23527 2016-03-18 21:49:19Z mvuilleu $
  *
  * Implements yFindTemperature(), the high-level API for Temperature functions
  *
@@ -28,8 +28,8 @@
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
  *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
+ *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
  *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
  *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
  *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
@@ -88,8 +88,12 @@ public class YTemperature : YSensor
     public const int SENSORTYPE_RES_NTC = 12;
     public const int SENSORTYPE_RES_LINEAR = 13;
     public const int SENSORTYPE_INVALID = -1;
+    public const double SIGNALVALUE_INVALID = YAPI.INVALID_DOUBLE;
+    public const string SIGNALUNIT_INVALID = YAPI.INVALID_STRING;
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _sensorType = SENSORTYPE_INVALID;
+    protected double _signalValue = SIGNALVALUE_INVALID;
+    protected string _signalUnit = SIGNALUNIT_INVALID;
     protected string _command = COMMAND_INVALID;
     protected ValueCallback _valueCallbackTemperature = null;
     protected TimedReportCallback _timedReportCallbackTemperature = null;
@@ -110,6 +114,16 @@ public class YTemperature : YSensor
         if (member.name == "sensorType")
         {
             _sensorType = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "signalValue")
+        {
+            _signalValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
+            return;
+        }
+        if (member.name == "signalUnit")
+        {
+            _signalUnit = member.svalue;
             return;
         }
         if (member.name == "command")
@@ -224,6 +238,56 @@ public class YTemperature : YSensor
         string rest_val;
         rest_val = (newval).ToString();
         return _setAttr("sensorType", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the current value of the electrical signal measured by the sensor.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a floating point number corresponding to the current value of the electrical signal measured by the sensor
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YTemperature.SIGNALVALUE_INVALID</c>.
+     * </para>
+     */
+    public double get_signalValue()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SIGNALVALUE_INVALID;
+            }
+        }
+        return Math.Round(this._signalValue * 1000) / 1000;
+    }
+
+    /**
+     * <summary>
+     *   Returns the measuring unit of the electrical signal used by the sensor.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to the measuring unit of the electrical signal used by the sensor
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YTemperature.SIGNALUNIT_INVALID</c>.
+     * </para>
+     */
+    public string get_signalUnit()
+    {
+        if (this._cacheExpiration == 0) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SIGNALUNIT_INVALID;
+            }
+        }
+        return this._signalUnit;
     }
 
     public string get_command()

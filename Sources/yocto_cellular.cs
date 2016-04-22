@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 21511 2015-09-14 16:25:19Z seb $
+ * $Id: yocto_cellular.cs 23960 2016-04-15 21:30:18Z mvuilleu $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *
@@ -153,27 +153,41 @@ public class YCellular : YFunction
     public const int LINKQUALITY_INVALID = YAPI.INVALID_UINT;
     public const string CELLOPERATOR_INVALID = YAPI.INVALID_STRING;
     public const string CELLIDENTIFIER_INVALID = YAPI.INVALID_STRING;
+    public const int CELLTYPE_GPRS = 0;
+    public const int CELLTYPE_EGPRS = 1;
+    public const int CELLTYPE_WCDMA = 2;
+    public const int CELLTYPE_HSDPA = 3;
+    public const int CELLTYPE_NONE = 4;
+    public const int CELLTYPE_CDMA = 5;
+    public const int CELLTYPE_INVALID = -1;
     public const string IMSI_INVALID = YAPI.INVALID_STRING;
     public const string MESSAGE_INVALID = YAPI.INVALID_STRING;
     public const string PIN_INVALID = YAPI.INVALID_STRING;
     public const string LOCKEDOPERATOR_INVALID = YAPI.INVALID_STRING;
+    public const int AIRPLANEMODE_OFF = 0;
+    public const int AIRPLANEMODE_ON = 1;
+    public const int AIRPLANEMODE_INVALID = -1;
     public const int ENABLEDATA_HOMENETWORK = 0;
     public const int ENABLEDATA_ROAMING = 1;
     public const int ENABLEDATA_NEVER = 2;
     public const int ENABLEDATA_INVALID = -1;
     public const string APN_INVALID = YAPI.INVALID_STRING;
     public const string APNSECRET_INVALID = YAPI.INVALID_STRING;
+    public const int PINGINTERVAL_INVALID = YAPI.INVALID_UINT;
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _linkQuality = LINKQUALITY_INVALID;
     protected string _cellOperator = CELLOPERATOR_INVALID;
     protected string _cellIdentifier = CELLIDENTIFIER_INVALID;
+    protected int _cellType = CELLTYPE_INVALID;
     protected string _imsi = IMSI_INVALID;
     protected string _message = MESSAGE_INVALID;
     protected string _pin = PIN_INVALID;
     protected string _lockedOperator = LOCKEDOPERATOR_INVALID;
+    protected int _airplaneMode = AIRPLANEMODE_INVALID;
     protected int _enableData = ENABLEDATA_INVALID;
     protected string _apn = APN_INVALID;
     protected string _apnSecret = APNSECRET_INVALID;
+    protected int _pingInterval = PINGINTERVAL_INVALID;
     protected string _command = COMMAND_INVALID;
     protected ValueCallback _valueCallbackCellular = null;
     //--- (end of generated code: YCellular definitions)
@@ -205,6 +219,11 @@ public class YCellular : YFunction
             _cellIdentifier = member.svalue;
             return;
         }
+        if (member.name == "cellType")
+        {
+            _cellType = (int)member.ivalue;
+            return;
+        }
         if (member.name == "imsi")
         {
             _imsi = member.svalue;
@@ -225,6 +244,11 @@ public class YCellular : YFunction
             _lockedOperator = member.svalue;
             return;
         }
+        if (member.name == "airplaneMode")
+        {
+            _airplaneMode = member.ivalue > 0 ? 1 : 0;
+            return;
+        }
         if (member.name == "enableData")
         {
             _enableData = (int)member.ivalue;
@@ -238,6 +262,11 @@ public class YCellular : YFunction
         if (member.name == "apnSecret")
         {
             _apnSecret = member.svalue;
+            return;
+        }
+        if (member.name == "pingInterval")
+        {
+            _pingInterval = (int)member.ivalue;
             return;
         }
         if (member.name == "command")
@@ -321,6 +350,33 @@ public class YCellular : YFunction
             }
         }
         return this._cellIdentifier;
+    }
+
+    /**
+     * <summary>
+     *   Active cellular connection type.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among <c>YCellular.CELLTYPE_GPRS</c>, <c>YCellular.CELLTYPE_EGPRS</c>,
+     *   <c>YCellular.CELLTYPE_WCDMA</c>, <c>YCellular.CELLTYPE_HSDPA</c>, <c>YCellular.CELLTYPE_NONE</c>
+     *   and <c>YCellular.CELLTYPE_CDMA</c>
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YCellular.CELLTYPE_INVALID</c>.
+     * </para>
+     */
+    public int get_cellType()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return CELLTYPE_INVALID;
+            }
+        }
+        return this._cellType;
     }
 
     /**
@@ -505,6 +561,60 @@ public class YCellular : YFunction
 
     /**
      * <summary>
+     *   Returns true if the airplane mode is active (radio turned off).
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   either <c>YCellular.AIRPLANEMODE_OFF</c> or <c>YCellular.AIRPLANEMODE_ON</c>, according to true if
+     *   the airplane mode is active (radio turned off)
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YCellular.AIRPLANEMODE_INVALID</c>.
+     * </para>
+     */
+    public int get_airplaneMode()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return AIRPLANEMODE_INVALID;
+            }
+        }
+        return this._airplaneMode;
+    }
+
+    /**
+     * <summary>
+     *   Changes the activation state of airplane mode (radio turned off).
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   either <c>YCellular.AIRPLANEMODE_OFF</c> or <c>YCellular.AIRPLANEMODE_ON</c>, according to the
+     *   activation state of airplane mode (radio turned off)
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_airplaneMode(int newval)
+    {
+        string rest_val;
+        rest_val = (newval > 0 ? "1" : "0");
+        return _setAttr("airplaneMode", rest_val);
+    }
+
+    /**
+     * <summary>
      *   Returns the condition for enabling IP data services (GPRS).
      * <para>
      *   When data services are disabled, SMS are the only mean of communication.
@@ -651,6 +761,58 @@ public class YCellular : YFunction
         string rest_val;
         rest_val = newval;
         return _setAttr("apnSecret", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the automated connectivity check interval, in seconds.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the automated connectivity check interval, in seconds
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YCellular.PINGINTERVAL_INVALID</c>.
+     * </para>
+     */
+    public int get_pingInterval()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PINGINTERVAL_INVALID;
+            }
+        }
+        return this._pingInterval;
+    }
+
+    /**
+     * <summary>
+     *   Changes the automated connectivity check interval, in seconds.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the automated connectivity check interval, in seconds
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_pingInterval(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("pingInterval", rest_val);
     }
 
     public string get_command()

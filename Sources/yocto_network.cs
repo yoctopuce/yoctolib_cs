@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_network.cs 22194 2015-12-02 10:50:41Z mvuilleu $
+ * $Id: yocto_network.cs 23930 2016-04-15 09:31:14Z seb $
  *
  * Implements yFindNetwork(), the high-level API for Network functions
  *
@@ -28,8 +28,8 @@
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
  *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
+ *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
  *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
  *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
  *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
@@ -105,8 +105,10 @@ public class YNetwork : YFunction
     public const int CALLBACKENCODING_EMONCMS = 6;
     public const int CALLBACKENCODING_AZURE = 7;
     public const int CALLBACKENCODING_INFLUXDB = 8;
+    public const int CALLBACKENCODING_MQTT = 9;
     public const int CALLBACKENCODING_INVALID = -1;
     public const string CALLBACKCREDENTIALS_INVALID = YAPI.INVALID_STRING;
+    public const int CALLBACKINITIALDELAY_INVALID = YAPI.INVALID_UINT;
     public const int CALLBACKMINDELAY_INVALID = YAPI.INVALID_UINT;
     public const int CALLBACKMAXDELAY_INVALID = YAPI.INVALID_UINT;
     public const int POECURRENT_INVALID = YAPI.INVALID_UINT;
@@ -129,6 +131,7 @@ public class YNetwork : YFunction
     protected int _callbackMethod = CALLBACKMETHOD_INVALID;
     protected int _callbackEncoding = CALLBACKENCODING_INVALID;
     protected string _callbackCredentials = CALLBACKCREDENTIALS_INVALID;
+    protected int _callbackInitialDelay = CALLBACKINITIALDELAY_INVALID;
     protected int _callbackMinDelay = CALLBACKMINDELAY_INVALID;
     protected int _callbackMaxDelay = CALLBACKMAXDELAY_INVALID;
     protected int _poeCurrent = POECURRENT_INVALID;
@@ -240,6 +243,11 @@ public class YNetwork : YFunction
         if (member.name == "callbackCredentials")
         {
             _callbackCredentials = member.svalue;
+            return;
+        }
+        if (member.name == "callbackInitialDelay")
+        {
+            _callbackInitialDelay = (int)member.ivalue;
             return;
         }
         if (member.name == "callbackMinDelay")
@@ -1051,9 +1059,9 @@ public class YNetwork : YFunction
      *   a value among <c>YNetwork.CALLBACKENCODING_FORM</c>, <c>YNetwork.CALLBACKENCODING_JSON</c>,
      *   <c>YNetwork.CALLBACKENCODING_JSON_ARRAY</c>, <c>YNetwork.CALLBACKENCODING_CSV</c>,
      *   <c>YNetwork.CALLBACKENCODING_YOCTO_API</c>, <c>YNetwork.CALLBACKENCODING_JSON_NUM</c>,
-     *   <c>YNetwork.CALLBACKENCODING_EMONCMS</c>, <c>YNetwork.CALLBACKENCODING_AZURE</c> and
-     *   <c>YNetwork.CALLBACKENCODING_INFLUXDB</c> corresponding to the encoding standard to use for
-     *   representing notification values
+     *   <c>YNetwork.CALLBACKENCODING_EMONCMS</c>, <c>YNetwork.CALLBACKENCODING_AZURE</c>,
+     *   <c>YNetwork.CALLBACKENCODING_INFLUXDB</c> and <c>YNetwork.CALLBACKENCODING_MQTT</c> corresponding
+     *   to the encoding standard to use for representing notification values
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YNetwork.CALLBACKENCODING_INVALID</c>.
@@ -1081,9 +1089,9 @@ public class YNetwork : YFunction
      *   a value among <c>YNetwork.CALLBACKENCODING_FORM</c>, <c>YNetwork.CALLBACKENCODING_JSON</c>,
      *   <c>YNetwork.CALLBACKENCODING_JSON_ARRAY</c>, <c>YNetwork.CALLBACKENCODING_CSV</c>,
      *   <c>YNetwork.CALLBACKENCODING_YOCTO_API</c>, <c>YNetwork.CALLBACKENCODING_JSON_NUM</c>,
-     *   <c>YNetwork.CALLBACKENCODING_EMONCMS</c>, <c>YNetwork.CALLBACKENCODING_AZURE</c> and
-     *   <c>YNetwork.CALLBACKENCODING_INFLUXDB</c> corresponding to the encoding standard to use for
-     *   representing notification values
+     *   <c>YNetwork.CALLBACKENCODING_EMONCMS</c>, <c>YNetwork.CALLBACKENCODING_AZURE</c>,
+     *   <c>YNetwork.CALLBACKENCODING_INFLUXDB</c> and <c>YNetwork.CALLBACKENCODING_MQTT</c> corresponding
+     *   to the encoding standard to use for representing notification values
      * </param>
      * <para>
      * </para>
@@ -1196,6 +1204,58 @@ public class YNetwork : YFunction
         string rest_val;
         rest_val = username+":"+password;
         return _setAttr("callbackCredentials", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the initial waiting time before first callback notifications, in seconds.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the initial waiting time before first callback notifications, in seconds
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YNetwork.CALLBACKINITIALDELAY_INVALID</c>.
+     * </para>
+     */
+    public int get_callbackInitialDelay()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return CALLBACKINITIALDELAY_INVALID;
+            }
+        }
+        return this._callbackInitialDelay;
+    }
+
+    /**
+     * <summary>
+     *   Changes the initial waiting time before first callback notifications, in seconds.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the initial waiting time before first callback notifications, in seconds
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_callbackInitialDelay(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("callbackInitialDelay", rest_val);
     }
 
     /**
@@ -1491,10 +1551,10 @@ public class YNetwork : YFunction
 
     /**
      * <summary>
-     *   Pings str_host to test the network connectivity.
+     *   Pings host to test the network connectivity.
      * <para>
      *   Sends four ICMP ECHO_REQUEST requests from the
-     *   module to the target str_host. This method returns a string with the result of the
+     *   module to the target host. This method returns a string with the result of the
      *   4 ICMP ECHO_REQUEST requests.
      * </para>
      * </summary>
@@ -1513,6 +1573,28 @@ public class YNetwork : YFunction
         // may throw an exception
         content = this._download("ping.txt?host="+host);
         return YAPI.DefaultEncoding.GetString(content);
+    }
+
+    /**
+     * <summary>
+     *   Trigger an HTTP callback quickly.
+     * <para>
+     *   This function can even be called within
+     *   an HTTP callback, in which case the next callback will be triggered 5 seconds
+     *   after the end of the current callback, regardless if the minimum time between
+     *   callbacks configured in the device.
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int triggerCallback()
+    {
+        return this.set_callbackMethod(this.get_callbackMethod());
     }
 
     /**

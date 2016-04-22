@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_anbutton.cs 19325 2015-02-17 17:28:16Z seb $
+ * $Id: yocto_anbutton.cs 23239 2016-02-23 14:07:00Z seb $
  *
  * Implements yFindAnButton(), the high-level API for AnButton functions
  *
@@ -28,8 +28,8 @@
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
  *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
+ *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
  *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
  *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
  *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
@@ -529,7 +529,9 @@ public class YAnButton : YFunction
 
     /**
      * <summary>
-     *   Returns the pulse counter value
+     *   Returns the pulse counter value.
+     * <para>
+     * </para>
      * <para>
      * </para>
      * </summary>
@@ -559,7 +561,9 @@ public class YAnButton : YFunction
 
     /**
      * <summary>
-     *   Returns the timer of the pulses counter (ms)
+     *   Returns the timer of the pulses counter (ms).
+     * <para>
+     * </para>
      * <para>
      * </para>
      * </summary>

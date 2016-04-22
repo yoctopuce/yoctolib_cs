@@ -23,10 +23,16 @@ namespace ConsoleApplication1
       Console.WriteLine(fct.get_hardwareId() + ": " + measure.get_averageValue() + " " + fct.get_unit() + " (timed report)");
     }
 
+    static void deviceLog(YModule module, string logline)
+    {
+        Console.WriteLine("log:" + module.get_hardwareId() + ":" + logline);
+    }
+
     static void deviceArrival(YModule m)
     {
       string serial = m.get_serialNumber();
       Console.WriteLine("Device arrival : " + serial);
+        m.registerLogCallback(deviceLog);
 
       // First solution: look for a specific type of function (eg. anButton)
       int fctcount = m.functionCount();

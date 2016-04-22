@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 22933 2016-01-27 17:20:24Z seb $
+ * $Id: yocto_api.cs 23873 2016-04-11 16:20:05Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -900,19 +900,51 @@ internal static class SafeNativeMethods
              }
         }
     }
-    [DllImport("yapi", EntryPoint = "yapiUpdateFirmware", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
-    private extern static YRETCODE _yapiUpdateFirmware32(StringBuilder serial, StringBuilder firmwarePath, StringBuilder settings, int startUpdate, StringBuilder errmsg);
-    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiUpdateFirmware", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
-    private extern static YRETCODE _yapiUpdateFirmware64(StringBuilder serial, StringBuilder firmwarePath, StringBuilder settings, int startUpdate, StringBuilder errmsg);
-    internal static YRETCODE _yapiUpdateFirmware(StringBuilder serial, StringBuilder firmwarePath, StringBuilder settings, int startUpdate, StringBuilder errmsg)
+    [DllImport("yapi", EntryPoint = "yapiUpdateFirmwareEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiUpdateFirmwareEx32(StringBuilder serial, StringBuilder firmwarePath, StringBuilder settings, int force, int startUpdate, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiUpdateFirmwareEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiUpdateFirmwareEx64(StringBuilder serial, StringBuilder firmwarePath, StringBuilder settings, int force, int startUpdate, StringBuilder errmsg);
+    internal static YRETCODE _yapiUpdateFirmwareEx(StringBuilder serial, StringBuilder firmwarePath, StringBuilder settings, int force, int startUpdate, StringBuilder errmsg)
     {
         if (IntPtr.Size == 4) {
-             return _yapiUpdateFirmware32(serial, firmwarePath, settings, startUpdate, errmsg);
+             return _yapiUpdateFirmwareEx32(serial, firmwarePath, settings, force, startUpdate, errmsg);
         } else {
              try {
-                 return _yapiUpdateFirmware64(serial, firmwarePath, settings, startUpdate, errmsg);
+                 return _yapiUpdateFirmwareEx64(serial, firmwarePath, settings, force, startUpdate, errmsg);
              } catch (System.DllNotFoundException) {
-                 return _yapiUpdateFirmware32(serial, firmwarePath, settings, startUpdate, errmsg);
+                 return _yapiUpdateFirmwareEx32(serial, firmwarePath, settings, force, startUpdate, errmsg);
+             }
+        }
+    }
+    [DllImport("yapi", EntryPoint = "yapiHTTPRequestSyncStartOutOfBand", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiHTTPRequestSyncStartOutOfBand32(ref YIOHDL iohdl, int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr reply, ref int replysize, ref IntPtr progress_cb, IntPtr progress_ctx, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequestSyncStartOutOfBand", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiHTTPRequestSyncStartOutOfBand64(ref YIOHDL iohdl, int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr reply, ref int replysize, ref IntPtr progress_cb, IntPtr progress_ctx, StringBuilder errmsg);
+    internal static YRETCODE _yapiHTTPRequestSyncStartOutOfBand(ref YIOHDL iohdl, int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr reply, ref int replysize, ref IntPtr progress_cb, IntPtr progress_ctx, StringBuilder errmsg)
+    {
+        if (IntPtr.Size == 4) {
+             return _yapiHTTPRequestSyncStartOutOfBand32(ref iohdl, channel, device, request, requestsize, ref reply, ref replysize, ref progress_cb, progress_ctx, errmsg);
+        } else {
+             try {
+                 return _yapiHTTPRequestSyncStartOutOfBand64(ref iohdl, channel, device, request, requestsize, ref reply, ref replysize, ref progress_cb, progress_ctx, errmsg);
+             } catch (System.DllNotFoundException) {
+                 return _yapiHTTPRequestSyncStartOutOfBand32(ref iohdl, channel, device, request, requestsize, ref reply, ref replysize, ref progress_cb, progress_ctx, errmsg);
+             }
+        }
+    }
+    [DllImport("yapi", EntryPoint = "yapiHTTPRequestAsyncOutOfBand", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiHTTPRequestAsyncOutOfBand32(int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr callback, IntPtr context, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequestAsyncOutOfBand", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiHTTPRequestAsyncOutOfBand64(int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr callback, IntPtr context, StringBuilder errmsg);
+    internal static YRETCODE _yapiHTTPRequestAsyncOutOfBand(int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr callback, IntPtr context, StringBuilder errmsg)
+    {
+        if (IntPtr.Size == 4) {
+             return _yapiHTTPRequestAsyncOutOfBand32(channel, device, request, requestsize, ref callback, context, errmsg);
+        } else {
+             try {
+                 return _yapiHTTPRequestAsyncOutOfBand64(channel, device, request, requestsize, ref callback, context, errmsg);
+             } catch (System.DllNotFoundException) {
+                 return _yapiHTTPRequestAsyncOutOfBand32(channel, device, request, requestsize, ref callback, context, errmsg);
              }
         }
     }
@@ -977,6 +1009,22 @@ internal static class SafeNativeMethods
                  return _yapiGetSubdevices64(serial, buffer, buffersize, ref totalSize, errmsg);
              } catch (System.DllNotFoundException) {
                  return _yapiGetSubdevices32(serial, buffer, buffersize, ref totalSize, errmsg);
+             }
+        }
+    }
+    [DllImport("yapi", EntryPoint = "yapiFreeMem", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static void _yapiFreeMem32(IntPtr buffer);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiFreeMem", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static void _yapiFreeMem64(IntPtr buffer);
+    internal static void _yapiFreeMem(IntPtr buffer)
+    {
+        if (IntPtr.Size == 4) {
+             _yapiFreeMem32(buffer);
+        } else {
+             try {
+                 _yapiFreeMem64(buffer);
+             } catch (System.DllNotFoundException) {
+                 _yapiFreeMem32(buffer);
              }
         }
     }
@@ -1697,7 +1745,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "22936";
+    public const string YOCTO_API_BUILD_NO = "24182";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -3652,7 +3700,20 @@ public class YFirmwareUpdate
     protected int _progress_c = 0;
     protected int _progress = 0;
     protected int _restore_step = 0;
+    protected bool _force;
     //--- (end of generated code: YFirmwareUpdate definitions)
+
+
+    public YFirmwareUpdate(string serial, string path, byte[] settings, bool force)
+    {
+        _serial = serial;
+        _firmwarepath = path;
+        _settings = settings;
+        _force = force;
+        //--- (generated code: YFirmwareUpdate attributes initialization)
+        //--- (end of generated code: YFirmwareUpdate attributes initialization)
+    }
+
 
 
     public YFirmwareUpdate(string serial, string path, byte[] settings)
@@ -3660,10 +3721,10 @@ public class YFirmwareUpdate
         _serial = serial;
         _firmwarepath = path;
         _settings = settings;
+        _force = false;
         //--- (generated code: YFirmwareUpdate attributes initialization)
         //--- (end of generated code: YFirmwareUpdate attributes initialization)
     }
-
 
 
     //--- (generated code: YFirmwareUpdate implementation)
@@ -3678,11 +3739,17 @@ public class YFirmwareUpdate
         string firmwarepath;
         string settings;
         string prod_prefix;
+        int force;
         if (this._progress_c < 100) {
             serial = this._serial;
             firmwarepath = this._firmwarepath;
             settings = YAPI.DefaultEncoding.GetString(this._settings);
-            res = SafeNativeMethods._yapiUpdateFirmware(new StringBuilder(serial), new StringBuilder(firmwarepath), new StringBuilder(settings), newupdate, errmsg);
+            if (this._force) {
+                force = 1;
+            } else {
+                force = 0;
+            }
+            res = SafeNativeMethods._yapiUpdateFirmwareEx(new StringBuilder(serial), new StringBuilder(firmwarepath), new StringBuilder(settings), force, newupdate, errmsg);
             if (res < 0) {
                 this._progress = res;
                 this._progress_msg = errmsg.ToString();
@@ -3725,15 +3792,17 @@ public class YFirmwareUpdate
 
     /**
      * <summary>
-     *   Retruns a list of all the modules in "update" mode.
+     *   Returns a list of all the modules in "firmware update" mode.
      * <para>
-     *   Only USB connected
-     *   devices are listed. For modules connected to a YoctoHub, you must
-     *   connect yourself to the YoctoHub web interface.
+     *   Only devices
+     *   connected over USB are listed. For devices connected to a YoctoHub, you
+     *   must connect yourself to the YoctoHub web interface.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an array of strings containing the serial list of module in "update" mode.
+     *   an array of strings containing the serial numbers of devices in "firmware update" mode.
      * </returns>
      */
     public static List<string> GetAllBootLoaders()
@@ -3775,9 +3844,9 @@ public class YFirmwareUpdate
      * <summary>
      *   Test if the byn file is valid for this module.
      * <para>
-     *   It's possible to pass an directory instead of a file.
-     *   In this case this method return the path of the most recent appropriate byn file. This method will
-     *   ignore firmware that are older than mintrelase.
+     *   It is possible to pass a directory instead of a file.
+     *   In that case, this method returns the path of the most recent appropriate byn file. This method will
+     *   ignore any firmware older than minrelease.
      * </para>
      * <para>
      * </para>
@@ -3792,10 +3861,10 @@ public class YFirmwareUpdate
      *   a positive integer
      * </param>
      * <returns>
-     *   : the path of the byn file to use or an empty string if no byn files match the requirement
+     *   : the path of the byn file to use, or an empty string if no byn files matches the requirement
      * </returns>
      * <para>
-     *   On failure, returns a string that start with "error:".
+     *   On failure, returns a string that starts with "error:".
      * </para>
      */
     public static string CheckFirmware(string serial, string path, int minrelease)
@@ -6669,6 +6738,7 @@ public class YFunction
         {
             byte[] reply = new byte[dllres];
             Marshal.Copy(p, reply, 0, dllres);
+            SafeNativeMethods._yapiFreeMem(p);
             result = YAPI.DefaultEncoding.GetString(reply);
         }
         return result;
@@ -7004,9 +7074,9 @@ public class YModule : YFunction
     {
       _logCallback = callback;
       if (_logCallback ==null){
-          SafeNativeMethods._yapiStartStopDeviceLogCallback(new StringBuilder(_serial), 0);
+          SafeNativeMethods._yapiStartStopDeviceLogCallback(new StringBuilder(_serialNumber), 0);
       } else {
-          SafeNativeMethods._yapiStartStopDeviceLogCallback(new StringBuilder(_serial), 1);
+          SafeNativeMethods._yapiStartStopDeviceLogCallback(new StringBuilder(_serialNumber), 1);
       }
       return YAPI.SUCCESS;
     }
@@ -7657,9 +7727,9 @@ public class YModule : YFunction
      *   This method is useful to test if the module needs to be updated.
      *   It is possible to pass a directory as argument instead of a file. In this case, this method returns
      *   the path of the most recent
-     *   appropriate byn file. If the parameter onlynew is true, the function discards firmware that are
-     *   older or equal to
-     *   the installed firmware.
+     *   appropriate <c>.byn</c> file. If the parameter <c>onlynew</c> is true, the function discards
+     *   firmwares that are older or
+     *   equal to the installed firmware.
      * </para>
      * <para>
      * </para>
@@ -7673,7 +7743,7 @@ public class YModule : YFunction
      * <para>
      * </para>
      * <returns>
-     *   : the path of the byn file to use or a empty string if no byn files matches the requirement
+     *   the path of the byn file to use or a empty string if no byn files matches the requirement
      * </returns>
      * <para>
      *   On failure, throws an exception or returns a string that start with "error:".
@@ -7709,13 +7779,16 @@ public class YModule : YFunction
      * </para>
      * </summary>
      * <param name="path">
-     *   the path of the byn file to use.
+     *   the path of the <c>.byn</c> file to use.
+     * </param>
+     * <param name="force">
+     *   true to force the firmware update even if some prerequisites appear not to be met
      * </param>
      * <returns>
-     *   : A <c>YFirmwareUpdate</c> object or NULL on error.
+     *   a <c>YFirmwareUpdate</c> object or NULL on error.
      * </returns>
      */
-    public virtual YFirmwareUpdate updateFirmware(string path)
+    public virtual YFirmwareUpdate updateFirmwareEx(string path, bool force)
     {
         string serial;
         byte[] settings;
@@ -7726,15 +7799,37 @@ public class YModule : YFunction
             this._throw(YAPI.IO_ERROR, "Unable to get device settings");
             settings = YAPI.DefaultEncoding.GetBytes("error:Unable to get device settings");
         }
-        return new YFirmwareUpdate(serial, path, settings);
+        return new YFirmwareUpdate(serial, path, settings, force);
+    }
+
+    /**
+     * <summary>
+     *   Prepares a firmware update of the module.
+     * <para>
+     *   This method returns a <c>YFirmwareUpdate</c> object which
+     *   handles the firmware update process.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="path">
+     *   the path of the <c>.byn</c> file to use.
+     * </param>
+     * <returns>
+     *   a <c>YFirmwareUpdate</c> object or NULL on error.
+     * </returns>
+     */
+    public virtual YFirmwareUpdate updateFirmware(string path)
+    {
+        return this.updateFirmwareEx(path, false);
     }
 
     /**
      * <summary>
      *   Returns all the settings and uploaded files of the module.
      * <para>
-     *   Useful to backup all the logical names, calibrations parameters,
-     *   and uploaded files of a connected module.
+     *   Useful to backup all the
+     *   logical names, calibrations parameters, and uploaded files of a device.
      * </para>
      * <para>
      * </para>
@@ -7787,7 +7882,7 @@ public class YModule : YFunction
                 }
             };
         }
-        ext_settings =  ext_settings + "],\n\"files\":[";
+        ext_settings = ext_settings + "],\n\"files\":[";
         if (this.hasFunction("files")) {
             json = this._download("files.json?a=dir&f=");
             if ((json).Length == 0) {
@@ -7797,18 +7892,16 @@ public class YModule : YFunction
             sep = "";
             for (int ii = 0; ii <  filelist.Count; ii++) {
                 name = this._json_get_key(YAPI.DefaultEncoding.GetBytes( filelist[ii]), "name");
-                if ((name).Length == 0) {
-                    return YAPI.DefaultEncoding.GetBytes(name);
-                }
-                file_data_bin = this._download(this._escapeAttr(name));
-                file_data = YAPI._bytesToHexStr(file_data_bin, 0, file_data_bin.Length);
-                item = ""+ sep+"{\"name\":\""+ name+"\", \"data\":\""+file_data+"\"}\n";
-                ext_settings = ext_settings + item;
-                sep = ",";;
+                if (((name).Length > 0) && !(name == "startupConf.json")) {
+                    file_data_bin = this._download(this._escapeAttr(name));
+                    file_data = YAPI._bytesToHexStr(file_data_bin, 0, file_data_bin.Length);
+                    item = ""+ sep+"{\"name\":\""+ name+"\", \"data\":\""+file_data+"\"}\n";
+                    ext_settings = ext_settings + item;
+                    sep = ",";
+                };
             }
         }
-        ext_settings = ext_settings + "]}";
-        res = YAPI._bytesMerge(YAPI.DefaultEncoding.GetBytes("{ \"api\":"), YAPI._bytesMerge(settings, YAPI.DefaultEncoding.GetBytes(ext_settings)));
+        res = YAPI.DefaultEncoding.GetBytes("{ \"api\":" + YAPI.DefaultEncoding.GetString(settings) + ext_settings + "]}");
         return res;
     }
 
@@ -7856,10 +7949,11 @@ public class YModule : YFunction
 
     /**
      * <summary>
-     *   Restores all the settings and uploaded files of the module.
+     *   Restores all the settings and uploaded files to the module.
      * <para>
-     *   Useful to restore all the logical names and calibrations parameters, uploaded
-     *   files etc.. of a module from a backup.Remember to call the <c>saveToFlash()</c> method of the module if the
+     *   This method is useful to restore all the logical names and calibrations parameters,
+     *   uploaded files etc. of a device from a backup.
+     *   Remember to call the <c>saveToFlash()</c> method of the module if the
      *   modifications must be kept.
      * </para>
      * <para>
@@ -7916,10 +8010,10 @@ public class YModule : YFunction
 
     /**
      * <summary>
-     *   Test if the device has a specific function.
+     *   Tests if the device includes a specific function.
      * <para>
-     *   This method took an function identifier
-     *   and return a boolean.
+     *   This method takes a function identifier
+     *   and returns a boolean.
      * </para>
      * <para>
      * </para>
@@ -7927,10 +8021,8 @@ public class YModule : YFunction
      * <param name="funcId">
      *   the requested function identifier
      * </param>
-     * <para>
-     * </para>
      * <returns>
-     *   : true if the device has the function identifier
+     *   true if the device has the function identifier
      * </returns>
      */
     public virtual bool hasFunction(string funcId)
@@ -7962,10 +8054,8 @@ public class YModule : YFunction
      * <param name="funType">
      *   The type of function (Relay, LightSensor, Voltage,...)
      * </param>
-     * <para>
-     * </para>
      * <returns>
-     *   : A array of string.
+     *   an array of strings.
      * </returns>
      */
     public virtual List<string> get_functionIds(string funType)
@@ -8240,7 +8330,7 @@ public class YModule : YFunction
 
     /**
      * <summary>
-     *   Restores all the settings of the module.
+     *   Restores all the settings of the device.
      * <para>
      *   Useful to restore all the logical names and calibrations parameters
      *   of a module from a backup.Remember to call the <c>saveToFlash()</c> method of the module if the
@@ -8596,12 +8686,34 @@ public class YModule : YFunction
 
     /**
      * <summary>
+     *   Adds a text message to the device logs.
+     * <para>
+     *   This function is useful in
+     *   particular to trace the execution of HTTP callbacks. If a newline
+     *   is desired after the message, it must be included in the string.
+     * </para>
+     * </summary>
+     * <param name="text">
+     *   the string to append to the logs.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int log(string text)
+    {
+        return this._upload("logs.txt", YAPI.DefaultEncoding.GetBytes(text));
+    }
+
+    /**
+     * <summary>
      *   Returns a list of all the modules that are plugged into the current module.
      * <para>
-     *   This
-     *   method is only useful on a YoctoHub/VirtualHub. This method return the serial number of all
-     *   module connected to a YoctoHub. Calling this method on a standard device is not an
-     *   error, and an empty array will be returned.
+     *   This method only makes sense when called for a YoctoHub/VirtualHub.
+     *   Otherwise, an empty array will be returned.
      * </para>
      * </summary>
      * <returns>
@@ -8650,7 +8762,7 @@ public class YModule : YFunction
      * <summary>
      *   Returns the serial number of the YoctoHub on which this module is connected.
      * <para>
-     *   If the module is connected by USB or if the module is the root YoctoHub an
+     *   If the module is connected by USB, or if the module is the root YoctoHub, an
      *   empty string is returned.
      * </para>
      * </summary>
@@ -8680,7 +8792,7 @@ public class YModule : YFunction
      * <summary>
      *   Returns the URL used to access the module.
      * <para>
-     *   If the module is connected by USB the
+     *   If the module is connected by USB, the
      *   string 'usb' is returned.
      * </para>
      * </summary>
