@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorled.cs 23577 2016-03-22 22:59:53Z mvuilleu $
+ * $Id: yocto_colorled.cs 24475 2016-05-12 14:03:35Z mvuilleu $
  *
  * Implements yFindColorLed(), the high-level API for ColorLed functions
  *
@@ -210,7 +210,7 @@ public class YColorLed : YFunction
 
     /**
      * <summary>
-     *   Changes the current color of the LED, using a RGB color.
+     *   Changes the current color of the LED, using an RGB color.
      * <para>
      *   Encoding is done as follows: 0xRRGGBB.
      * </para>
@@ -218,7 +218,7 @@ public class YColorLed : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to the current color of the LED, using a RGB color
+     *   an integer corresponding to the current color of the LED, using an RGB color
      * </param>
      * <para>
      * </para>
@@ -661,8 +661,8 @@ public class YColorLed : YFunction
 
     /**
      * <summary>
-     *   Add a new transition to the blinking sequence, the move will
-     *   be performed in the RGB space.
+     *   Adds a new transition to the blinking sequence, the move is
+     *   performed in the RGB space.
      * <para>
      * </para>
      * </summary>
@@ -686,8 +686,8 @@ public class YColorLed : YFunction
      * <summary>
      *   Starts the preprogrammed blinking sequence.
      * <para>
-     *   The sequence will
-     *   run in loop until it is stopped by stopBlinkSeq or an explicit
+     *   The sequence is
+     *   run in a loop until it is stopped by stopBlinkSeq or an explicit
      *   change.
      * </para>
      * </summary>

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 23960 2016-04-15 21:30:18Z mvuilleu $
+ * $Id: yocto_cellular.cs 24465 2016-05-12 07:30:46Z mvuilleu $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *
@@ -962,7 +962,7 @@ public class YCellular : YFunction
     {
         string gsmMsg;
         gsmMsg = this.get_message();
-        if (!(gsmMsg == "Enter SIM PUK")) { this._throw(YAPI.INVALID_ARGUMENT, "PUK not expected at this time"); return YAPI.INVALID_ARGUMENT; }
+        if (!((gsmMsg).Substring(0, 13) == "Enter SIM PUK")) { this._throw(YAPI.INVALID_ARGUMENT, "PUK not expected at this time"); return YAPI.INVALID_ARGUMENT; }
         if (newPin == "") {
             return this.set_command("AT+CPIN="+puk+",0000;+CLCK=SC,0,0000");
         }

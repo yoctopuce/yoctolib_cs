@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_spiport.cs 24086 2016-04-21 15:43:42Z seb $
+ * $Id: yocto_spiport.cs 24252 2016-04-26 13:39:30Z seb $
  *
  * Implements yFindSpiPort(), the high-level API for SpiPort functions
  *
@@ -54,11 +54,11 @@ using YFUN_DESCR = System.Int32;
 //--- (YSpiPort class start)
 /**
  * <summary>
- *   The SerialPort function interface allows you to fully drive a Yoctopuce
- *   serial port, to send and receive data, and to configure communication
+ *   The SpiPort function interface allows you to fully drive a Yoctopuce
+ *   SPI port, to send and receive data, and to configure communication
  *   parameters (baud rate, bit count, parity, flow control and protocol).
  * <para>
- *   Note that Yoctopuce serial ports are not exposed as virtual COM ports.
+ *   Note that Yoctopuce SPI ports are not exposed as virtual COM ports.
  *   They are meant to be used in the same way as all Yoctopuce devices.
  * </para>
  * <para>
@@ -602,7 +602,7 @@ public class YSpiPort : YFunction
 
     /**
      * <summary>
-     *   Returns the serial port communication parameters, as a string such as
+     *   Returns the SPI port communication parameters, as a string such as
      *   "125000,0,msb".
      * <para>
      *   The string includes the baud rate, the SPI mode (between
@@ -612,7 +612,7 @@ public class YSpiPort : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   a string corresponding to the serial port communication parameters, as a string such as
+     *   a string corresponding to the SPI port communication parameters, as a string such as
      *   "125000,0,msb"
      * </returns>
      * <para>
@@ -631,7 +631,7 @@ public class YSpiPort : YFunction
 
     /**
      * <summary>
-     *   Changes the serial port communication parameters, with a string such as
+     *   Changes the SPI port communication parameters, with a string such as
      *   "125000,0,msb".
      * <para>
      *   The string includes the baud rate, the SPI mode (between
@@ -641,7 +641,7 @@ public class YSpiPort : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   a string corresponding to the serial port communication parameters, with a string such as
+     *   a string corresponding to the SPI port communication parameters, with a string such as
      *   "125000,0,msb"
      * </param>
      * <para>
@@ -716,7 +716,7 @@ public class YSpiPort : YFunction
 
     /**
      * <summary>
-     *   Returns true when SDI line phase is shifted with regards to SDO line.
+     *   Returns true when the SDI line phase is shifted with regards to the SDO line.
      * <para>
      * </para>
      * <para>
@@ -724,7 +724,7 @@ public class YSpiPort : YFunction
      * </summary>
      * <returns>
      *   either <c>YSpiPort.SHITFTSAMPLING_OFF</c> or <c>YSpiPort.SHITFTSAMPLING_ON</c>, according to true
-     *   when SDI line phase is shifted with regards to SDO line
+     *   when the SDI line phase is shifted with regards to the SDO line
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YSpiPort.SHITFTSAMPLING_INVALID</c>.

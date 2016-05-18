@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorledcluster.cs 24149 2016-04-22 07:02:18Z mvuilleu $
+ * $Id: yocto_colorledcluster.cs 24475 2016-05-12 14:03:35Z mvuilleu $
  *
  * Implements yFindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -128,14 +128,14 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Returns the count of LEDs currently handled by the device.
+     *   Returns the number of LEDs currently handled by the device.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the count of LEDs currently handled by the device
+     *   an integer corresponding to the number of LEDs currently handled by the device
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YColorLedCluster.ACTIVELEDCOUNT_INVALID</c>.
@@ -153,14 +153,14 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Changes the count of LEDs currently handled by the device.
+     *   Changes the number of LEDs currently handled by the device.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to the count of LEDs currently handled by the device
+     *   an integer corresponding to the number of LEDs currently handled by the device
      * </param>
      * <para>
      * </para>
@@ -180,14 +180,14 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Returns the maximum count of LEDs that the device can handle.
+     *   Returns the maximum number of LEDs that the device can handle.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the maximum count of LEDs that the device can handle
+     *   an integer corresponding to the maximum number of LEDs that the device can handle
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YColorLedCluster.MAXLEDCOUNT_INVALID</c>.
@@ -205,14 +205,12 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Returns the maximum count of sequences.
-     * <para>
-     * </para>
+     *   Returns the maximum number of sequences that the device can handle
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the maximum count of sequences
+     *   an integer corresponding to the maximum number of sequences that the device can handle
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YColorLedCluster.BLINKSEQMAXCOUNT_INVALID</c>.
@@ -400,7 +398,30 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Changes the current color of consecutive LEDs in the cluster , using a HSL color.
+     *   Changes the  color at device startup of consecutve LEDs in the cluster , using a RGB color.
+     * <para>
+     *   Encoding is done as follows: 0xRRGGBB.
+     * </para>
+     * </summary>
+     * <param name="ledIndex">
+     *   index of the first affected LED.
+     * </param>
+     * <param name="count">
+     *   affected LED count.
+     * </param>
+     * <param name="rgbValue">
+     *   new color.
+     *   On failure, throws an exception or returns a negative error code.
+     * </param>
+     */
+    public virtual int set_rgbColorAtPowerOn(int ledIndex, int count, int rgbValue)
+    {
+        return this.sendCommand("SC"+Convert.ToString(ledIndex)+","+Convert.ToString(count)+","+String.Format("{0:X}",rgbValue));
+    }
+
+    /**
+     * <summary>
+     *   Changes the current color of consecutive LEDs in the cluster, using a HSL color.
      * <para>
      *   Encoding is done as follows: 0xHHSSLL.
      * </para>
@@ -423,10 +444,10 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Allows you to modify the current color of a group of adjacent LED  to another color, in a seamless and
+     *   Allows you to modify the current color of a group of adjacent LEDs to another color, in a seamless and
      *   autonomous manner.
      * <para>
-     *   The transition is performed in the RGB space..
+     *   The transition is performed in the RGB space.
      * </para>
      * </summary>
      * <param name="ledIndex">
@@ -481,11 +502,11 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Adds a RGB transition to a sequence.
+     *   Adds an RGB transition to a sequence.
      * <para>
-     *   A sequence is a transitions list, which can
-     *   be executed in loop by an group of LEDs.  Sequences are persistent and are saved
-     *   in the device flash as soon as the module <c>saveToFlash()</c> method is called.
+     *   A sequence is a transition list, which can
+     *   be executed in loop by a group of LEDs.  Sequences are persistent and are saved
+     *   in the device flash memory as soon as the module <c>saveToFlash()</c> method is called.
      * </para>
      * </summary>
      * <param name="seqIndex">
@@ -506,11 +527,11 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Adds a HSL transition to a sequence.
+     *   Adds an HSL transition to a sequence.
      * <para>
-     *   A sequence is a transitions list, which can
+     *   A sequence is a transition list, which can
      *   be executed in loop by an group of LEDs.  Sequences are persistant and are saved
-     *   in the device flash as soon as the module <c>saveToFlash()</c> method is called.
+     *   in the device flash memory as soon as the module <c>saveToFlash()</c> method is called.
      * </para>
      * </summary>
      * <param name="seqIndex">
@@ -534,9 +555,9 @@ public class YColorLedCluster : YFunction
      *   Adds a mirror ending to a sequence.
      * <para>
      *   When the sequence will reach the end of the last
-     *   transition, its running speed will automatically be reverted so that the sequence plays
-     *   in the reverse direction, like in a mirror. When the first transition of the sequence
-     *   will be played at the end of the reverse execution, the sequence will start again in
+     *   transition, its running speed will automatically be reversed so that the sequence plays
+     *   in the reverse direction, like in a mirror. After the first transition of the sequence
+     *   is played at the end of the reverse execution, the sequence starts again in
      *   the initial direction.
      * </para>
      * </summary>
@@ -554,10 +575,10 @@ public class YColorLedCluster : YFunction
      * <summary>
      *   Links adjacent LEDs to a specific sequence.
      * <para>
-     *   these LED will start to execute
+     *   These LEDs start to execute
      *   the sequence as soon as  startBlinkSeq is called. It is possible to add an offset
      *   in the execution: that way we  can have several groups of LED executing the same
-     *   sequence, with a  temporal offset. A LED cannot be linked to more than one LED.
+     *   sequence, with a  temporal offset. A LED cannot be linked to more than one sequence.
      * </para>
      * </summary>
      * <param name="ledIndex">
@@ -581,11 +602,40 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
+     *   Links adjacent LEDs to a specific sequence at device poweron.
+     * <para>
+     *   Don't forget to configure
+     *   the sequence auto start flag as well and call saveLedsState. It is possible to add an offset
+     *   in the execution: that way we  can have several groups of LEDs executing the same
+     *   sequence, with a  temporal offset. A LED cannot be linked to more than one sequence.
+     * </para>
+     * </summary>
+     * <param name="ledIndex">
+     *   index of the first affected LED.
+     * </param>
+     * <param name="count">
+     *   affected LED count.
+     * </param>
+     * <param name="seqIndex">
+     *   sequence index.
+     * </param>
+     * <param name="offset">
+     *   execution offset in ms.
+     *   On failure, throws an exception or returns a negative error code.
+     * </param>
+     */
+    public virtual int linkLedToBlinkSeqAtPowerOn(int ledIndex, int count, int seqIndex, int offset)
+    {
+        return this.sendCommand("LO"+Convert.ToString(ledIndex)+","+Convert.ToString(count)+","+Convert.ToString(seqIndex)+","+Convert.ToString(offset));
+    }
+
+    /**
+     * <summary>
      *   Links adjacent LEDs to a specific sequence.
      * <para>
-     *   these LED will start to execute
+     *   These LED start to execute
      *   the sequence as soon as  startBlinkSeq is called. This function automatically
-     *   introduce a shift between LEDs so that the specified number of sequence periods
+     *   introduces a shift between LEDs so that the specified number of sequence periods
      *   appears on the group of LEDs (wave effect).
      * </para>
      * </summary>
@@ -610,7 +660,7 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   UnLink adjacent LED  from a  sequence.
+     *   Unlinks adjacent LEDs from a  sequence.
      * <para>
      * </para>
      * </summary>
@@ -629,7 +679,7 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Start a sequence execution: every LED linked to that sequence will start to
+     *   Starts a sequence execution: every LED linked to that sequence starts to
      *   run it in a loop.
      * <para>
      * </para>
@@ -646,10 +696,10 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Stop a sequence execution.
+     *   Stops a sequence execution.
      * <para>
-     *   if started again, the execution
-     *   will restart from the beginning.
+     *   If started again, the execution
+     *   restarts from the beginning.
      * </para>
      * </summary>
      * <param name="seqIndex">
@@ -664,10 +714,10 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Stop a sequence execution and reset its contents.
+     *   Stops a sequence execution and resets its contents.
      * <para>
      *   Leds linked to this
-     *   sequences will no more be automatically updated.
+     *   sequence are not automatically updated anymore.
      * </para>
      * </summary>
      * <param name="seqIndex">
@@ -682,7 +732,29 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Change the execution speed of a sequence.
+     *   Configures a sequence to make it start automatically at device
+     *   startup.
+     * <para>
+     *   Don't forget to call  saveLedsState() to make sure the
+     *   modification is saved in the device flash memory.
+     * </para>
+     * </summary>
+     * <param name="seqIndex">
+     *   index of the sequence to reset
+     * </param>
+     * <param name="autostart">
+     *   boolean telling if the sequence must start automatically or not.
+     *   On failure, throws an exception or returns a negative error code.
+     * </param>
+     */
+    public virtual int set_blinkSeqAutoStart(int seqIndex, bool autostart)
+    {
+        return this.sendCommand("AS"+Convert.ToString(seqIndex)+","+(autostart?"1":"0"));
+    }
+
+    /**
+     * <summary>
+     *   Changes the execution speed of a sequence.
      * <para>
      *   The natural execution speed is 1000 per
      *   thousand. If you configure a slower speed, you can play the sequence in slow-motion.
@@ -697,16 +769,16 @@ public class YColorLedCluster : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </param>
      */
-    public virtual int changeBlinkSeqSpeed(int seqIndex, int speed)
+    public virtual int set_blinkSeqSpeed(int seqIndex, int speed)
     {
-        return this.sendCommand("CS"+Convert.ToString(seqIndex));
+        return this.sendCommand("CS"+Convert.ToString(seqIndex)+","+Convert.ToString(speed));
     }
 
     /**
      * <summary>
-     *   Save the current state of all LEDs as the initial startup state.
+     *   Saves the cluster power-on configuration, this includes
+     *   LED start-up colors, sequence steps and sequence auto-start flags.
      * <para>
-     *   The initial startup state includes the choice of sequence linked to each LED.
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      * </summary>
@@ -777,7 +849,7 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Setup a smooth RGB color transition to the specified pixel-by-pixel list of RGB
+     *   Sets up a smooth RGB color transition to the specified pixel-by-pixel list of RGB
      *   color codes.
      * <para>
      *   The first color code represents the target RGB value of the first LED,
@@ -878,7 +950,7 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Setup a smooth HSL color transition to the specified pixel-by-pixel list of HSL
+     *   Sets up a smooth HSL color transition to the specified pixel-by-pixel list of HSL
      *   color codes.
      * <para>
      *   The first color code represents the target HSL value of the first LED,
@@ -986,6 +1058,47 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
+     *   Returns a list on 24bit RGB color values with the RGB LEDs startup colors.
+     * <para>
+     *   The first number represents the startup RGB value of the first LED,
+     *   the second number represents the RGB value of the second LED, etc.
+     * </para>
+     * </summary>
+     * <param name="ledIndex">
+     *   index of the first LED  which should be returned
+     * </param>
+     * <param name="count">
+     *   number of LEDs which should be returned
+     * </param>
+     * <returns>
+     *   a list of 24bit color codes with RGB components of selected LEDs, as 0xRRGGBB.
+     *   On failure, throws an exception or returns an empty array.
+     * </returns>
+     */
+    public virtual List<int> get_rgbColorArrayAtPowerOn(int ledIndex, int count)
+    {
+        byte[] buff;
+        List<int> res = new List<int>();
+        int idx;
+        int r;
+        int g;
+        int b;
+        // may throw an exception
+        buff = this._download("rgb.bin?typ=4&pos="+Convert.ToString(3*ledIndex)+"&len="+Convert.ToString(3*count));
+        res.Clear();
+        idx = 0;
+        while (idx < count) {
+            r = buff[3*idx];
+            g = buff[3*idx+1];
+            b = buff[3*idx+2];
+            res.Add(r*65536+g*256+b);
+            idx = idx + 1;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
      *   Returns a list on sequence index for each RGB LED.
      * <para>
      *   The first number represents the
@@ -1060,6 +1173,78 @@ public class YColorLedCluster : YFunction
             lh = buff[4*idx+2];
             ll = buff[4*idx+3];
             res.Add(((hh) << (24))+((hl) << (16))+((lh) << (8))+ll);
+            idx = idx + 1;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Returns a list of integers with the current speed for specified blinking sequences.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="seqIndex">
+     *   index of the first sequence speed which should be returned
+     * </param>
+     * <param name="count">
+     *   number of sequence speeds which should be returned
+     * </param>
+     * <returns>
+     *   a list of integers, 0 for sequences turned off and 1 for sequences running
+     *   On failure, throws an exception or returns an empty array.
+     * </returns>
+     */
+    public virtual List<int> get_blinkSeqStateSpeed(int seqIndex, int count)
+    {
+        byte[] buff;
+        List<int> res = new List<int>();
+        int idx;
+        int lh;
+        int ll;
+        // may throw an exception
+        buff = this._download("rgb.bin?typ=6&pos="+Convert.ToString(seqIndex)+"&len="+Convert.ToString(count));
+        res.Clear();
+        idx = 0;
+        while (idx < count) {
+            lh = buff[2*idx];
+            ll = buff[2*idx+1];
+            res.Add(((lh) << (8))+ll);
+            idx = idx + 1;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Returns a list of integers with the "auto-start at power on" flag state for specified blinking sequences.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="seqIndex">
+     *   index of the first blinking sequence which should be returned
+     * </param>
+     * <param name="count">
+     *   number of blinking sequences which should be returned
+     * </param>
+     * <returns>
+     *   a list of integers, 0 for sequences turned off and 1 for sequences running
+     *   On failure, throws an exception or returns an empty array.
+     * </returns>
+     */
+    public virtual List<int> get_blinkSeqStateAtPowerOn(int seqIndex, int count)
+    {
+        byte[] buff;
+        List<int> res = new List<int>();
+        int idx;
+        int started;
+        // may throw an exception
+        buff = this._download("rgb.bin?typ=5&pos="+Convert.ToString(seqIndex)+"&len="+Convert.ToString(count));
+        res.Clear();
+        idx = 0;
+        while (idx < count) {
+            started = buff[idx];
+            res.Add(started);
             idx = idx + 1;
         }
         return res;
