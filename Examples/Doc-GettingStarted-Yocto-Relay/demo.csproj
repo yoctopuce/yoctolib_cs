@@ -163,6 +163,9 @@
     <Compile Include="..\..\Sources\yocto_magnetometer.cs">
       <Link>yocto_api\yocto_magnetometer.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\yocto_messagebox.cs">
+      <Link>yocto_api\yocto_messagebox.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_motor.cs">
       <Link>yocto_api\yocto_motor.cs</Link>
     </Compile>

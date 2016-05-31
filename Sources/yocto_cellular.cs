@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 24465 2016-05-12 07:30:46Z mvuilleu $
+ * $Id: yocto_cellular.cs 24622 2016-05-27 12:51:52Z mvuilleu $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *
@@ -174,6 +174,8 @@ public class YCellular : YFunction
     public const string APN_INVALID = YAPI.INVALID_STRING;
     public const string APNSECRET_INVALID = YAPI.INVALID_STRING;
     public const int PINGINTERVAL_INVALID = YAPI.INVALID_UINT;
+    public const int DATASENT_INVALID = YAPI.INVALID_UINT;
+    public const int DATARECEIVED_INVALID = YAPI.INVALID_UINT;
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _linkQuality = LINKQUALITY_INVALID;
     protected string _cellOperator = CELLOPERATOR_INVALID;
@@ -188,6 +190,8 @@ public class YCellular : YFunction
     protected string _apn = APN_INVALID;
     protected string _apnSecret = APNSECRET_INVALID;
     protected int _pingInterval = PINGINTERVAL_INVALID;
+    protected int _dataSent = DATASENT_INVALID;
+    protected int _dataReceived = DATARECEIVED_INVALID;
     protected string _command = COMMAND_INVALID;
     protected ValueCallback _valueCallbackCellular = null;
     //--- (end of generated code: YCellular definitions)
@@ -267,6 +271,16 @@ public class YCellular : YFunction
         if (member.name == "pingInterval")
         {
             _pingInterval = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "dataSent")
+        {
+            _dataSent = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "dataReceived")
+        {
+            _dataReceived = (int)member.ivalue;
             return;
         }
         if (member.name == "command")
@@ -815,6 +829,110 @@ public class YCellular : YFunction
         return _setAttr("pingInterval", rest_val);
     }
 
+    /**
+     * <summary>
+     *   Returns the number of bytes sent so far.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the number of bytes sent so far
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YCellular.DATASENT_INVALID</c>.
+     * </para>
+     */
+    public int get_dataSent()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return DATASENT_INVALID;
+            }
+        }
+        return this._dataSent;
+    }
+
+    /**
+     * <summary>
+     *   Changes the value of the outgoing data counter.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the value of the outgoing data counter
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_dataSent(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("dataSent", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the number of bytes received so far.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the number of bytes received so far
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YCellular.DATARECEIVED_INVALID</c>.
+     * </para>
+     */
+    public int get_dataReceived()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return DATARECEIVED_INVALID;
+            }
+        }
+        return this._dataReceived;
+    }
+
+    /**
+     * <summary>
+     *   Changes the value of the incoming data counter.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the value of the incoming data counter
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_dataReceived(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("dataReceived", rest_val);
+    }
+
     public string get_command()
     {
         if (this._cacheExpiration <= YAPI.GetTickCount()) {
@@ -962,7 +1080,7 @@ public class YCellular : YFunction
     {
         string gsmMsg;
         gsmMsg = this.get_message();
-        if (!((gsmMsg).Substring(0, 13) == "Enter SIM PUK")) { this._throw(YAPI.INVALID_ARGUMENT, "PUK not expected at this time"); return YAPI.INVALID_ARGUMENT; }
+        if (!(!((gsmMsg).Substring(0, 13) == "Enter SIM PUK"))) { this._throw(YAPI.INVALID_ARGUMENT, "PUK not expected at this time"); return YAPI.INVALID_ARGUMENT; }
         if (newPin == "") {
             return this.set_command("AT+CPIN="+puk+",0000;+CLCK=SC,0,0000");
         }
@@ -995,6 +1113,31 @@ public class YCellular : YFunction
     public virtual int set_apnAuth(string username, string password)
     {
         return this.set_apnSecret(""+username+","+password);
+    }
+
+    /**
+     * <summary>
+     *   Clear the transmitted data counters.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int clearDataCounters()
+    {
+        int retcode;
+        // may throw an exception
+        retcode = this.set_dataReceived(0);
+        if (retcode != YAPI.SUCCESS) {
+            return retcode;
+        }
+        retcode = this.set_dataSent(0);
+        return retcode;
     }
 
     /**
