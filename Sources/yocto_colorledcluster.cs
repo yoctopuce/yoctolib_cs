@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorledcluster.cs 24586 2016-05-26 12:42:56Z seb $
+ * $Id: yocto_colorledcluster.cs 24717 2016-06-03 16:09:53Z seb $
  *
  * Implements yFindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -208,7 +208,9 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Returns the maximum number of sequences that the device can handle
+     *   Returns the maximum number of sequences that the device can handle.
+     * <para>
+     * </para>
      * <para>
      * </para>
      * </summary>
@@ -378,7 +380,7 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Changes the current color of consecutve LEDs in the cluster , using a RGB color.
+     *   Changes the current color of consecutve LEDs in the cluster, using a RGB color.
      * <para>
      *   Encoding is done as follows: 0xRRGGBB.
      * </para>
@@ -391,8 +393,13 @@ public class YColorLedCluster : YFunction
      * </param>
      * <param name="rgbValue">
      *   new color.
-     *   On failure, throws an exception or returns a negative error code.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int set_rgbColor(int ledIndex, int count, int rgbValue)
     {
@@ -401,9 +408,11 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Changes the  color at device startup of consecutve LEDs in the cluster , using a RGB color.
+     *   Changes the  color at device startup of consecutve LEDs in the cluster, using a RGB color.
      * <para>
      *   Encoding is done as follows: 0xRRGGBB.
+     *   Don't forget to call <c>saveLedsConfigAtPowerOn()</c> to make sure the modification is saved in the
+     *   device flash memory.
      * </para>
      * </summary>
      * <param name="ledIndex">
@@ -414,8 +423,13 @@ public class YColorLedCluster : YFunction
      * </param>
      * <param name="rgbValue">
      *   new color.
-     *   On failure, throws an exception or returns a negative error code.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int set_rgbColorAtPowerOn(int ledIndex, int count, int rgbValue)
     {
@@ -437,8 +451,13 @@ public class YColorLedCluster : YFunction
      * </param>
      * <param name="hslValue">
      *   new color.
-     *   On failure, throws an exception or returns a negative error code.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int set_hslColor(int ledIndex, int count, int hslValue)
     {
@@ -464,8 +483,13 @@ public class YColorLedCluster : YFunction
      * </param>
      * <param name="delay">
      *   transition duration in ms
-     *   On failure, throws an exception or returns a negative error code.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int rgb_move(int ledIndex, int count, int rgbValue, int delay)
     {
@@ -495,8 +519,13 @@ public class YColorLedCluster : YFunction
      * </param>
      * <param name="delay">
      *   transition duration in ms
-     *   On failure, throws an exception or returns a negative error code.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int hsl_move(int ledIndex, int count, int hslValue, int delay)
     {
@@ -509,7 +538,7 @@ public class YColorLedCluster : YFunction
      * <para>
      *   A sequence is a transition list, which can
      *   be executed in loop by a group of LEDs.  Sequences are persistent and are saved
-     *   in the device flash memory as soon as the module <c>saveToFlash()</c> method is called.
+     *   in the device flash memory as soon as the <c>saveBlinkSeq()</c> method is called.
      * </para>
      * </summary>
      * <param name="seqIndex">
@@ -520,8 +549,13 @@ public class YColorLedCluster : YFunction
      * </param>
      * <param name="delay">
      *   transition duration in ms
-     *   On failure, throws an exception or returns a negative error code.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int addRgbMoveToBlinkSeq(int seqIndex, int rgbValue, int delay)
     {
@@ -534,7 +568,7 @@ public class YColorLedCluster : YFunction
      * <para>
      *   A sequence is a transition list, which can
      *   be executed in loop by an group of LEDs.  Sequences are persistant and are saved
-     *   in the device flash memory as soon as the module <c>saveToFlash()</c> method is called.
+     *   in the device flash memory as soon as the <c>saveBlinkSeq()</c> method is called.
      * </para>
      * </summary>
      * <param name="seqIndex">
@@ -545,8 +579,13 @@ public class YColorLedCluster : YFunction
      * </param>
      * <param name="delay">
      *   transition duration in ms
-     *   On failure, throws an exception or returns a negative error code.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int addHslMoveToBlinkSeq(int seqIndex, int hslValue, int delay)
     {
@@ -566,8 +605,13 @@ public class YColorLedCluster : YFunction
      * </summary>
      * <param name="seqIndex">
      *   sequence index.
-     *   On failure, throws an exception or returns a negative error code.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int addMirrorToBlinkSeq(int seqIndex)
     {
@@ -595,8 +639,13 @@ public class YColorLedCluster : YFunction
      * </param>
      * <param name="offset">
      *   execution offset in ms.
-     *   On failure, throws an exception or returns a negative error code.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int linkLedToBlinkSeq(int ledIndex, int count, int seqIndex, int offset)
     {
@@ -608,7 +657,7 @@ public class YColorLedCluster : YFunction
      *   Links adjacent LEDs to a specific sequence at device poweron.
      * <para>
      *   Don't forget to configure
-     *   the sequence auto start flag as well and call saveLedsState. It is possible to add an offset
+     *   the sequence auto start flag as well and call <c>saveLedsConfigAtPowerOn()</c>. It is possible to add an offset
      *   in the execution: that way we  can have several groups of LEDs executing the same
      *   sequence, with a  temporal offset. A LED cannot be linked to more than one sequence.
      * </para>
@@ -624,8 +673,13 @@ public class YColorLedCluster : YFunction
      * </param>
      * <param name="offset">
      *   execution offset in ms.
-     *   On failure, throws an exception or returns a negative error code.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int linkLedToBlinkSeqAtPowerOn(int ledIndex, int count, int seqIndex, int offset)
     {
@@ -653,8 +707,13 @@ public class YColorLedCluster : YFunction
      * </param>
      * <param name="periods">
      *   number of periods to show on LEDs.
-     *   On failure, throws an exception or returns a negative error code.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int linkLedToPeriodicBlinkSeq(int ledIndex, int count, int seqIndex, int periods)
     {
@@ -672,8 +731,13 @@ public class YColorLedCluster : YFunction
      * </param>
      * <param name="count">
      *   affected LED count.
-     *   On failure, throws an exception or returns a negative error code.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int unlinkLedFromBlinkSeq(int ledIndex, int count)
     {
@@ -689,8 +753,13 @@ public class YColorLedCluster : YFunction
      * </summary>
      * <param name="seqIndex">
      *   index of the sequence to start.
-     *   On failure, throws an exception or returns a negative error code.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int startBlinkSeq(int seqIndex)
     {
@@ -707,8 +776,13 @@ public class YColorLedCluster : YFunction
      * </summary>
      * <param name="seqIndex">
      *   index of the sequence to stop.
-     *   On failure, throws an exception or returns a negative error code.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int stopBlinkSeq(int seqIndex)
     {
@@ -725,8 +799,13 @@ public class YColorLedCluster : YFunction
      * </summary>
      * <param name="seqIndex">
      *   index of the sequence to reset
-     *   On failure, throws an exception or returns a negative error code.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int resetBlinkSeq(int seqIndex)
     {
@@ -738,21 +817,26 @@ public class YColorLedCluster : YFunction
      *   Configures a sequence to make it start automatically at device
      *   startup.
      * <para>
-     *   Don't forget to call  saveLedsState() to make sure the
+     *   Don't forget to call <c>saveBlinkSeq()</c> to make sure the
      *   modification is saved in the device flash memory.
      * </para>
      * </summary>
      * <param name="seqIndex">
-     *   index of the sequence to reset
+     *   index of the sequence to reset.
      * </param>
      * <param name="autostart">
-     *   boolean telling if the sequence must start automatically or not.
-     *   On failure, throws an exception or returns a negative error code.
+     *   0 to keep the sequence turned off and 1 to start it automatically.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
-    public virtual int set_blinkSeqAutoStart(int seqIndex, bool autostart)
+    public virtual int set_blinkSeqStateAtPowerOn(int seqIndex, int autostart)
     {
-        return this.sendCommand("AS"+Convert.ToString(seqIndex)+","+(autostart?"1":"0"));
+        return this.sendCommand("AS"+Convert.ToString(seqIndex)+","+Convert.ToString(autostart));
     }
 
     /**
@@ -769,8 +853,13 @@ public class YColorLedCluster : YFunction
      * </param>
      * <param name="speed">
      *   sequence running speed (-1000...1000).
-     *   On failure, throws an exception or returns a negative error code.
      * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int set_blinkSeqSpeed(int seqIndex, int speed)
     {
@@ -779,56 +868,97 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
-     *   Saves the cluster power-on configuration, this includes
-     *   LED start-up colors, sequence steps and sequence auto-start flags.
+     *   Saves the LEDs power-on configuration.
+     * <para>
+     *   This includes the start-up color or
+     *   sequence binding for all LEDs. Warning: if some LEDs are linked to a sequence, the
+     *   method <c>saveBlinkSeq()</c> must also be called to save the sequence definition.
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
      * <para>
      *   On failure, throws an exception or returns a negative error code.
      * </para>
-     * </summary>
      */
-    public virtual int saveLedsState()
+    public virtual int saveLedsConfigAtPowerOn()
     {
-        return this.sendCommand("SL");
+        return this.sendCommand("WL");
+    }
+
+    /**
+     * <summary>
+     *   Saves the definition of a sequence.
+     * <para>
+     *   Warning: only sequence steps and flags are saved.
+     *   to save the LEDs startup bindings, the method <c>saveLedsConfigAtPowerOn()</c>
+     *   must be called.
+     * </para>
+     * </summary>
+     * <param name="seqIndex">
+     *   index of the sequence to start.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int saveBlinkSeq(int seqIndex)
+    {
+        return this.sendCommand("WS"+Convert.ToString(seqIndex));
     }
 
     /**
      * <summary>
      *   Sends a binary buffer to the LED RGB buffer, as is.
      * <para>
-     *   First three bytes are RGB components for first LED, the
-     *   next three bytes for the second LED, etc.
+     *   First three bytes are RGB components for LED specified as parameter, the
+     *   next three bytes for the next LED, etc.
      * </para>
      * </summary>
+     * <param name="ledIndex">
+     *   index of the first LED which should be updated
+     * </param>
      * <param name="buff">
      *   the binary buffer to send
      * </param>
      * <returns>
      *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     *   On failure, throws an exception or returns a negative error code.
      * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
-    public virtual int set_rgbBuffer(byte[] buff)
+    public virtual int set_rgbColorBuffer(int ledIndex, byte[] buff)
     {
-        return this._upload("rgb:0", buff);
+        return this._upload("rgb:0:"+Convert.ToString(ledIndex), buff);
     }
 
     /**
      * <summary>
      *   Sends 24bit RGB colors (provided as a list of integers) to the LED RGB buffer, as is.
      * <para>
-     *   The first number represents the RGB value of the first LED, the second number represents
-     *   the RGB value of the second LED, etc.
+     *   The first number represents the RGB value of the LED specified as parameter, the second
+     *   number represents the RGB value of the next LED, etc.
      * </para>
      * </summary>
+     * <param name="ledIndex">
+     *   index of the first LED which should be updated
+     * </param>
      * <param name="rgbList">
      *   a list of 24bit RGB codes, in the form 0xRRGGBB
      * </param>
      * <returns>
      *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     *   On failure, throws an exception or returns a negative error code.
      * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
-    public virtual int set_rgbArray(List<int> rgbList)
+    public virtual int set_rgbColorArray(int ledIndex, List<int> rgbList)
     {
         int listlen;
         byte[] buff;
@@ -846,7 +976,7 @@ public class YColorLedCluster : YFunction
             idx = idx + 1;
         }
         // may throw an exception
-        res = this._upload("rgb:0", buff);
+        res = this._upload("rgb:0:"+Convert.ToString(ledIndex), buff);
         return res;
     }
 
@@ -856,7 +986,7 @@ public class YColorLedCluster : YFunction
      *   color codes.
      * <para>
      *   The first color code represents the target RGB value of the first LED,
-     *   the second color code represents the target value of the second LED, etc.
+     *   the next color code represents the target value of the next LED, etc.
      * </para>
      * </summary>
      * <param name="rgbList">
@@ -867,8 +997,10 @@ public class YColorLedCluster : YFunction
      * </param>
      * <returns>
      *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     *   On failure, throws an exception or returns a negative error code.
      * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int rgbArray_move(List<int> rgbList, int delay)
     {
@@ -896,40 +1028,50 @@ public class YColorLedCluster : YFunction
      * <summary>
      *   Sends a binary buffer to the LED HSL buffer, as is.
      * <para>
-     *   First three bytes are HSL components for first LED, the
+     *   First three bytes are HSL components for the LED specified as parameter, the
      *   next three bytes for the second LED, etc.
      * </para>
      * </summary>
+     * <param name="ledIndex">
+     *   index of the first LED which should be updated
+     * </param>
      * <param name="buff">
      *   the binary buffer to send
      * </param>
      * <returns>
      *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     *   On failure, throws an exception or returns a negative error code.
      * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
-    public virtual int set_hslBuffer(byte[] buff)
+    public virtual int set_hslColorBuffer(int ledIndex, byte[] buff)
     {
-        return this._upload("hsl:0", buff);
+        return this._upload("hsl:0:"+Convert.ToString(ledIndex), buff);
     }
 
     /**
      * <summary>
      *   Sends 24bit HSL colors (provided as a list of integers) to the LED HSL buffer, as is.
      * <para>
-     *   The first number represents the HSL value of the first LED, the second number represents
+     *   The first number represents the HSL value of the LED specified as parameter, the second number represents
      *   the HSL value of the second LED, etc.
      * </para>
      * </summary>
+     * <param name="ledIndex">
+     *   index of the first LED which should be updated
+     * </param>
      * <param name="hslList">
      *   a list of 24bit HSL codes, in the form 0xHHSSLL
      * </param>
      * <returns>
      *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     *   On failure, throws an exception or returns a negative error code.
      * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
-    public virtual int set_hslArray(List<int> hslList)
+    public virtual int set_hslColorArray(int ledIndex, List<int> hslList)
     {
         int listlen;
         byte[] buff;
@@ -947,7 +1089,7 @@ public class YColorLedCluster : YFunction
             idx = idx + 1;
         }
         // may throw an exception
-        res = this._upload("hsl:0", buff);
+        res = this._upload("hsl:0:"+Convert.ToString(ledIndex), buff);
         return res;
     }
 
@@ -968,8 +1110,10 @@ public class YColorLedCluster : YFunction
      * </param>
      * <returns>
      *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     *   On failure, throws an exception or returns a negative error code.
      * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
      */
     public virtual int hslArray_move(List<int> hslList, int delay)
     {
@@ -1009,8 +1153,10 @@ public class YColorLedCluster : YFunction
      * </param>
      * <returns>
      *   a binary buffer with RGB components of selected LEDs.
-     *   On failure, throws an exception or returns an empty binary buffer.
      * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty binary buffer.
+     * </para>
      */
     public virtual byte[] get_rgbColorBuffer(int ledIndex, int count)
     {
@@ -1034,8 +1180,10 @@ public class YColorLedCluster : YFunction
      * </param>
      * <returns>
      *   a list of 24bit color codes with RGB components of selected LEDs, as 0xRRGGBB.
-     *   On failure, throws an exception or returns an empty array.
      * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
      */
     public virtual List<int> get_rgbColorArray(int ledIndex, int count)
     {
@@ -1075,8 +1223,10 @@ public class YColorLedCluster : YFunction
      * </param>
      * <returns>
      *   a list of 24bit color codes with RGB components of selected LEDs, as 0xRRGGBB.
-     *   On failure, throws an exception or returns an empty array.
      * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
      */
     public virtual List<int> get_rgbColorArrayAtPowerOn(int ledIndex, int count)
     {
@@ -1117,8 +1267,10 @@ public class YColorLedCluster : YFunction
      * </param>
      * <returns>
      *   a list of integers with sequence index
-     *   On failure, throws an exception or returns an empty array.
      * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
      */
     public virtual List<int> get_linkedSeqArray(int ledIndex, int count)
     {
@@ -1154,8 +1306,10 @@ public class YColorLedCluster : YFunction
      * </param>
      * <returns>
      *   a list of 32 bit integer signatures
-     *   On failure, throws an exception or returns an empty array.
      * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
      */
     public virtual List<int> get_blinkSeqSignatures(int seqIndex, int count)
     {
@@ -1195,8 +1349,10 @@ public class YColorLedCluster : YFunction
      * </param>
      * <returns>
      *   a list of integers, 0 for sequences turned off and 1 for sequences running
-     *   On failure, throws an exception or returns an empty array.
      * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
      */
     public virtual List<int> get_blinkSeqStateSpeed(int seqIndex, int count)
     {
@@ -1232,8 +1388,10 @@ public class YColorLedCluster : YFunction
      * </param>
      * <returns>
      *   a list of integers, 0 for sequences turned off and 1 for sequences running
-     *   On failure, throws an exception or returns an empty array.
      * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
      */
     public virtual List<int> get_blinkSeqStateAtPowerOn(int seqIndex, int count)
     {
@@ -1267,8 +1425,10 @@ public class YColorLedCluster : YFunction
      * </param>
      * <returns>
      *   a list of integers, 0 for sequences turned off and 1 for sequences running
-     *   On failure, throws an exception or returns an empty array.
      * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
      */
     public virtual List<int> get_blinkSeqState(int seqIndex, int count)
     {
