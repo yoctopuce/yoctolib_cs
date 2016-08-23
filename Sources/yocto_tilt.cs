@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_tilt.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_tilt.cs 24934 2016-06-30 22:32:01Z mvuilleu $
  *
  * Implements yFindTilt(), the high-level API for Tilt functions
  *
@@ -77,10 +77,12 @@ public class YTilt : YSensor
     public new delegate void ValueCallback(YTilt func, string value);
     public new delegate void TimedReportCallback(YTilt func, YMeasure measure);
 
+    public const int BANDWIDTH_INVALID = YAPI.INVALID_INT;
     public const int AXIS_X = 0;
     public const int AXIS_Y = 1;
     public const int AXIS_Z = 2;
     public const int AXIS_INVALID = -1;
+    protected int _bandwidth = BANDWIDTH_INVALID;
     protected int _axis = AXIS_INVALID;
     protected ValueCallback _valueCallbackTilt = null;
     protected TimedReportCallback _timedReportCallbackTilt = null;
@@ -98,12 +100,71 @@ public class YTilt : YSensor
 
     protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
+        if (member.name == "bandwidth")
+        {
+            _bandwidth = (int)member.ivalue;
+            return;
+        }
         if (member.name == "axis")
         {
             _axis = (int)member.ivalue;
             return;
         }
         base._parseAttr(member);
+    }
+
+    /**
+     * <summary>
+     *   Returns the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YTilt.BANDWIDTH_INVALID</c>.
+     * </para>
+     */
+    public int get_bandwidth()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BANDWIDTH_INVALID;
+            }
+        }
+        return this._bandwidth;
+    }
+
+    /**
+     * <summary>
+     *   Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     * <para>
+     *   When the
+     *   frequency is lower, the device performs averaging.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_bandwidth(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("bandwidth", rest_val);
     }
 
     public int get_axis()

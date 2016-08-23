@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 24622 2016-05-27 12:51:52Z mvuilleu $
+ * $Id: yocto_cellular.cs 24921 2016-06-29 13:15:24Z mvuilleu $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *
@@ -170,6 +170,7 @@ public class YCellular : YFunction
     public const int ENABLEDATA_HOMENETWORK = 0;
     public const int ENABLEDATA_ROAMING = 1;
     public const int ENABLEDATA_NEVER = 2;
+    public const int ENABLEDATA_NEUTRALITY = 3;
     public const int ENABLEDATA_INVALID = -1;
     public const string APN_INVALID = YAPI.INVALID_STRING;
     public const string APNSECRET_INVALID = YAPI.INVALID_STRING;
@@ -637,8 +638,9 @@ public class YCellular : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   a value among <c>YCellular.ENABLEDATA_HOMENETWORK</c>, <c>YCellular.ENABLEDATA_ROAMING</c> and
-     *   <c>YCellular.ENABLEDATA_NEVER</c> corresponding to the condition for enabling IP data services (GPRS)
+     *   a value among <c>YCellular.ENABLEDATA_HOMENETWORK</c>, <c>YCellular.ENABLEDATA_ROAMING</c>,
+     *   <c>YCellular.ENABLEDATA_NEVER</c> and <c>YCellular.ENABLEDATA_NEUTRALITY</c> corresponding to the
+     *   condition for enabling IP data services (GPRS)
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YCellular.ENABLEDATA_INVALID</c>.
@@ -669,8 +671,9 @@ public class YCellular : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   a value among <c>YCellular.ENABLEDATA_HOMENETWORK</c>, <c>YCellular.ENABLEDATA_ROAMING</c> and
-     *   <c>YCellular.ENABLEDATA_NEVER</c> corresponding to the condition for enabling IP data services (GPRS)
+     *   a value among <c>YCellular.ENABLEDATA_HOMENETWORK</c>, <c>YCellular.ENABLEDATA_ROAMING</c>,
+     *   <c>YCellular.ENABLEDATA_NEVER</c> and <c>YCellular.ENABLEDATA_NEUTRALITY</c> corresponding to the
+     *   condition for enabling IP data services (GPRS)
      * </param>
      * <para>
      * </para>

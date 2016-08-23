@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_gyro.cs 22693 2016-01-12 23:10:50Z seb $
+ * $Id: yocto_gyro.cs 24948 2016-07-01 20:57:28Z mvuilleu $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -349,9 +349,11 @@ public class YGyro : YSensor
     public new delegate void ValueCallback(YGyro func, string value);
     public new delegate void TimedReportCallback(YGyro func, YMeasure measure);
 
+    public const int BANDWIDTH_INVALID = YAPI.INVALID_INT;
     public const double XVALUE_INVALID = YAPI.INVALID_DOUBLE;
     public const double YVALUE_INVALID = YAPI.INVALID_DOUBLE;
     public const double ZVALUE_INVALID = YAPI.INVALID_DOUBLE;
+    protected int _bandwidth = BANDWIDTH_INVALID;
     protected double _xValue = XVALUE_INVALID;
     protected double _yValue = YVALUE_INVALID;
     protected double _zValue = ZVALUE_INVALID;
@@ -402,6 +404,11 @@ public class YGyro : YSensor
 
     protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
+        if (member.name == "bandwidth")
+        {
+            _bandwidth = (int)member.ivalue;
+            return;
+        }
         if (member.name == "xValue")
         {
             _xValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
@@ -418,6 +425,60 @@ public class YGyro : YSensor
             return;
         }
         base._parseAttr(member);
+    }
+
+    /**
+     * <summary>
+     *   Returns the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YGyro.BANDWIDTH_INVALID</c>.
+     * </para>
+     */
+    public int get_bandwidth()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BANDWIDTH_INVALID;
+            }
+        }
+        return this._bandwidth;
+    }
+
+    /**
+     * <summary>
+     *   Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     * <para>
+     *   When the
+     *   frequency is lower, the device performs averaging.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_bandwidth(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("bandwidth", rest_val);
     }
 
     /**
@@ -697,11 +758,11 @@ public class YGyro : YSensor
             delta = this._y * this._w - this._x * this._z;
             if (delta > 0.499 * norm) {
                 this._pitch = 90.0;
-                this._head  = Math.Round(2.0 * 1800.0/Math.PI * Math.Atan2(this._x,this._w)) / 10.0;
+                this._head  = Math.Round(2.0 * 1800.0/Math.PI * Math.Atan2(this._x,-this._w)) / 10.0;
             } else {
                 if (delta < -0.499 * norm) {
                     this._pitch = -90.0;
-                    this._head  = Math.Round(-2.0 * 1800.0/Math.PI * Math.Atan2(this._x,this._w)) / 10.0;
+                    this._head  = Math.Round(-2.0 * 1800.0/Math.PI * Math.Atan2(this._x,-this._w)) / 10.0;
                 } else {
                     this._roll  = Math.Round(1800.0/Math.PI * Math.Atan2(2.0 * (this._w * this._x + this._y * this._z),sqw - sqx - sqy + sqz)) / 10.0;
                     this._pitch = Math.Round(1800.0/Math.PI * Math.Asin(2.0 * delta / norm)) / 10.0;

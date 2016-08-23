@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_accelerometer.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_accelerometer.cs 24934 2016-06-30 22:32:01Z mvuilleu $
  *
  * Implements yFindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -77,12 +77,14 @@ public class YAccelerometer : YSensor
     public new delegate void ValueCallback(YAccelerometer func, string value);
     public new delegate void TimedReportCallback(YAccelerometer func, YMeasure measure);
 
+    public const int BANDWIDTH_INVALID = YAPI.INVALID_INT;
     public const double XVALUE_INVALID = YAPI.INVALID_DOUBLE;
     public const double YVALUE_INVALID = YAPI.INVALID_DOUBLE;
     public const double ZVALUE_INVALID = YAPI.INVALID_DOUBLE;
     public const int GRAVITYCANCELLATION_OFF = 0;
     public const int GRAVITYCANCELLATION_ON = 1;
     public const int GRAVITYCANCELLATION_INVALID = -1;
+    protected int _bandwidth = BANDWIDTH_INVALID;
     protected double _xValue = XVALUE_INVALID;
     protected double _yValue = YVALUE_INVALID;
     protected double _zValue = ZVALUE_INVALID;
@@ -103,6 +105,11 @@ public class YAccelerometer : YSensor
 
     protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
+        if (member.name == "bandwidth")
+        {
+            _bandwidth = (int)member.ivalue;
+            return;
+        }
         if (member.name == "xValue")
         {
             _xValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
@@ -124,6 +131,60 @@ public class YAccelerometer : YSensor
             return;
         }
         base._parseAttr(member);
+    }
+
+    /**
+     * <summary>
+     *   Returns the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YAccelerometer.BANDWIDTH_INVALID</c>.
+     * </para>
+     */
+    public int get_bandwidth()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BANDWIDTH_INVALID;
+            }
+        }
+        return this._bandwidth;
+    }
+
+    /**
+     * <summary>
+     *   Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     * <para>
+     *   When the
+     *   frequency is lower, the device performs averaging.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_bandwidth(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("bandwidth", rest_val);
     }
 
     /**

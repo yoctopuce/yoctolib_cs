@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_refframe.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_refframe.cs 24943 2016-07-01 14:02:25Z seb $
  *
  * Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -94,6 +94,7 @@ public enum   MOUNTORIENTATION
     protected double _bearing = BEARING_INVALID;
     protected string _calibrationParam = CALIBRATIONPARAM_INVALID;
     protected ValueCallback _valueCallbackRefFrame = null;
+    protected bool _calibV2;
     protected int _calibStage = 0;
     protected string _calibStageHint;
     protected int _calibStageProgress = 0;
@@ -454,6 +455,81 @@ public enum   MOUNTORIENTATION
         return this.set_mountPos(mixedPos);
     }
 
+    /**
+     * <summary>
+     *   Returns the 3D sensor calibration state (Yocto-3D-V2 only).
+     * <para>
+     *   This function returns
+     *   an integer representing the calibration state of the 3 inertial sensors of
+     *   the BNO055 chip, found in the Yocto-3D-V2. Hundredths show the calibration state
+     *   of the accelerometer, tenths show the calibration state of the magnetometer while
+     *   units show the calibration state of the gyroscope. For each sensor, the value 0
+     *   means no calibration and the value 3 means full calibration.
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer representing the calibration state of Yocto-3D-V2:
+     *   333 when fully calibrated, 0 when not calibrated at all.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     *   For the Yocto-3D (V1), this function always return -3 (unsupported function).
+     * </para>
+     */
+    public virtual int get_calibrationState()
+    {
+        string calibParam;
+        List<int> iCalib = new List<int>();
+        int caltyp;
+        int res;
+        // may throw an exception
+        calibParam = this.get_calibrationParam();
+        iCalib = YAPI._decodeFloats(calibParam);
+        caltyp = ((iCalib[0]) / (1000));
+        if (caltyp != 33) {
+            return YAPI.NOT_SUPPORTED;
+        }
+        res = ((iCalib[1]) / (1000));
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Returns estimated quality of the orientation (Yocto-3D-V2 only).
+     * <para>
+     *   This function returns
+     *   an integer between 0 and 3 representing the degree of confidence of the position
+     *   estimate. When the value is 3, the estimation is reliable. Below 3, one should
+     *   expect sudden corrections, in particular for heading (<c>compass</c> function).
+     *   The most frequent causes for values below 3 are magnetic interferences, and
+     *   accelerations or rotations beyond the sensor range.
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer between 0 and 3 (3 when the measure is reliable)
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     *   For the Yocto-3D (V1), this function always return -3 (unsupported function).
+     * </para>
+     */
+    public virtual int get_measureQuality()
+    {
+        string calibParam;
+        List<int> iCalib = new List<int>();
+        int caltyp;
+        int res;
+        // may throw an exception
+        calibParam = this.get_calibrationParam();
+        iCalib = YAPI._decodeFloats(calibParam);
+        caltyp = ((iCalib[0]) / (1000));
+        if (caltyp != 33) {
+            return YAPI.NOT_SUPPORTED;
+        }
+        res = ((iCalib[2]) / (1000));
+        return res;
+    }
+
     public virtual int _calibSort(int start, int stopidx)
     {
         int idx;
@@ -526,6 +602,7 @@ public enum   MOUNTORIENTATION
             this.cancel3DCalibration();
         }
         this._calibSavedParams = this.get_calibrationParam();
+        this._calibV2 = (YAPI._atoi(this._calibSavedParams) == 33);
         this.set_calibrationParam("0");
         this._calibCount = 50;
         this._calibStage = 1;
@@ -558,6 +635,14 @@ public enum   MOUNTORIENTATION
      * </summary>
      */
     public virtual int more3DCalibration()
+    {
+        if (this._calibV2) {
+            return this.more3DCalibrationV2();
+        }
+        return this.more3DCalibrationV1();
+    }
+
+    public virtual int more3DCalibrationV1()
     {
         int currTick;
         byte[] jsonData;
@@ -756,6 +841,65 @@ public enum   MOUNTORIENTATION
         return YAPI.SUCCESS;
     }
 
+    public virtual int more3DCalibrationV2()
+    {
+        int currTick;
+        byte[] calibParam;
+        List<int> iCalib = new List<int>();
+        int cal3;
+        int calAcc;
+        int calMag;
+        int calGyr;
+        // make sure calibration has been started
+        if (this._calibStage == 0) {
+            return YAPI.INVALID_ARGUMENT;
+        }
+        if (this._calibProgress == 100) {
+            return YAPI.SUCCESS;
+        }
+        // make sure we don't start before previous calibration is cleared
+        if (this._calibStage == 1) {
+            currTick = (int) ((YAPI.GetTickCount()) & (0x7FFFFFFF));
+            currTick = ((currTick - this._calibPrevTick) & (0x7FFFFFFF));
+            if (currTick < 1600) {
+                this._calibStageHint = "Set down the device on a steady horizontal surface";
+                this._calibStageProgress = ((currTick) / (40));
+                this._calibProgress = 1;
+                return YAPI.SUCCESS;
+            }
+        }
+        // may throw an exception
+        calibParam = this._download("api/refFrame/calibrationParam.txt");
+        iCalib = YAPI._decodeFloats(YAPI.DefaultEncoding.GetString(calibParam));
+        cal3 = ((iCalib[1]) / (1000));
+        calAcc = ((cal3) / (100));
+        calMag = ((cal3) / (10)) - 10*calAcc;
+        calGyr = ((cal3) % (10));
+        if (calGyr < 3) {
+            this._calibStageHint = "Set down the device on a steady horizontal surface";
+            this._calibStageProgress = 40 + calGyr*20;
+            this._calibProgress = 4 + calGyr*2;
+        } else {
+            this._calibStage = 2;
+            if (calMag < 3) {
+                this._calibStageHint = "Slowly draw '8' shapes along the 3 axis";
+                this._calibStageProgress = 1 + calMag*33;
+                this._calibProgress = 10 + calMag*5;
+            } else {
+                this._calibStage = 3;
+                if (calAcc < 3) {
+                    this._calibStageHint = "Slowly turn the device, stopping at each 90 degrees";
+                    this._calibStageProgress = 1 + calAcc*33;
+                    this._calibProgress = 25 + calAcc*25;
+                } else {
+                    this._calibStageProgress = 99;
+                    this._calibProgress = 100;
+                }
+            }
+        }
+        return YAPI.SUCCESS;
+    }
+
     /**
      * <summary>
      *   Returns instructions to proceed to the tridimensional calibration initiated with
@@ -853,6 +997,14 @@ public enum   MOUNTORIENTATION
      */
     public virtual int save3DCalibration()
     {
+        if (this._calibV2) {
+            return this.save3DCalibrationV2();
+        }
+        return this.save3DCalibrationV1();
+    }
+
+    public virtual int save3DCalibrationV1()
+    {
         int shiftX;
         int shiftY;
         int shiftZ;
@@ -915,6 +1067,11 @@ public enum   MOUNTORIENTATION
         newcalib = "5,"+Convert.ToString( shiftX)+","+Convert.ToString( shiftY)+","+Convert.ToString( shiftZ)+","+Convert.ToString( scaleLo)+","+Convert.ToString(scaleHi);
         this._calibStage = 0;
         return this.set_calibrationParam(newcalib);
+    }
+
+    public virtual int save3DCalibrationV2()
+    {
+        return this.set_calibrationParam("5,5,5,5,5,5");
     }
 
     /**

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_anbutton.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_anbutton.cs 24825 2016-06-16 09:48:45Z seb $
  *
  * Implements yFindAnButton(), the high-level API for AnButton functions
  *
@@ -531,6 +531,9 @@ public class YAnButton : YFunction
      * <summary>
      *   Returns the pulse counter value.
      * <para>
+     *   The value is a 32 bit integer. In case
+     *   of overflow (>=2^32), the counter will wrap. To reset the counter, just
+     *   call the resetCounter() method.
      * </para>
      * <para>
      * </para>

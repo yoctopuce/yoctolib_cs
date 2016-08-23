@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_spiport.cs 24252 2016-04-26 13:39:30Z seb $
+ * $Id: yocto_spiport.cs 25085 2016-07-26 16:38:36Z mvuilleu $
  *
  * Implements yFindSpiPort(), the high-level API for SpiPort functions
  *
@@ -113,6 +113,8 @@ public class YSpiPort : YFunction
     protected int _shitftSampling = SHITFTSAMPLING_INVALID;
     protected ValueCallback _valueCallbackSpiPort = null;
     protected int _rxptr = 0;
+    protected byte[] _rxbuff;
+    protected int _rxbuffptr = 0;
     //--- (end of YSpiPort definitions)
 
     public YSpiPort(string func)
@@ -894,6 +896,8 @@ public class YSpiPort : YFunction
     public virtual int reset()
     {
         this._rxptr = 0;
+        this._rxbuffptr = 0;
+        this._rxbuff = new byte[0];
         // may throw an exception
         return this.sendCommand("Z");
     }
@@ -1119,11 +1123,49 @@ public class YSpiPort : YFunction
      */
     public virtual int readByte()
     {
+        int currpos;
+        int reqlen;
         byte[] buff;
         int bufflen;
         int mult;
         int endpos;
         int res;
+        
+        // first check if we have the requested character in the look-ahead buffer
+        bufflen = (this._rxbuff).Length;
+        if ((this._rxptr >= this._rxbuffptr) && (this._rxptr < this._rxbuffptr+bufflen)) {
+            res = this._rxbuff[this._rxptr-this._rxbuffptr];
+            this._rxptr = this._rxptr + 1;
+            return res;
+        }
+        
+        // try to preload more than one byte to speed-up byte-per-byte access
+        currpos = this._rxptr;
+        reqlen = 1024;
+        buff = this.readBin(reqlen);
+        bufflen = (buff).Length;
+        if (this._rxptr == currpos+bufflen) {
+            res = buff[0];
+            this._rxptr = currpos+1;
+            this._rxbuffptr = currpos;
+            this._rxbuff = buff;
+            return res;
+        }
+        // mixed bidirectional data, retry with a smaller block
+        this._rxptr = currpos;
+        reqlen = 16;
+        buff = this.readBin(reqlen);
+        bufflen = (buff).Length;
+        if (this._rxptr == currpos+bufflen) {
+            res = buff[0];
+            this._rxptr = currpos+1;
+            this._rxbuffptr = currpos;
+            this._rxbuff = buff;
+            return res;
+        }
+        // still mixed, need to process character by character
+        this._rxptr = currpos;
+        
         // may throw an exception
         buff = this._download("rxdata.bin?pos="+Convert.ToString(this._rxptr)+"&len=1");
         bufflen = (buff).Length - 1;

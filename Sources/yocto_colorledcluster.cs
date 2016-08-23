@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorledcluster.cs 24717 2016-06-03 16:09:53Z seb $
+ * $Id: yocto_colorledcluster.cs 24934 2016-06-30 22:32:01Z mvuilleu $
  *
  * Implements yFindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -883,6 +883,11 @@ public class YColorLedCluster : YFunction
      * </para>
      */
     public virtual int saveLedsConfigAtPowerOn()
+    {
+        return this.sendCommand("WL");
+    }
+
+    public virtual int saveLedsState()
     {
         return this.sendCommand("WL");
     }
