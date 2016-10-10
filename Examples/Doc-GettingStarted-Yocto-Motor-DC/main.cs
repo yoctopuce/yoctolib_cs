@@ -32,20 +32,18 @@ namespace ConsoleApplication1
             YTemperature temperature;
 
             // parse the  command line
-            if (args.Length < 1) usage();
+            if (args.Length < 2) usage();
             target = args[0].ToUpper();
             power = Convert.ToInt32(args[1]);
 
-            if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS)
-            {
+            if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS) {
                 Console.WriteLine("RegisterHub error: " + errmsg);
                 Environment.Exit(0);
             }
-            if (target == "ANY")
-            {  // find the serial# of the first available motor
+            if (target == "ANY") {
+                // find the serial# of the first available motor
                 motor = YMotor.FirstMotor();
-                if (motor == null)
-                {
+                if (motor == null) {
                     Console.WriteLine("No module connected (check USB cable) ");
                     Environment.Exit(0);
                 }
@@ -58,22 +56,22 @@ namespace ConsoleApplication1
             temperature = YTemperature.FindTemperature(target + ".temperature");
 
             // lets start the motor
-            if (motor.isOnline())
-            {  // if motor is in error state, reset it.
-                if (motor.get_motorStatus() >= YMotor.MOTORSTATUS_LOVOLT)
-                {
+            if (motor.isOnline()) {
+                // if motor is in error state, reset it.
+                if (motor.get_motorStatus() >= YMotor.MOTORSTATUS_LOVOLT) {
                     motor.resetStatus();
                 }
                 motor.drivingForceMove(power, 2000);  // ramp up to power in 2 seconds
-                while (true)
-                { // display motor status
+                while (motor.isOnline()) {
+                    // display motor status
                     Console.WriteLine("Status=" + motor.get_advertisedValue() + "  " +
-                         "Voltage=" + voltage.get_currentValue() + "V  " +
-                         "Current=" + current.get_currentValue() / 1000 + "A  " +
-                         "Temp=" + temperature.get_currentValue() + "deg C");
+                                      "Voltage=" + voltage.get_currentValue() + "V  " +
+                                      "Current=" + current.get_currentValue() / 1000 + "A  " +
+                                      "Temp=" + temperature.get_currentValue() + "deg C");
                     YAPI.Sleep(1000, ref errmsg); // wait for one second
                 }
             }
+            YAPI.FreeAPI();
         }
     }
 }

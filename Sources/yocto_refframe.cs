@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_refframe.cs 24943 2016-07-01 14:02:25Z seb $
+ * $Id: yocto_refframe.cs 25275 2016-08-24 13:42:24Z mvuilleu $
  *
  * Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -79,13 +79,15 @@ public enum   MOUNTPOSITION
         FRONT = 2,
         REAR = 3,
         RIGHT = 4,
-        LEFT = 5
+        LEFT = 5,
+        INVALID = 6
      };
 public enum   MOUNTORIENTATION
     {   TWELVE = 0,
         THREE = 1,
         SIX = 2,
-        NINE = 3
+        NINE = 3,
+        INVALID = 4
      };
     public const int MOUNTPOS_INVALID = YAPI.INVALID_UINT;
     public const double BEARING_INVALID = YAPI.INVALID_DOUBLE;
@@ -365,19 +367,22 @@ public enum   MOUNTORIENTATION
      * </summary>
      * <returns>
      *   a value among the <c>YRefFrame.MOUNTPOSITION</c> enumeration
-     *   (<c>YRefFrame.MOUNTPOSITION_BOTTOM</c>,   <c>YRefFrame.MOUNTPOSITION_TOP</c>,
-     *   <c>YRefFrame.MOUNTPOSITION_FRONT</c>,    <c>YRefFrame.MOUNTPOSITION_RIGHT</c>,
-     *   <c>YRefFrame.MOUNTPOSITION_REAR</c>,     <c>YRefFrame.MOUNTPOSITION_LEFT</c>),
+     *   (<c>YRefFrame.MOUNTPOSITION.BOTTOM</c>,   <c>YRefFrame.MOUNTPOSITION.TOP</c>,
+     *   <c>YRefFrame.MOUNTPOSITION.FRONT</c>,    <c>YRefFrame.MOUNTPOSITION.RIGHT</c>,
+     *   <c>YRefFrame.MOUNTPOSITION.REAR</c>,     <c>YRefFrame.MOUNTPOSITION.LEFT</c>),
      *   corresponding to the installation in a box, on one of the six faces.
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns a negative error code.
+     *   On failure, throws an exception or returns YRefFrame.MOUNTPOSITION.INVALID.
      * </para>
      */
     public virtual MOUNTPOSITION get_mountPosition()
     {
         int position;
         position = this.get_mountPos();
+        if (position < 0) {
+            return MOUNTPOSITION.INVALID;
+        }
         return (MOUNTPOSITION) ((position) >> (2));
     }
 
@@ -393,21 +398,24 @@ public enum   MOUNTORIENTATION
      * </summary>
      * <returns>
      *   a value among the enumeration <c>YRefFrame.MOUNTORIENTATION</c>
-     *   (<c>YRefFrame.MOUNTORIENTATION_TWELVE</c>, <c>YRefFrame.MOUNTORIENTATION_THREE</c>,
-     *   <c>YRefFrame.MOUNTORIENTATION_SIX</c>,     <c>YRefFrame.MOUNTORIENTATION_NINE</c>)
+     *   (<c>YRefFrame.MOUNTORIENTATION.TWELVE</c>, <c>YRefFrame.MOUNTORIENTATION.THREE</c>,
+     *   <c>YRefFrame.MOUNTORIENTATION.SIX</c>,     <c>YRefFrame.MOUNTORIENTATION.NINE</c>)
      *   corresponding to the orientation of the "X" arrow on the device,
      *   as on a clock dial seen from an observer in the center of the box.
      *   On the bottom face, the 12H orientation points to the front, while
      *   on the top face, the 12H orientation points to the rear.
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns a negative error code.
+     *   On failure, throws an exception or returns YRefFrame.MOUNTORIENTATION.INVALID.
      * </para>
      */
     public virtual MOUNTORIENTATION get_mountOrientation()
     {
         int position;
         position = this.get_mountPos();
+        if (position < 0) {
+            return MOUNTORIENTATION.INVALID;
+        }
         return (MOUNTORIENTATION) ((position) & (3));
     }
 
@@ -426,15 +434,15 @@ public enum   MOUNTORIENTATION
      * </summary>
      * <param name="position">
      *   a value among the <c>YRefFrame.MOUNTPOSITION</c> enumeration
-     *   (<c>YRefFrame.MOUNTPOSITION_BOTTOM</c>,   <c>YRefFrame.MOUNTPOSITION_TOP</c>,
-     *   <c>YRefFrame.MOUNTPOSITION_FRONT</c>,    <c>YRefFrame.MOUNTPOSITION_RIGHT</c>,
-     *   <c>YRefFrame.MOUNTPOSITION_REAR</c>,     <c>YRefFrame.MOUNTPOSITION_LEFT</c>),
+     *   (<c>YRefFrame.MOUNTPOSITION.BOTTOM</c>,   <c>YRefFrame.MOUNTPOSITION.TOP</c>,
+     *   <c>YRefFrame.MOUNTPOSITION.FRONT</c>,    <c>YRefFrame.MOUNTPOSITION.RIGHT</c>,
+     *   <c>YRefFrame.MOUNTPOSITION.REAR</c>,     <c>YRefFrame.MOUNTPOSITION.LEFT</c>),
      *   corresponding to the installation in a box, on one of the six faces.
      * </param>
      * <param name="orientation">
      *   a value among the enumeration <c>YRefFrame.MOUNTORIENTATION</c>
-     *   (<c>YRefFrame.MOUNTORIENTATION_TWELVE</c>, <c>YRefFrame.MOUNTORIENTATION_THREE</c>,
-     *   <c>YRefFrame.MOUNTORIENTATION_SIX</c>,     <c>YRefFrame.MOUNTORIENTATION_NINE</c>)
+     *   (<c>YRefFrame.MOUNTORIENTATION.TWELVE</c>, <c>YRefFrame.MOUNTORIENTATION.THREE</c>,
+     *   <c>YRefFrame.MOUNTORIENTATION.SIX</c>,     <c>YRefFrame.MOUNTORIENTATION.NINE</c>)
      *   corresponding to the orientation of the "X" arrow on the device,
      *   as on a clock dial seen from an observer in the center of the box.
      *   On the bottom face, the 12H orientation points to the front, while

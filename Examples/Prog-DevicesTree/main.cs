@@ -156,7 +156,7 @@ namespace ConsoleApplication1
             string serial = module.get_serialNumber();
             for (int i = __rootDevices.Count() - 1; i >= 0; i--) {
                 __rootDevices[i].removeSubDevice(serial);
-                if (__rootDevices[i].getSerial() ==serial) {
+                if (__rootDevices[i].getSerial() == serial) {
                     __rootDevices.RemoveAt(i);
                 }
             }

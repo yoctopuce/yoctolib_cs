@@ -23,15 +23,13 @@ namespace ConsoleApplication1
             // No exception please
             YAPI.DisableExceptions();
 
-            if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS)
-            {
+            if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS) {
                 Console.WriteLine("RegisterHub error: " + errmsg);
                 Environment.Exit(0);
             }
 
             logger = YDataLogger.FirstDataLogger();
-            if (logger == null)
-            {
+            if (logger == null) {
                 Console.WriteLine("No module with data logger found");
                 Console.WriteLine("(Device not connected or firmware too old)");
                 Environment.Exit(0);
@@ -39,8 +37,7 @@ namespace ConsoleApplication1
 
             Console.WriteLine("Using DataLogger of " + logger.get_module().get_serialNumber());
 
-            if (logger.get_dataStreams(dataStreams) != YAPI.SUCCESS)
-            {
+            if (logger.get_dataStreams(dataStreams) != YAPI.SUCCESS) {
                 Console.WriteLine("get_dataStreams failed: " + errmsg);
                 Environment.Exit(0);
             }
@@ -48,8 +45,7 @@ namespace ConsoleApplication1
 
             Console.WriteLine("found: " + dataStreams.Count.ToString() + " stream(s) of data.");
 
-            for (i = 0; i < dataStreams.Count; i++)
-            {
+            for (i = 0; i < dataStreams.Count; i++) {
                 YDataStream s = dataStreams[i];
                 long nrows, ncols;
                 Console.WriteLine("Data stream  " + i.ToString());
@@ -62,8 +58,7 @@ namespace ConsoleApplication1
                 nrows = s.get_rowCount();
                 ncols = s.get_columnCount();
 
-                if (nrows > 0)
-                {
+                if (nrows > 0) {
                     Console.Write(" " + nrows.ToString() + " samples taken every ");
                     Console.WriteLine(s.get_dataSamplesInterval().ToString() + " [s]");
                 }
@@ -71,22 +66,19 @@ namespace ConsoleApplication1
 
                 List<String> names = s.get_columnNames();
                 Console.Write("   ");
-                for (int c = 0; c < names.Count; c++)
-                {
+                for (int c = 0; c < names.Count; c++) {
                     Console.Write(names[c] + "\t");
                 }
                 Console.WriteLine();
 
                 List<List<double>> datatable = s.get_dataRows();
-                if (datatable.Count < nrows)
-                {
+                if (datatable.Count < nrows) {
                     datatable = s.get_dataRows();
-                
+
                 }
 
 
-                for (int r = 0; r < nrows; r++)
-                {
+                for (int r = 0; r < nrows; r++) {
                     Console.Write("   ");
                     for (int c = 0; c < ncols; c++)
                         Console.Write(datatable[r][c].ToString("0.#") + '\t');

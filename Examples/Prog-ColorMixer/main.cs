@@ -66,7 +66,9 @@ namespace ConsoleApplication1
 
         // register a YoctoLed
         public void addLED(YColorLed led)
-        { _leds.Add(led); }
+        {
+            _leds.Add(led);
+        }
 
         // update only red component
         public void changeRed(byte red)
@@ -124,10 +126,11 @@ namespace ConsoleApplication1
     class Program
     {
         static void usage()
-        {   string execname = System.AppDomain.CurrentDomain.FriendlyName;
-            Console.WriteLine(execname+" <serial_number>");
-            Console.WriteLine(execname+" <logical_name>");
-            Console.WriteLine(execname+" any  ");
+        {
+            string execname = System.AppDomain.CurrentDomain.FriendlyName;
+            Console.WriteLine(execname + " <serial_number>");
+            Console.WriteLine(execname + " <logical_name>");
+            Console.WriteLine(execname + " any  ");
             System.Threading.Thread.Sleep(2500);
             Environment.Exit(0);
         }
@@ -138,21 +141,18 @@ namespace ConsoleApplication1
             int i;
             int nbled = 0;
 
-            Console.WriteLine("Yoctopuce Library v"+YAPI.GetAPIVersion());
+            Console.WriteLine("Yoctopuce Library v" + YAPI.GetAPIVersion());
             Console.WriteLine("ColorMixer");
-            if (args.Length < 1)
-            {
+            if (args.Length < 1) {
                 Console.WriteLine("usage: demo [usb | ip_address]");
                 return 1;
             }
 
-            for (i = 0; i < args.Length; i++)
-            {
+            for (i = 0; i < args.Length; i++) {
                 // Setup the API to use local USB devices
-                if (YAPI.RegisterHub(args[i], ref errmsg) != YAPI.SUCCESS)
-                {
-                    Console.WriteLine("Unable to get acces to devices on "+ args[i]);
-                    Console.WriteLine("error: "+ errmsg);
+                if (YAPI.RegisterHub(args[i], ref errmsg) != YAPI.SUCCESS) {
+                    Console.WriteLine("Unable to get acces to devices on " + args[i]);
+                    Console.WriteLine("error: " + errmsg);
                     return 1;
                 }
             }
@@ -174,24 +174,22 @@ namespace ConsoleApplication1
 
             // display a warning if we miss a knob
             if (!knobRed.isOnline())
-                Console.WriteLine("Warning: knob \""+knobRed+"\" is not connected");
+                Console.WriteLine("Warning: knob \"" + knobRed + "\" is not connected");
             if (!knobGreen.isOnline())
-                Console.WriteLine("Warning: knob \""+knobGreen+"\" is not connected" );
+                Console.WriteLine("Warning: knob \"" + knobGreen + "\" is not connected" );
             if (!knobBlue.isOnline())
-                Console.WriteLine("Warning: knob \""+knobBlue+"\" is not connected" );
+                Console.WriteLine("Warning: knob \"" + knobBlue + "\" is not connected" );
 
             // register all led that is connected to our "network"
             YColorLed led = YColorLed.FirstColorLed();
-            while (led != null)
-            {
+            while (led != null) {
                 mixer.addLED(led);
                 nbled++;
                 led = led.nextColorLed();
             }
-            Console.WriteLine(nbled+" Color Led detected", nbled);
+            Console.WriteLine(nbled + " Color Led detected", nbled);
             // never hanling loop that will..
-            while (true)
-            {
+            while (true) {
                 // ... handle all event durring 5000ms without using lots of CPU ...
                 YAPI.Sleep(1000, ref errmsg);
                 // ... and check for device plug/unplug

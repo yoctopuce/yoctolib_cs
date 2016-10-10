@@ -29,22 +29,18 @@ namespace ConsoleApplication1
             if (args.Length < 1) usage();
             target = args[0].ToUpper();
 
-            if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS)
-            {
+            if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS) {
                 Console.WriteLine("RegisterHub error: " + errmsg);
                 Environment.Exit(0);
             }
 
-            if (target == "ANY")
-            {
+            if (target == "ANY") {
                 buz = YBuzzer.FirstBuzzer();
-                if (buz == null)
-                {
+                if (buz == null) {
                     Console.WriteLine("No module connected (check USB cable) ");
                     Environment.Exit(0);
                 }
-            }
-            else buz = YBuzzer.FindBuzzer(target + ".buzzer");
+            } else buz = YBuzzer.FindBuzzer(target + ".buzzer");
 
             if (!buz.isOnline())
                 Console.WriteLine("Module not connected (check identification and USB cable)");
@@ -57,21 +53,23 @@ namespace ConsoleApplication1
 
             Console.WriteLine("press a test button or hit Ctrl-C");
 
-            while (true)
-            {
+            while (buz.isOnline()) {
                 int frequency;
                 bool b1 = (button1.get_isPressed() == YAnButton.ISPRESSED_TRUE);
                 bool b2 = (button2.get_isPressed() == YAnButton.ISPRESSED_TRUE);
-                if (b1 || b2)
-                {
-                    if (b1) { led = led1; frequency = 1500; }
-                    else { led = led2; frequency = 750; }
+                if (b1 || b2) {
+                    if (b1) {
+                        led = led1;
+                        frequency = 1500;
+                    } else {
+                        led = led2;
+                        frequency = 750;
+                    }
 
                     led.set_power(YLed.POWER_ON);
                     led.set_luminosity(100);
                     led.set_blinking(YLed.BLINKING_PANIC);
-                    for (int i = 0; i < 5; i++)  // this can be done using sequence as well
-                    {
+                    for (int i = 0; i < 5; i++) { // this can be done using sequence as well
                         buz.set_frequency(frequency);
                         buz.freqMove(2 * frequency, 250);
                         YAPI.Sleep(250, ref errmsg);
@@ -81,7 +79,7 @@ namespace ConsoleApplication1
                 }
 
             }
+            YAPI.FreeAPI();
         }
-
     }
 }

@@ -38,14 +38,13 @@ namespace ConsoleApplication1
 
         static void Main(string[] args)
         {
-            
+
             string errmsg = "";
-      
+
             Console.WriteLine("Waiting for hubs to signal themselves..." );
 
             // configure the API to contact any networked device
-            if (YAPI.RegisterHub("net", ref errmsg) != YAPI.SUCCESS)
-            {
+            if (YAPI.RegisterHub("net", ref errmsg) != YAPI.SUCCESS) {
                 Console.WriteLine("RegisterHub error: " + errmsg);
                 Environment.Exit(0);
             }
@@ -55,8 +54,7 @@ namespace ConsoleApplication1
             YAPI.RegisterDeviceArrivalCallback(arrivalCallback);
 
             // wait for 30 seconds, doing nothing.
-            for (int i = 0; i < 30; i++)
-            {
+            for (int i = 0; i < 30; i++) {
                 YAPI.UpdateDeviceList(ref errmsg);
                 YAPI.Sleep(1000, ref errmsg);
             }

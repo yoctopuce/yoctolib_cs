@@ -27,29 +27,25 @@ namespace ConsoleApplication1
             YAccelerometer accelerometer;
             YGyro gyro;
 
+            if (args.Length < 1)
+                usage();
             target = args[0].ToUpper();
 
             // Setup the API to use local USB devices
-            if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS)
-            {
+            if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS) {
                 Console.WriteLine("RegisterHub error: " + errmsg);
                 Environment.Exit(0);
             }
 
-            if (target == "ANY")
-            {
+            if (target == "ANY") {
                 anytilt = YTilt.FirstTilt();
-                if (anytilt == null)
-                {
+                if (anytilt == null) {
                     Console.WriteLine("No module connected (check USB cable)");
                     Environment.Exit(0);
                 }
-            }
-            else
-            {
+            } else {
                 anytilt = YTilt.FindTilt(target + ".tilt1");
-                if (!anytilt.isOnline())
-                {
+                if (!anytilt.isOnline()) {
                     Console.WriteLine("Module not connected (check identification and USB cable)");
                     Environment.Exit(0);
                 }
@@ -63,13 +59,12 @@ namespace ConsoleApplication1
             gyro = YGyro.FindGyro(serial + ".gyro");
             int count = 0;
 
-            while (true)
-            {
-                if (!tilt1.isOnline())
-                {
-                    Console.WriteLine("device disconnected");
-                    Environment.Exit(0);
-                }
+            if (!tilt1.isOnline()) {
+                Console.WriteLine("device disconnected");
+                Environment.Exit(0);
+            }
+
+            while (tilt1.isOnline()) {
 
                 if (count % 10 == 0) Console.WriteLine("tilt1   tilt2   compass   acc   gyro");
 
@@ -81,6 +76,7 @@ namespace ConsoleApplication1
 
                 YAPI.Sleep(250, ref errmsg);
             }
+            YAPI.FreeAPI();
         }
     }
 }

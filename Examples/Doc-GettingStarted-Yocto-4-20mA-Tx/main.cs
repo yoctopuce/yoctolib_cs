@@ -31,10 +31,9 @@ namespace ConsoleApplication1
             YCurrentLoopOutput loop;
             double value;
 
-          
 
-            if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS)
-            {
+
+            if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS) {
                 Console.WriteLine("RegisterHub error: " + errmsg);
                 Environment.Exit(0);
             }
@@ -44,43 +43,36 @@ namespace ConsoleApplication1
             target = args[0].ToUpper();
             value = Convert.ToDouble(args[1]);
 
-           
 
-            if (target == "ANY")
-            {
+
+            if (target == "ANY") {
                 loop = YCurrentLoopOutput.FirstCurrentLoopOutput();
-                if (loop == null)
-                {
+                if (loop == null) {
                     Console.WriteLine("No module connected (check USB cable) ");
                     Environment.Exit(0);
                 }
-            }
-            else
-            {
+            } else {
                 loop = YCurrentLoopOutput.FindCurrentLoopOutput(target + ".currentLoopOutput");
             }
 
 
-            if (loop.isOnline())
-            {
+            if (loop.isOnline()) {
                 loop.set_current(value);
                 int loopPower = loop.get_loopPower();
-                if (loopPower == YCurrentLoopOutput.LOOPPOWER_NOPWR)
-                {
+                if (loopPower == YCurrentLoopOutput.LOOPPOWER_NOPWR) {
                     Console.WriteLine("Current loop not powered");
                     Environment.Exit(0);
                 }
-                if (loopPower == YCurrentLoopOutput.LOOPPOWER_LOWPWR)
-                {
+                if (loopPower == YCurrentLoopOutput.LOOPPOWER_LOWPWR) {
                     Console.WriteLine("Insufficient voltage on current loop");
                     Environment.Exit(0);
                 }
 
                 Console.WriteLine("current loop set to " + value.ToString() + " mA");
-            }
-            else
+            } else {
                 Console.WriteLine("Module not connected (check identification and USB cable)");
-
+            }
+            YAPI.FreeAPI();
         }
     }
 }

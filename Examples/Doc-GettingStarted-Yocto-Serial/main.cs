@@ -13,50 +13,41 @@ namespace ConsoleApplication1
             string target;
             YSerialPort serialPort;
 
-            if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS)
-            {
+            if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS) {
                 Console.WriteLine("RegisterHub error: " + errmsg);
                 Environment.Exit(0);
             }
 
-            if (args.Length > 0)
-            {
+            if (args.Length > 0) {
                 target = args[0];
                 serialPort = YSerialPort.FindSerialPort(target + ".serialPort");
-                if (!serialPort.isOnline())
-                {
+                if (!serialPort.isOnline()) {
                     Console.WriteLine("No module connected (check cable)");
                     Environment.Exit(0);
                 }
-            }
-            else
-            {
+            } else {
                 serialPort = YSerialPort.FirstSerialPort();
-                if (serialPort == null)
-                {
+                if (serialPort == null) {
                     Console.WriteLine("No module connected (check USB cable)");
                     Environment.Exit(0);
                 }
             }
-            
+
             Console.WriteLine("****************************");
-            Console.WriteLine("* make sure voltage levels *"); 
+            Console.WriteLine("* make sure voltage levels *");
             Console.WriteLine("* are properly configured  *");
             Console.WriteLine("****************************");
-   
+
             serialPort.set_serialMode("9600,8N1");
             serialPort.set_protocol("Line");
             serialPort.reset();
 
             string line;
-            do
-            {
+            do {
                 YAPI.Sleep(500, ref errmsg);
-                do
-                {
+                do {
                     line = serialPort.readLine();
-                    if (line != "")
-                    {
+                    if (line != "") {
                         Console.WriteLine("Received: " + line);
                     }
                 } while (line != "");

@@ -25,21 +25,19 @@ namespace ConsoleApplication1
             int value;
             YSpiPort spiPort;
 
-            if (args.Length < 2) usage();
+            if (args.Length < 2)
+                usage();
             target = args[0].ToUpper();
             value = Convert.ToInt32(args[1]);
 
-            if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS)
-            {
+            if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS) {
                 Console.WriteLine("RegisterHub error: " + errmsg);
                 Environment.Exit(0);
             }
 
-            if (target == "ANY")
-            {
+            if (target == "ANY") {
                 spiPort = YSpiPort.FirstSpiPort();
-                if (spiPort == null)
-                {
+                if (spiPort == null) {
                     Console.WriteLine("No module connected (check USB cable) ");
                     Environment.Exit(0);
                 }
@@ -47,14 +45,15 @@ namespace ConsoleApplication1
             }
 
             spiPort = YSpiPort.FindSpiPort(target + ".spiPort");
-            if (spiPort.isOnline())
-            {
-                spiPort.set_spiMode("250000,2,msb");
+            if (spiPort.isOnline()) {
+                spiPort.set_spiMode("250000,3,msb");
                 spiPort.set_ssPolarity(YSpiPort.SSPOLARITY_ACTIVE_LOW);
                 spiPort.set_protocol("Frame:5ms");
                 spiPort.reset();
+                // do not forget to configure the powerOutput of the Yocto-SPI
+                // ( for SPI7SEGDISP8.56 powerOutput need to be set at 5v )
                 Console.WriteLine("****************************");
-                Console.WriteLine("* make sure voltage levels *"); 
+                Console.WriteLine("* make sure voltage levels *");
                 Console.WriteLine("* are properly configured  *");
                 Console.WriteLine("****************************");
 
@@ -62,13 +61,12 @@ namespace ConsoleApplication1
                 spiPort.writeHex("09ff"); // Enable BCD for all digits
                 spiPort.writeHex("0b07"); // Enable digits 0-7 (=8 in total)
                 spiPort.writeHex("0a0a"); // Set medium brightness
-                for(int i = 1; i <= 8; i++) {
+                for (int i = 1; i <= 8; i++) {
                     int digit = value % 10; // digit value
                     spiPort.writeArray(new List<int> { i, digit });
                     value = value / 10;
                 }
-            }
-            else
+            } else
                 Console.WriteLine("Module not connected (check identification and USB cable)");
 
             YAPI.FreeAPI();

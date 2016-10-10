@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 19325 2015-02-17 17:28:16Z seb $
+ * $Id: yocto_display.cs 25275 2016-08-24 13:42:24Z mvuilleu $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -424,14 +424,14 @@ public enum   ALIGN
      * </param>
      * <param name="anchor">
      *   the text anchor point, chosen among the <c>YDisplayLayer.ALIGN</c> enumeration:
-     *   <c>YDisplayLayer.ALIGN_TOP_LEFT</c>,    <c>YDisplayLayer.ALIGN_CENTER_LEFT</c>,   
-     *   <c>YDisplayLayer.ALIGN_BASELINE_LEFT</c>,    <c>YDisplayLayer.ALIGN_BOTTOM_LEFT</c>,
-     *   <c>YDisplayLayer.ALIGN_TOP_CENTER</c>,  <c>YDisplayLayer.ALIGN_CENTER</c>,        
-     *   <c>YDisplayLayer.ALIGN_BASELINE_CENTER</c>,  <c>YDisplayLayer.ALIGN_BOTTOM_CENTER</c>,
-     *   <c>YDisplayLayer.ALIGN_TOP_DECIMAL</c>, <c>YDisplayLayer.ALIGN_CENTER_DECIMAL</c>,
-     *   <c>YDisplayLayer.ALIGN_BASELINE_DECIMAL</c>, <c>YDisplayLayer.ALIGN_BOTTOM_DECIMAL</c>,
-     *   <c>YDisplayLayer.ALIGN_TOP_RIGHT</c>,   <c>YDisplayLayer.ALIGN_CENTER_RIGHT</c>,  
-     *   <c>YDisplayLayer.ALIGN_BASELINE_RIGHT</c>,   <c>YDisplayLayer.ALIGN_BOTTOM_RIGHT</c>.
+     *   <c>YDisplayLayer.ALIGN.TOP_LEFT</c>,    <c>YDisplayLayer.ALIGN.CENTER_LEFT</c>,   
+     *   <c>YDisplayLayer.ALIGN.BASELINE_LEFT</c>,    <c>YDisplayLayer.ALIGN.BOTTOM_LEFT</c>,
+     *   <c>YDisplayLayer.ALIGN.TOP_CENTER</c>,  <c>YDisplayLayer.ALIGN.CENTER</c>,        
+     *   <c>YDisplayLayer.ALIGN.BASELINE_CENTER</c>,  <c>YDisplayLayer.ALIGN.BOTTOM_CENTER</c>,
+     *   <c>YDisplayLayer.ALIGN.TOP_DECIMAL</c>, <c>YDisplayLayer.ALIGN.CENTER_DECIMAL</c>,
+     *   <c>YDisplayLayer.ALIGN.BASELINE_DECIMAL</c>, <c>YDisplayLayer.ALIGN.BOTTOM_DECIMAL</c>,
+     *   <c>YDisplayLayer.ALIGN.TOP_RIGHT</c>,   <c>YDisplayLayer.ALIGN.CENTER_RIGHT</c>,  
+     *   <c>YDisplayLayer.ALIGN.BASELINE_RIGHT</c>,   <c>YDisplayLayer.ALIGN.BOTTOM_RIGHT</c>.
      * </param>
      * <param name="text">
      *   the text string to draw
