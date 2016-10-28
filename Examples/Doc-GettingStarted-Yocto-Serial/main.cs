@@ -18,7 +18,7 @@ namespace ConsoleApplication1
                 Environment.Exit(0);
             }
 
-            if (args.Length > 0) {
+            if (args.Length > 0 && args[0] != "any") {
                 target = args[0];
                 serialPort = YSerialPort.FindSerialPort(target + ".serialPort");
                 if (!serialPort.isOnline()) {

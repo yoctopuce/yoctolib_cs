@@ -1,4 +1,2 @@
-- Fix some demo examples
-- Fix some comments in sources
-- Fix YFunction.FirstFunction() method that was not returning all functions.
-- YFunction.FirstFunction() method that was not returning all functions.
+- Fix method sendPUK of class YCellular
+- Fix possible timeout during firmware update of GSM hub

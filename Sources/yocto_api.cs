@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 23873 2016-04-11 16:20:05Z seb $
+ * $Id: yocto_api.cs 25651 2016-10-20 13:36:46Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1745,7 +1745,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "25534";
+    public const string YOCTO_API_BUILD_NO = "25748";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -4279,7 +4279,9 @@ public class YDataStream
             }
         }
         if (this._caltyp != 0) {
-            val = this._calhdl(val, this._caltyp, this._calpar, this._calraw, this._calref);
+            if (this._calhdl != null) {
+                val = this._calhdl(val, this._caltyp, this._calpar, this._calraw, this._calref);
+            }
         }
         return val;
     }
@@ -4298,7 +4300,9 @@ public class YDataStream
             }
         }
         if (this._caltyp != 0) {
-            val = this._calhdl(val, this._caltyp, this._calpar, this._calraw, this._calref);
+            if (this._calhdl != null) {
+                val = this._calhdl(val, this._caltyp, this._calpar, this._calraw, this._calref);
+            }
         }
         return val;
     }
