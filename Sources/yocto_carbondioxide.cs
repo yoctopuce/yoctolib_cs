@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_carbondioxide.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_carbondioxide.cs 25831 2016-11-08 11:12:15Z seb $
  *
  * Implements yFindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -344,9 +344,14 @@ public class YCarbonDioxide : YSensor
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int triggetBaselineCalibration()
+    public virtual int triggerBaselineCalibration()
     {
         return this.set_command("BC");
+    }
+
+    public virtual int triggetBaselineCalibration()
+    {
+        return this.triggerBaselineCalibration();
     }
 
     /**
@@ -373,9 +378,14 @@ public class YCarbonDioxide : YSensor
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int triggetZeroCalibration()
+    public virtual int triggerZeroCalibration()
     {
         return this.set_command("ZC");
+    }
+
+    public virtual int triggetZeroCalibration()
+    {
+        return this.triggerZeroCalibration();
     }
 
     /**

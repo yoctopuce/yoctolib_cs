@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_digitalio.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_digitalio.cs 25871 2016-11-15 14:32:56Z seb $
  *
  * Implements yFindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -337,7 +337,8 @@ public class YDigitalIO : YFunction
 
     /**
      * <summary>
-     *   Changes the polarity of all the bits of the port: 0 makes a bit an input, 1 makes it an output.
+     *   Changes the polarity of all the bits of the port: For each bit set to 0, the matching I/O works the regular,
+     *   intuitive way; for each bit set to 1, the I/O works in reverse mode.
      * <para>
      *   Remember to call the <c>saveToFlash()</c> method  to make sure the setting will be kept after a reboot.
      * </para>
@@ -345,8 +346,9 @@ public class YDigitalIO : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to the polarity of all the bits of the port: 0 makes a bit an input, 1
-     *   makes it an output
+     *   an integer corresponding to the polarity of all the bits of the port: For each bit set to 0, the
+     *   matching I/O works the regular,
+     *   intuitive way; for each bit set to 1, the I/O works in reverse mode
      * </param>
      * <para>
      * </para>
