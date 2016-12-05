@@ -194,6 +194,9 @@
 <Compile Include="..\..\Sources\yocto_pressure.cs">
 <Link>yocto_api\yocto_pressure.cs</Link>
 </Compile>
+<Compile Include="..\..\Sources\yocto_proximity.cs">
+<Link>yocto_api\yocto_proximity.cs</Link>
+</Compile>
 <Compile Include="..\..\Sources\yocto_pwminput.cs">
 <Link>yocto_api\yocto_pwminput.cs</Link>
 </Compile>
@@ -226,6 +229,9 @@
 </Compile>
 <Compile Include="..\..\Sources\yocto_spiport.cs">
 <Link>yocto_api\yocto_spiport.cs</Link>
+</Compile>
+<Compile Include="..\..\Sources\yocto_steppermotor.cs">
+<Link>yocto_api\yocto_steppermotor.cs</Link>
 </Compile>
 <Compile Include="..\..\Sources\yocto_temperature.cs">
 <Link>yocto_api\yocto_temperature.cs</Link>

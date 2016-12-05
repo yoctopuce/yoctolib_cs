@@ -1,6 +1,6 @@
 /********************************************************************
  *
- * $Id: yocto_datalogger.cs 22197 2015-12-02 12:58:24Z mvuilleu $
+ * $Id: yocto_datalogger.cs 26132 2016-12-01 17:02:38Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -825,7 +825,7 @@ public class YDataLogger : YFunction
         for (int ii = 0; ii < dslist.Count; ii++) {
             dataset = new YDataSet(this);
             dataset._parse(dslist[ii]);
-            res.Add(dataset);;
+            res.Add(dataset);
         }
         return res;
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 25651 2016-10-20 13:36:46Z seb $
+ * $Id: yocto_api.cs 26132 2016-12-01 17:02:38Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1745,7 +1745,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "25913";
+    public const string YOCTO_API_BUILD_NO = "26144";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -5073,8 +5073,8 @@ public class YDataSet
                 this._measures.Add(new YMeasure(tim - itv, tim, dataRows[ii][minCol], dataRows[ii][avgCol], dataRows[ii][maxCol]));
             }
             tim = tim + itv;
+            tim = Math.Round(tim * 1000) / 1000.0;
         }
-        
         return this.get_progress();
     }
 
@@ -5364,7 +5364,6 @@ public class YDataSet
             if (this._streams[ii].get_startTimeUTC() == startUtc) {
                 stream = this._streams[ii];
             }
-            ;;
         }
         if (stream == null) {
             return measures;
@@ -5395,7 +5394,7 @@ public class YDataSet
             if ((tim >= this._startTime) && ((this._endTime == 0) || (tim <= this._endTime))) {
                 measures.Add(new YMeasure(tim - itv, tim, dataRows[ii][minCol], dataRows[ii][avgCol], dataRows[ii][maxCol]));
             }
-            tim = tim + itv;;
+            tim = tim + itv;
         }
         return measures;
     }
@@ -7884,7 +7883,7 @@ public class YModule : YFunction
                     ext_settings = ext_settings + item;
                     sep = ",";
                 }
-            };
+            }
         }
         ext_settings = ext_settings + "],\n\"files\":[";
         if (this.hasFunction("files")) {
@@ -7902,7 +7901,7 @@ public class YModule : YFunction
                     item = ""+ sep+"{\"name\":\""+ name+"\", \"data\":\""+file_data+"\"}\n";
                     ext_settings = ext_settings + item;
                     sep = ",";
-                };
+                }
             }
         }
         res = YAPI.DefaultEncoding.GetBytes("{ \"api\":" + YAPI.DefaultEncoding.GetString(settings) + ext_settings + "]}");
@@ -7946,7 +7945,7 @@ public class YModule : YFunction
             data = this._get_json_path( extras[ii], "json");
             if (this.hasFunction(functionId)) {
                 this.loadThermistorExtra(functionId, data);
-            };
+            }
         }
         return YAPI.SUCCESS;
     }
@@ -8006,7 +8005,7 @@ public class YModule : YFunction
                 name = this._decode_json_string(name);
                 data = this._get_json_path( files[ii], "data");
                 data = this._decode_json_string(data);
-                this._upload(name, YAPI._hexStrToBin(data));;
+                this._upload(name, YAPI._hexStrToBin(data));
             }
         }
         return YAPI.SUCCESS;
@@ -8409,7 +8408,7 @@ public class YModule : YFunction
             value = (each_str).Substring( eqpos, leng - eqpos);
             old_jpath.Add(jpath);
             old_jpath_len.Add((jpath).Length);
-            old_val_arr.Add(value);;
+            old_val_arr.Add(value);
         }
         // may throw an exception
         actualSettings = this._download("api.json");
@@ -8428,7 +8427,7 @@ public class YModule : YFunction
             value = (each_str).Substring( eqpos, leng - eqpos);
             new_jpath.Add(jpath);
             new_jpath_len.Add((jpath).Length);
-            new_val_arr.Add(value);;
+            new_val_arr.Add(value);
         }
         i = 0;
         while (i < new_jpath.Count) {
@@ -8619,7 +8618,7 @@ public class YModule : YFunction
             i = i + 1;
         }
         for (int ii = 0; ii < restoreLast.Count; ii++) {
-            this._download(restoreLast[ii]);;
+            this._download(restoreLast[ii]);
         }
         return YAPI.SUCCESS;
     }
