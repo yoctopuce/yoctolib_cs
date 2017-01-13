@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 26132 2016-12-01 17:02:38Z seb $
+ * $Id: yocto_api.cs 26329 2017-01-11 14:04:39Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -1745,7 +1745,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "26144";
+    public const string YOCTO_API_BUILD_NO = "26380";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6262,6 +6262,34 @@ public class YFunction
     public virtual int unmuteValueCallbacks()
     {
         return this.set_advertisedValue("");
+    }
+
+    /**
+     * <summary>
+     *   Returns the current value of a single function attribute, as a text string, as quickly as
+     *   possible but without using the cached value.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="attrName">
+     *   le nom de l'attribut désiré
+     * </param>
+     * <returns>
+     *   une chaîne de caractères représentant la valeur actuelle de l'attribut.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty string.
+     * </para>
+     */
+    public virtual string loadAttribute(string attrName)
+    {
+        string url;
+        byte[] attrVal;
+        url = "api/"+ this.get_functionId()+"/"+attrName;
+        attrVal = this._download(url);
+        return YAPI.DefaultEncoding.GetString(attrVal);
     }
 
     public virtual int _parserHelper()

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 25964 2016-11-21 15:30:59Z mvuilleu $
+ * $Id: yocto_steppermotor.cs 26277 2017-01-04 15:35:59Z seb $
  *
  * Implements yFindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -87,11 +87,12 @@ public class YStepperMotor : YFunction
     public const int STEPPING_HALFSTEP = 3;
     public const int STEPPING_FULLSTEP = 4;
     public const int STEPPING_INVALID = -1;
-    public const double USTEPMAXSPEED_INVALID = YAPI.INVALID_DOUBLE;
     public const int OVERCURRENT_INVALID = YAPI.INVALID_UINT;
     public const int TCURRSTOP_INVALID = YAPI.INVALID_UINT;
     public const int TCURRRUN_INVALID = YAPI.INVALID_UINT;
     public const string ALERTMODE_INVALID = YAPI.INVALID_STRING;
+    public const string AUXMODE_INVALID = YAPI.INVALID_STRING;
+    public const int AUXSIGNAL_INVALID = YAPI.INVALID_INT;
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _motorState = MOTORSTATE_INVALID;
     protected int _diags = DIAGS_INVALID;
@@ -101,11 +102,12 @@ public class YStepperMotor : YFunction
     protected double _maxAccel = MAXACCEL_INVALID;
     protected double _maxSpeed = MAXSPEED_INVALID;
     protected int _stepping = STEPPING_INVALID;
-    protected double _ustepMaxSpeed = USTEPMAXSPEED_INVALID;
     protected int _overcurrent = OVERCURRENT_INVALID;
     protected int _tCurrStop = TCURRSTOP_INVALID;
     protected int _tCurrRun = TCURRRUN_INVALID;
     protected string _alertMode = ALERTMODE_INVALID;
+    protected string _auxMode = AUXMODE_INVALID;
+    protected int _auxSignal = AUXSIGNAL_INVALID;
     protected string _command = COMMAND_INVALID;
     protected ValueCallback _valueCallbackStepperMotor = null;
     //--- (end of YStepperMotor definitions)
@@ -162,11 +164,6 @@ public class YStepperMotor : YFunction
             _stepping = (int)member.ivalue;
             return;
         }
-        if (member.name == "ustepMaxSpeed")
-        {
-            _ustepMaxSpeed = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
-        }
         if (member.name == "overcurrent")
         {
             _overcurrent = (int)member.ivalue;
@@ -185,6 +182,16 @@ public class YStepperMotor : YFunction
         if (member.name == "alertMode")
         {
             _alertMode = member.svalue;
+            return;
+        }
+        if (member.name == "auxMode")
+        {
+            _auxMode = member.svalue;
+            return;
+        }
+        if (member.name == "auxSignal")
+        {
+            _auxSignal = (int)member.ivalue;
             return;
         }
         if (member.name == "command")
@@ -548,60 +555,6 @@ public class YStepperMotor : YFunction
 
     /**
      * <summary>
-     *   Changes the maximal motor speed for micro-stepping, measured in steps per second.
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="newval">
-     *   a floating point number corresponding to the maximal motor speed for micro-stepping, measured in
-     *   steps per second
-     * </param>
-     * <para>
-     * </para>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public int set_ustepMaxSpeed(double newval)
-    {
-        string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("ustepMaxSpeed", rest_val);
-    }
-
-    /**
-     * <summary>
-     *   Returns the maximal motor speed for micro-stepping, measured in steps per second.
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   a floating point number corresponding to the maximal motor speed for micro-stepping, measured in
-     *   steps per second
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns <c>YStepperMotor.USTEPMAXSPEED_INVALID</c>.
-     * </para>
-     */
-    public double get_ustepMaxSpeed()
-    {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return USTEPMAXSPEED_INVALID;
-            }
-        }
-        return this._ustepMaxSpeed;
-    }
-
-    /**
-     * <summary>
      *   Returns the overcurrent alert and emergency stop threshold, measured in mA.
      * <para>
      * </para>
@@ -773,6 +726,76 @@ public class YStepperMotor : YFunction
         return _setAttr("alertMode", rest_val);
     }
 
+    public string get_auxMode()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return AUXMODE_INVALID;
+            }
+        }
+        return this._auxMode;
+    }
+
+    public int set_auxMode(string newval)
+    {
+        string rest_val;
+        rest_val = newval;
+        return _setAttr("auxMode", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the current value of the signal generated on the auxiliary output.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the current value of the signal generated on the auxiliary output
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YStepperMotor.AUXSIGNAL_INVALID</c>.
+     * </para>
+     */
+    public int get_auxSignal()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return AUXSIGNAL_INVALID;
+            }
+        }
+        return this._auxSignal;
+    }
+
+    /**
+     * <summary>
+     *   Changes the value of the signal generated on the auxiliary output.
+     * <para>
+     *   Acceptable values depend on the auxiliary output signal type configured.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the value of the signal generated on the auxiliary output
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_auxSignal(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("auxSignal", rest_val);
+    }
+
     public string get_command()
     {
         if (this._cacheExpiration <= YAPI.GetTickCount()) {
@@ -902,7 +925,7 @@ public class YStepperMotor : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   <c>YAPI_SUCCESS</c> if the call succeeds.
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
      *   On failure, throws an exception or returns a negative error code.
      * </returns>
      */
@@ -921,13 +944,13 @@ public class YStepperMotor : YFunction
      *   desired speed, in steps per second.
      * </param>
      * <returns>
-     *   <c>YAPI_SUCCESS</c> if the call succeeds.
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
      *   On failure, throws an exception or returns a negative error code.
      * </returns>
      */
     public virtual int findHomePosition(double speed)
     {
-        return this.sendCommand("H");
+        return this.sendCommand("H"+Convert.ToString((int) Math.Round(1000*speed)));
     }
 
     /**
@@ -943,13 +966,13 @@ public class YStepperMotor : YFunction
      *   is 0.001 pulse per second.
      * </param>
      * <returns>
-     *   <c>YAPI_SUCCESS</c> if the call succeeds.
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
      *   On failure, throws an exception or returns a negative error code.
      * </returns>
      */
     public virtual int changeSpeed(double speed)
     {
-        return this.sendCommand("R"+Convert.ToString(Math.Round(1000*speed)));
+        return this.sendCommand("R"+Convert.ToString((int) Math.Round(1000*speed)));
     }
 
     /**
@@ -965,39 +988,54 @@ public class YStepperMotor : YFunction
      *   absolute position, measured in steps from the origin.
      * </param>
      * <returns>
-     *   <c>YAPI_SUCCESS</c> if the call succeeds.
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
      *   On failure, throws an exception or returns a negative error code.
      * </returns>
      */
     public virtual int moveTo(double absPos)
     {
-        return this.sendCommand("M"+Convert.ToString(Math.Round(16*absPos)));
+        return this.sendCommand("M"+Convert.ToString((int) Math.Round(16*absPos)));
     }
 
     /**
      * <summary>
-     *   Starts the motor to reach a given absolute position.
+     *   Starts the motor to reach a given relative position.
      * <para>
      *   The time needed to reach the requested
      *   position will depend on the acceleration and max speed parameters configured for
      *   the motor.
-     * </para>
-     * <para>
      * </para>
      * </summary>
      * <param name="relPos">
      *   relative position, measured in steps from the current position.
      * </param>
      * <returns>
-     *   <c>YAPI_SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
      *   On failure, throws an exception or returns a negative error code.
-     * </para>
+     * </returns>
      */
     public virtual int moveRel(double relPos)
     {
-        return this.sendCommand("m"+Convert.ToString(Math.Round(16*relPos)));
+        return this.sendCommand("m"+Convert.ToString((int) Math.Round(16*relPos)));
+    }
+
+    /**
+     * <summary>
+     *   Keep the motor in the same state for the specified amount of time, before processing next command.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="waitMs">
+     *   wait time, specified in milliseconds.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     *   On failure, throws an exception or returns a negative error code.
+     * </returns>
+     */
+    public virtual int pause(int waitMs)
+    {
+        return this.sendCommand("_"+Convert.ToString(waitMs));
     }
 
     /**
@@ -1007,7 +1045,7 @@ public class YStepperMotor : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   <c>YAPI_SUCCESS</c> if the call succeeds.
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
      *   On failure, throws an exception or returns a negative error code.
      * </returns>
      */
@@ -1025,7 +1063,7 @@ public class YStepperMotor : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   <c>YAPI_SUCCESS</c> if the call succeeds.
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
      *   On failure, throws an exception or returns a negative error code.
      * </returns>
      */
@@ -1041,7 +1079,7 @@ public class YStepperMotor : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   <c>YAPI_SUCCESS</c> if the call succeeds.
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
      *   On failure, throws an exception or returns a negative error code.
      * </returns>
      */
@@ -1057,7 +1095,7 @@ public class YStepperMotor : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   <c>YAPI_SUCCESS</c> if the call succeeds.
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
      *   On failure, throws an exception or returns a negative error code.
      * </returns>
      */

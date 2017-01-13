@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_voltage.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_voltage.cs 26183 2016-12-15 00:14:02Z mvuilleu $
  *
  * Implements yFindVoltage(), the high-level API for Voltage functions
  *
@@ -71,6 +71,10 @@ public class YVoltage : YSensor
     public new delegate void ValueCallback(YVoltage func, string value);
     public new delegate void TimedReportCallback(YVoltage func, YMeasure measure);
 
+    public const int ENABLED_FALSE = 0;
+    public const int ENABLED_TRUE = 1;
+    public const int ENABLED_INVALID = -1;
+    protected int _enabled = ENABLED_INVALID;
     protected ValueCallback _valueCallbackVoltage = null;
     protected TimedReportCallback _timedReportCallbackVoltage = null;
     //--- (end of YVoltage definitions)
@@ -87,7 +91,29 @@ public class YVoltage : YSensor
 
     protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
+        if (member.name == "enabled")
+        {
+            _enabled = member.ivalue > 0 ? 1 : 0;
+            return;
+        }
         base._parseAttr(member);
+    }
+
+    public int get_enabled()
+    {
+        if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return ENABLED_INVALID;
+            }
+        }
+        return this._enabled;
+    }
+
+    public int set_enabled(int newval)
+    {
+        string rest_val;
+        rest_val = (newval > 0 ? "1" : "0");
+        return _setAttr("enabled", rest_val);
     }
 
     /**

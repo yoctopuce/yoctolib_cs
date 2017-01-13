@@ -179,6 +179,9 @@
 <Compile Include="..\..\Sources\yocto_motor.cs">
 <Link>yocto_api\yocto_motor.cs</Link>
 </Compile>
+<Compile Include="..\..\Sources\yocto_multiaxiscontroller.cs">
+<Link>yocto_api\yocto_multiaxiscontroller.cs</Link>
+</Compile>
 <Compile Include="..\..\Sources\yocto_network.cs">
 <Link>yocto_api\yocto_network.cs</Link>
 </Compile>
@@ -208,6 +211,9 @@
 </Compile>
 <Compile Include="..\..\Sources\yocto_quadraturedecoder.cs">
 <Link>yocto_api\yocto_quadraturedecoder.cs</Link>
+</Compile>
+<Compile Include="..\..\Sources\yocto_rangefinder.cs">
+<Link>yocto_api\yocto_rangefinder.cs</Link>
 </Compile>
 <Compile Include="..\..\Sources\yocto_realtimeclock.cs">
 <Link>yocto_api\yocto_realtimeclock.cs</Link>
