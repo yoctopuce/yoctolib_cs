@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pwminput.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_pwminput.cs 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements yFindPwmInput(), the high-level API for PwmInput functions
  *
@@ -58,7 +58,7 @@ using YFUN_DESCR = System.Int32;
  *   sensors.
  * <para>
  *   It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  *   This class adds the ability to configure the signal parameter used to transmit
  *   information: the duty cycle, the frequency or the pulse width.
  * </para>
@@ -162,12 +162,16 @@ public class YPwmInput : YSensor
      */
     public double get_dutyCycle()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DUTYCYCLE_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DUTYCYCLE_INVALID;
+                }
             }
+            res = this._dutyCycle;
         }
-        return this._dutyCycle;
+        return res;
     }
 
     /**
@@ -187,12 +191,16 @@ public class YPwmInput : YSensor
      */
     public double get_pulseDuration()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PULSEDURATION_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PULSEDURATION_INVALID;
+                }
             }
+            res = this._pulseDuration;
         }
-        return this._pulseDuration;
+        return res;
     }
 
     /**
@@ -212,12 +220,16 @@ public class YPwmInput : YSensor
      */
     public double get_frequency()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return FREQUENCY_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return FREQUENCY_INVALID;
+                }
             }
+            res = this._frequency;
         }
-        return this._frequency;
+        return res;
     }
 
     /**
@@ -237,12 +249,16 @@ public class YPwmInput : YSensor
      */
     public double get_period()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PERIOD_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PERIOD_INVALID;
+                }
             }
+            res = this._period;
         }
-        return this._period;
+        return res;
     }
 
     /**
@@ -265,12 +281,16 @@ public class YPwmInput : YSensor
      */
     public long get_pulseCounter()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PULSECOUNTER_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PULSECOUNTER_INVALID;
+                }
             }
+            res = this._pulseCounter;
         }
-        return this._pulseCounter;
+        return res;
     }
 
     public int set_pulseCounter(long newval)
@@ -297,12 +317,16 @@ public class YPwmInput : YSensor
      */
     public long get_pulseTimer()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PULSETIMER_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PULSETIMER_INVALID;
+                }
             }
+            res = this._pulseTimer;
         }
-        return this._pulseTimer;
+        return res;
     }
 
     /**
@@ -326,12 +350,16 @@ public class YPwmInput : YSensor
      */
     public int get_pwmReportMode()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PWMREPORTMODE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PWMREPORTMODE_INVALID;
+                }
             }
+            res = this._pwmReportMode;
         }
-        return this._pwmReportMode;
+        return res;
     }
 
     /**
@@ -409,10 +437,12 @@ public class YPwmInput : YSensor
     public static YPwmInput FindPwmInput(string func)
     {
         YPwmInput obj;
-        obj = (YPwmInput) YFunction._FindFromCache("PwmInput", func);
-        if (obj == null) {
-            obj = new YPwmInput(func);
-            YFunction._AddToCache("PwmInput", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YPwmInput) YFunction._FindFromCache("PwmInput", func);
+            if (obj == null) {
+                obj = new YPwmInput(func);
+                YFunction._AddToCache("PwmInput", func, obj);
+            }
         }
         return obj;
     }

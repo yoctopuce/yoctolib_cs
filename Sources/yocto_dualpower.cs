@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_dualpower.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_dualpower.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindDualPower(), the high-level API for DualPower functions
  *
@@ -137,12 +137,16 @@ public class YDualPower : YFunction
      */
     public int get_powerState()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return POWERSTATE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return POWERSTATE_INVALID;
+                }
             }
+            res = this._powerState;
         }
-        return this._powerState;
+        return res;
     }
 
     /**
@@ -164,12 +168,16 @@ public class YDualPower : YFunction
      */
     public int get_powerControl()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return POWERCONTROL_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return POWERCONTROL_INVALID;
+                }
             }
+            res = this._powerControl;
         }
-        return this._powerControl;
+        return res;
     }
 
     /**
@@ -218,12 +226,16 @@ public class YDualPower : YFunction
      */
     public int get_extVoltage()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return EXTVOLTAGE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return EXTVOLTAGE_INVALID;
+                }
             }
+            res = this._extVoltage;
         }
-        return this._extVoltage;
+        return res;
     }
 
     /**
@@ -271,10 +283,12 @@ public class YDualPower : YFunction
     public static YDualPower FindDualPower(string func)
     {
         YDualPower obj;
-        obj = (YDualPower) YFunction._FindFromCache("DualPower", func);
-        if (obj == null) {
-            obj = new YDualPower(func);
-            YFunction._AddToCache("DualPower", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YDualPower) YFunction._FindFromCache("DualPower", func);
+            if (obj == null) {
+                obj = new YDualPower(func);
+                YFunction._AddToCache("DualPower", func, obj);
+            }
         }
         return obj;
     }

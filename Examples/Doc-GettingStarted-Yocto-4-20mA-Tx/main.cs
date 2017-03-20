@@ -31,8 +31,6 @@ namespace ConsoleApplication1
       YCurrentLoopOutput loop;
       double value;
 
-
-
       if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS) {
         Console.WriteLine("RegisterHub error: " + errmsg);
         Environment.Exit(0);
@@ -43,8 +41,6 @@ namespace ConsoleApplication1
       target = args[0].ToUpper();
       value = Convert.ToDouble(args[1]);
 
-
-
       if (target == "ANY") {
         loop = YCurrentLoopOutput.FirstCurrentLoopOutput();
         if (loop == null) {
@@ -54,7 +50,6 @@ namespace ConsoleApplication1
       } else {
         loop = YCurrentLoopOutput.FindCurrentLoopOutput(target + ".currentLoopOutput");
       }
-
 
       if (loop.isOnline()) {
         loop.set_current(value);

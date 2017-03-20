@@ -56,10 +56,11 @@ namespace ConsoleApplication1
       if (ch1.isOnline()) unitSensor1  = ch1.get_unit();
       if (ch2.isOnline()) unitSensor2 = ch2.get_unit();
 
-
       while (ch1.isOnline() && ch2.isOnline()) {
-        Console.Write("Channel 1 : " + ch1.get_currentValue().ToString() + unitSensor1);
-        Console.Write("   Channel 2 : " + ch2.get_currentValue().ToString() + unitSensor2);
+        Console.Write("Channel 1 : " + ch1.get_currentValue().ToString()
+                      + unitSensor1);
+        Console.Write("   Channel 2 : " + ch2.get_currentValue().ToString()
+                      + unitSensor2);
         Console.WriteLine("  (press Ctrl-C to exit)");
         YAPI.Sleep(1000, ref errmsg);
       }

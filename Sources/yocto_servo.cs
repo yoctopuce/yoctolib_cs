@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_servo.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_servo.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindServo(), the high-level API for Servo functions
  *
@@ -178,12 +178,16 @@ public class YServo : YFunction
      */
     public int get_position()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return POSITION_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return POSITION_INVALID;
+                }
             }
+            res = this._position;
         }
-        return this._position;
+        return res;
     }
 
     /**
@@ -230,12 +234,16 @@ public class YServo : YFunction
      */
     public int get_enabled()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLED_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLED_INVALID;
+                }
             }
+            res = this._enabled;
         }
-        return this._enabled;
+        return res;
     }
 
     /**
@@ -282,12 +290,16 @@ public class YServo : YFunction
      */
     public int get_range()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RANGE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RANGE_INVALID;
+                }
             }
+            res = this._range;
         }
-        return this._range;
+        return res;
     }
 
     /**
@@ -340,12 +352,16 @@ public class YServo : YFunction
      */
     public int get_neutral()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return NEUTRAL_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return NEUTRAL_INVALID;
+                }
             }
+            res = this._neutral;
         }
-        return this._neutral;
+        return res;
     }
 
     /**
@@ -382,12 +398,16 @@ public class YServo : YFunction
 
     public YServoMove get_move()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MOVE_INVALID;
+        YServoMove res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MOVE_INVALID;
+                }
             }
+            res = this._move;
         }
-        return this._move;
+        return res;
     }
 
     public int set_move(YServoMove newval)
@@ -444,12 +464,16 @@ public class YServo : YFunction
      */
     public int get_positionAtPowerOn()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return POSITIONATPOWERON_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return POSITIONATPOWERON_INVALID;
+                }
             }
+            res = this._positionAtPowerOn;
         }
-        return this._positionAtPowerOn;
+        return res;
     }
 
     /**
@@ -499,12 +523,16 @@ public class YServo : YFunction
      */
     public int get_enabledAtPowerOn()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLEDATPOWERON_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLEDATPOWERON_INVALID;
+                }
             }
+            res = this._enabledAtPowerOn;
         }
-        return this._enabledAtPowerOn;
+        return res;
     }
 
     /**
@@ -581,10 +609,12 @@ public class YServo : YFunction
     public static YServo FindServo(string func)
     {
         YServo obj;
-        obj = (YServo) YFunction._FindFromCache("Servo", func);
-        if (obj == null) {
-            obj = new YServo(func);
-            YFunction._AddToCache("Servo", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YServo) YFunction._FindFromCache("Servo", func);
+            if (obj == null) {
+                obj = new YServo(func);
+                YFunction._AddToCache("Servo", func, obj);
+            }
         }
         return obj;
     }

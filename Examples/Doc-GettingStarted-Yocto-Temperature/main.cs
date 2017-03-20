@@ -51,7 +51,8 @@ namespace ConsoleApplication1
       }
 
       while (tsensor.isOnline()) {
-        Console.WriteLine("Current temperature: " + tsensor.get_currentValue().ToString() + " °C");
+        Console.WriteLine("Current temperature: " + tsensor.get_currentValue().ToString()
+                          + " °C");
         Console.WriteLine("  (press Ctrl-C to exit)");
 
         YAPI.Sleep(1000, ref errmsg);

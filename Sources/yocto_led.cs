@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_led.cs 24475 2016-05-12 14:03:35Z mvuilleu $
+ * $Id: yocto_led.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindLed(), the high-level API for Led functions
  *
@@ -134,12 +134,16 @@ public class YLed : YFunction
      */
     public int get_power()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return POWER_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return POWER_INVALID;
+                }
             }
+            res = this._power;
         }
-        return this._power;
+        return res;
     }
 
     /**
@@ -186,12 +190,16 @@ public class YLed : YFunction
      */
     public int get_luminosity()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LUMINOSITY_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LUMINOSITY_INVALID;
+                }
             }
+            res = this._luminosity;
         }
-        return this._luminosity;
+        return res;
     }
 
     /**
@@ -240,12 +248,16 @@ public class YLed : YFunction
      */
     public int get_blinking()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BLINKING_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BLINKING_INVALID;
+                }
             }
+            res = this._blinking;
         }
-        return this._blinking;
+        return res;
     }
 
     /**
@@ -322,10 +334,12 @@ public class YLed : YFunction
     public static YLed FindLed(string func)
     {
         YLed obj;
-        obj = (YLed) YFunction._FindFromCache("Led", func);
-        if (obj == null) {
-            obj = new YLed(func);
-            YFunction._AddToCache("Led", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YLed) YFunction._FindFromCache("Led", func);
+            if (obj == null) {
+                obj = new YLed(func);
+                YFunction._AddToCache("Led", func, obj);
+            }
         }
         return obj;
     }

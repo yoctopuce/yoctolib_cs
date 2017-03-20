@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_currentloopoutput.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_currentloopoutput.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -165,22 +165,30 @@ public class YCurrentLoopOutput : YFunction
      */
     public double get_current()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CURRENT_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CURRENT_INVALID;
+                }
             }
+            res = this._current;
         }
-        return this._current;
+        return res;
     }
 
     public string get_currentTransition()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CURRENTTRANSITION_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CURRENTTRANSITION_INVALID;
+                }
             }
+            res = this._currentTransition;
         }
-        return this._currentTransition;
+        return res;
     }
 
     public int set_currentTransition(string newval)
@@ -236,12 +244,16 @@ public class YCurrentLoopOutput : YFunction
      */
     public double get_currentAtStartUp()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CURRENTATSTARTUP_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CURRENTATSTARTUP_INVALID;
+                }
             }
+            res = this._currentAtStartUp;
         }
-        return this._currentAtStartUp;
+        return res;
     }
 
     /**
@@ -265,12 +277,16 @@ public class YCurrentLoopOutput : YFunction
      */
     public int get_loopPower()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LOOPPOWER_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LOOPPOWER_INVALID;
+                }
             }
+            res = this._loopPower;
         }
-        return this._loopPower;
+        return res;
     }
 
     /**
@@ -318,10 +334,12 @@ public class YCurrentLoopOutput : YFunction
     public static YCurrentLoopOutput FindCurrentLoopOutput(string func)
     {
         YCurrentLoopOutput obj;
-        obj = (YCurrentLoopOutput) YFunction._FindFromCache("CurrentLoopOutput", func);
-        if (obj == null) {
-            obj = new YCurrentLoopOutput(func);
-            YFunction._AddToCache("CurrentLoopOutput", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YCurrentLoopOutput) YFunction._FindFromCache("CurrentLoopOutput", func);
+            if (obj == null) {
+                obj = new YCurrentLoopOutput(func);
+                YFunction._AddToCache("CurrentLoopOutput", func, obj);
+            }
         }
         return obj;
     }

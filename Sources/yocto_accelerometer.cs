@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_accelerometer.cs 24934 2016-06-30 22:32:01Z mvuilleu $
+ * $Id: yocto_accelerometer.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -150,12 +150,16 @@ public class YAccelerometer : YSensor
      */
     public int get_bandwidth()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BANDWIDTH_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BANDWIDTH_INVALID;
+                }
             }
+            res = this._bandwidth;
         }
-        return this._bandwidth;
+        return res;
     }
 
     /**
@@ -204,12 +208,16 @@ public class YAccelerometer : YSensor
      */
     public double get_xValue()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return XVALUE_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return XVALUE_INVALID;
+                }
             }
+            res = this._xValue;
         }
-        return this._xValue;
+        return res;
     }
 
     /**
@@ -229,12 +237,16 @@ public class YAccelerometer : YSensor
      */
     public double get_yValue()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return YVALUE_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return YVALUE_INVALID;
+                }
             }
+            res = this._yValue;
         }
-        return this._yValue;
+        return res;
     }
 
     /**
@@ -254,22 +266,30 @@ public class YAccelerometer : YSensor
      */
     public double get_zValue()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ZVALUE_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ZVALUE_INVALID;
+                }
             }
+            res = this._zValue;
         }
-        return this._zValue;
+        return res;
     }
 
     public int get_gravityCancellation()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return GRAVITYCANCELLATION_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return GRAVITYCANCELLATION_INVALID;
+                }
             }
+            res = this._gravityCancellation;
         }
-        return this._gravityCancellation;
+        return res;
     }
 
     public int set_gravityCancellation(int newval)
@@ -324,10 +344,12 @@ public class YAccelerometer : YSensor
     public static YAccelerometer FindAccelerometer(string func)
     {
         YAccelerometer obj;
-        obj = (YAccelerometer) YFunction._FindFromCache("Accelerometer", func);
-        if (obj == null) {
-            obj = new YAccelerometer(func);
-            YFunction._AddToCache("Accelerometer", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YAccelerometer) YFunction._FindFromCache("Accelerometer", func);
+            if (obj == null) {
+                obj = new YAccelerometer(func);
+                YFunction._AddToCache("Accelerometer", func, obj);
+            }
         }
         return obj;
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorledcluster.cs 24934 2016-06-30 22:32:01Z mvuilleu $
+ * $Id: yocto_colorledcluster.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -146,12 +146,16 @@ public class YColorLedCluster : YFunction
      */
     public int get_activeLedCount()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ACTIVELEDCOUNT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ACTIVELEDCOUNT_INVALID;
+                }
             }
+            res = this._activeLedCount;
         }
-        return this._activeLedCount;
+        return res;
     }
 
     /**
@@ -198,12 +202,16 @@ public class YColorLedCluster : YFunction
      */
     public int get_maxLedCount()
     {
-        if (this._cacheExpiration == 0) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MAXLEDCOUNT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration == 0) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MAXLEDCOUNT_INVALID;
+                }
             }
+            res = this._maxLedCount;
         }
-        return this._maxLedCount;
+        return res;
     }
 
     /**
@@ -223,12 +231,16 @@ public class YColorLedCluster : YFunction
      */
     public int get_blinkSeqMaxCount()
     {
-        if (this._cacheExpiration == 0) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BLINKSEQMAXCOUNT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration == 0) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BLINKSEQMAXCOUNT_INVALID;
+                }
             }
+            res = this._blinkSeqMaxCount;
         }
-        return this._blinkSeqMaxCount;
+        return res;
     }
 
     /**
@@ -248,22 +260,30 @@ public class YColorLedCluster : YFunction
      */
     public int get_blinkSeqMaxSize()
     {
-        if (this._cacheExpiration == 0) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BLINKSEQMAXSIZE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration == 0) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BLINKSEQMAXSIZE_INVALID;
+                }
             }
+            res = this._blinkSeqMaxSize;
         }
-        return this._blinkSeqMaxSize;
+        return res;
     }
 
     public string get_command()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = this._command;
         }
-        return this._command;
+        return res;
     }
 
     public int set_command(string newval)
@@ -318,10 +338,12 @@ public class YColorLedCluster : YFunction
     public static YColorLedCluster FindColorLedCluster(string func)
     {
         YColorLedCluster obj;
-        obj = (YColorLedCluster) YFunction._FindFromCache("ColorLedCluster", func);
-        if (obj == null) {
-            obj = new YColorLedCluster(func);
-            YFunction._AddToCache("ColorLedCluster", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YColorLedCluster) YFunction._FindFromCache("ColorLedCluster", func);
+            if (obj == null) {
+                obj = new YColorLedCluster(func);
+                YFunction._AddToCache("ColorLedCluster", func, obj);
+            }
         }
         return obj;
     }

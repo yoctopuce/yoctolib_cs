@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_spiport.cs 25085 2016-07-26 16:38:36Z mvuilleu $
+ * $Id: yocto_spiport.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindSpiPort(), the high-level API for SpiPort functions
  *
@@ -219,12 +219,16 @@ public class YSpiPort : YFunction
      */
     public int get_rxCount()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RXCOUNT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RXCOUNT_INVALID;
+                }
             }
+            res = this._rxCount;
         }
-        return this._rxCount;
+        return res;
     }
 
     /**
@@ -244,12 +248,16 @@ public class YSpiPort : YFunction
      */
     public int get_txCount()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return TXCOUNT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return TXCOUNT_INVALID;
+                }
             }
+            res = this._txCount;
         }
-        return this._txCount;
+        return res;
     }
 
     /**
@@ -269,12 +277,16 @@ public class YSpiPort : YFunction
      */
     public int get_errCount()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ERRCOUNT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ERRCOUNT_INVALID;
+                }
             }
+            res = this._errCount;
         }
-        return this._errCount;
+        return res;
     }
 
     /**
@@ -294,12 +306,16 @@ public class YSpiPort : YFunction
      */
     public int get_rxMsgCount()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RXMSGCOUNT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RXMSGCOUNT_INVALID;
+                }
             }
+            res = this._rxMsgCount;
         }
-        return this._rxMsgCount;
+        return res;
     }
 
     /**
@@ -319,12 +335,16 @@ public class YSpiPort : YFunction
      */
     public int get_txMsgCount()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return TXMSGCOUNT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return TXMSGCOUNT_INVALID;
+                }
             }
+            res = this._txMsgCount;
         }
-        return this._txMsgCount;
+        return res;
     }
 
     /**
@@ -344,12 +364,16 @@ public class YSpiPort : YFunction
      */
     public string get_lastMsg()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LASTMSG_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LASTMSG_INVALID;
+                }
             }
+            res = this._lastMsg;
         }
-        return this._lastMsg;
+        return res;
     }
 
     /**
@@ -369,12 +393,16 @@ public class YSpiPort : YFunction
      */
     public string get_currentJob()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CURRENTJOB_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CURRENTJOB_INVALID;
+                }
             }
+            res = this._currentJob;
         }
-        return this._currentJob;
+        return res;
     }
 
     /**
@@ -423,12 +451,16 @@ public class YSpiPort : YFunction
      */
     public string get_startupJob()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return STARTUPJOB_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return STARTUPJOB_INVALID;
+                }
             }
+            res = this._startupJob;
         }
-        return this._startupJob;
+        return res;
     }
 
     /**
@@ -462,12 +494,16 @@ public class YSpiPort : YFunction
 
     public string get_command()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = this._command;
         }
-        return this._command;
+        return res;
     }
 
     public int set_command(string newval)
@@ -497,12 +533,16 @@ public class YSpiPort : YFunction
      */
     public int get_voltageLevel()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return VOLTAGELEVEL_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return VOLTAGELEVEL_INVALID;
+                }
             }
+            res = this._voltageLevel;
         }
-        return this._voltageLevel;
+        return res;
     }
 
     /**
@@ -561,12 +601,16 @@ public class YSpiPort : YFunction
      */
     public string get_protocol()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PROTOCOL_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PROTOCOL_INVALID;
+                }
             }
+            res = this._protocol;
         }
-        return this._protocol;
+        return res;
     }
 
     /**
@@ -623,12 +667,16 @@ public class YSpiPort : YFunction
      */
     public string get_spiMode()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SPIMODE_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SPIMODE_INVALID;
+                }
             }
+            res = this._spiMode;
         }
-        return this._spiMode;
+        return res;
     }
 
     /**
@@ -680,12 +728,16 @@ public class YSpiPort : YFunction
      */
     public int get_ssPolarity()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SSPOLARITY_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SSPOLARITY_INVALID;
+                }
             }
+            res = this._ssPolarity;
         }
-        return this._ssPolarity;
+        return res;
     }
 
     /**
@@ -734,12 +786,16 @@ public class YSpiPort : YFunction
      */
     public int get_shitftSampling()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SHITFTSAMPLING_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SHITFTSAMPLING_INVALID;
+                }
             }
+            res = this._shitftSampling;
         }
-        return this._shitftSampling;
+        return res;
     }
 
     /**
@@ -818,10 +874,12 @@ public class YSpiPort : YFunction
     public static YSpiPort FindSpiPort(string func)
     {
         YSpiPort obj;
-        obj = (YSpiPort) YFunction._FindFromCache("SpiPort", func);
-        if (obj == null) {
-            obj = new YSpiPort(func);
-            YFunction._AddToCache("SpiPort", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YSpiPort) YFunction._FindFromCache("SpiPort", func);
+            if (obj == null) {
+                obj = new YSpiPort(func);
+                YFunction._AddToCache("SpiPort", func, obj);
+            }
         }
         return obj;
     }

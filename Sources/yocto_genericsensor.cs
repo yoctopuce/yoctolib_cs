@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_genericsensor.cs 23527 2016-03-18 21:49:19Z mvuilleu $
+ * $Id: yocto_genericsensor.cs 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements yFindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -58,7 +58,7 @@ using YFUN_DESCR = System.Int32;
  *   transducers.
  * <para>
  *   It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  *   This class adds the ability to configure the automatic conversion between the
  *   measured signal and the corresponding engineering unit.
  * </para>
@@ -184,12 +184,16 @@ public class YGenericSensor : YSensor
      */
     public double get_signalValue()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SIGNALVALUE_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SIGNALVALUE_INVALID;
+                }
             }
+            res = Math.Round(this._signalValue * 1000) / 1000;
         }
-        return Math.Round(this._signalValue * 1000) / 1000;
+        return res;
     }
 
     /**
@@ -209,12 +213,16 @@ public class YGenericSensor : YSensor
      */
     public string get_signalUnit()
     {
-        if (this._cacheExpiration == 0) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SIGNALUNIT_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration == 0) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SIGNALUNIT_INVALID;
+                }
             }
+            res = this._signalUnit;
         }
-        return this._signalUnit;
+        return res;
     }
 
     /**
@@ -234,18 +242,23 @@ public class YGenericSensor : YSensor
      */
     public string get_signalRange()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SIGNALRANGE_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SIGNALRANGE_INVALID;
+                }
             }
+            res = this._signalRange;
         }
-        return this._signalRange;
+        return res;
     }
 
     /**
      * <summary>
      *   Changes the electric signal range used by the sensor.
      * <para>
+     *   Default value is "-999999.999...999999.999".
      * </para>
      * <para>
      * </para>
@@ -286,12 +299,16 @@ public class YGenericSensor : YSensor
      */
     public string get_valueRange()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return VALUERANGE_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return VALUERANGE_INVALID;
+                }
             }
+            res = this._valueRange;
         }
-        return this._valueRange;
+        return res;
     }
 
     /**
@@ -299,7 +316,7 @@ public class YGenericSensor : YSensor
      *   Changes the physical value range measured by the sensor.
      * <para>
      *   As a side effect, the range modification may
-     *   automatically modify the display resolution.
+     *   automatically modify the display resolution. Default value is "-999999.999...999999.999".
      * </para>
      * <para>
      * </para>
@@ -371,12 +388,16 @@ public class YGenericSensor : YSensor
      */
     public double get_signalBias()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SIGNALBIAS_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SIGNALBIAS_INVALID;
+                }
             }
+            res = this._signalBias;
         }
-        return this._signalBias;
+        return res;
     }
 
     /**
@@ -404,12 +425,16 @@ public class YGenericSensor : YSensor
      */
     public int get_signalSampling()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SIGNALSAMPLING_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SIGNALSAMPLING_INVALID;
+                }
             }
+            res = this._signalSampling;
         }
-        return this._signalSampling;
+        return res;
     }
 
     /**
@@ -492,10 +517,12 @@ public class YGenericSensor : YSensor
     public static YGenericSensor FindGenericSensor(string func)
     {
         YGenericSensor obj;
-        obj = (YGenericSensor) YFunction._FindFromCache("GenericSensor", func);
-        if (obj == null) {
-            obj = new YGenericSensor(func);
-            YFunction._AddToCache("GenericSensor", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YGenericSensor) YFunction._FindFromCache("GenericSensor", func);
+            if (obj == null) {
+                obj = new YGenericSensor(func);
+                YFunction._AddToCache("GenericSensor", func, obj);
+            }
         }
         return obj;
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_latitude.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_latitude.cs 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements yFindLatitude(), the high-level API for Latitude functions
  *
@@ -58,7 +58,7 @@ using YFUN_DESCR = System.Int32;
  *   geolocalization sensors.
  * <para>
  *   It inherits from the YSensor class the core functions to
- *   read measurements, register callback functions, access the autonomous
+ *   read measurements, to register callback functions, to access the autonomous
  *   datalogger.
  * </para>
  * <para>
@@ -136,10 +136,12 @@ public class YLatitude : YSensor
     public static YLatitude FindLatitude(string func)
     {
         YLatitude obj;
-        obj = (YLatitude) YFunction._FindFromCache("Latitude", func);
-        if (obj == null) {
-            obj = new YLatitude(func);
-            YFunction._AddToCache("Latitude", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YLatitude) YFunction._FindFromCache("Latitude", func);
+            if (obj == null) {
+                obj = new YLatitude(func);
+                YFunction._AddToCache("Latitude", func, obj);
+            }
         }
         return obj;
     }

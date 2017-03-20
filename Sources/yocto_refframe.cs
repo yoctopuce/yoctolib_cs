@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_refframe.cs 25275 2016-08-24 13:42:24Z mvuilleu $
+ * $Id: yocto_refframe.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -151,12 +151,16 @@ public enum   MOUNTORIENTATION
 
     public int get_mountPos()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MOUNTPOS_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MOUNTPOS_INVALID;
+                }
             }
+            res = this._mountPos;
         }
-        return this._mountPos;
+        return res;
     }
 
     public int set_mountPos(int newval)
@@ -230,22 +234,30 @@ public enum   MOUNTORIENTATION
      */
     public double get_bearing()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BEARING_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BEARING_INVALID;
+                }
             }
+            res = this._bearing;
         }
-        return this._bearing;
+        return res;
     }
 
     public string get_calibrationParam()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALIBRATIONPARAM_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALIBRATIONPARAM_INVALID;
+                }
             }
+            res = this._calibrationParam;
         }
-        return this._calibrationParam;
+        return res;
     }
 
     public int set_calibrationParam(string newval)
@@ -300,10 +312,12 @@ public enum   MOUNTORIENTATION
     public static YRefFrame FindRefFrame(string func)
     {
         YRefFrame obj;
-        obj = (YRefFrame) YFunction._FindFromCache("RefFrame", func);
-        if (obj == null) {
-            obj = new YRefFrame(func);
-            YFunction._AddToCache("RefFrame", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YRefFrame) YFunction._FindFromCache("RefFrame", func);
+            if (obj == null) {
+                obj = new YRefFrame(func);
+                YFunction._AddToCache("RefFrame", func, obj);
+            }
         }
         return obj;
     }

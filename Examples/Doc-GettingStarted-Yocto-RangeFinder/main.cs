@@ -20,8 +20,9 @@ namespace ConsoleApplication1
     {
       string errmsg = "";
       string target;
-
-      YCarbonDioxide co2sensor;
+      YRangeFinder rf;
+      YLightSensor ir;
+      YTemperature tmp;
 
       if (args.Length < 1) usage();
       target = args[0].ToUpper();
@@ -33,25 +34,26 @@ namespace ConsoleApplication1
       }
 
       if (target == "ANY") {
-        co2sensor = YCarbonDioxide.FirstCarbonDioxide();
-
-        if (co2sensor == null) {
+        rf = YRangeFinder.FirstRangeFinder();
+        if (rf == null) {
           Console.WriteLine("No module connected (check USB cable) ");
           Environment.Exit(0);
         }
-        Console.WriteLine("using " + co2sensor.get_module().get_serialNumber());
-      } else {
-        co2sensor = YCarbonDioxide.FindCarbonDioxide(target + ".carbonDioxide");
-      }
+        target = rf.get_module().get_serialNumber();
+      } else rf = YRangeFinder.FindRangeFinder(target + ".rangefinder1");
 
-      if (!co2sensor.isOnline()) {
+      if (!rf.isOnline()) {
         Console.WriteLine("Module not connected (check identification and USB cable)");
         Environment.Exit(0);
       }
-      while (co2sensor.isOnline()) {
-        Console.WriteLine("CO2: " + co2sensor.get_currentValue().ToString() + " ppm");
-        Console.WriteLine("  (press Ctrl-C to exit)");
+      ir = YLightSensor.FindLightSensor(target + ".lightSensor1");
+      tmp = YTemperature.FindTemperature(target + ".temperature1");
 
+      while (rf.isOnline()) {
+        Console.WriteLine("Distance    : " + rf.get_currentValue().ToString());
+        Console.WriteLine("Ambiant IR  : " + ir.get_currentValue().ToString());
+        Console.WriteLine("Temperature : " + tmp.get_currentValue().ToString());
+        Console.WriteLine("  (press Ctrl-C to exit)");
         YAPI.Sleep(1000, ref errmsg);
       }
       YAPI.FreeAPI();

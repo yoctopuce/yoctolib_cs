@@ -1,6 +1,6 @@
 /********************************************************************
  *
- * $Id: yocto_datalogger.cs 26132 2016-12-01 17:02:38Z seb $
+ * $Id: yocto_datalogger.cs 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -426,12 +426,16 @@ public class YDataLogger : YFunction
      */
     public int get_currentRunIndex()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CURRENTRUNINDEX_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CURRENTRUNINDEX_INVALID;
+                }
             }
+            res = this._currentRunIndex;
         }
-        return this._currentRunIndex;
+        return res;
     }
 
     /**
@@ -451,12 +455,16 @@ public class YDataLogger : YFunction
      */
     public long get_timeUTC()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return TIMEUTC_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return TIMEUTC_INVALID;
+                }
             }
+            res = this._timeUTC;
         }
-        return this._timeUTC;
+        return res;
     }
 
     /**
@@ -504,12 +512,16 @@ public class YDataLogger : YFunction
      */
     public int get_recording()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RECORDING_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RECORDING_INVALID;
+                }
             }
+            res = this._recording;
         }
-        return this._recording;
+        return res;
     }
 
     /**
@@ -559,12 +571,16 @@ public class YDataLogger : YFunction
      */
     public int get_autoStart()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return AUTOSTART_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return AUTOSTART_INVALID;
+                }
             }
+            res = this._autoStart;
         }
-        return this._autoStart;
+        return res;
     }
 
     /**
@@ -599,14 +615,15 @@ public class YDataLogger : YFunction
 
     /**
      * <summary>
-     *   Return true if the data logger is synchronised with the localization beacon.
+     *   Returns true if the data logger is synchronised with the localization beacon.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   either <c>YDataLogger.BEACONDRIVEN_OFF</c> or <c>YDataLogger.BEACONDRIVEN_ON</c>
+     *   either <c>YDataLogger.BEACONDRIVEN_OFF</c> or <c>YDataLogger.BEACONDRIVEN_ON</c>, according to true
+     *   if the data logger is synchronised with the localization beacon
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YDataLogger.BEACONDRIVEN_INVALID</c>.
@@ -614,12 +631,16 @@ public class YDataLogger : YFunction
      */
     public int get_beaconDriven()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BEACONDRIVEN_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BEACONDRIVEN_INVALID;
+                }
             }
+            res = this._beaconDriven;
         }
-        return this._beaconDriven;
+        return res;
     }
 
     /**
@@ -654,12 +675,16 @@ public class YDataLogger : YFunction
 
     public int get_clearHistory()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CLEARHISTORY_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CLEARHISTORY_INVALID;
+                }
             }
+            res = this._clearHistory;
         }
-        return this._clearHistory;
+        return res;
     }
 
     public int set_clearHistory(int newval)
@@ -714,10 +739,12 @@ public class YDataLogger : YFunction
     public static YDataLogger FindDataLogger(string func)
     {
         YDataLogger obj;
-        obj = (YDataLogger) YFunction._FindFromCache("DataLogger", func);
-        if (obj == null) {
-            obj = new YDataLogger(func);
-            YFunction._AddToCache("DataLogger", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YDataLogger) YFunction._FindFromCache("DataLogger", func);
+            if (obj == null) {
+                obj = new YDataLogger(func);
+                YFunction._AddToCache("DataLogger", func, obj);
+            }
         }
         return obj;
     }
@@ -882,7 +909,7 @@ public class YDataLogger : YFunction
             query = "GET " + _dataLoggerURL + " HTTP/1.1\r\n\r\n";
         }
 
-        res = dev.HTTPRequest(query, ref buffer, ref errmsg);
+        res = dev.HTTPRequest(query, out buffer, ref errmsg);
         if (YAPI.YISERR(res))
         {
             res = YAPI.UpdateDeviceList(ref errmsg);
@@ -892,7 +919,7 @@ public class YDataLogger : YFunction
                 return res;
             }
 
-            res = dev.HTTPRequest("GET " + _dataLoggerURL + " HTTP/1.1\r\n\r\n", ref buffer, ref errmsg);
+            res = dev.HTTPRequest("GET " + _dataLoggerURL + " HTTP/1.1\r\n\r\n", out buffer, ref errmsg);
             if (YAPI.YISERR(res))
             {
                 _throw(res, errmsg);

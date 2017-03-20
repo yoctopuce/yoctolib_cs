@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs 22693 2016-01-12 23:10:50Z seb $
+ * $Id: yocto_files.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -166,12 +166,16 @@ public class YFiles : YFunction
      */
     public int get_filesCount()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return FILESCOUNT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return FILESCOUNT_INVALID;
+                }
             }
+            res = this._filesCount;
         }
-        return this._filesCount;
+        return res;
     }
 
     /**
@@ -191,12 +195,16 @@ public class YFiles : YFunction
      */
     public int get_freeSpace()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return FREESPACE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return FREESPACE_INVALID;
+                }
             }
+            res = this._freeSpace;
         }
-        return this._freeSpace;
+        return res;
     }
 
     /**
@@ -244,10 +252,12 @@ public class YFiles : YFunction
     public static YFiles FindFiles(string func)
     {
         YFiles obj;
-        obj = (YFiles) YFunction._FindFromCache("Files", func);
-        if (obj == null) {
-            obj = new YFiles(func);
-            YFunction._AddToCache("Files", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YFiles) YFunction._FindFromCache("Files", func);
+            if (obj == null) {
+                obj = new YFiles(func);
+                YFunction._AddToCache("Files", func, obj);
+            }
         }
         return obj;
     }

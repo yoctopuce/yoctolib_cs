@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pwmoutput.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_pwmoutput.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -163,12 +163,16 @@ public class YPwmOutput : YFunction
      */
     public int get_enabled()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLED_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLED_INVALID;
+                }
             }
+            res = this._enabled;
         }
-        return this._enabled;
+        return res;
     }
 
     /**
@@ -244,12 +248,16 @@ public class YPwmOutput : YFunction
      */
     public double get_frequency()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return FREQUENCY_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return FREQUENCY_INVALID;
+                }
             }
+            res = this._frequency;
         }
-        return this._frequency;
+        return res;
     }
 
     /**
@@ -296,12 +304,16 @@ public class YPwmOutput : YFunction
      */
     public double get_period()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PERIOD_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PERIOD_INVALID;
+                }
             }
+            res = this._period;
         }
-        return this._period;
+        return res;
     }
 
     /**
@@ -348,12 +360,16 @@ public class YPwmOutput : YFunction
      */
     public double get_dutyCycle()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DUTYCYCLE_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DUTYCYCLE_INVALID;
+                }
             }
+            res = this._dutyCycle;
         }
-        return this._dutyCycle;
+        return res;
     }
 
     /**
@@ -401,22 +417,30 @@ public class YPwmOutput : YFunction
      */
     public double get_pulseDuration()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PULSEDURATION_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PULSEDURATION_INVALID;
+                }
             }
+            res = this._pulseDuration;
         }
-        return this._pulseDuration;
+        return res;
     }
 
     public string get_pwmTransition()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PWMTRANSITION_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PWMTRANSITION_INVALID;
+                }
             }
+            res = this._pwmTransition;
         }
-        return this._pwmTransition;
+        return res;
     }
 
     public int set_pwmTransition(string newval)
@@ -444,12 +468,16 @@ public class YPwmOutput : YFunction
      */
     public int get_enabledAtPowerOn()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLEDATPOWERON_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLEDATPOWERON_INVALID;
+                }
             }
+            res = this._enabledAtPowerOn;
         }
-        return this._enabledAtPowerOn;
+        return res;
     }
 
     /**
@@ -529,12 +557,16 @@ public class YPwmOutput : YFunction
      */
     public double get_dutyCycleAtPowerOn()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DUTYCYCLEATPOWERON_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DUTYCYCLEATPOWERON_INVALID;
+                }
             }
+            res = this._dutyCycleAtPowerOn;
         }
-        return this._dutyCycleAtPowerOn;
+        return res;
     }
 
     /**
@@ -582,10 +614,12 @@ public class YPwmOutput : YFunction
     public static YPwmOutput FindPwmOutput(string func)
     {
         YPwmOutput obj;
-        obj = (YPwmOutput) YFunction._FindFromCache("PwmOutput", func);
-        if (obj == null) {
-            obj = new YPwmOutput(func);
-            YFunction._AddToCache("PwmOutput", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YPwmOutput) YFunction._FindFromCache("PwmOutput", func);
+            if (obj == null) {
+                obj = new YPwmOutput(func);
+                YFunction._AddToCache("PwmOutput", func, obj);
+            }
         }
         return obj;
     }

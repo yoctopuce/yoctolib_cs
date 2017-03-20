@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 25275 2016-08-24 13:42:24Z mvuilleu $
+ * $Id: yocto_display.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -1047,12 +1047,16 @@ public class YDisplay : YFunction
      */
     public int get_enabled()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLED_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLED_INVALID;
+                }
             }
+            res = this._enabled;
         }
-        return this._enabled;
+        return res;
     }
 
     /**
@@ -1100,12 +1104,16 @@ public class YDisplay : YFunction
      */
     public string get_startupSeq()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return STARTUPSEQ_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return STARTUPSEQ_INVALID;
+                }
             }
+            res = this._startupSeq;
         }
-        return this._startupSeq;
+        return res;
     }
 
     /**
@@ -1154,12 +1162,16 @@ public class YDisplay : YFunction
      */
     public int get_brightness()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BRIGHTNESS_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BRIGHTNESS_INVALID;
+                }
             }
+            res = this._brightness;
         }
-        return this._brightness;
+        return res;
     }
 
     /**
@@ -1211,12 +1223,16 @@ public class YDisplay : YFunction
      */
     public int get_orientation()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ORIENTATION_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ORIENTATION_INVALID;
+                }
             }
+            res = this._orientation;
         }
-        return this._orientation;
+        return res;
     }
 
     /**
@@ -1266,12 +1282,16 @@ public class YDisplay : YFunction
      */
     public int get_displayWidth()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DISPLAYWIDTH_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DISPLAYWIDTH_INVALID;
+                }
             }
+            res = this._displayWidth;
         }
-        return this._displayWidth;
+        return res;
     }
 
     /**
@@ -1291,12 +1311,16 @@ public class YDisplay : YFunction
      */
     public int get_displayHeight()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DISPLAYHEIGHT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DISPLAYHEIGHT_INVALID;
+                }
             }
+            res = this._displayHeight;
         }
-        return this._displayHeight;
+        return res;
     }
 
     /**
@@ -1317,12 +1341,16 @@ public class YDisplay : YFunction
      */
     public int get_displayType()
     {
-        if (this._cacheExpiration == 0) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DISPLAYTYPE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration == 0) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DISPLAYTYPE_INVALID;
+                }
             }
+            res = this._displayType;
         }
-        return this._displayType;
+        return res;
     }
 
     /**
@@ -1342,12 +1370,16 @@ public class YDisplay : YFunction
      */
     public int get_layerWidth()
     {
-        if (this._cacheExpiration == 0) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LAYERWIDTH_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration == 0) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LAYERWIDTH_INVALID;
+                }
             }
+            res = this._layerWidth;
         }
-        return this._layerWidth;
+        return res;
     }
 
     /**
@@ -1367,12 +1399,16 @@ public class YDisplay : YFunction
      */
     public int get_layerHeight()
     {
-        if (this._cacheExpiration == 0) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LAYERHEIGHT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration == 0) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LAYERHEIGHT_INVALID;
+                }
             }
+            res = this._layerHeight;
         }
-        return this._layerHeight;
+        return res;
     }
 
     /**
@@ -1392,22 +1428,30 @@ public class YDisplay : YFunction
      */
     public int get_layerCount()
     {
-        if (this._cacheExpiration == 0) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LAYERCOUNT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration == 0) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LAYERCOUNT_INVALID;
+                }
             }
+            res = this._layerCount;
         }
-        return this._layerCount;
+        return res;
     }
 
     public string get_command()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = this._command;
         }
-        return this._command;
+        return res;
     }
 
     public int set_command(string newval)
@@ -1462,10 +1506,12 @@ public class YDisplay : YFunction
     public static YDisplay FindDisplay(string func)
     {
         YDisplay obj;
-        obj = (YDisplay) YFunction._FindFromCache("Display", func);
-        if (obj == null) {
-            obj = new YDisplay(func);
-            YFunction._AddToCache("Display", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YDisplay) YFunction._FindFromCache("Display", func);
+            if (obj == null) {
+                obj = new YDisplay(func);
+                YFunction._AddToCache("Display", func, obj);
+            }
         }
         return obj;
     }

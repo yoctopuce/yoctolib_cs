@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_quadraturedecoder.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_quadraturedecoder.cs 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements yFindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -58,7 +58,7 @@ using YFUN_DESCR = System.Int32;
  *   quadrature encoder.
  * <para>
  *   It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  * </para>
  * <para>
  * </para>
@@ -151,12 +151,16 @@ public class YQuadratureDecoder : YSensor
      */
     public double get_speed()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SPEED_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SPEED_INVALID;
+                }
             }
+            res = this._speed;
         }
-        return this._speed;
+        return res;
     }
 
     /**
@@ -177,12 +181,16 @@ public class YQuadratureDecoder : YSensor
      */
     public int get_decoding()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DECODING_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DECODING_INVALID;
+                }
             }
+            res = this._decoding;
         }
-        return this._decoding;
+        return res;
     }
 
     /**
@@ -258,10 +266,12 @@ public class YQuadratureDecoder : YSensor
     public static YQuadratureDecoder FindQuadratureDecoder(string func)
     {
         YQuadratureDecoder obj;
-        obj = (YQuadratureDecoder) YFunction._FindFromCache("QuadratureDecoder", func);
-        if (obj == null) {
-            obj = new YQuadratureDecoder(func);
-            YFunction._AddToCache("QuadratureDecoder", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YQuadratureDecoder) YFunction._FindFromCache("QuadratureDecoder", func);
+            if (obj == null) {
+                obj = new YQuadratureDecoder(func);
+                YFunction._AddToCache("QuadratureDecoder", func, obj);
+            }
         }
         return obj;
     }

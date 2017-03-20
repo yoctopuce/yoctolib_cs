@@ -125,6 +125,9 @@
 <Compile Include="..\..\Sources\yocto_currentloopoutput.cs">
 <Link>yocto_api\yocto_currentloopoutput.cs</Link>
 </Compile>
+<Compile Include="..\..\Sources\yocto_daisychain.cs">
+<Link>yocto_api\yocto_daisychain.cs</Link>
+</Compile>
 <Compile Include="..\..\Sources\yocto_datalogger.cs">
 <Link>yocto_api\yocto_datalogger.cs</Link>
 </Compile>

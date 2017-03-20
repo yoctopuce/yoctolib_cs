@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_relay.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_relay.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindRelay(), the high-level API for Relay functions
  *
@@ -191,12 +191,16 @@ public class YRelay : YFunction
      */
     public int get_state()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return STATE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return STATE_INVALID;
+                }
             }
+            res = this._state;
         }
-        return this._state;
+        return res;
     }
 
     /**
@@ -246,12 +250,16 @@ public class YRelay : YFunction
      */
     public int get_stateAtPowerOn()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return STATEATPOWERON_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return STATEATPOWERON_INVALID;
+                }
             }
+            res = this._stateAtPowerOn;
         }
-        return this._stateAtPowerOn;
+        return res;
     }
 
     /**
@@ -303,12 +311,16 @@ public class YRelay : YFunction
      */
     public long get_maxTimeOnStateA()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MAXTIMEONSTATEA_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MAXTIMEONSTATEA_INVALID;
+                }
             }
+            res = this._maxTimeOnStateA;
         }
-        return this._maxTimeOnStateA;
+        return res;
     }
 
     /**
@@ -357,12 +369,16 @@ public class YRelay : YFunction
      */
     public long get_maxTimeOnStateB()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MAXTIMEONSTATEB_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MAXTIMEONSTATEB_INVALID;
+                }
             }
+            res = this._maxTimeOnStateB;
         }
-        return this._maxTimeOnStateB;
+        return res;
     }
 
     /**
@@ -411,12 +427,16 @@ public class YRelay : YFunction
      */
     public int get_output()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return OUTPUT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return OUTPUT_INVALID;
+                }
             }
+            res = this._output;
         }
-        return this._output;
+        return res;
     }
 
     /**
@@ -467,12 +487,16 @@ public class YRelay : YFunction
      */
     public long get_pulseTimer()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PULSETIMER_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PULSETIMER_INVALID;
+                }
             }
+            res = this._pulseTimer;
         }
-        return this._pulseTimer;
+        return res;
     }
 
     public int set_pulseTimer(long newval)
@@ -512,12 +536,16 @@ public class YRelay : YFunction
 
     public YRelayDelayedPulse get_delayedPulseTimer()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DELAYEDPULSETIMER_INVALID;
+        YRelayDelayedPulse res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DELAYEDPULSETIMER_INVALID;
+                }
             }
+            res = this._delayedPulseTimer;
         }
-        return this._delayedPulseTimer;
+        return res;
     }
 
     public int set_delayedPulseTimer(YRelayDelayedPulse newval)
@@ -576,12 +604,16 @@ public class YRelay : YFunction
      */
     public long get_countdown()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COUNTDOWN_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COUNTDOWN_INVALID;
+                }
             }
+            res = this._countdown;
         }
-        return this._countdown;
+        return res;
     }
 
     /**
@@ -629,10 +661,12 @@ public class YRelay : YFunction
     public static YRelay FindRelay(string func)
     {
         YRelay obj;
-        obj = (YRelay) YFunction._FindFromCache("Relay", func);
-        if (obj == null) {
-            obj = new YRelay(func);
-            YFunction._AddToCache("Relay", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YRelay) YFunction._FindFromCache("Relay", func);
+            if (obj == null) {
+                obj = new YRelay(func);
+                YFunction._AddToCache("Relay", func, obj);
+            }
         }
         return obj;
     }

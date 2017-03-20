@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_audioin.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_audioin.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindAudioIn(), the high-level API for AudioIn functions
  *
@@ -140,12 +140,16 @@ public class YAudioIn : YFunction
      */
     public int get_volume()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return VOLUME_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return VOLUME_INVALID;
+                }
             }
+            res = this._volume;
         }
-        return this._volume;
+        return res;
     }
 
     /**
@@ -192,12 +196,16 @@ public class YAudioIn : YFunction
      */
     public int get_mute()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MUTE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MUTE_INVALID;
+                }
             }
+            res = this._mute;
         }
-        return this._mute;
+        return res;
     }
 
     /**
@@ -250,12 +258,16 @@ public class YAudioIn : YFunction
      */
     public string get_volumeRange()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return VOLUMERANGE_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return VOLUMERANGE_INVALID;
+                }
             }
+            res = this._volumeRange;
         }
-        return this._volumeRange;
+        return res;
     }
 
     /**
@@ -275,12 +287,16 @@ public class YAudioIn : YFunction
      */
     public int get_signal()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SIGNAL_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SIGNAL_INVALID;
+                }
             }
+            res = this._signal;
         }
-        return this._signal;
+        return res;
     }
 
     /**
@@ -300,12 +316,16 @@ public class YAudioIn : YFunction
      */
     public int get_noSignalFor()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return NOSIGNALFOR_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return NOSIGNALFOR_INVALID;
+                }
             }
+            res = this._noSignalFor;
         }
-        return this._noSignalFor;
+        return res;
     }
 
     /**
@@ -353,10 +373,12 @@ public class YAudioIn : YFunction
     public static YAudioIn FindAudioIn(string func)
     {
         YAudioIn obj;
-        obj = (YAudioIn) YFunction._FindFromCache("AudioIn", func);
-        if (obj == null) {
-            obj = new YAudioIn(func);
-            YFunction._AddToCache("AudioIn", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YAudioIn) YFunction._FindFromCache("AudioIn", func);
+            if (obj == null) {
+                obj = new YAudioIn(func);
+                YFunction._AddToCache("AudioIn", func, obj);
+            }
         }
         return obj;
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_network.cs 23930 2016-04-15 09:31:14Z seb $
+ * $Id: yocto_network.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindNetwork(), the high-level API for Network functions
  *
@@ -109,6 +109,7 @@ public class YNetwork : YFunction
     public const int CALLBACKENCODING_INVALID = -1;
     public const string CALLBACKCREDENTIALS_INVALID = YAPI.INVALID_STRING;
     public const int CALLBACKINITIALDELAY_INVALID = YAPI.INVALID_UINT;
+    public const string CALLBACKSCHEDULE_INVALID = YAPI.INVALID_STRING;
     public const int CALLBACKMINDELAY_INVALID = YAPI.INVALID_UINT;
     public const int CALLBACKMAXDELAY_INVALID = YAPI.INVALID_UINT;
     public const int POECURRENT_INVALID = YAPI.INVALID_UINT;
@@ -132,6 +133,7 @@ public class YNetwork : YFunction
     protected int _callbackEncoding = CALLBACKENCODING_INVALID;
     protected string _callbackCredentials = CALLBACKCREDENTIALS_INVALID;
     protected int _callbackInitialDelay = CALLBACKINITIALDELAY_INVALID;
+    protected string _callbackSchedule = CALLBACKSCHEDULE_INVALID;
     protected int _callbackMinDelay = CALLBACKMINDELAY_INVALID;
     protected int _callbackMaxDelay = CALLBACKMAXDELAY_INVALID;
     protected int _poeCurrent = POECURRENT_INVALID;
@@ -250,6 +252,11 @@ public class YNetwork : YFunction
             _callbackInitialDelay = (int)member.ivalue;
             return;
         }
+        if (member.name == "callbackSchedule")
+        {
+            _callbackSchedule = member.svalue;
+            return;
+        }
         if (member.name == "callbackMinDelay")
         {
             _callbackMinDelay = (int)member.ivalue;
@@ -300,12 +307,16 @@ public class YNetwork : YFunction
      */
     public int get_readiness()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return READINESS_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return READINESS_INVALID;
+                }
             }
+            res = this._readiness;
         }
-        return this._readiness;
+        return res;
     }
 
     /**
@@ -327,12 +338,16 @@ public class YNetwork : YFunction
      */
     public string get_macAddress()
     {
-        if (this._cacheExpiration == 0) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MACADDRESS_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration == 0) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MACADDRESS_INVALID;
+                }
             }
+            res = this._macAddress;
         }
-        return this._macAddress;
+        return res;
     }
 
     /**
@@ -354,12 +369,16 @@ public class YNetwork : YFunction
      */
     public string get_ipAddress()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return IPADDRESS_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return IPADDRESS_INVALID;
+                }
             }
+            res = this._ipAddress;
         }
-        return this._ipAddress;
+        return res;
     }
 
     /**
@@ -379,12 +398,16 @@ public class YNetwork : YFunction
      */
     public string get_subnetMask()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SUBNETMASK_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SUBNETMASK_INVALID;
+                }
             }
+            res = this._subnetMask;
         }
-        return this._subnetMask;
+        return res;
     }
 
     /**
@@ -404,22 +427,59 @@ public class YNetwork : YFunction
      */
     public string get_router()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ROUTER_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ROUTER_INVALID;
+                }
             }
+            res = this._router;
         }
-        return this._router;
+        return res;
     }
 
+    /**
+     * <summary>
+     *   Returns the IP configuration of the network interface.
+     * <para>
+     * </para>
+     * <para>
+     *   If the network interface is setup to use a static IP address, the string starts with "STATIC:" and
+     *   is followed by three
+     *   parameters, separated by "/". The first is the device IP address, followed by the subnet mask
+     *   length, and finally the
+     *   router IP address (default gateway). For instance: "STATIC:192.168.1.14/16/192.168.1.1"
+     * </para>
+     * <para>
+     *   If the network interface is configured to receive its IP from a DHCP server, the string start with
+     *   "DHCP:" and is followed by
+     *   three parameters separated by "/". The first is the fallback IP address, then the fallback subnet
+     *   mask length and finally the
+     *   fallback router IP address. These three parameters are used when no DHCP reply is received.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to the IP configuration of the network interface
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YNetwork.IPCONFIG_INVALID</c>.
+     * </para>
+     */
     public string get_ipConfig()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return IPCONFIG_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return IPCONFIG_INVALID;
+                }
             }
+            res = this._ipConfig;
         }
-        return this._ipConfig;
+        return res;
     }
 
     public int set_ipConfig(string newval)
@@ -446,12 +506,16 @@ public class YNetwork : YFunction
      */
     public string get_primaryDNS()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PRIMARYDNS_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PRIMARYDNS_INVALID;
+                }
             }
+            res = this._primaryDNS;
         }
-        return this._primaryDNS;
+        return res;
     }
 
     /**
@@ -500,12 +564,16 @@ public class YNetwork : YFunction
      */
     public string get_secondaryDNS()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SECONDARYDNS_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SECONDARYDNS_INVALID;
+                }
             }
+            res = this._secondaryDNS;
         }
-        return this._secondaryDNS;
+        return res;
     }
 
     /**
@@ -554,12 +622,16 @@ public class YNetwork : YFunction
      */
     public string get_ntpServer()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return NTPSERVER_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return NTPSERVER_INVALID;
+                }
             }
+            res = this._ntpServer;
         }
-        return this._ntpServer;
+        return res;
     }
 
     /**
@@ -609,12 +681,16 @@ public class YNetwork : YFunction
      */
     public string get_userPassword()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return USERPASSWORD_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return USERPASSWORD_INVALID;
+                }
             }
+            res = this._userPassword;
         }
-        return this._userPassword;
+        return res;
     }
 
     /**
@@ -668,12 +744,16 @@ public class YNetwork : YFunction
      */
     public string get_adminPassword()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ADMINPASSWORD_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ADMINPASSWORD_INVALID;
+                }
             }
+            res = this._adminPassword;
         }
-        return this._adminPassword;
+        return res;
     }
 
     /**
@@ -725,12 +805,16 @@ public class YNetwork : YFunction
      */
     public int get_httpPort()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return HTTPPORT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return HTTPPORT_INVALID;
+                }
             }
+            res = this._httpPort;
         }
-        return this._httpPort;
+        return res;
     }
 
     /**
@@ -780,12 +864,16 @@ public class YNetwork : YFunction
      */
     public string get_defaultPage()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DEFAULTPAGE_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DEFAULTPAGE_INVALID;
+                }
             }
+            res = this._defaultPage;
         }
-        return this._defaultPage;
+        return res;
     }
 
     /**
@@ -838,12 +926,16 @@ public class YNetwork : YFunction
      */
     public int get_discoverable()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DISCOVERABLE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DISCOVERABLE_INVALID;
+                }
             }
+            res = this._discoverable;
         }
-        return this._discoverable;
+        return res;
     }
 
     /**
@@ -897,12 +989,16 @@ public class YNetwork : YFunction
      */
     public int get_wwwWatchdogDelay()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return WWWWATCHDOGDELAY_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return WWWWATCHDOGDELAY_INVALID;
+                }
             }
+            res = this._wwwWatchdogDelay;
         }
-        return this._wwwWatchdogDelay;
+        return res;
     }
 
     /**
@@ -954,12 +1050,16 @@ public class YNetwork : YFunction
      */
     public string get_callbackUrl()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALLBACKURL_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALLBACKURL_INVALID;
+                }
             }
+            res = this._callbackUrl;
         }
-        return this._callbackUrl;
+        return res;
     }
 
     /**
@@ -1010,12 +1110,16 @@ public class YNetwork : YFunction
      */
     public int get_callbackMethod()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALLBACKMETHOD_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALLBACKMETHOD_INVALID;
+                }
             }
+            res = this._callbackMethod;
         }
-        return this._callbackMethod;
+        return res;
     }
 
     /**
@@ -1069,12 +1173,16 @@ public class YNetwork : YFunction
      */
     public int get_callbackEncoding()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALLBACKENCODING_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALLBACKENCODING_INVALID;
+                }
             }
+            res = this._callbackEncoding;
         }
-        return this._callbackEncoding;
+        return res;
     }
 
     /**
@@ -1128,12 +1236,16 @@ public class YNetwork : YFunction
      */
     public string get_callbackCredentials()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALLBACKCREDENTIALS_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALLBACKCREDENTIALS_INVALID;
+                }
             }
+            res = this._callbackCredentials;
         }
-        return this._callbackCredentials;
+        return res;
     }
 
     /**
@@ -1223,12 +1335,16 @@ public class YNetwork : YFunction
      */
     public int get_callbackInitialDelay()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALLBACKINITIALDELAY_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALLBACKINITIALDELAY_INVALID;
+                }
             }
+            res = this._callbackInitialDelay;
         }
-        return this._callbackInitialDelay;
+        return res;
     }
 
     /**
@@ -1260,14 +1376,70 @@ public class YNetwork : YFunction
 
     /**
      * <summary>
-     *   Returns the minimum waiting time between two callback notifications, in seconds.
+     *   Returns the HTTP callback schedule strategy, as a text string.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the minimum waiting time between two callback notifications, in seconds
+     *   a string corresponding to the HTTP callback schedule strategy, as a text string
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YNetwork.CALLBACKSCHEDULE_INVALID</c>.
+     * </para>
+     */
+    public string get_callbackSchedule()
+    {
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALLBACKSCHEDULE_INVALID;
+                }
+            }
+            res = this._callbackSchedule;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Changes the HTTP callback schedule strategy, as a text string.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a string corresponding to the HTTP callback schedule strategy, as a text string
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_callbackSchedule(string newval)
+    {
+        string rest_val;
+        rest_val = newval;
+        return _setAttr("callbackSchedule", rest_val);
+    }
+
+    /**
+     * <summary>
+     *   Returns the minimum waiting time between two HTTP callbacks, in seconds.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the minimum waiting time between two HTTP callbacks, in seconds
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YNetwork.CALLBACKMINDELAY_INVALID</c>.
@@ -1275,24 +1447,28 @@ public class YNetwork : YFunction
      */
     public int get_callbackMinDelay()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALLBACKMINDELAY_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALLBACKMINDELAY_INVALID;
+                }
             }
+            res = this._callbackMinDelay;
         }
-        return this._callbackMinDelay;
+        return res;
     }
 
     /**
      * <summary>
-     *   Changes the minimum waiting time between two callback notifications, in seconds.
+     *   Changes the minimum waiting time between two HTTP callbacks, in seconds.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to the minimum waiting time between two callback notifications, in seconds
+     *   an integer corresponding to the minimum waiting time between two HTTP callbacks, in seconds
      * </param>
      * <para>
      * </para>
@@ -1312,14 +1488,14 @@ public class YNetwork : YFunction
 
     /**
      * <summary>
-     *   Returns the maximum waiting time between two callback notifications, in seconds.
+     *   Returns the waiting time between two HTTP callbacks when there is nothing new.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the maximum waiting time between two callback notifications, in seconds
+     *   an integer corresponding to the waiting time between two HTTP callbacks when there is nothing new
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YNetwork.CALLBACKMAXDELAY_INVALID</c>.
@@ -1327,24 +1503,28 @@ public class YNetwork : YFunction
      */
     public int get_callbackMaxDelay()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALLBACKMAXDELAY_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALLBACKMAXDELAY_INVALID;
+                }
             }
+            res = this._callbackMaxDelay;
         }
-        return this._callbackMaxDelay;
+        return res;
     }
 
     /**
      * <summary>
-     *   Changes the maximum waiting time between two callback notifications, in seconds.
+     *   Changes the waiting time between two HTTP callbacks when there is nothing new.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to the maximum waiting time between two callback notifications, in seconds
+     *   an integer corresponding to the waiting time between two HTTP callbacks when there is nothing new
      * </param>
      * <para>
      * </para>
@@ -1381,12 +1561,16 @@ public class YNetwork : YFunction
      */
     public int get_poeCurrent()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return POECURRENT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return POECURRENT_INVALID;
+                }
             }
+            res = this._poeCurrent;
         }
-        return this._poeCurrent;
+        return res;
     }
 
     /**
@@ -1434,10 +1618,12 @@ public class YNetwork : YFunction
     public static YNetwork FindNetwork(string func)
     {
         YNetwork obj;
-        obj = (YNetwork) YFunction._FindFromCache("Network", func);
-        if (obj == null) {
-            obj = new YNetwork(func);
-            YFunction._AddToCache("Network", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YNetwork) YFunction._FindFromCache("Network", func);
+            if (obj == null) {
+                obj = new YNetwork(func);
+                YFunction._AddToCache("Network", func, obj);
+            }
         }
         return obj;
     }

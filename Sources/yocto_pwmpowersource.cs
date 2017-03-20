@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pwmpowersource.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_pwmpowersource.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *
@@ -117,12 +117,16 @@ public class YPwmPowerSource : YFunction
      */
     public int get_powerMode()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return POWERMODE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return POWERMODE_INVALID;
+                }
             }
+            res = this._powerMode;
         }
-        return this._powerMode;
+        return res;
     }
 
     /**
@@ -206,10 +210,12 @@ public class YPwmPowerSource : YFunction
     public static YPwmPowerSource FindPwmPowerSource(string func)
     {
         YPwmPowerSource obj;
-        obj = (YPwmPowerSource) YFunction._FindFromCache("PwmPowerSource", func);
-        if (obj == null) {
-            obj = new YPwmPowerSource(func);
-            YFunction._AddToCache("PwmPowerSource", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YPwmPowerSource) YFunction._FindFromCache("PwmPowerSource", func);
+            if (obj == null) {
+                obj = new YPwmPowerSource(func);
+                YFunction._AddToCache("PwmPowerSource", func, obj);
+            }
         }
         return obj;
     }

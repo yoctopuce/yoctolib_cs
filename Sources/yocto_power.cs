@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_power.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_power.cs 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements yFindPower(), the high-level API for Power functions
  *
@@ -58,7 +58,7 @@ using YFUN_DESCR = System.Int32;
  *   sensors.
  * <para>
  *   It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  *   This class adds the ability to access the energy counter and the power factor.
  * </para>
  * <para>
@@ -131,12 +131,16 @@ public class YPower : YSensor
      */
     public double get_cosPhi()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COSPHI_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COSPHI_INVALID;
+                }
             }
+            res = this._cosPhi;
         }
-        return this._cosPhi;
+        return res;
     }
 
     public int set_meter(double newval)
@@ -165,12 +169,16 @@ public class YPower : YSensor
      */
     public double get_meter()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return METER_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return METER_INVALID;
+                }
             }
+            res = this._meter;
         }
-        return this._meter;
+        return res;
     }
 
     /**
@@ -190,12 +198,16 @@ public class YPower : YSensor
      */
     public int get_meterTimer()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return METERTIMER_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return METERTIMER_INVALID;
+                }
             }
+            res = this._meterTimer;
         }
-        return this._meterTimer;
+        return res;
     }
 
     /**
@@ -243,10 +255,12 @@ public class YPower : YSensor
     public static YPower FindPower(string func)
     {
         YPower obj;
-        obj = (YPower) YFunction._FindFromCache("Power", func);
-        if (obj == null) {
-            obj = new YPower(func);
-            YFunction._AddToCache("Power", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YPower) YFunction._FindFromCache("Power", func);
+            if (obj == null) {
+                obj = new YPower(func);
+                YFunction._AddToCache("Power", func, obj);
+            }
         }
         return obj;
     }

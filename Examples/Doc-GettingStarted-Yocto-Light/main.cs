@@ -44,7 +44,8 @@ namespace ConsoleApplication1
         Environment.Exit(0);
       }
       while (sensor.isOnline()) {
-        Console.WriteLine("Current ambient light: " + sensor.get_currentValue().ToString() + " lx");
+        Console.WriteLine("Current ambient light: " + sensor.get_currentValue().ToString()
+                          + " lx");
         Console.WriteLine("  (press Ctrl-C to exit)");
         YAPI.Sleep(1000, ref errmsg);
       }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-
 namespace ConsoleApplication1
 {
   class Program
@@ -17,7 +16,6 @@ namespace ConsoleApplication1
         Console.WriteLine("RegisterHub error: " + errmsg);
         Environment.Exit(1);
       }
-
 
       YSerialPort serialPort;
       if (args.Length > 0 && args[0] != "any") {

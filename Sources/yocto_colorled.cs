@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorled.cs 24475 2016-05-12 14:03:35Z mvuilleu $
+ * $Id: yocto_colorled.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindColorLed(), the high-level API for ColorLed functions
  *
@@ -200,12 +200,16 @@ public class YColorLed : YFunction
      */
     public int get_rgbColor()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RGBCOLOR_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RGBCOLOR_INVALID;
+                }
             }
+            res = this._rgbColor;
         }
-        return this._rgbColor;
+        return res;
     }
 
     /**
@@ -253,12 +257,16 @@ public class YColorLed : YFunction
      */
     public int get_hslColor()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return HSLCOLOR_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return HSLCOLOR_INVALID;
+                }
             }
+            res = this._hslColor;
         }
-        return this._hslColor;
+        return res;
     }
 
     /**
@@ -291,12 +299,16 @@ public class YColorLed : YFunction
 
     public YColorLedMove get_rgbMove()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RGBMOVE_INVALID;
+        YColorLedMove res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RGBMOVE_INVALID;
+                }
             }
+            res = this._rgbMove;
         }
-        return this._rgbMove;
+        return res;
     }
 
     public int set_rgbMove(YColorLedMove newval)
@@ -338,12 +350,16 @@ public class YColorLed : YFunction
 
     public YColorLedMove get_hslMove()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return HSLMOVE_INVALID;
+        YColorLedMove res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return HSLMOVE_INVALID;
+                }
             }
+            res = this._hslMove;
         }
-        return this._hslMove;
+        return res;
     }
 
     public int set_hslMove(YColorLedMove newval)
@@ -400,12 +416,16 @@ public class YColorLed : YFunction
      */
     public int get_rgbColorAtPowerOn()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RGBCOLORATPOWERON_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RGBCOLORATPOWERON_INVALID;
+                }
             }
+            res = this._rgbColorAtPowerOn;
         }
-        return this._rgbColorAtPowerOn;
+        return res;
     }
 
     /**
@@ -452,12 +472,16 @@ public class YColorLed : YFunction
      */
     public int get_blinkSeqSize()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BLINKSEQSIZE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BLINKSEQSIZE_INVALID;
+                }
             }
+            res = this._blinkSeqSize;
         }
-        return this._blinkSeqSize;
+        return res;
     }
 
     /**
@@ -477,12 +501,16 @@ public class YColorLed : YFunction
      */
     public int get_blinkSeqMaxSize()
     {
-        if (this._cacheExpiration == 0) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BLINKSEQMAXSIZE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration == 0) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BLINKSEQMAXSIZE_INVALID;
+                }
             }
+            res = this._blinkSeqMaxSize;
         }
-        return this._blinkSeqMaxSize;
+        return res;
     }
 
     /**
@@ -506,22 +534,30 @@ public class YColorLed : YFunction
      */
     public int get_blinkSeqSignature()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BLINKSEQSIGNATURE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BLINKSEQSIGNATURE_INVALID;
+                }
             }
+            res = this._blinkSeqSignature;
         }
-        return this._blinkSeqSignature;
+        return res;
     }
 
     public string get_command()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = this._command;
         }
-        return this._command;
+        return res;
     }
 
     public int set_command(string newval)
@@ -576,10 +612,12 @@ public class YColorLed : YFunction
     public static YColorLed FindColorLed(string func)
     {
         YColorLed obj;
-        obj = (YColorLed) YFunction._FindFromCache("ColorLed", func);
-        if (obj == null) {
-            obj = new YColorLed(func);
-            YFunction._AddToCache("ColorLed", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YColorLed) YFunction._FindFromCache("ColorLed", func);
+            if (obj == null) {
+                obj = new YColorLed(func);
+                YFunction._AddToCache("ColorLed", func, obj);
+            }
         }
         return obj;
     }

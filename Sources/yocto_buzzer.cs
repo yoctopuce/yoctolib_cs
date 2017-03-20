@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_buzzer.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_buzzer.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindBuzzer(), the high-level API for Buzzer functions
  *
@@ -175,12 +175,16 @@ public class YBuzzer : YFunction
      */
     public double get_frequency()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return FREQUENCY_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return FREQUENCY_INVALID;
+                }
             }
+            res = this._frequency;
         }
-        return this._frequency;
+        return res;
     }
 
     /**
@@ -200,12 +204,16 @@ public class YBuzzer : YFunction
      */
     public int get_volume()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return VOLUME_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return VOLUME_INVALID;
+                }
             }
+            res = this._volume;
         }
-        return this._volume;
+        return res;
     }
 
     /**
@@ -252,12 +260,16 @@ public class YBuzzer : YFunction
      */
     public int get_playSeqSize()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PLAYSEQSIZE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PLAYSEQSIZE_INVALID;
+                }
             }
+            res = this._playSeqSize;
         }
-        return this._playSeqSize;
+        return res;
     }
 
     /**
@@ -277,12 +289,16 @@ public class YBuzzer : YFunction
      */
     public int get_playSeqMaxSize()
     {
-        if (this._cacheExpiration == 0) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PLAYSEQMAXSIZE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration == 0) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PLAYSEQMAXSIZE_INVALID;
+                }
             }
+            res = this._playSeqMaxSize;
         }
-        return this._playSeqMaxSize;
+        return res;
     }
 
     /**
@@ -306,22 +322,30 @@ public class YBuzzer : YFunction
      */
     public int get_playSeqSignature()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PLAYSEQSIGNATURE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PLAYSEQSIGNATURE_INVALID;
+                }
             }
+            res = this._playSeqSignature;
         }
-        return this._playSeqSignature;
+        return res;
     }
 
     public string get_command()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = this._command;
         }
-        return this._command;
+        return res;
     }
 
     public int set_command(string newval)
@@ -376,10 +400,12 @@ public class YBuzzer : YFunction
     public static YBuzzer FindBuzzer(string func)
     {
         YBuzzer obj;
-        obj = (YBuzzer) YFunction._FindFromCache("Buzzer", func);
-        if (obj == null) {
-            obj = new YBuzzer(func);
-            YFunction._AddToCache("Buzzer", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YBuzzer) YFunction._FindFromCache("Buzzer", func);
+            if (obj == null) {
+                obj = new YBuzzer(func);
+                YFunction._AddToCache("Buzzer", func, obj);
+            }
         }
         return obj;
     }

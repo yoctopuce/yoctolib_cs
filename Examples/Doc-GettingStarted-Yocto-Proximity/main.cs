@@ -41,7 +41,6 @@ namespace ConsoleApplication1
         target = p.get_module().get_serialNumber();
       } else p = YProximity.FindProximity(target + ".proximity1");
 
-
       if (!p.isOnline()) {
         Console.WriteLine("Module not connected (check identification and USB cable)");
         Environment.Exit(0);

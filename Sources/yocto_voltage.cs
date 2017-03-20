@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_voltage.cs 26183 2016-12-15 00:14:02Z mvuilleu $
+ * $Id: yocto_voltage.cs 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements yFindVoltage(), the high-level API for Voltage functions
  *
@@ -58,7 +58,7 @@ using YFUN_DESCR = System.Int32;
  *   sensors.
  * <para>
  *   It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  * </para>
  * <para>
  * </para>
@@ -101,12 +101,16 @@ public class YVoltage : YSensor
 
     public int get_enabled()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLED_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLED_INVALID;
+                }
             }
+            res = this._enabled;
         }
-        return this._enabled;
+        return res;
     }
 
     public int set_enabled(int newval)
@@ -161,10 +165,12 @@ public class YVoltage : YSensor
     public static YVoltage FindVoltage(string func)
     {
         YVoltage obj;
-        obj = (YVoltage) YFunction._FindFromCache("Voltage", func);
-        if (obj == null) {
-            obj = new YVoltage(func);
-            YFunction._AddToCache("Voltage", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YVoltage) YFunction._FindFromCache("Voltage", func);
+            if (obj == null) {
+                obj = new YVoltage(func);
+                YFunction._AddToCache("Voltage", func, obj);
+            }
         }
         return obj;
     }

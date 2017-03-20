@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_voc.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_voc.cs 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements yFindVoc(), the high-level API for Voc functions
  *
@@ -58,7 +58,7 @@ using YFUN_DESCR = System.Int32;
  *   Compound sensors.
  * <para>
  *   It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  * </para>
  * <para>
  * </para>
@@ -135,10 +135,12 @@ public class YVoc : YSensor
     public static YVoc FindVoc(string func)
     {
         YVoc obj;
-        obj = (YVoc) YFunction._FindFromCache("Voc", func);
-        if (obj == null) {
-            obj = new YVoc(func);
-            YFunction._AddToCache("Voc", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YVoc) YFunction._FindFromCache("Voc", func);
+            if (obj == null) {
+                obj = new YVoc(func);
+                YFunction._AddToCache("Voc", func, obj);
+            }
         }
         return obj;
     }

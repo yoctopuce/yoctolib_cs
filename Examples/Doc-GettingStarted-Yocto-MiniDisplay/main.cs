@@ -43,7 +43,6 @@ namespace ConsoleApplication1
         }
       } else disp = YDisplay.FindDisplay(target + ".display");
 
-
       if (!disp.isOnline()) {
         Console.WriteLine("Module not connected (check identification and USB cable) ");
         Environment.Exit(0);

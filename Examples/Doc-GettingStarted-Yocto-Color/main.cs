@@ -31,7 +31,6 @@ namespace ConsoleApplication1
 
       if (args.Length < 2) usage();
 
-
       target = args[0].ToUpper();
       color_str = args[1].ToUpper();
 
@@ -40,12 +39,10 @@ namespace ConsoleApplication1
       else if (color_str == "BLUE") color = 0x0000FF;
       else color = Convert.ToInt32("0x" + color_str, 16);
 
-
       if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS) {
         Console.WriteLine("RegisterHub error: " + errmsg);
         Environment.Exit(0);
       }
-
 
       if (target == "ANY") {
         led1 = YColorLed.FirstColorLed();
@@ -59,7 +56,6 @@ namespace ConsoleApplication1
         led1 = YColorLed.FindColorLed(target + ".colorLed1");
         led2 = YColorLed.FindColorLed(target + ".colorLed2");
       }
-
 
       if (led1.isOnline()) {
         led1.set_rgbColor(color);// immediate switch

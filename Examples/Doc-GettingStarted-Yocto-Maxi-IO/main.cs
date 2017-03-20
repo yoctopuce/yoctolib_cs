@@ -40,7 +40,6 @@ namespace ConsoleApplication1
         }
       } else io = YDigitalIO.FindDigitalIO(target + ".digitalIO");
 
-
       // lets configure the channels direction
       // bits 0..3 as output
       // bits 4..7 as input

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_realtimeclock.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_realtimeclock.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -137,12 +137,16 @@ public class YRealTimeClock : YFunction
      */
     public long get_unixTime()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return UNIXTIME_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return UNIXTIME_INVALID;
+                }
             }
+            res = this._unixTime;
         }
-        return this._unixTime;
+        return res;
     }
 
     /**
@@ -190,12 +194,16 @@ public class YRealTimeClock : YFunction
      */
     public string get_dateTime()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DATETIME_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DATETIME_INVALID;
+                }
             }
+            res = this._dateTime;
         }
-        return this._dateTime;
+        return res;
     }
 
     /**
@@ -215,12 +223,16 @@ public class YRealTimeClock : YFunction
      */
     public int get_utcOffset()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return UTCOFFSET_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return UTCOFFSET_INVALID;
+                }
             }
+            res = this._utcOffset;
         }
-        return this._utcOffset;
+        return res;
     }
 
     /**
@@ -269,12 +281,16 @@ public class YRealTimeClock : YFunction
      */
     public int get_timeSet()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return TIMESET_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return TIMESET_INVALID;
+                }
             }
+            res = this._timeSet;
         }
-        return this._timeSet;
+        return res;
     }
 
     /**
@@ -322,10 +338,12 @@ public class YRealTimeClock : YFunction
     public static YRealTimeClock FindRealTimeClock(string func)
     {
         YRealTimeClock obj;
-        obj = (YRealTimeClock) YFunction._FindFromCache("RealTimeClock", func);
-        if (obj == null) {
-            obj = new YRealTimeClock(func);
-            YFunction._AddToCache("RealTimeClock", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YRealTimeClock) YFunction._FindFromCache("RealTimeClock", func);
+            if (obj == null) {
+                obj = new YRealTimeClock(func);
+                YFunction._AddToCache("RealTimeClock", func, obj);
+            }
         }
         return obj;
     }

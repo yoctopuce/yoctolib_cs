@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_altitude.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_altitude.cs 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements yFindAltitude(), the high-level API for Altitude functions
  *
@@ -58,7 +58,7 @@ using YFUN_DESCR = System.Int32;
  *   sensors.
  * <para>
  *   It inherits from the YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  *   This class adds the ability to configure the barometric pressure adjusted to
  *   sea level (QNH) for barometric sensors.
  * </para>
@@ -185,12 +185,16 @@ public class YAltitude : YSensor
      */
     public double get_qnh()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return QNH_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return QNH_INVALID;
+                }
             }
+            res = this._qnh;
         }
-        return this._qnh;
+        return res;
     }
 
     /**
@@ -213,12 +217,16 @@ public class YAltitude : YSensor
      */
     public string get_technology()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return TECHNOLOGY_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return TECHNOLOGY_INVALID;
+                }
             }
+            res = this._technology;
         }
-        return this._technology;
+        return res;
     }
 
     /**
@@ -266,10 +274,12 @@ public class YAltitude : YSensor
     public static YAltitude FindAltitude(string func)
     {
         YAltitude obj;
-        obj = (YAltitude) YFunction._FindFromCache("Altitude", func);
-        if (obj == null) {
-            obj = new YAltitude(func);
-            YFunction._AddToCache("Altitude", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YAltitude) YFunction._FindFromCache("Altitude", func);
+            if (obj == null) {
+                obj = new YAltitude(func);
+                YFunction._AddToCache("Altitude", func, obj);
+            }
         }
         return obj;
     }

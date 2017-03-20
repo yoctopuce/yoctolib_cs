@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_gyro.cs 24948 2016-07-01 20:57:28Z mvuilleu $
+ * $Id: yocto_gyro.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -136,10 +136,12 @@ public class YQt : YSensor
     public static YQt FindQt(string func)
     {
         YQt obj;
-        obj = (YQt) YFunction._FindFromCache("Qt", func);
-        if (obj == null) {
-            obj = new YQt(func);
-            YFunction._AddToCache("Qt", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YQt) YFunction._FindFromCache("Qt", func);
+            if (obj == null) {
+                obj = new YQt(func);
+                YFunction._AddToCache("Qt", func, obj);
+            }
         }
         return obj;
     }
@@ -444,12 +446,16 @@ public class YGyro : YSensor
      */
     public int get_bandwidth()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BANDWIDTH_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BANDWIDTH_INVALID;
+                }
             }
+            res = this._bandwidth;
         }
-        return this._bandwidth;
+        return res;
     }
 
     /**
@@ -499,12 +505,16 @@ public class YGyro : YSensor
      */
     public double get_xValue()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return XVALUE_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return XVALUE_INVALID;
+                }
             }
+            res = this._xValue;
         }
-        return this._xValue;
+        return res;
     }
 
     /**
@@ -525,12 +535,16 @@ public class YGyro : YSensor
      */
     public double get_yValue()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return YVALUE_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return YVALUE_INVALID;
+                }
             }
+            res = this._yValue;
         }
-        return this._yValue;
+        return res;
     }
 
     /**
@@ -551,12 +565,16 @@ public class YGyro : YSensor
      */
     public double get_zValue()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ZVALUE_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ZVALUE_INVALID;
+                }
             }
+            res = this._zValue;
         }
-        return this._zValue;
+        return res;
     }
 
     /**
@@ -604,10 +622,12 @@ public class YGyro : YSensor
     public static YGyro FindGyro(string func)
     {
         YGyro obj;
-        obj = (YGyro) YFunction._FindFromCache("Gyro", func);
-        if (obj == null) {
-            obj = new YGyro(func);
-            YFunction._AddToCache("Gyro", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YGyro) YFunction._FindFromCache("Gyro", func);
+            if (obj == null) {
+                obj = new YGyro(func);
+                YFunction._AddToCache("Gyro", func, obj);
+            }
         }
         return obj;
     }

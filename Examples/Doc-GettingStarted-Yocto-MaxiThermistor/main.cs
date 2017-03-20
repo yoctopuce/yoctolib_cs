@@ -56,7 +56,6 @@ namespace ConsoleApplication1
       YTemperature ch5 = YTemperature.FindTemperature(serial + ".temperature5");
       YTemperature ch6 = YTemperature.FindTemperature(serial + ".temperature6");
 
-
       if (!ch2.isOnline()) {
         Console.WriteLine("Module not connected (check identification and USB cable)");
         Environment.Exit(0);

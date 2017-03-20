@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_oscontrol.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_oscontrol.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindOsControl(), the high-level API for OsControl functions
  *
@@ -114,12 +114,16 @@ public class YOsControl : YFunction
      */
     public int get_shutdownCountdown()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SHUTDOWNCOUNTDOWN_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SHUTDOWNCOUNTDOWN_INVALID;
+                }
             }
+            res = this._shutdownCountdown;
         }
-        return this._shutdownCountdown;
+        return res;
     }
 
     public int set_shutdownCountdown(int newval)
@@ -174,10 +178,12 @@ public class YOsControl : YFunction
     public static YOsControl FindOsControl(string func)
     {
         YOsControl obj;
-        obj = (YOsControl) YFunction._FindFromCache("OsControl", func);
-        if (obj == null) {
-            obj = new YOsControl(func);
-            YFunction._AddToCache("OsControl", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YOsControl) YFunction._FindFromCache("OsControl", func);
+            if (obj == null) {
+                obj = new YOsControl(func);
+                YFunction._AddToCache("OsControl", func, obj);
+            }
         }
         return obj;
     }

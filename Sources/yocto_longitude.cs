@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_longitude.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_longitude.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindLongitude(), the high-level API for Longitude functions
  *
@@ -136,10 +136,12 @@ public class YLongitude : YSensor
     public static YLongitude FindLongitude(string func)
     {
         YLongitude obj;
-        obj = (YLongitude) YFunction._FindFromCache("Longitude", func);
-        if (obj == null) {
-            obj = new YLongitude(func);
-            YFunction._AddToCache("Longitude", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YLongitude) YFunction._FindFromCache("Longitude", func);
+            if (obj == null) {
+                obj = new YLongitude(func);
+                YFunction._AddToCache("Longitude", func, obj);
+            }
         }
         return obj;
     }

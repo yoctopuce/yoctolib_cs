@@ -51,7 +51,8 @@ namespace ConsoleApplication1
       }
 
       while (psensor.isOnline()) {
-        Console.WriteLine("Current power: " + psensor.get_currentValue().ToString() + " W");
+        Console.WriteLine("Current power: " + psensor.get_currentValue().ToString()
+                          + " W");
         Console.WriteLine("  (press Ctrl-C to exit)");
 
         YAPI.Sleep(1000, ref errmsg);

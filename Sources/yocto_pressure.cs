@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pressure.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_pressure.cs 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements yFindPressure(), the high-level API for Pressure functions
  *
@@ -58,7 +58,7 @@ using YFUN_DESCR = System.Int32;
  *   sensors.
  * <para>
  *   It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  * </para>
  * <para>
  * </para>
@@ -135,10 +135,12 @@ public class YPressure : YSensor
     public static YPressure FindPressure(string func)
     {
         YPressure obj;
-        obj = (YPressure) YFunction._FindFromCache("Pressure", func);
-        if (obj == null) {
-            obj = new YPressure(func);
-            YFunction._AddToCache("Pressure", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YPressure) YFunction._FindFromCache("Pressure", func);
+            if (obj == null) {
+                obj = new YPressure(func);
+                YFunction._AddToCache("Pressure", func, obj);
+            }
         }
         return obj;
     }

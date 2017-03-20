@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_segmenteddisplay.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_segmenteddisplay.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
  *
@@ -121,12 +121,16 @@ public class YSegmentedDisplay : YFunction
      */
     public string get_displayedText()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DISPLAYEDTEXT_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DISPLAYEDTEXT_INVALID;
+                }
             }
+            res = this._displayedText;
         }
-        return this._displayedText;
+        return res;
     }
 
     /**
@@ -158,12 +162,16 @@ public class YSegmentedDisplay : YFunction
 
     public int get_displayMode()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DISPLAYMODE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DISPLAYMODE_INVALID;
+                }
             }
+            res = this._displayMode;
         }
-        return this._displayMode;
+        return res;
     }
 
     public int set_displayMode(int newval)
@@ -218,10 +226,12 @@ public class YSegmentedDisplay : YFunction
     public static YSegmentedDisplay FindSegmentedDisplay(string func)
     {
         YSegmentedDisplay obj;
-        obj = (YSegmentedDisplay) YFunction._FindFromCache("SegmentedDisplay", func);
-        if (obj == null) {
-            obj = new YSegmentedDisplay(func);
-            YFunction._AddToCache("SegmentedDisplay", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YSegmentedDisplay) YFunction._FindFromCache("SegmentedDisplay", func);
+            if (obj == null) {
+                obj = new YSegmentedDisplay(func);
+                YFunction._AddToCache("SegmentedDisplay", func, obj);
+            }
         }
         return obj;
     }

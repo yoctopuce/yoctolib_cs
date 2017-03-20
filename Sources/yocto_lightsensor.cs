@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_lightsensor.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_lightsensor.cs 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements yFindLightSensor(), the high-level API for LightSensor functions
  *
@@ -58,7 +58,7 @@ using YFUN_DESCR = System.Int32;
  *   sensors.
  * <para>
  *   It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  *   This class adds the ability to easily perform a one-point linear calibration
  *   to compensate the effect of a glass or filter placed in front of the sensor.
  *   For some light sensors with several working modes, this class can select the
@@ -164,17 +164,21 @@ public class YLightSensor : YSensor
      */
     public int get_measureType()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MEASURETYPE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MEASURETYPE_INVALID;
+                }
             }
+            res = this._measureType;
         }
-        return this._measureType;
+        return res;
     }
 
     /**
      * <summary>
-     *   Modify the light sensor type used in the device.
+     *   Modifies the light sensor type used in the device.
      * <para>
      *   The measure can either
      *   approximate the response of the human eye, focus on a specific light
@@ -251,10 +255,12 @@ public class YLightSensor : YSensor
     public static YLightSensor FindLightSensor(string func)
     {
         YLightSensor obj;
-        obj = (YLightSensor) YFunction._FindFromCache("LightSensor", func);
-        if (obj == null) {
-            obj = new YLightSensor(func);
-            YFunction._AddToCache("LightSensor", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YLightSensor) YFunction._FindFromCache("LightSensor", func);
+            if (obj == null) {
+                obj = new YLightSensor(func);
+                YFunction._AddToCache("LightSensor", func, obj);
+            }
         }
         return obj;
     }

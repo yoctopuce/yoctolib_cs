@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_messagebox.cs 24649 2016-05-31 11:20:13Z mvuilleu $
+ * $Id: yocto_messagebox.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindMessageBox(), the high-level API for MessageBox functions
  *
@@ -1380,12 +1380,16 @@ public class YMessageBox : YFunction
      */
     public int get_slotsInUse()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SLOTSINUSE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SLOTSINUSE_INVALID;
+                }
             }
+            res = this._slotsInUse;
         }
-        return this._slotsInUse;
+        return res;
     }
 
     /**
@@ -1405,22 +1409,30 @@ public class YMessageBox : YFunction
      */
     public int get_slotsCount()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SLOTSCOUNT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SLOTSCOUNT_INVALID;
+                }
             }
+            res = this._slotsCount;
         }
-        return this._slotsCount;
+        return res;
     }
 
     public string get_slotsBitmap()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SLOTSBITMAP_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SLOTSBITMAP_INVALID;
+                }
             }
+            res = this._slotsBitmap;
         }
-        return this._slotsBitmap;
+        return res;
     }
 
     /**
@@ -1440,12 +1452,16 @@ public class YMessageBox : YFunction
      */
     public int get_pduSent()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PDUSENT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PDUSENT_INVALID;
+                }
             }
+            res = this._pduSent;
         }
-        return this._pduSent;
+        return res;
     }
 
     /**
@@ -1492,12 +1508,16 @@ public class YMessageBox : YFunction
      */
     public int get_pduReceived()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PDURECEIVED_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PDURECEIVED_INVALID;
+                }
             }
+            res = this._pduReceived;
         }
-        return this._pduReceived;
+        return res;
     }
 
     /**
@@ -1529,12 +1549,16 @@ public class YMessageBox : YFunction
 
     public string get_command()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = this._command;
         }
-        return this._command;
+        return res;
     }
 
     public int set_command(string newval)
@@ -1589,10 +1613,12 @@ public class YMessageBox : YFunction
     public static YMessageBox FindMessageBox(string func)
     {
         YMessageBox obj;
-        obj = (YMessageBox) YFunction._FindFromCache("MessageBox", func);
-        if (obj == null) {
-            obj = new YMessageBox(func);
-            YFunction._AddToCache("MessageBox", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YMessageBox) YFunction._FindFromCache("MessageBox", func);
+            if (obj == null) {
+                obj = new YMessageBox(func);
+                YFunction._AddToCache("MessageBox", func, obj);
+            }
         }
         return obj;
     }

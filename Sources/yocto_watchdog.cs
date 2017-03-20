@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_watchdog.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_watchdog.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindWatchdog(), the high-level API for Watchdog functions
  *
@@ -223,12 +223,16 @@ public class YWatchdog : YFunction
      */
     public int get_state()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return STATE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return STATE_INVALID;
+                }
             }
+            res = this._state;
         }
-        return this._state;
+        return res;
     }
 
     /**
@@ -278,12 +282,16 @@ public class YWatchdog : YFunction
      */
     public int get_stateAtPowerOn()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return STATEATPOWERON_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return STATEATPOWERON_INVALID;
+                }
             }
+            res = this._stateAtPowerOn;
         }
-        return this._stateAtPowerOn;
+        return res;
     }
 
     /**
@@ -335,12 +343,16 @@ public class YWatchdog : YFunction
      */
     public long get_maxTimeOnStateA()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MAXTIMEONSTATEA_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MAXTIMEONSTATEA_INVALID;
+                }
             }
+            res = this._maxTimeOnStateA;
         }
-        return this._maxTimeOnStateA;
+        return res;
     }
 
     /**
@@ -389,12 +401,16 @@ public class YWatchdog : YFunction
      */
     public long get_maxTimeOnStateB()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MAXTIMEONSTATEB_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MAXTIMEONSTATEB_INVALID;
+                }
             }
+            res = this._maxTimeOnStateB;
         }
-        return this._maxTimeOnStateB;
+        return res;
     }
 
     /**
@@ -443,12 +459,16 @@ public class YWatchdog : YFunction
      */
     public int get_output()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return OUTPUT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return OUTPUT_INVALID;
+                }
             }
+            res = this._output;
         }
-        return this._output;
+        return res;
     }
 
     /**
@@ -500,12 +520,16 @@ public class YWatchdog : YFunction
      */
     public long get_pulseTimer()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PULSETIMER_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PULSETIMER_INVALID;
+                }
             }
+            res = this._pulseTimer;
         }
-        return this._pulseTimer;
+        return res;
     }
 
     public int set_pulseTimer(long newval)
@@ -545,12 +569,16 @@ public class YWatchdog : YFunction
 
     public YWatchdogDelayedPulse get_delayedPulseTimer()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DELAYEDPULSETIMER_INVALID;
+        YWatchdogDelayedPulse res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DELAYEDPULSETIMER_INVALID;
+                }
             }
+            res = this._delayedPulseTimer;
         }
-        return this._delayedPulseTimer;
+        return res;
     }
 
     public int set_delayedPulseTimer(YWatchdogDelayedPulse newval)
@@ -609,12 +637,16 @@ public class YWatchdog : YFunction
      */
     public long get_countdown()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COUNTDOWN_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COUNTDOWN_INVALID;
+                }
             }
+            res = this._countdown;
         }
-        return this._countdown;
+        return res;
     }
 
     /**
@@ -635,12 +667,16 @@ public class YWatchdog : YFunction
      */
     public int get_autoStart()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return AUTOSTART_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return AUTOSTART_INVALID;
+                }
             }
+            res = this._autoStart;
         }
-        return this._autoStart;
+        return res;
     }
 
     /**
@@ -690,12 +726,16 @@ public class YWatchdog : YFunction
      */
     public int get_running()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RUNNING_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RUNNING_INVALID;
+                }
             }
+            res = this._running;
         }
-        return this._running;
+        return res;
     }
 
     /**
@@ -769,12 +809,16 @@ public class YWatchdog : YFunction
      */
     public long get_triggerDelay()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return TRIGGERDELAY_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return TRIGGERDELAY_INVALID;
+                }
             }
+            res = this._triggerDelay;
         }
-        return this._triggerDelay;
+        return res;
     }
 
     /**
@@ -821,12 +865,16 @@ public class YWatchdog : YFunction
      */
     public long get_triggerDuration()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return TRIGGERDURATION_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return TRIGGERDURATION_INVALID;
+                }
             }
+            res = this._triggerDuration;
         }
-        return this._triggerDuration;
+        return res;
     }
 
     /**
@@ -901,10 +949,12 @@ public class YWatchdog : YFunction
     public static YWatchdog FindWatchdog(string func)
     {
         YWatchdog obj;
-        obj = (YWatchdog) YFunction._FindFromCache("Watchdog", func);
-        if (obj == null) {
-            obj = new YWatchdog(func);
-            YFunction._AddToCache("Watchdog", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YWatchdog) YFunction._FindFromCache("Watchdog", func);
+            if (obj == null) {
+                obj = new YWatchdog(func);
+                YFunction._AddToCache("Watchdog", func, obj);
+            }
         }
         return obj;
     }

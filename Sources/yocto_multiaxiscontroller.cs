@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_multiaxiscontroller.cs 26303 2017-01-10 13:52:43Z mvuilleu $
+ * $Id: yocto_multiaxiscontroller.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -130,12 +130,16 @@ public class YMultiAxisController : YFunction
      */
     public int get_nAxis()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return NAXIS_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return NAXIS_INVALID;
+                }
             }
+            res = this._nAxis;
         }
-        return this._nAxis;
+        return res;
     }
 
     /**
@@ -185,22 +189,30 @@ public class YMultiAxisController : YFunction
      */
     public int get_globalState()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return GLOBALSTATE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return GLOBALSTATE_INVALID;
+                }
             }
+            res = this._globalState;
         }
-        return this._globalState;
+        return res;
     }
 
     public string get_command()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = this._command;
         }
-        return this._command;
+        return res;
     }
 
     public int set_command(string newval)
@@ -255,10 +267,12 @@ public class YMultiAxisController : YFunction
     public static YMultiAxisController FindMultiAxisController(string func)
     {
         YMultiAxisController obj;
-        obj = (YMultiAxisController) YFunction._FindFromCache("MultiAxisController", func);
-        if (obj == null) {
-            obj = new YMultiAxisController(func);
-            YFunction._AddToCache("MultiAxisController", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YMultiAxisController) YFunction._FindFromCache("MultiAxisController", func);
+            if (obj == null) {
+                obj = new YMultiAxisController(func);
+                YFunction._AddToCache("MultiAxisController", func, obj);
+            }
         }
         return obj;
     }

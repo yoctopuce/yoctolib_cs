@@ -45,7 +45,6 @@ namespace ConsoleApplication1
         gps = YGps.FindGps(target + ".temperature");
       }
 
-
       if (!gps.isOnline()) {
         Console.WriteLine("Module not connected (check identification and USB cable)");
         Environment.Exit(0);

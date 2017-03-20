@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_compass.cs 24934 2016-06-30 22:32:01Z mvuilleu $
+ * $Id: yocto_compass.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindCompass(), the high-level API for Compass functions
  *
@@ -137,12 +137,16 @@ public class YCompass : YSensor
      */
     public int get_bandwidth()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BANDWIDTH_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BANDWIDTH_INVALID;
+                }
             }
+            res = this._bandwidth;
         }
-        return this._bandwidth;
+        return res;
     }
 
     /**
@@ -176,12 +180,16 @@ public class YCompass : YSensor
 
     public int get_axis()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return AXIS_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return AXIS_INVALID;
+                }
             }
+            res = this._axis;
         }
-        return this._axis;
+        return res;
     }
 
     /**
@@ -201,12 +209,16 @@ public class YCompass : YSensor
      */
     public double get_magneticHeading()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MAGNETICHEADING_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MAGNETICHEADING_INVALID;
+                }
             }
+            res = this._magneticHeading;
         }
-        return this._magneticHeading;
+        return res;
     }
 
     /**
@@ -254,10 +266,12 @@ public class YCompass : YSensor
     public static YCompass FindCompass(string func)
     {
         YCompass obj;
-        obj = (YCompass) YFunction._FindFromCache("Compass", func);
-        if (obj == null) {
-            obj = new YCompass(func);
-            YFunction._AddToCache("Compass", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YCompass) YFunction._FindFromCache("Compass", func);
+            if (obj == null) {
+                obj = new YCompass(func);
+                YFunction._AddToCache("Compass", func, obj);
+            }
         }
         return obj;
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_carbondioxide.cs 25831 2016-11-08 11:12:15Z seb $
+ * $Id: yocto_carbondioxide.cs 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements yFindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -58,7 +58,7 @@ using YFUN_DESCR = System.Int32;
  *   sensors.
  * <para>
  *   It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions,  to access the autonomous datalogger.
  *   This class adds the ability to perform manual calibration if reuired.
  * </para>
  * <para>
@@ -124,12 +124,16 @@ public class YCarbonDioxide : YSensor
      */
     public int get_abcPeriod()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ABCPERIOD_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ABCPERIOD_INVALID;
+                }
             }
+            res = this._abcPeriod;
         }
-        return this._abcPeriod;
+        return res;
     }
 
     /**
@@ -166,12 +170,16 @@ public class YCarbonDioxide : YSensor
 
     public string get_command()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = this._command;
         }
-        return this._command;
+        return res;
     }
 
     public int set_command(string newval)
@@ -226,10 +234,12 @@ public class YCarbonDioxide : YSensor
     public static YCarbonDioxide FindCarbonDioxide(string func)
     {
         YCarbonDioxide obj;
-        obj = (YCarbonDioxide) YFunction._FindFromCache("CarbonDioxide", func);
-        if (obj == null) {
-            obj = new YCarbonDioxide(func);
-            YFunction._AddToCache("CarbonDioxide", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YCarbonDioxide) YFunction._FindFromCache("CarbonDioxide", func);
+            if (obj == null) {
+                obj = new YCarbonDioxide(func);
+                YFunction._AddToCache("CarbonDioxide", func, obj);
+            }
         }
         return obj;
     }

@@ -15,8 +15,11 @@ namespace ConsoleApplication1
       Console.WriteLine("loading summary... ");
       dataset.loadMore();
       YMeasure summary = dataset.get_summary();
-      String line = String.Format("from {0} to {1} : min={2:0.00}{5} avg={3:0.00}{5}  max={4:0.00}{5}",
-                                  summary.get_startTimeUTC_asDateTime().ToString(fmt), summary.get_endTimeUTC_asDateTime().ToString(fmt), summary.get_minValue(), summary.get_averageValue(),  summary.get_maxValue(), sensor.get_unit());
+      String line =
+        String.Format("from {0} to {1} : min={2:0.00}{5} avg={3:0.00}{5}  max={4:0.00}{5}",
+                      summary.get_startTimeUTC_asDateTime().ToString(fmt),
+                      summary.get_endTimeUTC_asDateTime().ToString(fmt), summary.get_minValue(),
+                      summary.get_averageValue(),  summary.get_maxValue(), sensor.get_unit());
       Console.WriteLine(line);
       Console.Write("loading details :   0%");
       int progress = 0;
@@ -27,8 +30,11 @@ namespace ConsoleApplication1
       Console.WriteLine("");
       List<YMeasure> details = dataset.get_measures();
       foreach (YMeasure m in details) {
-        Console.WriteLine(String.Format("from {0} to {1} : min={2:0.00}{5} avg={3:0.00}{5}  max={4:0.00}{5}",
-                                        m.get_startTimeUTC_asDateTime().ToString(fmt), m.get_endTimeUTC_asDateTime().ToString(fmt), m.get_minValue(),  m.get_averageValue(), m.get_maxValue(), sensor.get_unit()));
+        Console.WriteLine(
+          String.Format("from {0} to {1} : min={2:0.00}{5} avg={3:0.00}{5}  max={4:0.00}{5}",
+                        m.get_startTimeUTC_asDateTime().ToString(fmt),
+                        m.get_endTimeUTC_asDateTime().ToString(fmt), m.get_minValue(),  m.get_averageValue(),
+                        m.get_maxValue(), sensor.get_unit()));
       }
     }
 

@@ -20,7 +20,8 @@ namespace ConsoleApplication1
 
     static void sensorTimedReportCallBack(YSensor fct, YMeasure measure)
     {
-      Console.WriteLine(fct.get_hardwareId() + ": " + measure.get_averageValue() + " " + fct.get_unit() + " (timed report)");
+      Console.WriteLine(fct.get_hardwareId() + ": " + measure.get_averageValue() + " " +
+                        fct.get_unit() + " (timed report)");
     }
 
     static void deviceLog(YModule module, string logline)

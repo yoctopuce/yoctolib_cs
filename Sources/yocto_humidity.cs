@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_humidity.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_humidity.cs 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements yFindHumidity(), the high-level API for Humidity functions
  *
@@ -58,7 +58,7 @@ using YFUN_DESCR = System.Int32;
  *   sensors.
  * <para>
  *   It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  * </para>
  * <para>
  * </para>
@@ -156,12 +156,16 @@ public class YHumidity : YSensor
      */
     public double get_relHum()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RELHUM_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RELHUM_INVALID;
+                }
             }
+            res = this._relHum;
         }
-        return this._relHum;
+        return res;
     }
 
     /**
@@ -181,12 +185,16 @@ public class YHumidity : YSensor
      */
     public double get_absHum()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ABSHUM_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ABSHUM_INVALID;
+                }
             }
+            res = this._absHum;
         }
-        return this._absHum;
+        return res;
     }
 
     /**
@@ -234,10 +242,12 @@ public class YHumidity : YSensor
     public static YHumidity FindHumidity(string func)
     {
         YHumidity obj;
-        obj = (YHumidity) YFunction._FindFromCache("Humidity", func);
-        if (obj == null) {
-            obj = new YHumidity(func);
-            YFunction._AddToCache("Humidity", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YHumidity) YFunction._FindFromCache("Humidity", func);
+            if (obj == null) {
+                obj = new YHumidity(func);
+                YFunction._AddToCache("Humidity", func, obj);
+            }
         }
         return obj;
     }

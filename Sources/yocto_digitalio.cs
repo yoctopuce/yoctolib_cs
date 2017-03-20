@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_digitalio.cs 25871 2016-11-15 14:32:56Z seb $
+ * $Id: yocto_digitalio.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -159,12 +159,16 @@ public class YDigitalIO : YFunction
      */
     public int get_portState()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PORTSTATE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PORTSTATE_INVALID;
+                }
             }
+            res = this._portState;
         }
-        return this._portState;
+        return res;
     }
 
     /**
@@ -214,12 +218,16 @@ public class YDigitalIO : YFunction
      */
     public int get_portDirection()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PORTDIRECTION_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PORTDIRECTION_INVALID;
+                }
             }
+            res = this._portDirection;
         }
-        return this._portDirection;
+        return res;
     }
 
     /**
@@ -270,12 +278,16 @@ public class YDigitalIO : YFunction
      */
     public int get_portOpenDrain()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PORTOPENDRAIN_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PORTOPENDRAIN_INVALID;
+                }
             }
+            res = this._portOpenDrain;
         }
-        return this._portOpenDrain;
+        return res;
     }
 
     /**
@@ -327,12 +339,16 @@ public class YDigitalIO : YFunction
      */
     public int get_portPolarity()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PORTPOLARITY_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PORTPOLARITY_INVALID;
+                }
             }
+            res = this._portPolarity;
         }
-        return this._portPolarity;
+        return res;
     }
 
     /**
@@ -383,12 +399,16 @@ public class YDigitalIO : YFunction
      */
     public int get_portSize()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PORTSIZE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PORTSIZE_INVALID;
+                }
             }
+            res = this._portSize;
         }
-        return this._portSize;
+        return res;
     }
 
     /**
@@ -409,12 +429,16 @@ public class YDigitalIO : YFunction
      */
     public int get_outputVoltage()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return OUTPUTVOLTAGE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return OUTPUTVOLTAGE_INVALID;
+                }
             }
+            res = this._outputVoltage;
         }
-        return this._outputVoltage;
+        return res;
     }
 
     /**
@@ -448,12 +472,16 @@ public class YDigitalIO : YFunction
 
     public string get_command()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = this._command;
         }
-        return this._command;
+        return res;
     }
 
     public int set_command(string newval)
@@ -508,10 +536,12 @@ public class YDigitalIO : YFunction
     public static YDigitalIO FindDigitalIO(string func)
     {
         YDigitalIO obj;
-        obj = (YDigitalIO) YFunction._FindFromCache("DigitalIO", func);
-        if (obj == null) {
-            obj = new YDigitalIO(func);
-            YFunction._AddToCache("DigitalIO", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YDigitalIO) YFunction._FindFromCache("DigitalIO", func);
+            if (obj == null) {
+                obj = new YDigitalIO(func);
+                YFunction._AddToCache("DigitalIO", func, obj);
+            }
         }
         return obj;
     }

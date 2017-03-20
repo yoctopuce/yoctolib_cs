@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: yocto_tilt.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_daisychain.cs 26751 2017-03-14 08:04:50Z seb $
  *
- * Implements yFindTilt(), the high-level API for Tilt functions
+ * Implements yFindDaisyChain(), the high-level API for DaisyChain functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -47,67 +47,68 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
-    //--- (YTilt return codes)
-    //--- (end of YTilt return codes)
-//--- (YTilt dlldef)
-//--- (end of YTilt dlldef)
-//--- (YTilt class start)
+    //--- (YDaisyChain return codes)
+    //--- (end of YDaisyChain return codes)
+//--- (YDaisyChain dlldef)
+//--- (end of YDaisyChain dlldef)
+//--- (YDaisyChain class start)
 /**
  * <summary>
- *   The YSensor class is the parent class for all Yoctopuce sensors.
+ *   The YDaisyChain interface can be used to verify that devices that
+ *   are daisy-chained directly from device to device, without a hub,
+ *   are detected properly.
  * <para>
- *   It can be
- *   used to read the current value and unit of any sensor, read the min/max
- *   value, configure autonomous recording frequency and access recorded data.
- *   It also provide a function to register a callback invoked each time the
- *   observed value changes, or at a predefined interval. Using this class rather
- *   than a specific subclass makes it possible to create generic applications
- *   that work with any Yoctopuce sensor, even those that do not yet exist.
- *   Note: The YAnButton class is the only analog input which does not inherit
- *   from YSensor.
  * </para>
  * <para>
  * </para>
  * </summary>
  */
-public class YTilt : YSensor
+public class YDaisyChain : YFunction
 {
-//--- (end of YTilt class start)
-    //--- (YTilt definitions)
-    public new delegate void ValueCallback(YTilt func, string value);
-    public new delegate void TimedReportCallback(YTilt func, YMeasure measure);
+//--- (end of YDaisyChain class start)
+    //--- (YDaisyChain definitions)
+    public new delegate void ValueCallback(YDaisyChain func, string value);
+    public new delegate void TimedReportCallback(YDaisyChain func, YMeasure measure);
 
-    public const int BANDWIDTH_INVALID = YAPI.INVALID_INT;
-    public const int AXIS_X = 0;
-    public const int AXIS_Y = 1;
-    public const int AXIS_Z = 2;
-    public const int AXIS_INVALID = -1;
-    protected int _bandwidth = BANDWIDTH_INVALID;
-    protected int _axis = AXIS_INVALID;
-    protected ValueCallback _valueCallbackTilt = null;
-    protected TimedReportCallback _timedReportCallbackTilt = null;
-    //--- (end of YTilt definitions)
+    public const int DAISYSTATE_READY = 0;
+    public const int DAISYSTATE_IS_CHILD = 1;
+    public const int DAISYSTATE_FIRMWARE_MISMATCH = 2;
+    public const int DAISYSTATE_CHILD_MISSING = 3;
+    public const int DAISYSTATE_CHILD_LOST = 4;
+    public const int DAISYSTATE_INVALID = -1;
+    public const int CHILDCOUNT_INVALID = YAPI.INVALID_UINT;
+    public const int REQUIREDCHILDCOUNT_INVALID = YAPI.INVALID_UINT;
+    protected int _daisyState = DAISYSTATE_INVALID;
+    protected int _childCount = CHILDCOUNT_INVALID;
+    protected int _requiredChildCount = REQUIREDCHILDCOUNT_INVALID;
+    protected ValueCallback _valueCallbackDaisyChain = null;
+    //--- (end of YDaisyChain definitions)
 
-    public YTilt(string func)
+    public YDaisyChain(string func)
         : base(func)
     {
-        _className = "Tilt";
-        //--- (YTilt attributes initialization)
-        //--- (end of YTilt attributes initialization)
+        _className = "DaisyChain";
+        //--- (YDaisyChain attributes initialization)
+        //--- (end of YDaisyChain attributes initialization)
     }
 
-    //--- (YTilt implementation)
+    //--- (YDaisyChain implementation)
 
     protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
-        if (member.name == "bandwidth")
+        if (member.name == "daisyState")
         {
-            _bandwidth = (int)member.ivalue;
+            _daisyState = (int)member.ivalue;
             return;
         }
-        if (member.name == "axis")
+        if (member.name == "childCount")
         {
-            _axis = (int)member.ivalue;
+            _childCount = (int)member.ivalue;
+            return;
+        }
+        if (member.name == "requiredChildCount")
+        {
+            _requiredChildCount = (int)member.ivalue;
             return;
         }
         base._parseAttr(member);
@@ -115,45 +116,106 @@ public class YTilt : YSensor
 
     /**
      * <summary>
-     *   Returns the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     *   Returns the state of the daisy-link between modules.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *   a value among <c>YDaisyChain.DAISYSTATE_READY</c>, <c>YDaisyChain.DAISYSTATE_IS_CHILD</c>,
+     *   <c>YDaisyChain.DAISYSTATE_FIRMWARE_MISMATCH</c>, <c>YDaisyChain.DAISYSTATE_CHILD_MISSING</c> and
+     *   <c>YDaisyChain.DAISYSTATE_CHILD_LOST</c> corresponding to the state of the daisy-link between modules
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns <c>YTilt.BANDWIDTH_INVALID</c>.
+     *   On failure, throws an exception or returns <c>YDaisyChain.DAISYSTATE_INVALID</c>.
      * </para>
      */
-    public int get_bandwidth()
+    public int get_daisyState()
     {
         int res;
         lock (thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                    return BANDWIDTH_INVALID;
+                    return DAISYSTATE_INVALID;
                 }
             }
-            res = this._bandwidth;
+            res = this._daisyState;
         }
         return res;
     }
 
     /**
      * <summary>
-     *   Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     *   Returns the number of child nodes currently detected.
      * <para>
-     *   When the
-     *   frequency is lower, the device performs averaging.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the number of child nodes currently detected
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YDaisyChain.CHILDCOUNT_INVALID</c>.
+     * </para>
+     */
+    public int get_childCount()
+    {
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CHILDCOUNT_INVALID;
+                }
+            }
+            res = this._childCount;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Returns the number of child nodes expected in normal conditions.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the number of child nodes expected in normal conditions
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YDaisyChain.REQUIREDCHILDCOUNT_INVALID</c>.
+     * </para>
+     */
+    public int get_requiredChildCount()
+    {
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return REQUIREDCHILDCOUNT_INVALID;
+                }
+            }
+            res = this._requiredChildCount;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Changes the number of child nodes expected in normal conditions.
+     * <para>
+     *   If the value is zero, no check is performed. If it is non-zero, the number
+     *   child nodes is checked on startup and the status will change to error if
+     *   the count does not match.
      * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *   an integer corresponding to the number of child nodes expected in normal conditions
      * </param>
      * <para>
      * </para>
@@ -164,30 +226,16 @@ public class YTilt : YSensor
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public int set_bandwidth(int newval)
+    public int set_requiredChildCount(int newval)
     {
         string rest_val;
         rest_val = (newval).ToString();
-        return _setAttr("bandwidth", rest_val);
-    }
-
-    public int get_axis()
-    {
-        int res;
-        lock (thisLock) {
-            if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                    return AXIS_INVALID;
-                }
-            }
-            res = this._axis;
-        }
-        return res;
+        return _setAttr("requiredChildCount", rest_val);
     }
 
     /**
      * <summary>
-     *   Retrieves a tilt sensor for a given identifier.
+     *   Retrieves a module chain for a given identifier.
      * <para>
      *   The identifier can be specified using several formats:
      * </para>
@@ -211,30 +259,30 @@ public class YTilt : YSensor
      * <para>
      * </para>
      * <para>
-     *   This function does not require that the tilt sensor is online at the time
+     *   This function does not require that the module chain is online at the time
      *   it is invoked. The returned object is nevertheless valid.
-     *   Use the method <c>YTilt.isOnline()</c> to test if the tilt sensor is
+     *   Use the method <c>YDaisyChain.isOnline()</c> to test if the module chain is
      *   indeed online at a given time. In case of ambiguity when looking for
-     *   a tilt sensor by logical name, no error is notified: the first instance
+     *   a module chain by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
      * </para>
      * </summary>
      * <param name="func">
-     *   a string that uniquely characterizes the tilt sensor
+     *   a string that uniquely characterizes the module chain
      * </param>
      * <returns>
-     *   a <c>YTilt</c> object allowing you to drive the tilt sensor.
+     *   a <c>YDaisyChain</c> object allowing you to drive the module chain.
      * </returns>
      */
-    public static YTilt FindTilt(string func)
+    public static YDaisyChain FindDaisyChain(string func)
     {
-        YTilt obj;
+        YDaisyChain obj;
         lock (YAPI.globalLock) {
-            obj = (YTilt) YFunction._FindFromCache("Tilt", func);
+            obj = (YDaisyChain) YFunction._FindFromCache("DaisyChain", func);
             if (obj == null) {
-                obj = new YTilt(func);
-                YFunction._AddToCache("Tilt", func, obj);
+                obj = new YDaisyChain(func);
+                YFunction._AddToCache("DaisyChain", func, obj);
             }
         }
         return obj;
@@ -266,7 +314,7 @@ public class YTilt : YSensor
         } else {
             YFunction._UpdateValueCallbackList(this, false);
         }
-        this._valueCallbackTilt = callback;
+        this._valueCallbackDaisyChain = callback;
         // Immediately invoke value callback with current value
         if (callback != null && this.isOnline()) {
             val = this._advertisedValue;
@@ -279,8 +327,8 @@ public class YTilt : YSensor
 
     public override int _invokeValueCallback(string value)
     {
-        if (this._valueCallbackTilt != null) {
-            this._valueCallbackTilt(this, value);
+        if (this._valueCallbackDaisyChain != null) {
+            this._valueCallbackDaisyChain(this, value);
         } else {
             base._invokeValueCallback(value);
         }
@@ -289,86 +337,45 @@ public class YTilt : YSensor
 
     /**
      * <summary>
-     *   Registers the callback function that is invoked on every periodic timed notification.
-     * <para>
-     *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
-     *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
-     *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="callback">
-     *   the callback function to call, or a null pointer. The callback function should take two
-     *   arguments: the function object of which the value has changed, and an YMeasure object describing
-     *   the new advertised value.
-     * @noreturn
-     * </param>
-     */
-    public int registerTimedReportCallback(TimedReportCallback callback)
-    {
-        YSensor sensor;
-        sensor = this;
-        if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(sensor, true);
-        } else {
-            YFunction._UpdateTimedReportCallbackList(sensor, false);
-        }
-        this._timedReportCallbackTilt = callback;
-        return 0;
-    }
-
-    public override int _invokeTimedReportCallback(YMeasure value)
-    {
-        if (this._timedReportCallbackTilt != null) {
-            this._timedReportCallbackTilt(this, value);
-        } else {
-            base._invokeTimedReportCallback(value);
-        }
-        return 0;
-    }
-
-    /**
-     * <summary>
-     *   Continues the enumeration of tilt sensors started using <c>yFirstTilt()</c>.
+     *   Continues the enumeration of module chains started using <c>yFirstDaisyChain()</c>.
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   a pointer to a <c>YTilt</c> object, corresponding to
-     *   a tilt sensor currently online, or a <c>null</c> pointer
-     *   if there are no more tilt sensors to enumerate.
+     *   a pointer to a <c>YDaisyChain</c> object, corresponding to
+     *   a module chain currently online, or a <c>null</c> pointer
+     *   if there are no more module chains to enumerate.
      * </returns>
      */
-    public YTilt nextTilt()
+    public YDaisyChain nextDaisyChain()
     {
         string hwid = "";
         if (YAPI.YISERR(_nextFunction(ref hwid)))
             return null;
         if (hwid == "")
             return null;
-        return FindTilt(hwid);
+        return FindDaisyChain(hwid);
     }
 
-    //--- (end of YTilt implementation)
+    //--- (end of YDaisyChain implementation)
 
-    //--- (Tilt functions)
+    //--- (DaisyChain functions)
 
     /**
      * <summary>
-     *   Starts the enumeration of tilt sensors currently accessible.
+     *   Starts the enumeration of module chains currently accessible.
      * <para>
-     *   Use the method <c>YTilt.nextTilt()</c> to iterate on
-     *   next tilt sensors.
+     *   Use the method <c>YDaisyChain.nextDaisyChain()</c> to iterate on
+     *   next module chains.
      * </para>
      * </summary>
      * <returns>
-     *   a pointer to a <c>YTilt</c> object, corresponding to
-     *   the first tilt sensor currently online, or a <c>null</c> pointer
+     *   a pointer to a <c>YDaisyChain</c> object, corresponding to
+     *   the first module chain currently online, or a <c>null</c> pointer
      *   if there are none.
      * </returns>
      */
-    public static YTilt FirstTilt()
+    public static YDaisyChain FirstDaisyChain()
     {
         YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
         YDEV_DESCR dev = default(YDEV_DESCR);
@@ -381,7 +388,7 @@ public class YTilt : YSensor
         string errmsg = "";
         int size = Marshal.SizeOf(v_fundescr[0]);
         IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
-        err = YAPI.apiGetFunctionsByClass("Tilt", 0, p, size, ref neededsize, ref errmsg);
+        err = YAPI.apiGetFunctionsByClass("DaisyChain", 0, p, size, ref neededsize, ref errmsg);
         Marshal.Copy(p, v_fundescr, 0, 1);
         Marshal.FreeHGlobal(p);
         if ((YAPI.YISERR(err) | (neededsize == 0)))
@@ -393,10 +400,10 @@ public class YTilt : YSensor
         errmsg = "";
         if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
             return null;
-        return FindTilt(serial + "." + funcId);
+        return FindDaisyChain(serial + "." + funcId);
     }
 
 
 
-    //--- (end of Tilt functions)
+    //--- (end of DaisyChain functions)
 }

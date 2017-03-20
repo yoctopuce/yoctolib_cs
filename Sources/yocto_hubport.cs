@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_hubport.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_hubport.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindHubPort(), the high-level API for HubPort functions
  *
@@ -135,12 +135,16 @@ public class YHubPort : YFunction
      */
     public int get_enabled()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLED_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLED_INVALID;
+                }
             }
+            res = this._enabled;
         }
-        return this._enabled;
+        return res;
     }
 
     /**
@@ -192,12 +196,16 @@ public class YHubPort : YFunction
      */
     public int get_portState()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PORTSTATE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PORTSTATE_INVALID;
+                }
             }
+            res = this._portState;
         }
-        return this._portState;
+        return res;
     }
 
     /**
@@ -219,12 +227,16 @@ public class YHubPort : YFunction
      */
     public int get_baudRate()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BAUDRATE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BAUDRATE_INVALID;
+                }
             }
+            res = this._baudRate;
         }
-        return this._baudRate;
+        return res;
     }
 
     /**
@@ -272,10 +284,12 @@ public class YHubPort : YFunction
     public static YHubPort FindHubPort(string func)
     {
         YHubPort obj;
-        obj = (YHubPort) YFunction._FindFromCache("HubPort", func);
-        if (obj == null) {
-            obj = new YHubPort(func);
-            YFunction._AddToCache("HubPort", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YHubPort) YFunction._FindFromCache("HubPort", func);
+            if (obj == null) {
+                obj = new YHubPort(func);
+                YFunction._AddToCache("HubPort", func, obj);
+            }
         }
         return obj;
     }

@@ -20,7 +20,8 @@ namespace ConsoleApplication1
 
 
     // this is the recusive function to draw 1/3nd of the Von Koch flake
-    static void recursiveLine(YDisplayLayer layer, double x0, double y0, double x1, double y1, int deep)
+    static void recursiveLine(YDisplayLayer layer, double x0, double y0, double x1, double y1,
+                              int deep)
     {
       double dx, dy, mx, my;
       if (deep <= 0) {

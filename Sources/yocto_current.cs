@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_current.cs 26183 2016-12-15 00:14:02Z mvuilleu $
+ * $Id: yocto_current.cs 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements yFindCurrent(), the high-level API for Current functions
  *
@@ -58,7 +58,7 @@ using YFUN_DESCR = System.Int32;
  *   sensors.
  * <para>
  *   It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  * </para>
  * <para>
  * </para>
@@ -101,12 +101,16 @@ public class YCurrent : YSensor
 
     public int get_enabled()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLED_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLED_INVALID;
+                }
             }
+            res = this._enabled;
         }
-        return this._enabled;
+        return res;
     }
 
     public int set_enabled(int newval)
@@ -161,10 +165,12 @@ public class YCurrent : YSensor
     public static YCurrent FindCurrent(string func)
     {
         YCurrent obj;
-        obj = (YCurrent) YFunction._FindFromCache("Current", func);
-        if (obj == null) {
-            obj = new YCurrent(func);
-            YFunction._AddToCache("Current", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YCurrent) YFunction._FindFromCache("Current", func);
+            if (obj == null) {
+                obj = new YCurrent(func);
+                YFunction._AddToCache("Current", func, obj);
+            }
         }
         return obj;
     }

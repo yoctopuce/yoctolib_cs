@@ -21,7 +21,8 @@ namespace ConsoleApplication1
         if (newfirm == "") {
           Console.WriteLine(product + " " + serial + "(rev=" + current + ") is up to date");
         } else {
-          Console.WriteLine(product + " " + serial + "(rev=" + current + ") need be updated with firmare : ");
+          Console.WriteLine(product + " " + serial + "(rev=" + current +
+                            ") need be updated with firmare : ");
           Console.WriteLine("    " + newfirm);
           // execute the firmware upgrade
           YFirmwareUpdate update = module.updateFirmware(newfirm);

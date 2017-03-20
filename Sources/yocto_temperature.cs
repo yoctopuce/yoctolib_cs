@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_temperature.cs 23527 2016-03-18 21:49:19Z mvuilleu $
+ * $Id: yocto_temperature.cs 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements yFindTemperature(), the high-level API for Temperature functions
  *
@@ -57,8 +57,8 @@ using YFUN_DESCR = System.Int32;
  *   The Yoctopuce class YTemperature allows you to read and configure Yoctopuce temperature
  *   sensors.
  * <para>
- *   It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   It inherits from YSensor class the core functions to read measurements, to
+ *   register callback functions, to access the autonomous datalogger.
  *   This class adds the ability to configure some specific parameters for some
  *   sensors (connection type, temperature mapping table).
  * </para>
@@ -194,12 +194,16 @@ public class YTemperature : YSensor
      */
     public int get_sensorType()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SENSORTYPE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SENSORTYPE_INVALID;
+                }
             }
+            res = this._sensorType;
         }
-        return this._sensorType;
+        return res;
     }
 
     /**
@@ -257,12 +261,16 @@ public class YTemperature : YSensor
      */
     public double get_signalValue()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SIGNALVALUE_INVALID;
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SIGNALVALUE_INVALID;
+                }
             }
+            res = Math.Round(this._signalValue * 1000) / 1000;
         }
-        return Math.Round(this._signalValue * 1000) / 1000;
+        return res;
     }
 
     /**
@@ -282,22 +290,30 @@ public class YTemperature : YSensor
      */
     public string get_signalUnit()
     {
-        if (this._cacheExpiration == 0) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SIGNALUNIT_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration == 0) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SIGNALUNIT_INVALID;
+                }
             }
+            res = this._signalUnit;
         }
-        return this._signalUnit;
+        return res;
     }
 
     public string get_command()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = this._command;
         }
-        return this._command;
+        return res;
     }
 
     public int set_command(string newval)
@@ -352,10 +368,12 @@ public class YTemperature : YSensor
     public static YTemperature FindTemperature(string func)
     {
         YTemperature obj;
-        obj = (YTemperature) YFunction._FindFromCache("Temperature", func);
-        if (obj == null) {
-            obj = new YTemperature(func);
-            YFunction._AddToCache("Temperature", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YTemperature) YFunction._FindFromCache("Temperature", func);
+            if (obj == null) {
+                obj = new YTemperature(func);
+                YFunction._AddToCache("Temperature", func, obj);
+            }
         }
         return obj;
     }
@@ -450,7 +468,7 @@ public class YTemperature : YSensor
 
     /**
      * <summary>
-     *   Configure NTC thermistor parameters in order to properly compute the temperature from
+     *   Configures NTC thermistor parameters in order to properly compute the temperature from
      *   the measured resistance.
      * <para>
      *   For increased precision, you can enter a complete mapping

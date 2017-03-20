@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 26169 2016-12-12 01:36:34Z mvuilleu $
+ * $Id: pic24config.php 26780 2017-03-16 14:02:09Z mvuilleu $
  *
  * Implements yFindProximity(), the high-level API for Proximity functions
  *
@@ -57,8 +57,8 @@ using YFUN_DESCR = System.Int32;
  *   The Yoctopuce class YProximity allows you to use and configure Yoctopuce proximity
  *   sensors.
  * <para>
- *   It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   It inherits from the YSensor class the core functions to read measurements,
+ *   to register callback functions, to access the autonomous datalogger.
  *   This class adds the ability to easily perform a one-point linear calibration
  *   to compensate the effect of a glass or filter placed in front of the sensor.
  * </para>
@@ -73,6 +73,7 @@ public class YProximity : YSensor
     public new delegate void ValueCallback(YProximity func, string value);
     public new delegate void TimedReportCallback(YProximity func, YMeasure measure);
 
+    public const double SIGNALVALUE_INVALID = YAPI.INVALID_DOUBLE;
     public const int DETECTIONTHRESHOLD_INVALID = YAPI.INVALID_UINT;
     public const int ISPRESENT_FALSE = 0;
     public const int ISPRESENT_TRUE = 1;
@@ -81,12 +82,18 @@ public class YProximity : YSensor
     public const long LASTTIMEREMOVED_INVALID = YAPI.INVALID_LONG;
     public const long PULSECOUNTER_INVALID = YAPI.INVALID_LONG;
     public const long PULSETIMER_INVALID = YAPI.INVALID_LONG;
+    public const int PROXIMITYREPORTMODE_NUMERIC = 0;
+    public const int PROXIMITYREPORTMODE_PRESENCE = 1;
+    public const int PROXIMITYREPORTMODE_PULSECOUNT = 2;
+    public const int PROXIMITYREPORTMODE_INVALID = -1;
+    protected double _signalValue = SIGNALVALUE_INVALID;
     protected int _detectionThreshold = DETECTIONTHRESHOLD_INVALID;
     protected int _isPresent = ISPRESENT_INVALID;
     protected long _lastTimeApproached = LASTTIMEAPPROACHED_INVALID;
     protected long _lastTimeRemoved = LASTTIMEREMOVED_INVALID;
     protected long _pulseCounter = PULSECOUNTER_INVALID;
     protected long _pulseTimer = PULSETIMER_INVALID;
+    protected int _proximityReportMode = PROXIMITYREPORTMODE_INVALID;
     protected ValueCallback _valueCallbackProximity = null;
     protected TimedReportCallback _timedReportCallbackProximity = null;
     //--- (end of YProximity definitions)
@@ -103,6 +110,11 @@ public class YProximity : YSensor
 
     protected override void _parseAttr(YAPI.TJSONRECORD member)
     {
+        if (member.name == "signalValue")
+        {
+            _signalValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
+            return;
+        }
         if (member.name == "detectionThreshold")
         {
             _detectionThreshold = (int)member.ivalue;
@@ -133,7 +145,41 @@ public class YProximity : YSensor
             _pulseTimer = member.ivalue;
             return;
         }
+        if (member.name == "proximityReportMode")
+        {
+            _proximityReportMode = (int)member.ivalue;
+            return;
+        }
         base._parseAttr(member);
+    }
+
+    /**
+     * <summary>
+     *   Returns the current value of signal measured by the proximity sensor.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a floating point number corresponding to the current value of signal measured by the proximity sensor
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YProximity.SIGNALVALUE_INVALID</c>.
+     * </para>
+     */
+    public double get_signalValue()
+    {
+        double res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SIGNALVALUE_INVALID;
+                }
+            }
+            res = Math.Round(this._signalValue * 1000) / 1000;
+        }
+        return res;
     }
 
     /**
@@ -156,12 +202,16 @@ public class YProximity : YSensor
      */
     public int get_detectionThreshold()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DETECTIONTHRESHOLD_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DETECTIONTHRESHOLD_INVALID;
+                }
             }
+            res = this._detectionThreshold;
         }
-        return this._detectionThreshold;
+        return res;
     }
 
     /**
@@ -213,12 +263,16 @@ public class YProximity : YSensor
      */
     public int get_isPresent()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ISPRESENT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ISPRESENT_INVALID;
+                }
             }
+            res = this._isPresent;
         }
-        return this._isPresent;
+        return res;
     }
 
     /**
@@ -240,12 +294,16 @@ public class YProximity : YSensor
      */
     public long get_lastTimeApproached()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LASTTIMEAPPROACHED_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LASTTIMEAPPROACHED_INVALID;
+                }
             }
+            res = this._lastTimeApproached;
         }
-        return this._lastTimeApproached;
+        return res;
     }
 
     /**
@@ -267,12 +325,16 @@ public class YProximity : YSensor
      */
     public long get_lastTimeRemoved()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LASTTIMEREMOVED_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LASTTIMEREMOVED_INVALID;
+                }
             }
+            res = this._lastTimeRemoved;
         }
-        return this._lastTimeRemoved;
+        return res;
     }
 
     /**
@@ -295,12 +357,16 @@ public class YProximity : YSensor
      */
     public long get_pulseCounter()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PULSECOUNTER_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PULSECOUNTER_INVALID;
+                }
             }
+            res = this._pulseCounter;
         }
-        return this._pulseCounter;
+        return res;
     }
 
     public int set_pulseCounter(long newval)
@@ -312,14 +378,14 @@ public class YProximity : YSensor
 
     /**
      * <summary>
-     *   Returns the timer of the pulses counter (ms).
+     *   Returns the timer of the pulse counter (ms).
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the timer of the pulses counter (ms)
+     *   an integer corresponding to the timer of the pulse counter (ms)
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YProximity.PULSETIMER_INVALID</c>.
@@ -327,12 +393,78 @@ public class YProximity : YSensor
      */
     public long get_pulseTimer()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PULSETIMER_INVALID;
+        long res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PULSETIMER_INVALID;
+                }
             }
+            res = this._pulseTimer;
         }
-        return this._pulseTimer;
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Returns the parameter (sensor value, presence or pulse count) returned by the get_currentValue function and callbacks.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among <c>YProximity.PROXIMITYREPORTMODE_NUMERIC</c>,
+     *   <c>YProximity.PROXIMITYREPORTMODE_PRESENCE</c> and <c>YProximity.PROXIMITYREPORTMODE_PULSECOUNT</c>
+     *   corresponding to the parameter (sensor value, presence or pulse count) returned by the
+     *   get_currentValue function and callbacks
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YProximity.PROXIMITYREPORTMODE_INVALID</c>.
+     * </para>
+     */
+    public int get_proximityReportMode()
+    {
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PROXIMITYREPORTMODE_INVALID;
+                }
+            }
+            res = this._proximityReportMode;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Modifies the  parameter  type (sensor value, presence or pulse count) returned by the get_currentValue function and callbacks.
+     * <para>
+     *   The edge count value is limited to the 6 lowest digits. For values greater than one million, use
+     *   get_pulseCounter().
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a value among <c>YProximity.PROXIMITYREPORTMODE_NUMERIC</c>,
+     *   <c>YProximity.PROXIMITYREPORTMODE_PRESENCE</c> and <c>YProximity.PROXIMITYREPORTMODE_PULSECOUNT</c>
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_proximityReportMode(int newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        return _setAttr("proximityReportMode", rest_val);
     }
 
     /**
@@ -380,10 +512,12 @@ public class YProximity : YSensor
     public static YProximity FindProximity(string func)
     {
         YProximity obj;
-        obj = (YProximity) YFunction._FindFromCache("Proximity", func);
-        if (obj == null) {
-            obj = new YProximity(func);
-            YFunction._AddToCache("Proximity", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YProximity) YFunction._FindFromCache("Proximity", func);
+            if (obj == null) {
+                obj = new YProximity(func);
+                YFunction._AddToCache("Proximity", func, obj);
+            }
         }
         return obj;
     }
@@ -478,7 +612,7 @@ public class YProximity : YSensor
 
     /**
      * <summary>
-     *   Returns the pulse counter value as well as its timer.
+     *   Resets the pulse counter value as well as its timer.
      * <para>
      * </para>
      * </summary>

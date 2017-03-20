@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 26132 2016-12-01 17:02:38Z seb $
+ * $Id: yocto_cellular.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *
@@ -309,12 +309,16 @@ public class YCellular : YFunction
      */
     public int get_linkQuality()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LINKQUALITY_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LINKQUALITY_INVALID;
+                }
             }
+            res = this._linkQuality;
         }
-        return this._linkQuality;
+        return res;
     }
 
     /**
@@ -334,12 +338,16 @@ public class YCellular : YFunction
      */
     public string get_cellOperator()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CELLOPERATOR_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CELLOPERATOR_INVALID;
+                }
             }
+            res = this._cellOperator;
         }
-        return this._cellOperator;
+        return res;
     }
 
     /**
@@ -359,12 +367,16 @@ public class YCellular : YFunction
      */
     public string get_cellIdentifier()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CELLIDENTIFIER_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CELLIDENTIFIER_INVALID;
+                }
             }
+            res = this._cellIdentifier;
         }
-        return this._cellIdentifier;
+        return res;
     }
 
     /**
@@ -386,12 +398,16 @@ public class YCellular : YFunction
      */
     public int get_cellType()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CELLTYPE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CELLTYPE_INVALID;
+                }
             }
+            res = this._cellType;
         }
-        return this._cellType;
+        return res;
     }
 
     /**
@@ -415,12 +431,16 @@ public class YCellular : YFunction
      */
     public string get_imsi()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return IMSI_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return IMSI_INVALID;
+                }
             }
+            res = this._imsi;
         }
-        return this._imsi;
+        return res;
     }
 
     /**
@@ -440,12 +460,16 @@ public class YCellular : YFunction
      */
     public string get_message()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MESSAGE_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MESSAGE_INVALID;
+                }
             }
+            res = this._message;
         }
-        return this._message;
+        return res;
     }
 
     /**
@@ -469,12 +493,16 @@ public class YCellular : YFunction
      */
     public string get_pin()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PIN_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PIN_INVALID;
+                }
             }
+            res = this._pin;
         }
-        return this._pin;
+        return res;
     }
 
     /**
@@ -536,12 +564,16 @@ public class YCellular : YFunction
      */
     public string get_lockedOperator()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LOCKEDOPERATOR_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LOCKEDOPERATOR_INVALID;
+                }
             }
+            res = this._lockedOperator;
         }
-        return this._lockedOperator;
+        return res;
     }
 
     /**
@@ -592,12 +624,16 @@ public class YCellular : YFunction
      */
     public int get_airplaneMode()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return AIRPLANEMODE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return AIRPLANEMODE_INVALID;
+                }
             }
+            res = this._airplaneMode;
         }
-        return this._airplaneMode;
+        return res;
     }
 
     /**
@@ -648,12 +684,16 @@ public class YCellular : YFunction
      */
     public int get_enableData()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLEDATA_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLEDATA_INVALID;
+                }
             }
+            res = this._enableData;
         }
-        return this._enableData;
+        return res;
     }
 
     /**
@@ -709,12 +749,16 @@ public class YCellular : YFunction
      */
     public string get_apn()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return APN_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return APN_INVALID;
+                }
             }
+            res = this._apn;
         }
-        return this._apn;
+        return res;
     }
 
     /**
@@ -765,12 +809,16 @@ public class YCellular : YFunction
      */
     public string get_apnSecret()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return APNSECRET_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return APNSECRET_INVALID;
+                }
             }
+            res = this._apnSecret;
         }
-        return this._apnSecret;
+        return res;
     }
 
     public int set_apnSecret(string newval)
@@ -797,12 +845,16 @@ public class YCellular : YFunction
      */
     public int get_pingInterval()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PINGINTERVAL_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PINGINTERVAL_INVALID;
+                }
             }
+            res = this._pingInterval;
         }
-        return this._pingInterval;
+        return res;
     }
 
     /**
@@ -849,12 +901,16 @@ public class YCellular : YFunction
      */
     public int get_dataSent()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DATASENT_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DATASENT_INVALID;
+                }
             }
+            res = this._dataSent;
         }
-        return this._dataSent;
+        return res;
     }
 
     /**
@@ -901,12 +957,16 @@ public class YCellular : YFunction
      */
     public int get_dataReceived()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DATARECEIVED_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DATARECEIVED_INVALID;
+                }
             }
+            res = this._dataReceived;
         }
-        return this._dataReceived;
+        return res;
     }
 
     /**
@@ -938,12 +998,16 @@ public class YCellular : YFunction
 
     public string get_command()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        string res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = this._command;
         }
-        return this._command;
+        return res;
     }
 
     public int set_command(string newval)
@@ -998,10 +1062,12 @@ public class YCellular : YFunction
     public static YCellular FindCellular(string func)
     {
         YCellular obj;
-        obj = (YCellular) YFunction._FindFromCache("Cellular", func);
-        if (obj == null) {
-            obj = new YCellular(func);
-            YFunction._AddToCache("Cellular", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YCellular) YFunction._FindFromCache("Cellular", func);
+            if (obj == null) {
+                obj = new YCellular(func);
+                YFunction._AddToCache("Cellular", func, obj);
+            }
         }
         return obj;
     }

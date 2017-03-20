@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_poweroutput.cs 23239 2016-02-23 14:07:00Z seb $
+ * $Id: yocto_poweroutput.cs 26751 2017-03-14 08:04:50Z seb $
  *
  * Implements yFindPowerOutput(), the high-level API for PowerOutput functions
  *
@@ -117,12 +117,16 @@ public class YPowerOutput : YFunction
      */
     public int get_voltage()
     {
-        if (this._cacheExpiration <= YAPI.GetTickCount()) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return VOLTAGE_INVALID;
+        int res;
+        lock (thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return VOLTAGE_INVALID;
+                }
             }
+            res = this._voltage;
         }
-        return this._voltage;
+        return res;
     }
 
     /**
@@ -202,10 +206,12 @@ public class YPowerOutput : YFunction
     public static YPowerOutput FindPowerOutput(string func)
     {
         YPowerOutput obj;
-        obj = (YPowerOutput) YFunction._FindFromCache("PowerOutput", func);
-        if (obj == null) {
-            obj = new YPowerOutput(func);
-            YFunction._AddToCache("PowerOutput", func, obj);
+        lock (YAPI.globalLock) {
+            obj = (YPowerOutput) YFunction._FindFromCache("PowerOutput", func);
+            if (obj == null) {
+                obj = new YPowerOutput(func);
+                YFunction._AddToCache("PowerOutput", func, obj);
+            }
         }
         return obj;
     }

@@ -50,15 +50,17 @@ namespace ConsoleApplication1
         psensor = YPressure.FindPressure(target + ".pressure");
       }
 
-
       if (!hsensor.isOnline()) {
         Console.WriteLine("Module not connected (check identification and USB cable)");
         Environment.Exit(0);
       }
       while (hsensor.isOnline()) {
-        Console.WriteLine("Current humidity:    " + hsensor.get_currentValue().ToString() + " %RH");
-        Console.WriteLine("Current temperature: " + tsensor.get_currentValue().ToString() + " °C");
-        Console.WriteLine("Current pressure:    " + psensor.get_currentValue().ToString() + " hPa");
+        Console.WriteLine("Current humidity:    " + hsensor.get_currentValue().ToString()
+                          + " %RH");
+        Console.WriteLine("Current temperature: " + tsensor.get_currentValue().ToString()
+                          + " °C");
+        Console.WriteLine("Current pressure:    " + psensor.get_currentValue().ToString()
+                          + " hPa");
         Console.WriteLine("  (press Ctrl-C to exit)");
 
         YAPI.Sleep(1000, ref errmsg);

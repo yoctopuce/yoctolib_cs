@@ -58,7 +58,6 @@ namespace ConsoleApplication1
         led1 = YColorLed.FindColorLed(target + ".colorLed1");
       }
 
-
       if (led1.isOnline()) {
         led1.rgbMove(color, 1000); // smooth transition
       } else {
