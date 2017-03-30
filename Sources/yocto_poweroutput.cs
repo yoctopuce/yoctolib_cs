@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_poweroutput.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_poweroutput.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindPowerOutput(), the high-level API for PowerOutput functions
  *
@@ -87,14 +87,13 @@ public class YPowerOutput : YFunction
 
     //--- (YPowerOutput implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "voltage")
+        if (json_val.Has("voltage"))
         {
-            _voltage = (int)member.ivalue;
-            return;
+            _voltage = json_val.GetInt("voltage");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -118,7 +117,7 @@ public class YPowerOutput : YFunction
     public int get_voltage()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return VOLTAGE_INVALID;
@@ -157,8 +156,10 @@ public class YPowerOutput : YFunction
     public int set_voltage(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("voltage", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("voltage", rest_val);
+        }
     }
 
     /**

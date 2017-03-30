@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_gyro.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_gyro.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -86,9 +86,9 @@ public class YQt : YSensor
 
     //--- (generated code: YQt implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -404,29 +404,25 @@ public class YGyro : YSensor
 
     //--- (generated code: YGyro implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "bandwidth")
+        if (json_val.Has("bandwidth"))
         {
-            _bandwidth = (int)member.ivalue;
-            return;
+            _bandwidth = json_val.GetInt("bandwidth");
         }
-        if (member.name == "xValue")
+        if (json_val.Has("xValue"))
         {
-            _xValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _xValue = Math.Round(json_val.GetDouble("xValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "yValue")
+        if (json_val.Has("yValue"))
         {
-            _yValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _yValue = Math.Round(json_val.GetDouble("yValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "zValue")
+        if (json_val.Has("zValue"))
         {
-            _zValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _zValue = Math.Round(json_val.GetDouble("zValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -447,7 +443,7 @@ public class YGyro : YSensor
     public int get_bandwidth()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return BANDWIDTH_INVALID;
@@ -483,8 +479,10 @@ public class YGyro : YSensor
     public int set_bandwidth(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("bandwidth", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("bandwidth", rest_val);
+        }
     }
 
     /**
@@ -506,7 +504,7 @@ public class YGyro : YSensor
     public double get_xValue()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return XVALUE_INVALID;
@@ -536,7 +534,7 @@ public class YGyro : YSensor
     public double get_yValue()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return YVALUE_INVALID;
@@ -566,7 +564,7 @@ public class YGyro : YSensor
     public double get_zValue()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ZVALUE_INVALID;

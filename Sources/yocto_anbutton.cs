@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_anbutton.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_anbutton.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindAnButton(), the high-level API for AnButton functions
  *
@@ -112,64 +112,53 @@ public class YAnButton : YFunction
 
     //--- (YAnButton implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "calibratedValue")
+        if (json_val.Has("calibratedValue"))
         {
-            _calibratedValue = (int)member.ivalue;
-            return;
+            _calibratedValue = json_val.GetInt("calibratedValue");
         }
-        if (member.name == "rawValue")
+        if (json_val.Has("rawValue"))
         {
-            _rawValue = (int)member.ivalue;
-            return;
+            _rawValue = json_val.GetInt("rawValue");
         }
-        if (member.name == "analogCalibration")
+        if (json_val.Has("analogCalibration"))
         {
-            _analogCalibration = member.ivalue > 0 ? 1 : 0;
-            return;
+            _analogCalibration = json_val.GetInt("analogCalibration") > 0 ? 1 : 0;
         }
-        if (member.name == "calibrationMax")
+        if (json_val.Has("calibrationMax"))
         {
-            _calibrationMax = (int)member.ivalue;
-            return;
+            _calibrationMax = json_val.GetInt("calibrationMax");
         }
-        if (member.name == "calibrationMin")
+        if (json_val.Has("calibrationMin"))
         {
-            _calibrationMin = (int)member.ivalue;
-            return;
+            _calibrationMin = json_val.GetInt("calibrationMin");
         }
-        if (member.name == "sensitivity")
+        if (json_val.Has("sensitivity"))
         {
-            _sensitivity = (int)member.ivalue;
-            return;
+            _sensitivity = json_val.GetInt("sensitivity");
         }
-        if (member.name == "isPressed")
+        if (json_val.Has("isPressed"))
         {
-            _isPressed = member.ivalue > 0 ? 1 : 0;
-            return;
+            _isPressed = json_val.GetInt("isPressed") > 0 ? 1 : 0;
         }
-        if (member.name == "lastTimePressed")
+        if (json_val.Has("lastTimePressed"))
         {
-            _lastTimePressed = member.ivalue;
-            return;
+            _lastTimePressed = json_val.GetLong("lastTimePressed");
         }
-        if (member.name == "lastTimeReleased")
+        if (json_val.Has("lastTimeReleased"))
         {
-            _lastTimeReleased = member.ivalue;
-            return;
+            _lastTimeReleased = json_val.GetLong("lastTimeReleased");
         }
-        if (member.name == "pulseCounter")
+        if (json_val.Has("pulseCounter"))
         {
-            _pulseCounter = member.ivalue;
-            return;
+            _pulseCounter = json_val.GetLong("pulseCounter");
         }
-        if (member.name == "pulseTimer")
+        if (json_val.Has("pulseTimer"))
         {
-            _pulseTimer = member.ivalue;
-            return;
+            _pulseTimer = json_val.GetLong("pulseTimer");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -190,7 +179,7 @@ public class YAnButton : YFunction
     public int get_calibratedValue()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CALIBRATEDVALUE_INVALID;
@@ -219,7 +208,7 @@ public class YAnButton : YFunction
     public int get_rawValue()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return RAWVALUE_INVALID;
@@ -248,7 +237,7 @@ public class YAnButton : YFunction
     public int get_analogCalibration()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ANALOGCALIBRATION_INVALID;
@@ -284,8 +273,10 @@ public class YAnButton : YFunction
     public int set_analogCalibration(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("analogCalibration", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("analogCalibration", rest_val);
+        }
     }
 
     /**
@@ -306,7 +297,7 @@ public class YAnButton : YFunction
     public int get_calibrationMax()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CALIBRATIONMAX_INVALID;
@@ -345,8 +336,10 @@ public class YAnButton : YFunction
     public int set_calibrationMax(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("calibrationMax", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("calibrationMax", rest_val);
+        }
     }
 
     /**
@@ -367,7 +360,7 @@ public class YAnButton : YFunction
     public int get_calibrationMin()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CALIBRATIONMIN_INVALID;
@@ -406,8 +399,10 @@ public class YAnButton : YFunction
     public int set_calibrationMin(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("calibrationMin", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("calibrationMin", rest_val);
+        }
     }
 
     /**
@@ -428,7 +423,7 @@ public class YAnButton : YFunction
     public int get_sensitivity()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SENSITIVITY_INVALID;
@@ -467,8 +462,10 @@ public class YAnButton : YFunction
     public int set_sensitivity(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("sensitivity", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("sensitivity", rest_val);
+        }
     }
 
     /**
@@ -490,7 +487,7 @@ public class YAnButton : YFunction
     public int get_isPressed()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ISPRESSED_INVALID;
@@ -521,7 +518,7 @@ public class YAnButton : YFunction
     public long get_lastTimePressed()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LASTTIMEPRESSED_INVALID;
@@ -552,7 +549,7 @@ public class YAnButton : YFunction
     public long get_lastTimeReleased()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LASTTIMERELEASED_INVALID;
@@ -584,7 +581,7 @@ public class YAnButton : YFunction
     public long get_pulseCounter()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PULSECOUNTER_INVALID;
@@ -598,8 +595,10 @@ public class YAnButton : YFunction
     public int set_pulseCounter(long newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("pulseCounter", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("pulseCounter", rest_val);
+        }
     }
 
     /**
@@ -620,7 +619,7 @@ public class YAnButton : YFunction
     public long get_pulseTimer()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PULSETIMER_INVALID;

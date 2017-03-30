@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_motor.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_motor.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindMotor(), the high-level API for Motor functions
  *
@@ -112,54 +112,45 @@ public class YMotor : YFunction
 
     //--- (YMotor implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "motorStatus")
+        if (json_val.Has("motorStatus"))
         {
-            _motorStatus = (int)member.ivalue;
-            return;
+            _motorStatus = json_val.GetInt("motorStatus");
         }
-        if (member.name == "drivingForce")
+        if (json_val.Has("drivingForce"))
         {
-            _drivingForce = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _drivingForce = Math.Round(json_val.GetDouble("drivingForce") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "brakingForce")
+        if (json_val.Has("brakingForce"))
         {
-            _brakingForce = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _brakingForce = Math.Round(json_val.GetDouble("brakingForce") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "cutOffVoltage")
+        if (json_val.Has("cutOffVoltage"))
         {
-            _cutOffVoltage = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _cutOffVoltage = Math.Round(json_val.GetDouble("cutOffVoltage") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "overCurrentLimit")
+        if (json_val.Has("overCurrentLimit"))
         {
-            _overCurrentLimit = (int)member.ivalue;
-            return;
+            _overCurrentLimit = json_val.GetInt("overCurrentLimit");
         }
-        if (member.name == "frequency")
+        if (json_val.Has("frequency"))
         {
-            _frequency = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _frequency = Math.Round(json_val.GetDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "starterTime")
+        if (json_val.Has("starterTime"))
         {
-            _starterTime = (int)member.ivalue;
-            return;
+            _starterTime = json_val.GetInt("starterTime");
         }
-        if (member.name == "failSafeTimeout")
+        if (json_val.Has("failSafeTimeout"))
         {
-            _failSafeTimeout = (int)member.ivalue;
-            return;
+            _failSafeTimeout = json_val.GetInt("failSafeTimeout");
         }
-        if (member.name == "command")
+        if (json_val.Has("command"))
         {
-            _command = member.svalue;
-            return;
+            _command = json_val.GetString("command");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -196,7 +187,7 @@ public class YMotor : YFunction
     public int get_motorStatus()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MOTORSTATUS_INVALID;
@@ -210,8 +201,10 @@ public class YMotor : YFunction
     public int set_motorStatus(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("motorStatus", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("motorStatus", rest_val);
+        }
     }
 
     /**
@@ -242,8 +235,10 @@ public class YMotor : YFunction
     public int set_drivingForce(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("drivingForce", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("drivingForce", rest_val);
+        }
     }
 
     /**
@@ -264,7 +259,7 @@ public class YMotor : YFunction
     public double get_drivingForce()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DRIVINGFORCE_INVALID;
@@ -300,8 +295,10 @@ public class YMotor : YFunction
     public int set_brakingForce(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("brakingForce", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("brakingForce", rest_val);
+        }
     }
 
     /**
@@ -323,7 +320,7 @@ public class YMotor : YFunction
     public double get_brakingForce()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return BRAKINGFORCE_INVALID;
@@ -364,8 +361,10 @@ public class YMotor : YFunction
     public int set_cutOffVoltage(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("cutOffVoltage", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("cutOffVoltage", rest_val);
+        }
     }
 
     /**
@@ -391,7 +390,7 @@ public class YMotor : YFunction
     public double get_cutOffVoltage()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CUTOFFVOLTAGE_INVALID;
@@ -423,7 +422,7 @@ public class YMotor : YFunction
     public int get_overCurrentLimit()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return OVERCURRENTLIMIT_INVALID;
@@ -462,8 +461,10 @@ public class YMotor : YFunction
     public int set_overCurrentLimit(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("overCurrentLimit", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("overCurrentLimit", rest_val);
+        }
     }
 
     /**
@@ -493,8 +494,10 @@ public class YMotor : YFunction
     public int set_frequency(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("frequency", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("frequency", rest_val);
+        }
     }
 
     /**
@@ -515,7 +518,7 @@ public class YMotor : YFunction
     public double get_frequency()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return FREQUENCY_INVALID;
@@ -546,7 +549,7 @@ public class YMotor : YFunction
     public int get_starterTime()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return STARTERTIME_INVALID;
@@ -582,8 +585,10 @@ public class YMotor : YFunction
     public int set_starterTime(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("starterTime", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("starterTime", rest_val);
+        }
     }
 
     /**
@@ -609,7 +614,7 @@ public class YMotor : YFunction
     public int get_failSafeTimeout()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return FAILSAFETIMEOUT_INVALID;
@@ -648,14 +653,16 @@ public class YMotor : YFunction
     public int set_failSafeTimeout(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("failSafeTimeout", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("failSafeTimeout", rest_val);
+        }
     }
 
     public string get_command()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
@@ -669,8 +676,10 @@ public class YMotor : YFunction
     public int set_command(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("command", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("command", rest_val);
+        }
     }
 
     /**

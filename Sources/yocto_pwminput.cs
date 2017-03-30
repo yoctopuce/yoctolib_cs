@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pwminput.cs 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: yocto_pwminput.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindPwmInput(), the high-level API for PwmInput functions
  *
@@ -105,44 +105,37 @@ public class YPwmInput : YSensor
 
     //--- (YPwmInput implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "dutyCycle")
+        if (json_val.Has("dutyCycle"))
         {
-            _dutyCycle = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _dutyCycle = Math.Round(json_val.GetDouble("dutyCycle") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "pulseDuration")
+        if (json_val.Has("pulseDuration"))
         {
-            _pulseDuration = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _pulseDuration = Math.Round(json_val.GetDouble("pulseDuration") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "frequency")
+        if (json_val.Has("frequency"))
         {
-            _frequency = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _frequency = Math.Round(json_val.GetDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "period")
+        if (json_val.Has("period"))
         {
-            _period = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _period = Math.Round(json_val.GetDouble("period") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "pulseCounter")
+        if (json_val.Has("pulseCounter"))
         {
-            _pulseCounter = member.ivalue;
-            return;
+            _pulseCounter = json_val.GetLong("pulseCounter");
         }
-        if (member.name == "pulseTimer")
+        if (json_val.Has("pulseTimer"))
         {
-            _pulseTimer = member.ivalue;
-            return;
+            _pulseTimer = json_val.GetLong("pulseTimer");
         }
-        if (member.name == "pwmReportMode")
+        if (json_val.Has("pwmReportMode"))
         {
-            _pwmReportMode = (int)member.ivalue;
-            return;
+            _pwmReportMode = json_val.GetInt("pwmReportMode");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -163,7 +156,7 @@ public class YPwmInput : YSensor
     public double get_dutyCycle()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DUTYCYCLE_INVALID;
@@ -192,7 +185,7 @@ public class YPwmInput : YSensor
     public double get_pulseDuration()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PULSEDURATION_INVALID;
@@ -221,7 +214,7 @@ public class YPwmInput : YSensor
     public double get_frequency()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return FREQUENCY_INVALID;
@@ -250,7 +243,7 @@ public class YPwmInput : YSensor
     public double get_period()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PERIOD_INVALID;
@@ -282,7 +275,7 @@ public class YPwmInput : YSensor
     public long get_pulseCounter()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PULSECOUNTER_INVALID;
@@ -296,8 +289,10 @@ public class YPwmInput : YSensor
     public int set_pulseCounter(long newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("pulseCounter", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("pulseCounter", rest_val);
+        }
     }
 
     /**
@@ -318,7 +313,7 @@ public class YPwmInput : YSensor
     public long get_pulseTimer()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PULSETIMER_INVALID;
@@ -351,7 +346,7 @@ public class YPwmInput : YSensor
     public int get_pwmReportMode()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PWMREPORTMODE_INVALID;
@@ -388,8 +383,10 @@ public class YPwmInput : YSensor
     public int set_pwmReportMode(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("pwmReportMode", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("pwmReportMode", rest_val);
+        }
     }
 
     /**

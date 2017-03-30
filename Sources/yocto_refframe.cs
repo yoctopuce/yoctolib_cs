@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_refframe.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_refframe.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -129,30 +129,27 @@ public enum   MOUNTORIENTATION
 
     //--- (YRefFrame implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "mountPos")
+        if (json_val.Has("mountPos"))
         {
-            _mountPos = (int)member.ivalue;
-            return;
+            _mountPos = json_val.GetInt("mountPos");
         }
-        if (member.name == "bearing")
+        if (json_val.Has("bearing"))
         {
-            _bearing = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _bearing = Math.Round(json_val.GetDouble("bearing") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "calibrationParam")
+        if (json_val.Has("calibrationParam"))
         {
-            _calibrationParam = member.svalue;
-            return;
+            _calibrationParam = json_val.GetString("calibrationParam");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     public int get_mountPos()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MOUNTPOS_INVALID;
@@ -166,8 +163,10 @@ public enum   MOUNTORIENTATION
     public int set_mountPos(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("mountPos", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("mountPos", rest_val);
+        }
     }
 
     /**
@@ -210,8 +209,10 @@ public enum   MOUNTORIENTATION
     public int set_bearing(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("bearing", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("bearing", rest_val);
+        }
     }
 
     /**
@@ -235,7 +236,7 @@ public enum   MOUNTORIENTATION
     public double get_bearing()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return BEARING_INVALID;
@@ -249,7 +250,7 @@ public enum   MOUNTORIENTATION
     public string get_calibrationParam()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CALIBRATIONPARAM_INVALID;
@@ -263,8 +264,10 @@ public enum   MOUNTORIENTATION
     public int set_calibrationParam(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("calibrationParam", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("calibrationParam", rest_val);
+        }
     }
 
     /**

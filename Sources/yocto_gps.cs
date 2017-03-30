@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_gps.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_gps.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindGps(), the high-level API for Gps functions
  *
@@ -117,74 +117,61 @@ public class YGps : YFunction
 
     //--- (YGps implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "isFixed")
+        if (json_val.Has("isFixed"))
         {
-            _isFixed = member.ivalue > 0 ? 1 : 0;
-            return;
+            _isFixed = json_val.GetInt("isFixed") > 0 ? 1 : 0;
         }
-        if (member.name == "satCount")
+        if (json_val.Has("satCount"))
         {
-            _satCount = member.ivalue;
-            return;
+            _satCount = json_val.GetLong("satCount");
         }
-        if (member.name == "coordSystem")
+        if (json_val.Has("coordSystem"))
         {
-            _coordSystem = (int)member.ivalue;
-            return;
+            _coordSystem = json_val.GetInt("coordSystem");
         }
-        if (member.name == "latitude")
+        if (json_val.Has("latitude"))
         {
-            _latitude = member.svalue;
-            return;
+            _latitude = json_val.GetString("latitude");
         }
-        if (member.name == "longitude")
+        if (json_val.Has("longitude"))
         {
-            _longitude = member.svalue;
-            return;
+            _longitude = json_val.GetString("longitude");
         }
-        if (member.name == "dilution")
+        if (json_val.Has("dilution"))
         {
-            _dilution = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _dilution = Math.Round(json_val.GetDouble("dilution") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "altitude")
+        if (json_val.Has("altitude"))
         {
-            _altitude = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _altitude = Math.Round(json_val.GetDouble("altitude") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "groundSpeed")
+        if (json_val.Has("groundSpeed"))
         {
-            _groundSpeed = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _groundSpeed = Math.Round(json_val.GetDouble("groundSpeed") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "direction")
+        if (json_val.Has("direction"))
         {
-            _direction = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _direction = Math.Round(json_val.GetDouble("direction") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "unixTime")
+        if (json_val.Has("unixTime"))
         {
-            _unixTime = member.ivalue;
-            return;
+            _unixTime = json_val.GetLong("unixTime");
         }
-        if (member.name == "dateTime")
+        if (json_val.Has("dateTime"))
         {
-            _dateTime = member.svalue;
-            return;
+            _dateTime = json_val.GetString("dateTime");
         }
-        if (member.name == "utcOffset")
+        if (json_val.Has("utcOffset"))
         {
-            _utcOffset = (int)member.ivalue;
-            return;
+            _utcOffset = json_val.GetInt("utcOffset");
         }
-        if (member.name == "command")
+        if (json_val.Has("command"))
         {
-            _command = member.svalue;
-            return;
+            _command = json_val.GetString("command");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -206,7 +193,7 @@ public class YGps : YFunction
     public int get_isFixed()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ISFIXED_INVALID;
@@ -235,7 +222,7 @@ public class YGps : YFunction
     public long get_satCount()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SATCOUNT_INVALID;
@@ -265,7 +252,7 @@ public class YGps : YFunction
     public int get_coordSystem()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COORDSYSTEM_INVALID;
@@ -300,8 +287,10 @@ public class YGps : YFunction
     public int set_coordSystem(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("coordSystem", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("coordSystem", rest_val);
+        }
     }
 
     /**
@@ -322,7 +311,7 @@ public class YGps : YFunction
     public string get_latitude()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LATITUDE_INVALID;
@@ -351,7 +340,7 @@ public class YGps : YFunction
     public string get_longitude()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LONGITUDE_INVALID;
@@ -382,7 +371,7 @@ public class YGps : YFunction
     public double get_dilution()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DILUTION_INVALID;
@@ -413,7 +402,7 @@ public class YGps : YFunction
     public double get_altitude()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ALTITUDE_INVALID;
@@ -442,7 +431,7 @@ public class YGps : YFunction
     public double get_groundSpeed()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return GROUNDSPEED_INVALID;
@@ -473,7 +462,7 @@ public class YGps : YFunction
     public double get_direction()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DIRECTION_INVALID;
@@ -504,7 +493,7 @@ public class YGps : YFunction
     public long get_unixTime()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return UNIXTIME_INVALID;
@@ -533,7 +522,7 @@ public class YGps : YFunction
     public string get_dateTime()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DATETIME_INVALID;
@@ -562,7 +551,7 @@ public class YGps : YFunction
     public int get_utcOffset()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return UTCOFFSET_INVALID;
@@ -598,14 +587,16 @@ public class YGps : YFunction
     public int set_utcOffset(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("utcOffset", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("utcOffset", rest_val);
+        }
     }
 
     public string get_command()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
@@ -619,8 +610,10 @@ public class YGps : YFunction
     public int set_command(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("command", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("command", rest_val);
+        }
     }
 
     /**

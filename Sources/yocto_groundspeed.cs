@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_groundspeed.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_groundspeed.cs 26867 2017-03-23 08:24:48Z seb $
  *
  * Implements yFindGroundSpeed(), the high-level API for GroundSpeed functions
  *
@@ -86,9 +86,9 @@ public class YGroundSpeed : YSensor
 
     //--- (YGroundSpeed implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_humidity.cs 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: yocto_humidity.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindHumidity(), the high-level API for Humidity functions
  *
@@ -89,19 +89,17 @@ public class YHumidity : YSensor
 
     //--- (YHumidity implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "relHum")
+        if (json_val.Has("relHum"))
         {
-            _relHum = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _relHum = Math.Round(json_val.GetDouble("relHum") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "absHum")
+        if (json_val.Has("absHum"))
         {
-            _absHum = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _absHum = Math.Round(json_val.GetDouble("absHum") * 1000.0 / 65536.0) / 1000.0;
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -135,8 +133,10 @@ public class YHumidity : YSensor
     public int set_unit(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("unit", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("unit", rest_val);
+        }
     }
 
     /**
@@ -157,7 +157,7 @@ public class YHumidity : YSensor
     public double get_relHum()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return RELHUM_INVALID;
@@ -186,7 +186,7 @@ public class YHumidity : YSensor
     public double get_absHum()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ABSHUM_INVALID;

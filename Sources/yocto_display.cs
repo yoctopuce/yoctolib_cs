@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_display.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -969,64 +969,53 @@ public class YDisplay : YFunction
 
   //--- (generated code: YDisplay implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "enabled")
+        if (json_val.Has("enabled"))
         {
-            _enabled = member.ivalue > 0 ? 1 : 0;
-            return;
+            _enabled = json_val.GetInt("enabled") > 0 ? 1 : 0;
         }
-        if (member.name == "startupSeq")
+        if (json_val.Has("startupSeq"))
         {
-            _startupSeq = member.svalue;
-            return;
+            _startupSeq = json_val.GetString("startupSeq");
         }
-        if (member.name == "brightness")
+        if (json_val.Has("brightness"))
         {
-            _brightness = (int)member.ivalue;
-            return;
+            _brightness = json_val.GetInt("brightness");
         }
-        if (member.name == "orientation")
+        if (json_val.Has("orientation"))
         {
-            _orientation = (int)member.ivalue;
-            return;
+            _orientation = json_val.GetInt("orientation");
         }
-        if (member.name == "displayWidth")
+        if (json_val.Has("displayWidth"))
         {
-            _displayWidth = (int)member.ivalue;
-            return;
+            _displayWidth = json_val.GetInt("displayWidth");
         }
-        if (member.name == "displayHeight")
+        if (json_val.Has("displayHeight"))
         {
-            _displayHeight = (int)member.ivalue;
-            return;
+            _displayHeight = json_val.GetInt("displayHeight");
         }
-        if (member.name == "displayType")
+        if (json_val.Has("displayType"))
         {
-            _displayType = (int)member.ivalue;
-            return;
+            _displayType = json_val.GetInt("displayType");
         }
-        if (member.name == "layerWidth")
+        if (json_val.Has("layerWidth"))
         {
-            _layerWidth = (int)member.ivalue;
-            return;
+            _layerWidth = json_val.GetInt("layerWidth");
         }
-        if (member.name == "layerHeight")
+        if (json_val.Has("layerHeight"))
         {
-            _layerHeight = (int)member.ivalue;
-            return;
+            _layerHeight = json_val.GetInt("layerHeight");
         }
-        if (member.name == "layerCount")
+        if (json_val.Has("layerCount"))
         {
-            _layerCount = (int)member.ivalue;
-            return;
+            _layerCount = json_val.GetInt("layerCount");
         }
-        if (member.name == "command")
+        if (json_val.Has("command"))
         {
-            _command = member.svalue;
-            return;
+            _command = json_val.GetString("command");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -1048,7 +1037,7 @@ public class YDisplay : YFunction
     public int get_enabled()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ENABLED_INVALID;
@@ -1083,8 +1072,10 @@ public class YDisplay : YFunction
     public int set_enabled(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("enabled", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("enabled", rest_val);
+        }
     }
 
     /**
@@ -1105,7 +1096,7 @@ public class YDisplay : YFunction
     public string get_startupSeq()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return STARTUPSEQ_INVALID;
@@ -1141,8 +1132,10 @@ public class YDisplay : YFunction
     public int set_startupSeq(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("startupSeq", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("startupSeq", rest_val);
+        }
     }
 
     /**
@@ -1163,7 +1156,7 @@ public class YDisplay : YFunction
     public int get_brightness()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return BRIGHTNESS_INVALID;
@@ -1200,8 +1193,10 @@ public class YDisplay : YFunction
     public int set_brightness(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("brightness", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("brightness", rest_val);
+        }
     }
 
     /**
@@ -1224,7 +1219,7 @@ public class YDisplay : YFunction
     public int get_orientation()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ORIENTATION_INVALID;
@@ -1261,8 +1256,10 @@ public class YDisplay : YFunction
     public int set_orientation(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("orientation", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("orientation", rest_val);
+        }
     }
 
     /**
@@ -1283,7 +1280,7 @@ public class YDisplay : YFunction
     public int get_displayWidth()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DISPLAYWIDTH_INVALID;
@@ -1312,7 +1309,7 @@ public class YDisplay : YFunction
     public int get_displayHeight()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DISPLAYHEIGHT_INVALID;
@@ -1342,7 +1339,7 @@ public class YDisplay : YFunction
     public int get_displayType()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration == 0) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DISPLAYTYPE_INVALID;
@@ -1371,7 +1368,7 @@ public class YDisplay : YFunction
     public int get_layerWidth()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration == 0) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LAYERWIDTH_INVALID;
@@ -1400,7 +1397,7 @@ public class YDisplay : YFunction
     public int get_layerHeight()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration == 0) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LAYERHEIGHT_INVALID;
@@ -1429,7 +1426,7 @@ public class YDisplay : YFunction
     public int get_layerCount()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration == 0) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LAYERCOUNT_INVALID;
@@ -1443,7 +1440,7 @@ public class YDisplay : YFunction
     public string get_command()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
@@ -1457,8 +1454,10 @@ public class YDisplay : YFunction
     public int set_command(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("command", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("command", rest_val);
+        }
     }
 
     /**

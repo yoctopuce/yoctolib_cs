@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_carbondioxide.cs 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: yocto_carbondioxide.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -90,19 +90,17 @@ public class YCarbonDioxide : YSensor
 
     //--- (YCarbonDioxide implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "abcPeriod")
+        if (json_val.Has("abcPeriod"))
         {
-            _abcPeriod = (int)member.ivalue;
-            return;
+            _abcPeriod = json_val.GetInt("abcPeriod");
         }
-        if (member.name == "command")
+        if (json_val.Has("command"))
         {
-            _command = member.svalue;
-            return;
+            _command = json_val.GetString("command");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -125,7 +123,7 @@ public class YCarbonDioxide : YSensor
     public int get_abcPeriod()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ABCPERIOD_INVALID;
@@ -164,14 +162,16 @@ public class YCarbonDioxide : YSensor
     public int set_abcPeriod(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("abcPeriod", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("abcPeriod", rest_val);
+        }
     }
 
     public string get_command()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
@@ -185,8 +185,10 @@ public class YCarbonDioxide : YSensor
     public int set_command(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("command", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("command", rest_val);
+        }
     }
 
     /**

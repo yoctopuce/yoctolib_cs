@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_oscontrol.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_oscontrol.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindOsControl(), the high-level API for OsControl functions
  *
@@ -85,14 +85,13 @@ public class YOsControl : YFunction
 
     //--- (YOsControl implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "shutdownCountdown")
+        if (json_val.Has("shutdownCountdown"))
         {
-            _shutdownCountdown = (int)member.ivalue;
-            return;
+            _shutdownCountdown = json_val.GetInt("shutdownCountdown");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -115,7 +114,7 @@ public class YOsControl : YFunction
     public int get_shutdownCountdown()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SHUTDOWNCOUNTDOWN_INVALID;
@@ -129,8 +128,10 @@ public class YOsControl : YFunction
     public int set_shutdownCountdown(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("shutdownCountdown", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("shutdownCountdown", rest_val);
+        }
     }
 
     /**

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pwmpowersource.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_pwmpowersource.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *
@@ -88,14 +88,13 @@ public class YPwmPowerSource : YFunction
 
     //--- (YPwmPowerSource implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "powerMode")
+        if (json_val.Has("powerMode"))
         {
-            _powerMode = (int)member.ivalue;
-            return;
+            _powerMode = json_val.GetInt("powerMode");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -118,7 +117,7 @@ public class YPwmPowerSource : YFunction
     public int get_powerMode()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return POWERMODE_INVALID;
@@ -161,8 +160,10 @@ public class YPwmPowerSource : YFunction
     public int set_powerMode(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("powerMode", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("powerMode", rest_val);
+        }
     }
 
     /**

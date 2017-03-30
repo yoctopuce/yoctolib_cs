@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wakeupmonitor.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_wakeupmonitor.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -103,39 +103,33 @@ public class YWakeUpMonitor : YFunction
 
     //--- (YWakeUpMonitor implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "powerDuration")
+        if (json_val.Has("powerDuration"))
         {
-            _powerDuration = (int)member.ivalue;
-            return;
+            _powerDuration = json_val.GetInt("powerDuration");
         }
-        if (member.name == "sleepCountdown")
+        if (json_val.Has("sleepCountdown"))
         {
-            _sleepCountdown = (int)member.ivalue;
-            return;
+            _sleepCountdown = json_val.GetInt("sleepCountdown");
         }
-        if (member.name == "nextWakeUp")
+        if (json_val.Has("nextWakeUp"))
         {
-            _nextWakeUp = member.ivalue;
-            return;
+            _nextWakeUp = json_val.GetLong("nextWakeUp");
         }
-        if (member.name == "wakeUpReason")
+        if (json_val.Has("wakeUpReason"))
         {
-            _wakeUpReason = (int)member.ivalue;
-            return;
+            _wakeUpReason = json_val.GetInt("wakeUpReason");
         }
-        if (member.name == "wakeUpState")
+        if (json_val.Has("wakeUpState"))
         {
-            _wakeUpState = (int)member.ivalue;
-            return;
+            _wakeUpState = json_val.GetInt("wakeUpState");
         }
-        if (member.name == "rtcTime")
+        if (json_val.Has("rtcTime"))
         {
-            _rtcTime = member.ivalue;
-            return;
+            _rtcTime = json_val.GetLong("rtcTime");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -156,7 +150,7 @@ public class YWakeUpMonitor : YFunction
     public int get_powerDuration()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return POWERDURATION_INVALID;
@@ -190,8 +184,10 @@ public class YWakeUpMonitor : YFunction
     public int set_powerDuration(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("powerDuration", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("powerDuration", rest_val);
+        }
     }
 
     /**
@@ -212,7 +208,7 @@ public class YWakeUpMonitor : YFunction
     public int get_sleepCountdown()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SLEEPCOUNTDOWN_INVALID;
@@ -246,8 +242,10 @@ public class YWakeUpMonitor : YFunction
     public int set_sleepCountdown(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("sleepCountdown", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("sleepCountdown", rest_val);
+        }
     }
 
     /**
@@ -268,7 +266,7 @@ public class YWakeUpMonitor : YFunction
     public long get_nextWakeUp()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return NEXTWAKEUP_INVALID;
@@ -302,8 +300,10 @@ public class YWakeUpMonitor : YFunction
     public int set_nextWakeUp(long newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("nextWakeUp", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("nextWakeUp", rest_val);
+        }
     }
 
     /**
@@ -327,7 +327,7 @@ public class YWakeUpMonitor : YFunction
     public int get_wakeUpReason()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return WAKEUPREASON_INVALID;
@@ -357,7 +357,7 @@ public class YWakeUpMonitor : YFunction
     public int get_wakeUpState()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return WAKEUPSTATE_INVALID;
@@ -371,14 +371,16 @@ public class YWakeUpMonitor : YFunction
     public int set_wakeUpState(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("wakeUpState", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("wakeUpState", rest_val);
+        }
     }
 
     public long get_rtcTime()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return RTCTIME_INVALID;

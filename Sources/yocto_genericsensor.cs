@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_genericsensor.cs 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: yocto_genericsensor.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -103,39 +103,33 @@ public class YGenericSensor : YSensor
 
     //--- (YGenericSensor implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "signalValue")
+        if (json_val.Has("signalValue"))
         {
-            _signalValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _signalValue = Math.Round(json_val.GetDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "signalUnit")
+        if (json_val.Has("signalUnit"))
         {
-            _signalUnit = member.svalue;
-            return;
+            _signalUnit = json_val.GetString("signalUnit");
         }
-        if (member.name == "signalRange")
+        if (json_val.Has("signalRange"))
         {
-            _signalRange = member.svalue;
-            return;
+            _signalRange = json_val.GetString("signalRange");
         }
-        if (member.name == "valueRange")
+        if (json_val.Has("valueRange"))
         {
-            _valueRange = member.svalue;
-            return;
+            _valueRange = json_val.GetString("valueRange");
         }
-        if (member.name == "signalBias")
+        if (json_val.Has("signalBias"))
         {
-            _signalBias = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _signalBias = Math.Round(json_val.GetDouble("signalBias") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "signalSampling")
+        if (json_val.Has("signalSampling"))
         {
-            _signalSampling = (int)member.ivalue;
-            return;
+            _signalSampling = json_val.GetInt("signalSampling");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -163,8 +157,10 @@ public class YGenericSensor : YSensor
     public int set_unit(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("unit", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("unit", rest_val);
+        }
     }
 
     /**
@@ -185,7 +181,7 @@ public class YGenericSensor : YSensor
     public double get_signalValue()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SIGNALVALUE_INVALID;
@@ -214,7 +210,7 @@ public class YGenericSensor : YSensor
     public string get_signalUnit()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration == 0) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SIGNALUNIT_INVALID;
@@ -243,7 +239,7 @@ public class YGenericSensor : YSensor
     public string get_signalRange()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SIGNALRANGE_INVALID;
@@ -278,8 +274,10 @@ public class YGenericSensor : YSensor
     public int set_signalRange(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("signalRange", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("signalRange", rest_val);
+        }
     }
 
     /**
@@ -300,7 +298,7 @@ public class YGenericSensor : YSensor
     public string get_valueRange()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return VALUERANGE_INVALID;
@@ -336,8 +334,10 @@ public class YGenericSensor : YSensor
     public int set_valueRange(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("valueRange", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("valueRange", rest_val);
+        }
     }
 
     /**
@@ -365,8 +365,10 @@ public class YGenericSensor : YSensor
     public int set_signalBias(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("signalBias", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("signalBias", rest_val);
+        }
     }
 
     /**
@@ -389,7 +391,7 @@ public class YGenericSensor : YSensor
     public double get_signalBias()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SIGNALBIAS_INVALID;
@@ -426,7 +428,7 @@ public class YGenericSensor : YSensor
     public int get_signalSampling()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SIGNALSAMPLING_INVALID;
@@ -468,8 +470,10 @@ public class YGenericSensor : YSensor
     public int set_signalSampling(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("signalSampling", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("signalSampling", rest_val);
+        }
     }
 
     /**

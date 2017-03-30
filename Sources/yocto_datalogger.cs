@@ -1,6 +1,6 @@
 /********************************************************************
  *
- * $Id: yocto_datalogger.cs 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: yocto_datalogger.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -142,12 +142,9 @@ public class YOldDataStream : YDataStream
 
     public new int loadStream()
     {
-        YAPI.TJsonParser json = null;
+        YAPI.YJSONContent raw_json;
+        YAPI.YJSONObject  json;
         int res = 0;
-        int count = 0;
-        YAPI.TJSONRECORD root = default(YAPI.TJSONRECORD);
-        YAPI.TJSONRECORD el = default(YAPI.TJSONRECORD);
-        string name = null;
         List<int> coldiv = new List<int>();
         List<int> coltype = new List<int>();
         List<int> udat = new List<int>();
@@ -161,10 +158,9 @@ public class YOldDataStream : YDataStream
         List<List<double>> calref = new List<List<double>>();
 
         int x = 0;
-        int i = 0;
         int j = 0;
 
-        res = _dataLogger.getData(_runNo, _timeStamp, ref json);
+        res = _dataLogger.getData(_runNo, _timeStamp, out raw_json);
         if ((res != YAPI.SUCCESS))
         {
             return res;
@@ -174,139 +170,109 @@ public class YOldDataStream : YDataStream
         _nCols = 0;
         _columnNames.Clear();
         _values = new List< List<double> >();
+        json = (YAPI.YJSONObject) raw_json;
 
 
-        root = json.GetRootNode();
+        if (json.Has("time")) {
+            _timeStamp = json.GetInt("time");
+        }
+        if (json.Has("UTC")) {
+            _utcStamp = json.GetLong("UTC");
+        }
+         if (json.Has("interval")) {
+            _interval = json.GetInt("interval");
+        }
+        if (json.Has("nRows")) {
+            _nRows = json.GetInt("nRows");
+        }
+        if (json.Has("keys")) {
+            YAPI.YJSONArray jsonkeys = json.GetYJSONArray("keys");
+            _nCols = jsonkeys.Length;
+            for (j = 0; j < _nCols ; j++) {
+                _columnNames.Add(jsonkeys.GetString(j));
+            }
+        }
+         if (json.Has("div")) {
+            YAPI.YJSONArray arr = json.GetYJSONArray("div");
+            _nCols = arr.Length;
+            for (j = 0; j < _nCols ; j++) {
+                coldiv.Add(arr.GetInt(j));
+            }
+        }
+         if (json.Has("type")) {
+            YAPI.YJSONArray arr = json.GetYJSONArray("type");
+            _nCols = arr.Length;
+            for (j = 0; j < _nCols; j++) {
+                coltype.Add(arr.GetInt(j));
+            }
+        }
+         if (json.Has("scal")) {
+            YAPI.YJSONArray arr = json.GetYJSONArray("type");
+            _nCols = arr.Length;
+            for (j = 0; j < _nCols; j++) {
+                colscl.Add(arr.GetInt(j) / 65536.0);
+                if (coltype[j] != 0)
+                    colofs.Add(-32767);
+                else
+                    colofs.Add(0);
+            }
 
-        for (i = 0; i <= root.membercount - 1; i++)
-        {
-            el = root.members[i];
-            name = el.name;
-
-            if (name == "time")
-            {
-                _timeStamp = (int)el.ivalue;
-            }
-            else if (name == "UTC")
-            {
-                _utcStamp = (UInt32)el.ivalue;
-            }
-            else if (name == "interval")
-            {
-                _interval = (int)el.ivalue;
-            }
-            else if (name == "nRows")
-            {
-                _nRows = (int)el.ivalue;
-            }
-            else if (name == "keys")
-            {
-                _nCols = el.itemcount;
-                for (j = 0; j <= _nCols - 1; j++)
-                {
-                    _columnNames.Add(el.items[j].svalue);
-                }
-            }
-            else if (name == "div")
-            {
-                _nCols = el.itemcount;
-                for (j = 0; j <= _nCols - 1; j++)
-                {
-                    coldiv.Add((int)el.items[j].ivalue);
-                }
-            }
-            else if (name == "type")
-            {
-                _nCols = el.itemcount;
-                for (j = 0; j <= _nCols - 1; j++)
-                {
-                    coltype.Add((int)el.items[j].ivalue);
-                }
-            }
-            else if (name == "scal")
-            {
-                _nCols = el.itemcount;
-                for (j = 0; j <= _nCols - 1; j++)
-                {
-                    colscl.Add(el.items[j].ivalue / 65536.0);
+        }
+         if (json.Has("cal")) {
+            //fixme no calibration
+        }
+        if (json.Has("data")) {
+            if (colscl.Count <= 0) {
+                for (j = 0; j <= _nCols - 1; j++) {
+                    colscl.Add(1.0/coldiv[j]);
                     if (coltype[j] != 0)
                         colofs.Add(-32767);
                     else
                         colofs.Add(0);
                 }
-
             }
-            else if (name == "cal")
-            {
-                //fixme no calibration
+            udat.Clear();
+            string data = null;
+            try {
+                data = json.GetString("data");
+                udat = YAPI._decodeWords(data);
             }
-            else if (name == "data")
-            {
-                if (colscl.Count <= 0)
-                {
-                    for (j = 0; j <= _nCols - 1; j++)
-                    {
-                        colscl.Add(1.0 / coldiv[j]);
-                        if (coltype[j] != 0)
-                            colofs.Add(-32767);
-                        else
-                            colofs.Add(0);
+            catch (Exception ) {}
+            if (data==null) {
+                YAPI.YJSONArray jsonData = json.GetYJSONArray("data");
+                for (j = 0; j < jsonData.Length; j++) {
+                    int tmp = (int) (jsonData.GetInt(j));
+                    udat.Add(tmp);
+                }
+            }
+            _values = new List<List<double>>();
+            List<double> dat = new List<double>();
+            foreach (int uval in udat) {
+                double value;
+                if (coltype[x] < 2) {
+                    value = (uval + colofs[x])*colscl[x];
+                }
+                else {
+                    value = YAPI._decimalToDouble(uval - 32767);
+                }
+                if (caltyp[x] > 0 && calhdl[x] != null) {
+                    YAPI.yCalibrationHandler handler = calhdl[x];
+                    if (caltyp[x] <= 10) {
+                        value = handler((uval + colofs[x])/coldiv[x], caltyp[x], calpar[x], calraw[x], calref[x]);
+                    }
+                    else if (caltyp[x] > 20) {
+                        value = handler(value, caltyp[x], calpar[x], calraw[x], calref[x]);
                     }
                 }
-                udat.Clear();
-                if (el.recordtype == YAPI.TJSONRECORDTYPE.JSON_STRING)
-                {
-                    udat = YAPI._decodeWords(el.svalue);
+                dat.Add(value);
+                x++;
+                if (x == _nCols) {
+                    _values.Add(dat);
+                    dat.Clear();
+                    x = 0;
                 }
-                else
-                {
-                    count = el.itemcount;
-                    for (j = 0; j <= count - 1; j++)
-                    {
-                        int tmp = (int)(el.items[j].ivalue);
-                        udat.Add(tmp);
-                    }
-                }
-                _values = new List< List<double> >();
-                List<double> dat = new List<double>();
-                foreach (int uval in udat)
-                {
-                    double value;
-                    if (coltype[x] < 2)
-                    {
-                        value = (uval + colofs[x]) * colscl[x];
-                    }
-                    else
-                    {
-                        value = YAPI._decimalToDouble(uval - 32767);
-                    }
-                    if (caltyp[x] > 0 && calhdl[x] != null)
-                    {
-                        YAPI.yCalibrationHandler handler = calhdl[x];
-                        if (caltyp[x] <= 10)
-                        {
-                            value = handler((uval + colofs[x]) / coldiv[x], caltyp[x], calpar[x], calraw[x], calref[x]);
-                        }
-                        else if (caltyp[x] > 20)
-                        {
-                            value = handler(value, caltyp[x], calpar[x], calraw[x], calref[x]);
-                        }
-                    }
-                    dat.Add(value);
-                    x++;
-                    if (x == _nCols)
-                    {
-                        _values.Add(dat);
-                        dat.Clear();
-                        x = 0;
-                    }
-                }
-
             }
         }
-
-        json = null;
-
         return YAPI.SUCCESS;
     }
 
@@ -372,39 +338,33 @@ public class YDataLogger : YFunction
 
     //--- (generated code: YDataLogger implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "currentRunIndex")
+        if (json_val.Has("currentRunIndex"))
         {
-            _currentRunIndex = (int)member.ivalue;
-            return;
+            _currentRunIndex = json_val.GetInt("currentRunIndex");
         }
-        if (member.name == "timeUTC")
+        if (json_val.Has("timeUTC"))
         {
-            _timeUTC = member.ivalue;
-            return;
+            _timeUTC = json_val.GetLong("timeUTC");
         }
-        if (member.name == "recording")
+        if (json_val.Has("recording"))
         {
-            _recording = (int)member.ivalue;
-            return;
+            _recording = json_val.GetInt("recording");
         }
-        if (member.name == "autoStart")
+        if (json_val.Has("autoStart"))
         {
-            _autoStart = member.ivalue > 0 ? 1 : 0;
-            return;
+            _autoStart = json_val.GetInt("autoStart") > 0 ? 1 : 0;
         }
-        if (member.name == "beaconDriven")
+        if (json_val.Has("beaconDriven"))
         {
-            _beaconDriven = member.ivalue > 0 ? 1 : 0;
-            return;
+            _beaconDriven = json_val.GetInt("beaconDriven") > 0 ? 1 : 0;
         }
-        if (member.name == "clearHistory")
+        if (json_val.Has("clearHistory"))
         {
-            _clearHistory = member.ivalue > 0 ? 1 : 0;
-            return;
+            _clearHistory = json_val.GetInt("clearHistory") > 0 ? 1 : 0;
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -427,7 +387,7 @@ public class YDataLogger : YFunction
     public int get_currentRunIndex()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CURRENTRUNINDEX_INVALID;
@@ -456,7 +416,7 @@ public class YDataLogger : YFunction
     public long get_timeUTC()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return TIMEUTC_INVALID;
@@ -490,8 +450,10 @@ public class YDataLogger : YFunction
     public int set_timeUTC(long newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("timeUTC", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("timeUTC", rest_val);
+        }
     }
 
     /**
@@ -513,7 +475,7 @@ public class YDataLogger : YFunction
     public int get_recording()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return RECORDING_INVALID;
@@ -549,8 +511,10 @@ public class YDataLogger : YFunction
     public int set_recording(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("recording", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("recording", rest_val);
+        }
     }
 
     /**
@@ -572,7 +536,7 @@ public class YDataLogger : YFunction
     public int get_autoStart()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return AUTOSTART_INVALID;
@@ -609,8 +573,10 @@ public class YDataLogger : YFunction
     public int set_autoStart(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("autoStart", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("autoStart", rest_val);
+        }
     }
 
     /**
@@ -632,7 +598,7 @@ public class YDataLogger : YFunction
     public int get_beaconDriven()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return BEACONDRIVEN_INVALID;
@@ -669,14 +635,16 @@ public class YDataLogger : YFunction
     public int set_beaconDriven(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("beaconDriven", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("beaconDriven", rest_val);
+        }
     }
 
     public int get_clearHistory()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CLEARHISTORY_INVALID;
@@ -690,8 +658,10 @@ public class YDataLogger : YFunction
     public int set_clearHistory(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("clearHistory", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("clearHistory", rest_val);
+        }
     }
 
     /**
@@ -881,14 +851,16 @@ public class YDataLogger : YFunction
 
     //--- (end of generated code: YDataLogger implementation)
 
+   
 
-    public int getData(long runIdx, long timeIdx, ref YAPI.TJsonParser jsondata)
+    public int getData(long runIdx, long timeIdx, out YAPI.YJSONContent jsondata)
     {
         YAPI.YDevice dev = null;
         string errmsg = "";
         string query = null;
         string buffer = "";
         int res = 0;
+        int http_headerlen;
 
         if (_dataLoggerURL == "") _dataLoggerURL = "/logger.json";
 
@@ -897,6 +869,7 @@ public class YDataLogger : YFunction
         if (YAPI.YISERR(res))
         {
             _throw(res, errmsg);
+            jsondata = null;
             return res;
         }
 
@@ -916,6 +889,7 @@ public class YDataLogger : YFunction
             if (YAPI.YISERR(res))
             {
                 _throw(res, errmsg);
+                jsondata = null;
                 return res;
             }
 
@@ -923,26 +897,30 @@ public class YDataLogger : YFunction
             if (YAPI.YISERR(res))
             {
                 _throw(res, errmsg);
+                jsondata = null;
                 return res;
             }
         }
 
-        try
-        {
-            jsondata = new YAPI.TJsonParser(buffer);
-        }
-        catch (Exception e)
-        {
-            errmsg = "unexpected JSON structure: " + e.Message;
-            _throw(YAPI.IO_ERROR, errmsg);
-            return YAPI.IO_ERROR;
-        }
-        if (jsondata.httpcode == 404 && _dataLoggerURL != "/dataLogger.json")
-        {
+        int httpcode = YAPI.ParseHTTP(buffer, 0, buffer.Length, out http_headerlen, out errmsg);
+        if (httpcode == 404 && _dataLoggerURL != "/dataLogger.json") {
             // retry using backward-compatible datalogger URL
             _dataLoggerURL = "/dataLogger.json";
-            return this.getData(runIdx, timeIdx, ref jsondata);
+            return this.getData(runIdx, timeIdx, out jsondata);
         }
+
+        if (httpcode != 200) {
+            jsondata = null;
+            return YAPI.IO_ERROR;
+        }
+        try {
+            jsondata = YAPI.YJSONContent.ParseJson(buffer, http_headerlen, buffer.Length);
+        } catch (Exception E) {
+            errmsg = "unexpected JSON structure: " + E.Message;
+            _throw(YAPI.IO_ERROR, errmsg);
+            jsondata = null;
+            return YAPI.IO_ERROR;
+        }      
         return YAPI.SUCCESS;
     }
 
@@ -975,32 +953,33 @@ public class YDataLogger : YFunction
     */
     public int get_dataStreams(List<YDataStream> v)
     {
-        YAPI.TJsonParser j = null;
+        YAPI.YJSONContent raw_json;
+        YAPI.YJSONArray root;
         int i = 0;
         int res = 0;
-        YAPI.TJSONRECORD root = default(YAPI.TJSONRECORD);
-        YAPI.TJSONRECORD el = default(YAPI.TJSONRECORD);
 
         v.Clear();
-        res = getData(0, 0, ref j);
+        res = getData(0, 0, out raw_json);
         if (res != YAPI.SUCCESS)
         {
             return res;
         }
+        root = (YAPI.YJSONArray) raw_json;
 
-        root = j.GetRootNode();
-        if (root.itemcount == 0) 
+
+        if (root.Length == 0) 
             return YAPI.SUCCESS;
-        if (root.items[0].recordtype == YAPI.TJSONRECORDTYPE.JSON_ARRAY) {
+        if (root.Get(0).GetJSONType() == YAPI.YJSONContent.YJSONType.ARRAY) {
             // old datalogger format: [runIdx, timerel, utc, interval]
-            for (i = 0; i <= root.itemcount - 1; i++)
+            for (i = 0; i < root.Length ; i++)
             {
-                el = root.items[i];
-                v.Add(new YOldDataStream(this,(int) el.items[0].ivalue, (int)el.items[1].ivalue, (UInt32)el.items[2].ivalue, (int) el.items[3].ivalue));
+                YAPI.YJSONArray el = root.GetYJSONArray(i);
+                v.Add(new YOldDataStream(this,el.GetInt(0), el.GetInt(1), (uint) el.GetLong(2), el.GetInt(1)));
             }
         } else {
             // new datalogger format: {"id":"...","unit":"...","streams":["...",...]}
-            string json_buffer = j.convertToString(root,false);
+            
+            string json_buffer = root.ToJSON();
             List<YDataSet> sets = this.parse_dataSets(YAPI.DefaultEncoding.GetBytes(json_buffer));
             for (int sj = 0; sj < sets.Count; sj++)
             {
@@ -1011,7 +990,6 @@ public class YDataLogger : YFunction
                 }
             }
         }
-        j = null;
         return YAPI.SUCCESS;
     }
 

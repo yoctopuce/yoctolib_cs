@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_buzzer.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_buzzer.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindBuzzer(), the high-level API for Buzzer functions
  *
@@ -95,39 +95,33 @@ public class YBuzzer : YFunction
 
     //--- (YBuzzer implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "frequency")
+        if (json_val.Has("frequency"))
         {
-            _frequency = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _frequency = Math.Round(json_val.GetDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "volume")
+        if (json_val.Has("volume"))
         {
-            _volume = (int)member.ivalue;
-            return;
+            _volume = json_val.GetInt("volume");
         }
-        if (member.name == "playSeqSize")
+        if (json_val.Has("playSeqSize"))
         {
-            _playSeqSize = (int)member.ivalue;
-            return;
+            _playSeqSize = json_val.GetInt("playSeqSize");
         }
-        if (member.name == "playSeqMaxSize")
+        if (json_val.Has("playSeqMaxSize"))
         {
-            _playSeqMaxSize = (int)member.ivalue;
-            return;
+            _playSeqMaxSize = json_val.GetInt("playSeqMaxSize");
         }
-        if (member.name == "playSeqSignature")
+        if (json_val.Has("playSeqSignature"))
         {
-            _playSeqSignature = (int)member.ivalue;
-            return;
+            _playSeqSignature = json_val.GetInt("playSeqSignature");
         }
-        if (member.name == "command")
+        if (json_val.Has("command"))
         {
-            _command = member.svalue;
-            return;
+            _command = json_val.GetString("command");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -154,8 +148,10 @@ public class YBuzzer : YFunction
     public int set_frequency(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("frequency", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("frequency", rest_val);
+        }
     }
 
     /**
@@ -176,7 +172,7 @@ public class YBuzzer : YFunction
     public double get_frequency()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return FREQUENCY_INVALID;
@@ -205,7 +201,7 @@ public class YBuzzer : YFunction
     public int get_volume()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return VOLUME_INVALID;
@@ -239,8 +235,10 @@ public class YBuzzer : YFunction
     public int set_volume(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("volume", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("volume", rest_val);
+        }
     }
 
     /**
@@ -261,7 +259,7 @@ public class YBuzzer : YFunction
     public int get_playSeqSize()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PLAYSEQSIZE_INVALID;
@@ -290,7 +288,7 @@ public class YBuzzer : YFunction
     public int get_playSeqMaxSize()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration == 0) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PLAYSEQMAXSIZE_INVALID;
@@ -323,7 +321,7 @@ public class YBuzzer : YFunction
     public int get_playSeqSignature()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PLAYSEQSIGNATURE_INVALID;
@@ -337,7 +335,7 @@ public class YBuzzer : YFunction
     public string get_command()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
@@ -351,8 +349,10 @@ public class YBuzzer : YFunction
     public int set_command(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("command", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("command", rest_val);
+        }
     }
 
     /**

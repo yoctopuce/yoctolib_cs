@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_servo.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_servo.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindServo(), the high-level API for Servo functions
  *
@@ -110,55 +110,46 @@ public class YServo : YFunction
 
     //--- (YServo implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "position")
+        if (json_val.Has("position"))
         {
-            _position = (int)member.ivalue;
-            return;
+            _position = json_val.GetInt("position");
         }
-        if (member.name == "enabled")
+        if (json_val.Has("enabled"))
         {
-            _enabled = member.ivalue > 0 ? 1 : 0;
-            return;
+            _enabled = json_val.GetInt("enabled") > 0 ? 1 : 0;
         }
-        if (member.name == "range")
+        if (json_val.Has("range"))
         {
-            _range = (int)member.ivalue;
-            return;
+            _range = json_val.GetInt("range");
         }
-        if (member.name == "neutral")
+        if (json_val.Has("neutral"))
         {
-            _neutral = (int)member.ivalue;
-            return;
+            _neutral = json_val.GetInt("neutral");
         }
-        if (member.name == "move")
+        if (json_val.Has("move"))
         {
-            if (member.recordtype == YAPI.TJSONRECORDTYPE.JSON_STRUCT) {
-                YAPI.TJSONRECORD submemb;
-                for (int l=0 ; l<member.membercount ; l++)
-                {   submemb = member.members[l];
-                    if (submemb.name == "moving")
-                        _move.moving = (int) submemb.ivalue;
-                    else if (submemb.name == "target")
-                        _move.target = (int) submemb.ivalue;
-                    else if (submemb.name == "ms")
-                        _move.ms = (int) submemb.ivalue;
-                }
+            YAPI.YJSONObject subjson = json_val.GetYJSONObject("move");
+            if (subjson.Has("moving")) {
+                _move.moving = subjson.GetInt("moving");
             }
-            return;
+            if (subjson.Has("target")) {
+                _move.moving = subjson.GetInt("target");
+            }
+            if (subjson.Has("ms")) {
+                _move.moving = subjson.GetInt("ms");
+            }
         }
-        if (member.name == "positionAtPowerOn")
+        if (json_val.Has("positionAtPowerOn"))
         {
-            _positionAtPowerOn = (int)member.ivalue;
-            return;
+            _positionAtPowerOn = json_val.GetInt("positionAtPowerOn");
         }
-        if (member.name == "enabledAtPowerOn")
+        if (json_val.Has("enabledAtPowerOn"))
         {
-            _enabledAtPowerOn = member.ivalue > 0 ? 1 : 0;
-            return;
+            _enabledAtPowerOn = json_val.GetInt("enabledAtPowerOn") > 0 ? 1 : 0;
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -179,7 +170,7 @@ public class YServo : YFunction
     public int get_position()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return POSITION_INVALID;
@@ -213,8 +204,10 @@ public class YServo : YFunction
     public int set_position(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("position", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("position", rest_val);
+        }
     }
 
     /**
@@ -235,7 +228,7 @@ public class YServo : YFunction
     public int get_enabled()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ENABLED_INVALID;
@@ -269,8 +262,10 @@ public class YServo : YFunction
     public int set_enabled(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("enabled", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("enabled", rest_val);
+        }
     }
 
     /**
@@ -291,7 +286,7 @@ public class YServo : YFunction
     public int get_range()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return RANGE_INVALID;
@@ -331,8 +326,10 @@ public class YServo : YFunction
     public int set_range(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("range", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("range", rest_val);
+        }
     }
 
     /**
@@ -353,7 +350,7 @@ public class YServo : YFunction
     public int get_neutral()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return NEUTRAL_INVALID;
@@ -392,14 +389,16 @@ public class YServo : YFunction
     public int set_neutral(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("neutral", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("neutral", rest_val);
+        }
     }
 
     public YServoMove get_move()
     {
         YServoMove res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MOVE_INVALID;
@@ -413,8 +412,10 @@ public class YServo : YFunction
     public int set_move(YServoMove newval)
     {
         string rest_val;
-        rest_val = (newval.target).ToString()+":"+(newval.ms).ToString();
-        return _setAttr("move", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval.target).ToString()+":"+(newval.ms).ToString();
+            return _setAttr("move", rest_val);
+        }
     }
 
     /**
@@ -465,7 +466,7 @@ public class YServo : YFunction
     public int get_positionAtPowerOn()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return POSITIONATPOWERON_INVALID;
@@ -501,8 +502,10 @@ public class YServo : YFunction
     public int set_positionAtPowerOn(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("positionAtPowerOn", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("positionAtPowerOn", rest_val);
+        }
     }
 
     /**
@@ -524,7 +527,7 @@ public class YServo : YFunction
     public int get_enabledAtPowerOn()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ENABLEDATPOWERON_INVALID;
@@ -560,8 +563,10 @@ public class YServo : YFunction
     public int set_enabledAtPowerOn(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("enabledAtPowerOn", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("enabledAtPowerOn", rest_val);
+        }
     }
 
     /**

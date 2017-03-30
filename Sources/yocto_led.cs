@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_led.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_led.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindLed(), the high-level API for Led functions
  *
@@ -97,24 +97,21 @@ public class YLed : YFunction
 
     //--- (YLed implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "power")
+        if (json_val.Has("power"))
         {
-            _power = member.ivalue > 0 ? 1 : 0;
-            return;
+            _power = json_val.GetInt("power") > 0 ? 1 : 0;
         }
-        if (member.name == "luminosity")
+        if (json_val.Has("luminosity"))
         {
-            _luminosity = (int)member.ivalue;
-            return;
+            _luminosity = json_val.GetInt("luminosity");
         }
-        if (member.name == "blinking")
+        if (json_val.Has("blinking"))
         {
-            _blinking = (int)member.ivalue;
-            return;
+            _blinking = json_val.GetInt("blinking");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -135,7 +132,7 @@ public class YLed : YFunction
     public int get_power()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return POWER_INVALID;
@@ -169,8 +166,10 @@ public class YLed : YFunction
     public int set_power(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("power", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("power", rest_val);
+        }
     }
 
     /**
@@ -191,7 +190,7 @@ public class YLed : YFunction
     public int get_luminosity()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LUMINOSITY_INVALID;
@@ -225,8 +224,10 @@ public class YLed : YFunction
     public int set_luminosity(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("luminosity", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("luminosity", rest_val);
+        }
     }
 
     /**
@@ -249,7 +250,7 @@ public class YLed : YFunction
     public int get_blinking()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return BLINKING_INVALID;
@@ -285,8 +286,10 @@ public class YLed : YFunction
     public int set_blinking(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("blinking", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("blinking", rest_val);
+        }
     }
 
     /**

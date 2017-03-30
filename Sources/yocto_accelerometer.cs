@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_accelerometer.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_accelerometer.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -103,34 +103,29 @@ public class YAccelerometer : YSensor
 
     //--- (YAccelerometer implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "bandwidth")
+        if (json_val.Has("bandwidth"))
         {
-            _bandwidth = (int)member.ivalue;
-            return;
+            _bandwidth = json_val.GetInt("bandwidth");
         }
-        if (member.name == "xValue")
+        if (json_val.Has("xValue"))
         {
-            _xValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _xValue = Math.Round(json_val.GetDouble("xValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "yValue")
+        if (json_val.Has("yValue"))
         {
-            _yValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _yValue = Math.Round(json_val.GetDouble("yValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "zValue")
+        if (json_val.Has("zValue"))
         {
-            _zValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _zValue = Math.Round(json_val.GetDouble("zValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "gravityCancellation")
+        if (json_val.Has("gravityCancellation"))
         {
-            _gravityCancellation = member.ivalue > 0 ? 1 : 0;
-            return;
+            _gravityCancellation = json_val.GetInt("gravityCancellation") > 0 ? 1 : 0;
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -151,7 +146,7 @@ public class YAccelerometer : YSensor
     public int get_bandwidth()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return BANDWIDTH_INVALID;
@@ -187,8 +182,10 @@ public class YAccelerometer : YSensor
     public int set_bandwidth(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("bandwidth", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("bandwidth", rest_val);
+        }
     }
 
     /**
@@ -209,7 +206,7 @@ public class YAccelerometer : YSensor
     public double get_xValue()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return XVALUE_INVALID;
@@ -238,7 +235,7 @@ public class YAccelerometer : YSensor
     public double get_yValue()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return YVALUE_INVALID;
@@ -267,7 +264,7 @@ public class YAccelerometer : YSensor
     public double get_zValue()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ZVALUE_INVALID;
@@ -281,7 +278,7 @@ public class YAccelerometer : YSensor
     public int get_gravityCancellation()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return GRAVITYCANCELLATION_INVALID;
@@ -295,8 +292,10 @@ public class YAccelerometer : YSensor
     public int set_gravityCancellation(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("gravityCancellation", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("gravityCancellation", rest_val);
+        }
     }
 
     /**

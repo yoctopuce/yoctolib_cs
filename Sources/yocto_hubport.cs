@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_hubport.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_hubport.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindHubPort(), the high-level API for HubPort functions
  *
@@ -97,24 +97,21 @@ public class YHubPort : YFunction
 
     //--- (YHubPort implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "enabled")
+        if (json_val.Has("enabled"))
         {
-            _enabled = member.ivalue > 0 ? 1 : 0;
-            return;
+            _enabled = json_val.GetInt("enabled") > 0 ? 1 : 0;
         }
-        if (member.name == "portState")
+        if (json_val.Has("portState"))
         {
-            _portState = (int)member.ivalue;
-            return;
+            _portState = json_val.GetInt("portState");
         }
-        if (member.name == "baudRate")
+        if (json_val.Has("baudRate"))
         {
-            _baudRate = (int)member.ivalue;
-            return;
+            _baudRate = json_val.GetInt("baudRate");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -136,7 +133,7 @@ public class YHubPort : YFunction
     public int get_enabled()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ENABLED_INVALID;
@@ -173,8 +170,10 @@ public class YHubPort : YFunction
     public int set_enabled(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("enabled", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("enabled", rest_val);
+        }
     }
 
     /**
@@ -197,7 +196,7 @@ public class YHubPort : YFunction
     public int get_portState()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PORTSTATE_INVALID;
@@ -228,7 +227,7 @@ public class YHubPort : YFunction
     public int get_baudRate()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return BAUDRATE_INVALID;

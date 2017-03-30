@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_files.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -60,17 +60,12 @@ public class YFileRecord
 
     public YFileRecord(string data)
     {
-        YAPI.TJsonParser p;
-        Nullable<YAPI.TJSONRECORD> node;
         //--- (generated code: YFileRecord attributes initialization)
         //--- (end of generated code: YFileRecord attributes initialization)
-        p = new YAPI.TJsonParser(data, false);
-        node = p.GetChildNode(null, "name");
-        this._name = node.Value.svalue;
-        node = p.GetChildNode(null, "size");
-        this._size = (int)node.Value.ivalue;
-        node = p.GetChildNode(null, "crc");
-        this._crc = (int)node.Value.ivalue;
+        YAPI.YJSONObject p  = new YAPI.YJSONObject(data);
+        this._name = p.GetString("name");
+        this._size = p.GetInt("size");
+        this._crc = p.GetInt("crc");
     }
     
     //--- (generated code: YFileRecord implementation)
@@ -134,19 +129,17 @@ public class YFiles : YFunction
 
     //--- (generated code: YFiles implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "filesCount")
+        if (json_val.Has("filesCount"))
         {
-            _filesCount = (int)member.ivalue;
-            return;
+            _filesCount = json_val.GetInt("filesCount");
         }
-        if (member.name == "freeSpace")
+        if (json_val.Has("freeSpace"))
         {
-            _freeSpace = (int)member.ivalue;
-            return;
+            _freeSpace = json_val.GetInt("freeSpace");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -167,7 +160,7 @@ public class YFiles : YFunction
     public int get_filesCount()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return FILESCOUNT_INVALID;
@@ -196,7 +189,7 @@ public class YFiles : YFunction
     public int get_freeSpace()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return FREESPACE_INVALID;

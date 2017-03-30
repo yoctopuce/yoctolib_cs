@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wakeupschedule.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_wakeupschedule.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -98,44 +98,37 @@ public class YWakeUpSchedule : YFunction
 
     //--- (YWakeUpSchedule implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "minutesA")
+        if (json_val.Has("minutesA"))
         {
-            _minutesA = (int)member.ivalue;
-            return;
+            _minutesA = json_val.GetInt("minutesA");
         }
-        if (member.name == "minutesB")
+        if (json_val.Has("minutesB"))
         {
-            _minutesB = (int)member.ivalue;
-            return;
+            _minutesB = json_val.GetInt("minutesB");
         }
-        if (member.name == "hours")
+        if (json_val.Has("hours"))
         {
-            _hours = (int)member.ivalue;
-            return;
+            _hours = json_val.GetInt("hours");
         }
-        if (member.name == "weekDays")
+        if (json_val.Has("weekDays"))
         {
-            _weekDays = (int)member.ivalue;
-            return;
+            _weekDays = json_val.GetInt("weekDays");
         }
-        if (member.name == "monthDays")
+        if (json_val.Has("monthDays"))
         {
-            _monthDays = (int)member.ivalue;
-            return;
+            _monthDays = json_val.GetInt("monthDays");
         }
-        if (member.name == "months")
+        if (json_val.Has("months"))
         {
-            _months = (int)member.ivalue;
-            return;
+            _months = json_val.GetInt("months");
         }
-        if (member.name == "nextOccurence")
+        if (json_val.Has("nextOccurence"))
         {
-            _nextOccurence = member.ivalue;
-            return;
+            _nextOccurence = json_val.GetLong("nextOccurence");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -156,7 +149,7 @@ public class YWakeUpSchedule : YFunction
     public int get_minutesA()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MINUTESA_INVALID;
@@ -190,8 +183,10 @@ public class YWakeUpSchedule : YFunction
     public int set_minutesA(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("minutesA", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("minutesA", rest_val);
+        }
     }
 
     /**
@@ -212,7 +207,7 @@ public class YWakeUpSchedule : YFunction
     public int get_minutesB()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MINUTESB_INVALID;
@@ -246,8 +241,10 @@ public class YWakeUpSchedule : YFunction
     public int set_minutesB(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("minutesB", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("minutesB", rest_val);
+        }
     }
 
     /**
@@ -268,7 +265,7 @@ public class YWakeUpSchedule : YFunction
     public int get_hours()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return HOURS_INVALID;
@@ -302,8 +299,10 @@ public class YWakeUpSchedule : YFunction
     public int set_hours(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("hours", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("hours", rest_val);
+        }
     }
 
     /**
@@ -324,7 +323,7 @@ public class YWakeUpSchedule : YFunction
     public int get_weekDays()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return WEEKDAYS_INVALID;
@@ -358,8 +357,10 @@ public class YWakeUpSchedule : YFunction
     public int set_weekDays(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("weekDays", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("weekDays", rest_val);
+        }
     }
 
     /**
@@ -380,7 +381,7 @@ public class YWakeUpSchedule : YFunction
     public int get_monthDays()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MONTHDAYS_INVALID;
@@ -414,8 +415,10 @@ public class YWakeUpSchedule : YFunction
     public int set_monthDays(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("monthDays", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("monthDays", rest_val);
+        }
     }
 
     /**
@@ -436,7 +439,7 @@ public class YWakeUpSchedule : YFunction
     public int get_months()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MONTHS_INVALID;
@@ -470,8 +473,10 @@ public class YWakeUpSchedule : YFunction
     public int set_months(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("months", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("months", rest_val);
+        }
     }
 
     /**
@@ -492,7 +497,7 @@ public class YWakeUpSchedule : YFunction
     public long get_nextOccurence()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return NEXTOCCURENCE_INVALID;

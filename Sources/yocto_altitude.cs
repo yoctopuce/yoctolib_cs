@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_altitude.cs 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: yocto_altitude.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindAltitude(), the high-level API for Altitude functions
  *
@@ -91,19 +91,17 @@ public class YAltitude : YSensor
 
     //--- (YAltitude implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "qnh")
+        if (json_val.Has("qnh"))
         {
-            _qnh = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _qnh = Math.Round(json_val.GetDouble("qnh") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "technology")
+        if (json_val.Has("technology"))
         {
-            _technology = member.svalue;
-            return;
+            _technology = json_val.GetString("technology");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -131,8 +129,10 @@ public class YAltitude : YSensor
     public int set_currentValue(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("currentValue", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("currentValue", rest_val);
+        }
     }
 
     /**
@@ -162,8 +162,10 @@ public class YAltitude : YSensor
     public int set_qnh(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("qnh", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("qnh", rest_val);
+        }
     }
 
     /**
@@ -186,7 +188,7 @@ public class YAltitude : YSensor
     public double get_qnh()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return QNH_INVALID;
@@ -218,7 +220,7 @@ public class YAltitude : YSensor
     public string get_technology()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return TECHNOLOGY_INVALID;

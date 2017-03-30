@@ -108,49 +108,41 @@ public class YProximity : YSensor
 
     //--- (YProximity implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "signalValue")
+        if (json_val.Has("signalValue"))
         {
-            _signalValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _signalValue = Math.Round(json_val.GetDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "detectionThreshold")
+        if (json_val.Has("detectionThreshold"))
         {
-            _detectionThreshold = (int)member.ivalue;
-            return;
+            _detectionThreshold = json_val.GetInt("detectionThreshold");
         }
-        if (member.name == "isPresent")
+        if (json_val.Has("isPresent"))
         {
-            _isPresent = member.ivalue > 0 ? 1 : 0;
-            return;
+            _isPresent = json_val.GetInt("isPresent") > 0 ? 1 : 0;
         }
-        if (member.name == "lastTimeApproached")
+        if (json_val.Has("lastTimeApproached"))
         {
-            _lastTimeApproached = member.ivalue;
-            return;
+            _lastTimeApproached = json_val.GetLong("lastTimeApproached");
         }
-        if (member.name == "lastTimeRemoved")
+        if (json_val.Has("lastTimeRemoved"))
         {
-            _lastTimeRemoved = member.ivalue;
-            return;
+            _lastTimeRemoved = json_val.GetLong("lastTimeRemoved");
         }
-        if (member.name == "pulseCounter")
+        if (json_val.Has("pulseCounter"))
         {
-            _pulseCounter = member.ivalue;
-            return;
+            _pulseCounter = json_val.GetLong("pulseCounter");
         }
-        if (member.name == "pulseTimer")
+        if (json_val.Has("pulseTimer"))
         {
-            _pulseTimer = member.ivalue;
-            return;
+            _pulseTimer = json_val.GetLong("pulseTimer");
         }
-        if (member.name == "proximityReportMode")
+        if (json_val.Has("proximityReportMode"))
         {
-            _proximityReportMode = (int)member.ivalue;
-            return;
+            _proximityReportMode = json_val.GetInt("proximityReportMode");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -171,7 +163,7 @@ public class YProximity : YSensor
     public double get_signalValue()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SIGNALVALUE_INVALID;
@@ -203,7 +195,7 @@ public class YProximity : YSensor
     public int get_detectionThreshold()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DETECTIONTHRESHOLD_INVALID;
@@ -240,8 +232,10 @@ public class YProximity : YSensor
     public int set_detectionThreshold(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("detectionThreshold", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("detectionThreshold", rest_val);
+        }
     }
 
     /**
@@ -264,7 +258,7 @@ public class YProximity : YSensor
     public int get_isPresent()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ISPRESENT_INVALID;
@@ -295,7 +289,7 @@ public class YProximity : YSensor
     public long get_lastTimeApproached()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LASTTIMEAPPROACHED_INVALID;
@@ -326,7 +320,7 @@ public class YProximity : YSensor
     public long get_lastTimeRemoved()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LASTTIMEREMOVED_INVALID;
@@ -358,7 +352,7 @@ public class YProximity : YSensor
     public long get_pulseCounter()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PULSECOUNTER_INVALID;
@@ -372,8 +366,10 @@ public class YProximity : YSensor
     public int set_pulseCounter(long newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("pulseCounter", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("pulseCounter", rest_val);
+        }
     }
 
     /**
@@ -394,7 +390,7 @@ public class YProximity : YSensor
     public long get_pulseTimer()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PULSETIMER_INVALID;
@@ -426,7 +422,7 @@ public class YProximity : YSensor
     public int get_proximityReportMode()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PROXIMITYREPORTMODE_INVALID;
@@ -463,8 +459,10 @@ public class YProximity : YSensor
     public int set_proximityReportMode(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("proximityReportMode", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("proximityReportMode", rest_val);
+        }
     }
 
     /**

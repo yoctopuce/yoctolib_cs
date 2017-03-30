@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_voc.cs 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: yocto_voc.cs 26867 2017-03-23 08:24:48Z seb $
  *
  * Implements yFindVoc(), the high-level API for Voc functions
  *
@@ -85,9 +85,9 @@ public class YVoc : YSensor
 
     //--- (YVoc implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_lightsensor.cs 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: yocto_lightsensor.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindLightSensor(), the high-level API for LightSensor functions
  *
@@ -96,21 +96,22 @@ public class YLightSensor : YSensor
 
     //--- (YLightSensor implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "measureType")
+        if (json_val.Has("measureType"))
         {
-            _measureType = (int)member.ivalue;
-            return;
+            _measureType = json_val.GetInt("measureType");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     public int set_currentValue(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("currentValue", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("currentValue", rest_val);
+        }
     }
 
     /**
@@ -165,7 +166,7 @@ public class YLightSensor : YSensor
     public int get_measureType()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MEASURETYPE_INVALID;
@@ -206,8 +207,10 @@ public class YLightSensor : YSensor
     public int set_measureType(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("measureType", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("measureType", rest_val);
+        }
     }
 
     /**

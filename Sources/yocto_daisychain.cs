@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_daisychain.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_daisychain.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindDaisyChain(), the high-level API for DaisyChain functions
  *
@@ -94,24 +94,21 @@ public class YDaisyChain : YFunction
 
     //--- (YDaisyChain implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "daisyState")
+        if (json_val.Has("daisyState"))
         {
-            _daisyState = (int)member.ivalue;
-            return;
+            _daisyState = json_val.GetInt("daisyState");
         }
-        if (member.name == "childCount")
+        if (json_val.Has("childCount"))
         {
-            _childCount = (int)member.ivalue;
-            return;
+            _childCount = json_val.GetInt("childCount");
         }
-        if (member.name == "requiredChildCount")
+        if (json_val.Has("requiredChildCount"))
         {
-            _requiredChildCount = (int)member.ivalue;
-            return;
+            _requiredChildCount = json_val.GetInt("requiredChildCount");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -134,7 +131,7 @@ public class YDaisyChain : YFunction
     public int get_daisyState()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DAISYSTATE_INVALID;
@@ -163,7 +160,7 @@ public class YDaisyChain : YFunction
     public int get_childCount()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CHILDCOUNT_INVALID;
@@ -192,7 +189,7 @@ public class YDaisyChain : YFunction
     public int get_requiredChildCount()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return REQUIREDCHILDCOUNT_INVALID;
@@ -229,8 +226,10 @@ public class YDaisyChain : YFunction
     public int set_requiredChildCount(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("requiredChildCount", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("requiredChildCount", rest_val);
+        }
     }
 
     /**

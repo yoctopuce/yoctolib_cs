@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_dualpower.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_dualpower.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindDualPower(), the high-level API for DualPower functions
  *
@@ -98,24 +98,21 @@ public class YDualPower : YFunction
 
     //--- (YDualPower implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "powerState")
+        if (json_val.Has("powerState"))
         {
-            _powerState = (int)member.ivalue;
-            return;
+            _powerState = json_val.GetInt("powerState");
         }
-        if (member.name == "powerControl")
+        if (json_val.Has("powerControl"))
         {
-            _powerControl = (int)member.ivalue;
-            return;
+            _powerControl = json_val.GetInt("powerControl");
         }
-        if (member.name == "extVoltage")
+        if (json_val.Has("extVoltage"))
         {
-            _extVoltage = (int)member.ivalue;
-            return;
+            _extVoltage = json_val.GetInt("extVoltage");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -138,7 +135,7 @@ public class YDualPower : YFunction
     public int get_powerState()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return POWERSTATE_INVALID;
@@ -169,7 +166,7 @@ public class YDualPower : YFunction
     public int get_powerControl()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return POWERCONTROL_INVALID;
@@ -205,8 +202,10 @@ public class YDualPower : YFunction
     public int set_powerControl(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("powerControl", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("powerControl", rest_val);
+        }
     }
 
     /**
@@ -227,7 +226,7 @@ public class YDualPower : YFunction
     public int get_extVoltage()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return EXTVOLTAGE_INVALID;

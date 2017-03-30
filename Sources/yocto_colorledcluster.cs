@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorledcluster.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_colorledcluster.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -99,34 +99,29 @@ public class YColorLedCluster : YFunction
 
     //--- (YColorLedCluster implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "activeLedCount")
+        if (json_val.Has("activeLedCount"))
         {
-            _activeLedCount = (int)member.ivalue;
-            return;
+            _activeLedCount = json_val.GetInt("activeLedCount");
         }
-        if (member.name == "maxLedCount")
+        if (json_val.Has("maxLedCount"))
         {
-            _maxLedCount = (int)member.ivalue;
-            return;
+            _maxLedCount = json_val.GetInt("maxLedCount");
         }
-        if (member.name == "blinkSeqMaxCount")
+        if (json_val.Has("blinkSeqMaxCount"))
         {
-            _blinkSeqMaxCount = (int)member.ivalue;
-            return;
+            _blinkSeqMaxCount = json_val.GetInt("blinkSeqMaxCount");
         }
-        if (member.name == "blinkSeqMaxSize")
+        if (json_val.Has("blinkSeqMaxSize"))
         {
-            _blinkSeqMaxSize = (int)member.ivalue;
-            return;
+            _blinkSeqMaxSize = json_val.GetInt("blinkSeqMaxSize");
         }
-        if (member.name == "command")
+        if (json_val.Has("command"))
         {
-            _command = member.svalue;
-            return;
+            _command = json_val.GetString("command");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -147,7 +142,7 @@ public class YColorLedCluster : YFunction
     public int get_activeLedCount()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ACTIVELEDCOUNT_INVALID;
@@ -181,8 +176,10 @@ public class YColorLedCluster : YFunction
     public int set_activeLedCount(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("activeLedCount", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("activeLedCount", rest_val);
+        }
     }
 
     /**
@@ -203,7 +200,7 @@ public class YColorLedCluster : YFunction
     public int get_maxLedCount()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration == 0) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MAXLEDCOUNT_INVALID;
@@ -232,7 +229,7 @@ public class YColorLedCluster : YFunction
     public int get_blinkSeqMaxCount()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration == 0) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return BLINKSEQMAXCOUNT_INVALID;
@@ -261,7 +258,7 @@ public class YColorLedCluster : YFunction
     public int get_blinkSeqMaxSize()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration == 0) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return BLINKSEQMAXSIZE_INVALID;
@@ -275,7 +272,7 @@ public class YColorLedCluster : YFunction
     public string get_command()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
@@ -289,8 +286,10 @@ public class YColorLedCluster : YFunction
     public int set_command(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("command", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("command", rest_val);
+        }
     }
 
     /**

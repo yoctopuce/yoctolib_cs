@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_power.cs 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: yocto_power.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindPower(), the high-level API for Power functions
  *
@@ -92,24 +92,21 @@ public class YPower : YSensor
 
     //--- (YPower implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "cosPhi")
+        if (json_val.Has("cosPhi"))
         {
-            _cosPhi = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _cosPhi = Math.Round(json_val.GetDouble("cosPhi") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "meter")
+        if (json_val.Has("meter"))
         {
-            _meter = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _meter = Math.Round(json_val.GetDouble("meter") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "meterTimer")
+        if (json_val.Has("meterTimer"))
         {
-            _meterTimer = (int)member.ivalue;
-            return;
+            _meterTimer = json_val.GetInt("meterTimer");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -132,7 +129,7 @@ public class YPower : YSensor
     public double get_cosPhi()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COSPHI_INVALID;
@@ -146,8 +143,10 @@ public class YPower : YSensor
     public int set_meter(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("meter", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("meter", rest_val);
+        }
     }
 
     /**
@@ -170,7 +169,7 @@ public class YPower : YSensor
     public double get_meter()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return METER_INVALID;
@@ -199,7 +198,7 @@ public class YPower : YSensor
     public int get_meterTimer()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return METERTIMER_INVALID;

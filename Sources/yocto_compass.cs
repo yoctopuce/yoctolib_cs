@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_compass.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_compass.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindCompass(), the high-level API for Compass functions
  *
@@ -100,24 +100,21 @@ public class YCompass : YSensor
 
     //--- (YCompass implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "bandwidth")
+        if (json_val.Has("bandwidth"))
         {
-            _bandwidth = (int)member.ivalue;
-            return;
+            _bandwidth = json_val.GetInt("bandwidth");
         }
-        if (member.name == "axis")
+        if (json_val.Has("axis"))
         {
-            _axis = (int)member.ivalue;
-            return;
+            _axis = json_val.GetInt("axis");
         }
-        if (member.name == "magneticHeading")
+        if (json_val.Has("magneticHeading"))
         {
-            _magneticHeading = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _magneticHeading = Math.Round(json_val.GetDouble("magneticHeading") * 1000.0 / 65536.0) / 1000.0;
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -138,7 +135,7 @@ public class YCompass : YSensor
     public int get_bandwidth()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return BANDWIDTH_INVALID;
@@ -174,14 +171,16 @@ public class YCompass : YSensor
     public int set_bandwidth(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("bandwidth", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("bandwidth", rest_val);
+        }
     }
 
     public int get_axis()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return AXIS_INVALID;
@@ -210,7 +209,7 @@ public class YCompass : YSensor
     public double get_magneticHeading()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MAGNETICHEADING_INVALID;

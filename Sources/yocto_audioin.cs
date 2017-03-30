@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_audioin.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_audioin.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindAudioIn(), the high-level API for AudioIn functions
  *
@@ -93,34 +93,29 @@ public class YAudioIn : YFunction
 
     //--- (YAudioIn implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "volume")
+        if (json_val.Has("volume"))
         {
-            _volume = (int)member.ivalue;
-            return;
+            _volume = json_val.GetInt("volume");
         }
-        if (member.name == "mute")
+        if (json_val.Has("mute"))
         {
-            _mute = member.ivalue > 0 ? 1 : 0;
-            return;
+            _mute = json_val.GetInt("mute") > 0 ? 1 : 0;
         }
-        if (member.name == "volumeRange")
+        if (json_val.Has("volumeRange"))
         {
-            _volumeRange = member.svalue;
-            return;
+            _volumeRange = json_val.GetString("volumeRange");
         }
-        if (member.name == "signal")
+        if (json_val.Has("signal"))
         {
-            _signal = (int)member.ivalue;
-            return;
+            _signal = json_val.GetInt("signal");
         }
-        if (member.name == "noSignalFor")
+        if (json_val.Has("noSignalFor"))
         {
-            _noSignalFor = (int)member.ivalue;
-            return;
+            _noSignalFor = json_val.GetInt("noSignalFor");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -141,7 +136,7 @@ public class YAudioIn : YFunction
     public int get_volume()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return VOLUME_INVALID;
@@ -175,8 +170,10 @@ public class YAudioIn : YFunction
     public int set_volume(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("volume", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("volume", rest_val);
+        }
     }
 
     /**
@@ -197,7 +194,7 @@ public class YAudioIn : YFunction
     public int get_mute()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MUTE_INVALID;
@@ -233,8 +230,10 @@ public class YAudioIn : YFunction
     public int set_mute(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("mute", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("mute", rest_val);
+        }
     }
 
     /**
@@ -259,7 +258,7 @@ public class YAudioIn : YFunction
     public string get_volumeRange()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return VOLUMERANGE_INVALID;
@@ -288,7 +287,7 @@ public class YAudioIn : YFunction
     public int get_signal()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SIGNAL_INVALID;
@@ -317,7 +316,7 @@ public class YAudioIn : YFunction
     public int get_noSignalFor()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return NOSIGNALFOR_INVALID;

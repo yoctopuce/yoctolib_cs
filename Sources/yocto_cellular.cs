@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_cellular.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *
@@ -207,89 +207,73 @@ public class YCellular : YFunction
 
     //--- (generated code: YCellular implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "linkQuality")
+        if (json_val.Has("linkQuality"))
         {
-            _linkQuality = (int)member.ivalue;
-            return;
+            _linkQuality = json_val.GetInt("linkQuality");
         }
-        if (member.name == "cellOperator")
+        if (json_val.Has("cellOperator"))
         {
-            _cellOperator = member.svalue;
-            return;
+            _cellOperator = json_val.GetString("cellOperator");
         }
-        if (member.name == "cellIdentifier")
+        if (json_val.Has("cellIdentifier"))
         {
-            _cellIdentifier = member.svalue;
-            return;
+            _cellIdentifier = json_val.GetString("cellIdentifier");
         }
-        if (member.name == "cellType")
+        if (json_val.Has("cellType"))
         {
-            _cellType = (int)member.ivalue;
-            return;
+            _cellType = json_val.GetInt("cellType");
         }
-        if (member.name == "imsi")
+        if (json_val.Has("imsi"))
         {
-            _imsi = member.svalue;
-            return;
+            _imsi = json_val.GetString("imsi");
         }
-        if (member.name == "message")
+        if (json_val.Has("message"))
         {
-            _message = member.svalue;
-            return;
+            _message = json_val.GetString("message");
         }
-        if (member.name == "pin")
+        if (json_val.Has("pin"))
         {
-            _pin = member.svalue;
-            return;
+            _pin = json_val.GetString("pin");
         }
-        if (member.name == "lockedOperator")
+        if (json_val.Has("lockedOperator"))
         {
-            _lockedOperator = member.svalue;
-            return;
+            _lockedOperator = json_val.GetString("lockedOperator");
         }
-        if (member.name == "airplaneMode")
+        if (json_val.Has("airplaneMode"))
         {
-            _airplaneMode = member.ivalue > 0 ? 1 : 0;
-            return;
+            _airplaneMode = json_val.GetInt("airplaneMode") > 0 ? 1 : 0;
         }
-        if (member.name == "enableData")
+        if (json_val.Has("enableData"))
         {
-            _enableData = (int)member.ivalue;
-            return;
+            _enableData = json_val.GetInt("enableData");
         }
-        if (member.name == "apn")
+        if (json_val.Has("apn"))
         {
-            _apn = member.svalue;
-            return;
+            _apn = json_val.GetString("apn");
         }
-        if (member.name == "apnSecret")
+        if (json_val.Has("apnSecret"))
         {
-            _apnSecret = member.svalue;
-            return;
+            _apnSecret = json_val.GetString("apnSecret");
         }
-        if (member.name == "pingInterval")
+        if (json_val.Has("pingInterval"))
         {
-            _pingInterval = (int)member.ivalue;
-            return;
+            _pingInterval = json_val.GetInt("pingInterval");
         }
-        if (member.name == "dataSent")
+        if (json_val.Has("dataSent"))
         {
-            _dataSent = (int)member.ivalue;
-            return;
+            _dataSent = json_val.GetInt("dataSent");
         }
-        if (member.name == "dataReceived")
+        if (json_val.Has("dataReceived"))
         {
-            _dataReceived = (int)member.ivalue;
-            return;
+            _dataReceived = json_val.GetInt("dataReceived");
         }
-        if (member.name == "command")
+        if (json_val.Has("command"))
         {
-            _command = member.svalue;
-            return;
+            _command = json_val.GetString("command");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -310,7 +294,7 @@ public class YCellular : YFunction
     public int get_linkQuality()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LINKQUALITY_INVALID;
@@ -339,7 +323,7 @@ public class YCellular : YFunction
     public string get_cellOperator()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CELLOPERATOR_INVALID;
@@ -368,7 +352,7 @@ public class YCellular : YFunction
     public string get_cellIdentifier()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CELLIDENTIFIER_INVALID;
@@ -399,7 +383,7 @@ public class YCellular : YFunction
     public int get_cellType()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CELLTYPE_INVALID;
@@ -432,7 +416,7 @@ public class YCellular : YFunction
     public string get_imsi()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return IMSI_INVALID;
@@ -461,7 +445,7 @@ public class YCellular : YFunction
     public string get_message()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MESSAGE_INVALID;
@@ -494,7 +478,7 @@ public class YCellular : YFunction
     public string get_pin()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PIN_INVALID;
@@ -539,8 +523,10 @@ public class YCellular : YFunction
     public int set_pin(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("pin", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("pin", rest_val);
+        }
     }
 
     /**
@@ -565,7 +551,7 @@ public class YCellular : YFunction
     public string get_lockedOperator()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LOCKEDOPERATOR_INVALID;
@@ -602,8 +588,10 @@ public class YCellular : YFunction
     public int set_lockedOperator(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("lockedOperator", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("lockedOperator", rest_val);
+        }
     }
 
     /**
@@ -625,7 +613,7 @@ public class YCellular : YFunction
     public int get_airplaneMode()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return AIRPLANEMODE_INVALID;
@@ -660,8 +648,10 @@ public class YCellular : YFunction
     public int set_airplaneMode(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("airplaneMode", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("airplaneMode", rest_val);
+        }
     }
 
     /**
@@ -685,7 +675,7 @@ public class YCellular : YFunction
     public int get_enableData()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ENABLEDATA_INVALID;
@@ -727,8 +717,10 @@ public class YCellular : YFunction
     public int set_enableData(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("enableData", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("enableData", rest_val);
+        }
     }
 
     /**
@@ -750,7 +742,7 @@ public class YCellular : YFunction
     public string get_apn()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return APN_INVALID;
@@ -785,8 +777,10 @@ public class YCellular : YFunction
     public int set_apn(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("apn", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("apn", rest_val);
+        }
     }
 
     /**
@@ -810,7 +804,7 @@ public class YCellular : YFunction
     public string get_apnSecret()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return APNSECRET_INVALID;
@@ -824,8 +818,10 @@ public class YCellular : YFunction
     public int set_apnSecret(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("apnSecret", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("apnSecret", rest_val);
+        }
     }
 
     /**
@@ -846,7 +842,7 @@ public class YCellular : YFunction
     public int get_pingInterval()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PINGINTERVAL_INVALID;
@@ -880,8 +876,10 @@ public class YCellular : YFunction
     public int set_pingInterval(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("pingInterval", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("pingInterval", rest_val);
+        }
     }
 
     /**
@@ -902,7 +900,7 @@ public class YCellular : YFunction
     public int get_dataSent()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DATASENT_INVALID;
@@ -936,8 +934,10 @@ public class YCellular : YFunction
     public int set_dataSent(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("dataSent", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("dataSent", rest_val);
+        }
     }
 
     /**
@@ -958,7 +958,7 @@ public class YCellular : YFunction
     public int get_dataReceived()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DATARECEIVED_INVALID;
@@ -992,14 +992,16 @@ public class YCellular : YFunction
     public int set_dataReceived(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("dataReceived", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("dataReceived", rest_val);
+        }
     }
 
     public string get_command()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
@@ -1013,8 +1015,10 @@ public class YCellular : YFunction
     public int set_command(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("command", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("command", rest_val);
+        }
     }
 
     /**

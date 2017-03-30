@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_bluetoothlink.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_bluetoothlink.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindBluetoothLink(), the high-level API for BluetoothLink functions
  *
@@ -110,59 +110,49 @@ public class YBluetoothLink : YFunction
 
     //--- (YBluetoothLink implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "ownAddress")
+        if (json_val.Has("ownAddress"))
         {
-            _ownAddress = member.svalue;
-            return;
+            _ownAddress = json_val.GetString("ownAddress");
         }
-        if (member.name == "pairingPin")
+        if (json_val.Has("pairingPin"))
         {
-            _pairingPin = member.svalue;
-            return;
+            _pairingPin = json_val.GetString("pairingPin");
         }
-        if (member.name == "remoteAddress")
+        if (json_val.Has("remoteAddress"))
         {
-            _remoteAddress = member.svalue;
-            return;
+            _remoteAddress = json_val.GetString("remoteAddress");
         }
-        if (member.name == "remoteName")
+        if (json_val.Has("remoteName"))
         {
-            _remoteName = member.svalue;
-            return;
+            _remoteName = json_val.GetString("remoteName");
         }
-        if (member.name == "mute")
+        if (json_val.Has("mute"))
         {
-            _mute = member.ivalue > 0 ? 1 : 0;
-            return;
+            _mute = json_val.GetInt("mute") > 0 ? 1 : 0;
         }
-        if (member.name == "preAmplifier")
+        if (json_val.Has("preAmplifier"))
         {
-            _preAmplifier = (int)member.ivalue;
-            return;
+            _preAmplifier = json_val.GetInt("preAmplifier");
         }
-        if (member.name == "volume")
+        if (json_val.Has("volume"))
         {
-            _volume = (int)member.ivalue;
-            return;
+            _volume = json_val.GetInt("volume");
         }
-        if (member.name == "linkState")
+        if (json_val.Has("linkState"))
         {
-            _linkState = (int)member.ivalue;
-            return;
+            _linkState = json_val.GetInt("linkState");
         }
-        if (member.name == "linkQuality")
+        if (json_val.Has("linkQuality"))
         {
-            _linkQuality = (int)member.ivalue;
-            return;
+            _linkQuality = json_val.GetInt("linkQuality");
         }
-        if (member.name == "command")
+        if (json_val.Has("command"))
         {
-            _command = member.svalue;
-            return;
+            _command = json_val.GetString("command");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -184,7 +174,7 @@ public class YBluetoothLink : YFunction
     public string get_ownAddress()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return OWNADDRESS_INVALID;
@@ -217,7 +207,7 @@ public class YBluetoothLink : YFunction
     public string get_pairingPin()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PAIRINGPIN_INVALID;
@@ -253,8 +243,10 @@ public class YBluetoothLink : YFunction
     public int set_pairingPin(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("pairingPin", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("pairingPin", rest_val);
+        }
     }
 
     /**
@@ -275,7 +267,7 @@ public class YBluetoothLink : YFunction
     public string get_remoteAddress()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return REMOTEADDRESS_INVALID;
@@ -309,8 +301,10 @@ public class YBluetoothLink : YFunction
     public int set_remoteAddress(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("remoteAddress", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("remoteAddress", rest_val);
+        }
     }
 
     /**
@@ -331,7 +325,7 @@ public class YBluetoothLink : YFunction
     public string get_remoteName()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return REMOTENAME_INVALID;
@@ -361,7 +355,7 @@ public class YBluetoothLink : YFunction
     public int get_mute()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MUTE_INVALID;
@@ -398,8 +392,10 @@ public class YBluetoothLink : YFunction
     public int set_mute(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("mute", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("mute", rest_val);
+        }
     }
 
     /**
@@ -420,7 +416,7 @@ public class YBluetoothLink : YFunction
     public int get_preAmplifier()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PREAMPLIFIER_INVALID;
@@ -454,8 +450,10 @@ public class YBluetoothLink : YFunction
     public int set_preAmplifier(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("preAmplifier", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("preAmplifier", rest_val);
+        }
     }
 
     /**
@@ -476,7 +474,7 @@ public class YBluetoothLink : YFunction
     public int get_volume()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return VOLUME_INVALID;
@@ -510,8 +508,10 @@ public class YBluetoothLink : YFunction
     public int set_volume(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("volume", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("volume", rest_val);
+        }
     }
 
     /**
@@ -535,7 +535,7 @@ public class YBluetoothLink : YFunction
     public int get_linkState()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LINKSTATE_INVALID;
@@ -565,7 +565,7 @@ public class YBluetoothLink : YFunction
     public int get_linkQuality()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LINKQUALITY_INVALID;
@@ -579,7 +579,7 @@ public class YBluetoothLink : YFunction
     public string get_command()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
@@ -593,8 +593,10 @@ public class YBluetoothLink : YFunction
     public int set_command(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("command", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("command", rest_val);
+        }
     }
 
     /**

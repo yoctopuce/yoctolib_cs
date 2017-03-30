@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_watchdog.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_watchdog.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindWatchdog(), the high-level API for Watchdog functions
  *
@@ -129,80 +129,66 @@ public class YWatchdog : YFunction
 
     //--- (YWatchdog implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "state")
+        if (json_val.Has("state"))
         {
-            _state = member.ivalue > 0 ? 1 : 0;
-            return;
+            _state = json_val.GetInt("state") > 0 ? 1 : 0;
         }
-        if (member.name == "stateAtPowerOn")
+        if (json_val.Has("stateAtPowerOn"))
         {
-            _stateAtPowerOn = (int)member.ivalue;
-            return;
+            _stateAtPowerOn = json_val.GetInt("stateAtPowerOn");
         }
-        if (member.name == "maxTimeOnStateA")
+        if (json_val.Has("maxTimeOnStateA"))
         {
-            _maxTimeOnStateA = member.ivalue;
-            return;
+            _maxTimeOnStateA = json_val.GetLong("maxTimeOnStateA");
         }
-        if (member.name == "maxTimeOnStateB")
+        if (json_val.Has("maxTimeOnStateB"))
         {
-            _maxTimeOnStateB = member.ivalue;
-            return;
+            _maxTimeOnStateB = json_val.GetLong("maxTimeOnStateB");
         }
-        if (member.name == "output")
+        if (json_val.Has("output"))
         {
-            _output = member.ivalue > 0 ? 1 : 0;
-            return;
+            _output = json_val.GetInt("output") > 0 ? 1 : 0;
         }
-        if (member.name == "pulseTimer")
+        if (json_val.Has("pulseTimer"))
         {
-            _pulseTimer = member.ivalue;
-            return;
+            _pulseTimer = json_val.GetLong("pulseTimer");
         }
-        if (member.name == "delayedPulseTimer")
+        if (json_val.Has("delayedPulseTimer"))
         {
-            if (member.recordtype == YAPI.TJSONRECORDTYPE.JSON_STRUCT) {
-                YAPI.TJSONRECORD submemb;
-                for (int l=0 ; l<member.membercount ; l++)
-                {   submemb = member.members[l];
-                    if (submemb.name == "moving")
-                        _delayedPulseTimer.moving = (int) submemb.ivalue;
-                    else if (submemb.name == "target")
-                        _delayedPulseTimer.target = (int) submemb.ivalue;
-                    else if (submemb.name == "ms")
-                        _delayedPulseTimer.ms = (int) submemb.ivalue;
-                }
+            YAPI.YJSONObject subjson = json_val.GetYJSONObject("delayedPulseTimer");
+            if (subjson.Has("moving")) {
+                _delayedPulseTimer.moving = subjson.GetInt("moving");
             }
-            return;
+            if (subjson.Has("target")) {
+                _delayedPulseTimer.moving = subjson.GetInt("target");
+            }
+            if (subjson.Has("ms")) {
+                _delayedPulseTimer.moving = subjson.GetInt("ms");
+            }
         }
-        if (member.name == "countdown")
+        if (json_val.Has("countdown"))
         {
-            _countdown = member.ivalue;
-            return;
+            _countdown = json_val.GetLong("countdown");
         }
-        if (member.name == "autoStart")
+        if (json_val.Has("autoStart"))
         {
-            _autoStart = member.ivalue > 0 ? 1 : 0;
-            return;
+            _autoStart = json_val.GetInt("autoStart") > 0 ? 1 : 0;
         }
-        if (member.name == "running")
+        if (json_val.Has("running"))
         {
-            _running = member.ivalue > 0 ? 1 : 0;
-            return;
+            _running = json_val.GetInt("running") > 0 ? 1 : 0;
         }
-        if (member.name == "triggerDelay")
+        if (json_val.Has("triggerDelay"))
         {
-            _triggerDelay = member.ivalue;
-            return;
+            _triggerDelay = json_val.GetLong("triggerDelay");
         }
-        if (member.name == "triggerDuration")
+        if (json_val.Has("triggerDuration"))
         {
-            _triggerDuration = member.ivalue;
-            return;
+            _triggerDuration = json_val.GetLong("triggerDuration");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -224,7 +210,7 @@ public class YWatchdog : YFunction
     public int get_state()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return STATE_INVALID;
@@ -259,8 +245,10 @@ public class YWatchdog : YFunction
     public int set_state(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("state", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("state", rest_val);
+        }
     }
 
     /**
@@ -283,7 +271,7 @@ public class YWatchdog : YFunction
     public int get_stateAtPowerOn()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return STATEATPOWERON_INVALID;
@@ -321,8 +309,10 @@ public class YWatchdog : YFunction
     public int set_stateAtPowerOn(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("stateAtPowerOn", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("stateAtPowerOn", rest_val);
+        }
     }
 
     /**
@@ -344,7 +334,7 @@ public class YWatchdog : YFunction
     public long get_maxTimeOnStateA()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MAXTIMEONSTATEA_INVALID;
@@ -379,8 +369,10 @@ public class YWatchdog : YFunction
     public int set_maxTimeOnStateA(long newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("maxTimeOnStateA", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("maxTimeOnStateA", rest_val);
+        }
     }
 
     /**
@@ -402,7 +394,7 @@ public class YWatchdog : YFunction
     public long get_maxTimeOnStateB()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MAXTIMEONSTATEB_INVALID;
@@ -437,8 +429,10 @@ public class YWatchdog : YFunction
     public int set_maxTimeOnStateB(long newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("maxTimeOnStateB", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("maxTimeOnStateB", rest_val);
+        }
     }
 
     /**
@@ -460,7 +454,7 @@ public class YWatchdog : YFunction
     public int get_output()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return OUTPUT_INVALID;
@@ -495,8 +489,10 @@ public class YWatchdog : YFunction
     public int set_output(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("output", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("output", rest_val);
+        }
     }
 
     /**
@@ -521,7 +517,7 @@ public class YWatchdog : YFunction
     public long get_pulseTimer()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PULSETIMER_INVALID;
@@ -535,8 +531,10 @@ public class YWatchdog : YFunction
     public int set_pulseTimer(long newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("pulseTimer", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("pulseTimer", rest_val);
+        }
     }
 
     /**
@@ -570,7 +568,7 @@ public class YWatchdog : YFunction
     public YWatchdogDelayedPulse get_delayedPulseTimer()
     {
         YWatchdogDelayedPulse res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DELAYEDPULSETIMER_INVALID;
@@ -584,8 +582,10 @@ public class YWatchdog : YFunction
     public int set_delayedPulseTimer(YWatchdogDelayedPulse newval)
     {
         string rest_val;
-        rest_val = (newval.target).ToString()+":"+(newval.ms).ToString();
-        return _setAttr("delayedPulseTimer", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval.target).ToString()+":"+(newval.ms).ToString();
+            return _setAttr("delayedPulseTimer", rest_val);
+        }
     }
 
     /**
@@ -638,7 +638,7 @@ public class YWatchdog : YFunction
     public long get_countdown()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COUNTDOWN_INVALID;
@@ -668,7 +668,7 @@ public class YWatchdog : YFunction
     public int get_autoStart()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return AUTOSTART_INVALID;
@@ -705,8 +705,10 @@ public class YWatchdog : YFunction
     public int set_autoStart(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("autoStart", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("autoStart", rest_val);
+        }
     }
 
     /**
@@ -727,7 +729,7 @@ public class YWatchdog : YFunction
     public int get_running()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return RUNNING_INVALID;
@@ -762,8 +764,10 @@ public class YWatchdog : YFunction
     public int set_running(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("running", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("running", rest_val);
+        }
     }
 
     /**
@@ -810,7 +814,7 @@ public class YWatchdog : YFunction
     public long get_triggerDelay()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return TRIGGERDELAY_INVALID;
@@ -844,8 +848,10 @@ public class YWatchdog : YFunction
     public int set_triggerDelay(long newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("triggerDelay", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("triggerDelay", rest_val);
+        }
     }
 
     /**
@@ -866,7 +872,7 @@ public class YWatchdog : YFunction
     public long get_triggerDuration()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return TRIGGERDURATION_INVALID;
@@ -900,8 +906,10 @@ public class YWatchdog : YFunction
     public int set_triggerDuration(long newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("triggerDuration", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("triggerDuration", rest_val);
+        }
     }
 
     /**

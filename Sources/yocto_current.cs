@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_current.cs 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: yocto_current.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindCurrent(), the high-level API for Current functions
  *
@@ -89,20 +89,19 @@ public class YCurrent : YSensor
 
     //--- (YCurrent implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "enabled")
+        if (json_val.Has("enabled"))
         {
-            _enabled = member.ivalue > 0 ? 1 : 0;
-            return;
+            _enabled = json_val.GetInt("enabled") > 0 ? 1 : 0;
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     public int get_enabled()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ENABLED_INVALID;
@@ -116,8 +115,10 @@ public class YCurrent : YSensor
     public int set_enabled(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("enabled", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("enabled", rest_val);
+        }
     }
 
     /**

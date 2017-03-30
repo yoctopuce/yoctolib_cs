@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_steppermotor.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_steppermotor.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -122,84 +122,69 @@ public class YStepperMotor : YFunction
 
     //--- (YStepperMotor implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "motorState")
+        if (json_val.Has("motorState"))
         {
-            _motorState = (int)member.ivalue;
-            return;
+            _motorState = json_val.GetInt("motorState");
         }
-        if (member.name == "diags")
+        if (json_val.Has("diags"))
         {
-            _diags = (int)member.ivalue;
-            return;
+            _diags = json_val.GetInt("diags");
         }
-        if (member.name == "stepPos")
+        if (json_val.Has("stepPos"))
         {
-            _stepPos = member.ivalue / 16.0;
-            return;
+            _stepPos = json_val.GetDouble("stepPos") / 16.0;
         }
-        if (member.name == "speed")
+        if (json_val.Has("speed"))
         {
-            _speed = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _speed = Math.Round(json_val.GetDouble("speed") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "pullinSpeed")
+        if (json_val.Has("pullinSpeed"))
         {
-            _pullinSpeed = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _pullinSpeed = Math.Round(json_val.GetDouble("pullinSpeed") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "maxAccel")
+        if (json_val.Has("maxAccel"))
         {
-            _maxAccel = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _maxAccel = Math.Round(json_val.GetDouble("maxAccel") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "maxSpeed")
+        if (json_val.Has("maxSpeed"))
         {
-            _maxSpeed = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _maxSpeed = Math.Round(json_val.GetDouble("maxSpeed") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "stepping")
+        if (json_val.Has("stepping"))
         {
-            _stepping = (int)member.ivalue;
-            return;
+            _stepping = json_val.GetInt("stepping");
         }
-        if (member.name == "overcurrent")
+        if (json_val.Has("overcurrent"))
         {
-            _overcurrent = (int)member.ivalue;
-            return;
+            _overcurrent = json_val.GetInt("overcurrent");
         }
-        if (member.name == "tCurrStop")
+        if (json_val.Has("tCurrStop"))
         {
-            _tCurrStop = (int)member.ivalue;
-            return;
+            _tCurrStop = json_val.GetInt("tCurrStop");
         }
-        if (member.name == "tCurrRun")
+        if (json_val.Has("tCurrRun"))
         {
-            _tCurrRun = (int)member.ivalue;
-            return;
+            _tCurrRun = json_val.GetInt("tCurrRun");
         }
-        if (member.name == "alertMode")
+        if (json_val.Has("alertMode"))
         {
-            _alertMode = member.svalue;
-            return;
+            _alertMode = json_val.GetString("alertMode");
         }
-        if (member.name == "auxMode")
+        if (json_val.Has("auxMode"))
         {
-            _auxMode = member.svalue;
-            return;
+            _auxMode = json_val.GetString("auxMode");
         }
-        if (member.name == "auxSignal")
+        if (json_val.Has("auxSignal"))
         {
-            _auxSignal = (int)member.ivalue;
-            return;
+            _auxSignal = json_val.GetInt("auxSignal");
         }
-        if (member.name == "command")
+        if (json_val.Has("command"))
         {
-            _command = member.svalue;
-            return;
+            _command = json_val.GetString("command");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -223,7 +208,7 @@ public class YStepperMotor : YFunction
     public int get_motorState()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MOTORSTATE_INVALID;
@@ -252,7 +237,7 @@ public class YStepperMotor : YFunction
     public int get_diags()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DIAGS_INVALID;
@@ -291,8 +276,10 @@ public class YStepperMotor : YFunction
     public int set_stepPos(double newval)
     {
         string rest_val;
-        rest_val = (Math.Round(newval * 100.0) / 100.0).ToString();
-        return _setAttr("stepPos", rest_val);
+        lock (_thisLock) {
+            rest_val = (Math.Round(newval * 100.0) / 100.0).ToString();
+            return _setAttr("stepPos", rest_val);
+        }
     }
 
     /**
@@ -314,7 +301,7 @@ public class YStepperMotor : YFunction
     public double get_stepPos()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return STEPPOS_INVALID;
@@ -344,7 +331,7 @@ public class YStepperMotor : YFunction
     public double get_speed()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SPEED_INVALID;
@@ -379,8 +366,10 @@ public class YStepperMotor : YFunction
     public int set_pullinSpeed(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("pullinSpeed", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("pullinSpeed", rest_val);
+        }
     }
 
     /**
@@ -402,7 +391,7 @@ public class YStepperMotor : YFunction
     public double get_pullinSpeed()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PULLINSPEED_INVALID;
@@ -436,8 +425,10 @@ public class YStepperMotor : YFunction
     public int set_maxAccel(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("maxAccel", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("maxAccel", rest_val);
+        }
     }
 
     /**
@@ -458,7 +449,7 @@ public class YStepperMotor : YFunction
     public double get_maxAccel()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MAXACCEL_INVALID;
@@ -492,8 +483,10 @@ public class YStepperMotor : YFunction
     public int set_maxSpeed(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("maxSpeed", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("maxSpeed", rest_val);
+        }
     }
 
     /**
@@ -514,7 +507,7 @@ public class YStepperMotor : YFunction
     public double get_maxSpeed()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MAXSPEED_INVALID;
@@ -545,7 +538,7 @@ public class YStepperMotor : YFunction
     public int get_stepping()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return STEPPING_INVALID;
@@ -581,8 +574,10 @@ public class YStepperMotor : YFunction
     public int set_stepping(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("stepping", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("stepping", rest_val);
+        }
     }
 
     /**
@@ -603,7 +598,7 @@ public class YStepperMotor : YFunction
     public int get_overcurrent()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return OVERCURRENT_INVALID;
@@ -637,8 +632,10 @@ public class YStepperMotor : YFunction
     public int set_overcurrent(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("overcurrent", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("overcurrent", rest_val);
+        }
     }
 
     /**
@@ -659,7 +656,7 @@ public class YStepperMotor : YFunction
     public int get_tCurrStop()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return TCURRSTOP_INVALID;
@@ -693,8 +690,10 @@ public class YStepperMotor : YFunction
     public int set_tCurrStop(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("tCurrStop", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("tCurrStop", rest_val);
+        }
     }
 
     /**
@@ -715,7 +714,7 @@ public class YStepperMotor : YFunction
     public int get_tCurrRun()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return TCURRRUN_INVALID;
@@ -749,14 +748,16 @@ public class YStepperMotor : YFunction
     public int set_tCurrRun(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("tCurrRun", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("tCurrRun", rest_val);
+        }
     }
 
     public string get_alertMode()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ALERTMODE_INVALID;
@@ -770,14 +771,16 @@ public class YStepperMotor : YFunction
     public int set_alertMode(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("alertMode", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("alertMode", rest_val);
+        }
     }
 
     public string get_auxMode()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return AUXMODE_INVALID;
@@ -791,8 +794,10 @@ public class YStepperMotor : YFunction
     public int set_auxMode(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("auxMode", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("auxMode", rest_val);
+        }
     }
 
     /**
@@ -813,7 +818,7 @@ public class YStepperMotor : YFunction
     public int get_auxSignal()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return AUXSIGNAL_INVALID;
@@ -848,14 +853,16 @@ public class YStepperMotor : YFunction
     public int set_auxSignal(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("auxSignal", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("auxSignal", rest_val);
+        }
     }
 
     public string get_command()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
@@ -869,8 +876,10 @@ public class YStepperMotor : YFunction
     public int set_command(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("command", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("command", rest_val);
+        }
     }
 
     /**

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_network.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_network.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindNetwork(), the high-level API for Network functions
  *
@@ -150,129 +150,105 @@ public class YNetwork : YFunction
 
     //--- (YNetwork implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "readiness")
+        if (json_val.Has("readiness"))
         {
-            _readiness = (int)member.ivalue;
-            return;
+            _readiness = json_val.GetInt("readiness");
         }
-        if (member.name == "macAddress")
+        if (json_val.Has("macAddress"))
         {
-            _macAddress = member.svalue;
-            return;
+            _macAddress = json_val.GetString("macAddress");
         }
-        if (member.name == "ipAddress")
+        if (json_val.Has("ipAddress"))
         {
-            _ipAddress = member.svalue;
-            return;
+            _ipAddress = json_val.GetString("ipAddress");
         }
-        if (member.name == "subnetMask")
+        if (json_val.Has("subnetMask"))
         {
-            _subnetMask = member.svalue;
-            return;
+            _subnetMask = json_val.GetString("subnetMask");
         }
-        if (member.name == "router")
+        if (json_val.Has("router"))
         {
-            _router = member.svalue;
-            return;
+            _router = json_val.GetString("router");
         }
-        if (member.name == "ipConfig")
+        if (json_val.Has("ipConfig"))
         {
-            _ipConfig = member.svalue;
-            return;
+            _ipConfig = json_val.GetString("ipConfig");
         }
-        if (member.name == "primaryDNS")
+        if (json_val.Has("primaryDNS"))
         {
-            _primaryDNS = member.svalue;
-            return;
+            _primaryDNS = json_val.GetString("primaryDNS");
         }
-        if (member.name == "secondaryDNS")
+        if (json_val.Has("secondaryDNS"))
         {
-            _secondaryDNS = member.svalue;
-            return;
+            _secondaryDNS = json_val.GetString("secondaryDNS");
         }
-        if (member.name == "ntpServer")
+        if (json_val.Has("ntpServer"))
         {
-            _ntpServer = member.svalue;
-            return;
+            _ntpServer = json_val.GetString("ntpServer");
         }
-        if (member.name == "userPassword")
+        if (json_val.Has("userPassword"))
         {
-            _userPassword = member.svalue;
-            return;
+            _userPassword = json_val.GetString("userPassword");
         }
-        if (member.name == "adminPassword")
+        if (json_val.Has("adminPassword"))
         {
-            _adminPassword = member.svalue;
-            return;
+            _adminPassword = json_val.GetString("adminPassword");
         }
-        if (member.name == "httpPort")
+        if (json_val.Has("httpPort"))
         {
-            _httpPort = (int)member.ivalue;
-            return;
+            _httpPort = json_val.GetInt("httpPort");
         }
-        if (member.name == "defaultPage")
+        if (json_val.Has("defaultPage"))
         {
-            _defaultPage = member.svalue;
-            return;
+            _defaultPage = json_val.GetString("defaultPage");
         }
-        if (member.name == "discoverable")
+        if (json_val.Has("discoverable"))
         {
-            _discoverable = member.ivalue > 0 ? 1 : 0;
-            return;
+            _discoverable = json_val.GetInt("discoverable") > 0 ? 1 : 0;
         }
-        if (member.name == "wwwWatchdogDelay")
+        if (json_val.Has("wwwWatchdogDelay"))
         {
-            _wwwWatchdogDelay = (int)member.ivalue;
-            return;
+            _wwwWatchdogDelay = json_val.GetInt("wwwWatchdogDelay");
         }
-        if (member.name == "callbackUrl")
+        if (json_val.Has("callbackUrl"))
         {
-            _callbackUrl = member.svalue;
-            return;
+            _callbackUrl = json_val.GetString("callbackUrl");
         }
-        if (member.name == "callbackMethod")
+        if (json_val.Has("callbackMethod"))
         {
-            _callbackMethod = (int)member.ivalue;
-            return;
+            _callbackMethod = json_val.GetInt("callbackMethod");
         }
-        if (member.name == "callbackEncoding")
+        if (json_val.Has("callbackEncoding"))
         {
-            _callbackEncoding = (int)member.ivalue;
-            return;
+            _callbackEncoding = json_val.GetInt("callbackEncoding");
         }
-        if (member.name == "callbackCredentials")
+        if (json_val.Has("callbackCredentials"))
         {
-            _callbackCredentials = member.svalue;
-            return;
+            _callbackCredentials = json_val.GetString("callbackCredentials");
         }
-        if (member.name == "callbackInitialDelay")
+        if (json_val.Has("callbackInitialDelay"))
         {
-            _callbackInitialDelay = (int)member.ivalue;
-            return;
+            _callbackInitialDelay = json_val.GetInt("callbackInitialDelay");
         }
-        if (member.name == "callbackSchedule")
+        if (json_val.Has("callbackSchedule"))
         {
-            _callbackSchedule = member.svalue;
-            return;
+            _callbackSchedule = json_val.GetString("callbackSchedule");
         }
-        if (member.name == "callbackMinDelay")
+        if (json_val.Has("callbackMinDelay"))
         {
-            _callbackMinDelay = (int)member.ivalue;
-            return;
+            _callbackMinDelay = json_val.GetInt("callbackMinDelay");
         }
-        if (member.name == "callbackMaxDelay")
+        if (json_val.Has("callbackMaxDelay"))
         {
-            _callbackMaxDelay = (int)member.ivalue;
-            return;
+            _callbackMaxDelay = json_val.GetInt("callbackMaxDelay");
         }
-        if (member.name == "poeCurrent")
+        if (json_val.Has("poeCurrent"))
         {
-            _poeCurrent = (int)member.ivalue;
-            return;
+            _poeCurrent = json_val.GetInt("poeCurrent");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -308,7 +284,7 @@ public class YNetwork : YFunction
     public int get_readiness()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return READINESS_INVALID;
@@ -339,7 +315,7 @@ public class YNetwork : YFunction
     public string get_macAddress()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration == 0) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MACADDRESS_INVALID;
@@ -370,7 +346,7 @@ public class YNetwork : YFunction
     public string get_ipAddress()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return IPADDRESS_INVALID;
@@ -399,7 +375,7 @@ public class YNetwork : YFunction
     public string get_subnetMask()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SUBNETMASK_INVALID;
@@ -428,7 +404,7 @@ public class YNetwork : YFunction
     public string get_router()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ROUTER_INVALID;
@@ -471,7 +447,7 @@ public class YNetwork : YFunction
     public string get_ipConfig()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return IPCONFIG_INVALID;
@@ -485,8 +461,10 @@ public class YNetwork : YFunction
     public int set_ipConfig(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("ipConfig", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("ipConfig", rest_val);
+        }
     }
 
     /**
@@ -507,7 +485,7 @@ public class YNetwork : YFunction
     public string get_primaryDNS()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PRIMARYDNS_INVALID;
@@ -543,8 +521,10 @@ public class YNetwork : YFunction
     public int set_primaryDNS(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("primaryDNS", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("primaryDNS", rest_val);
+        }
     }
 
     /**
@@ -565,7 +545,7 @@ public class YNetwork : YFunction
     public string get_secondaryDNS()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SECONDARYDNS_INVALID;
@@ -601,8 +581,10 @@ public class YNetwork : YFunction
     public int set_secondaryDNS(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("secondaryDNS", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("secondaryDNS", rest_val);
+        }
     }
 
     /**
@@ -623,7 +605,7 @@ public class YNetwork : YFunction
     public string get_ntpServer()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return NTPSERVER_INVALID;
@@ -658,8 +640,10 @@ public class YNetwork : YFunction
     public int set_ntpServer(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("ntpServer", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("ntpServer", rest_val);
+        }
     }
 
     /**
@@ -682,7 +666,7 @@ public class YNetwork : YFunction
     public string get_userPassword()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return USERPASSWORD_INVALID;
@@ -721,8 +705,10 @@ public class YNetwork : YFunction
     public int set_userPassword(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("userPassword", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("userPassword", rest_val);
+        }
     }
 
     /**
@@ -745,7 +731,7 @@ public class YNetwork : YFunction
     public string get_adminPassword()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ADMINPASSWORD_INVALID;
@@ -784,8 +770,10 @@ public class YNetwork : YFunction
     public int set_adminPassword(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("adminPassword", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("adminPassword", rest_val);
+        }
     }
 
     /**
@@ -806,7 +794,7 @@ public class YNetwork : YFunction
     public int get_httpPort()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return HTTPPORT_INVALID;
@@ -843,8 +831,10 @@ public class YNetwork : YFunction
     public int set_httpPort(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("httpPort", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("httpPort", rest_val);
+        }
     }
 
     /**
@@ -865,7 +855,7 @@ public class YNetwork : YFunction
     public string get_defaultPage()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DEFAULTPAGE_INVALID;
@@ -902,8 +892,10 @@ public class YNetwork : YFunction
     public int set_defaultPage(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("defaultPage", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("defaultPage", rest_val);
+        }
     }
 
     /**
@@ -927,7 +919,7 @@ public class YNetwork : YFunction
     public int get_discoverable()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DISCOVERABLE_INVALID;
@@ -964,8 +956,10 @@ public class YNetwork : YFunction
     public int set_discoverable(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("discoverable", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("discoverable", rest_val);
+        }
     }
 
     /**
@@ -990,7 +984,7 @@ public class YNetwork : YFunction
     public int get_wwwWatchdogDelay()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return WWWWATCHDOGDELAY_INVALID;
@@ -1029,8 +1023,10 @@ public class YNetwork : YFunction
     public int set_wwwWatchdogDelay(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("wwwWatchdogDelay", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("wwwWatchdogDelay", rest_val);
+        }
     }
 
     /**
@@ -1051,7 +1047,7 @@ public class YNetwork : YFunction
     public string get_callbackUrl()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CALLBACKURL_INVALID;
@@ -1087,8 +1083,10 @@ public class YNetwork : YFunction
     public int set_callbackUrl(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("callbackUrl", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("callbackUrl", rest_val);
+        }
     }
 
     /**
@@ -1111,7 +1109,7 @@ public class YNetwork : YFunction
     public int get_callbackMethod()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CALLBACKMETHOD_INVALID;
@@ -1147,8 +1145,10 @@ public class YNetwork : YFunction
     public int set_callbackMethod(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("callbackMethod", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("callbackMethod", rest_val);
+        }
     }
 
     /**
@@ -1174,7 +1174,7 @@ public class YNetwork : YFunction
     public int get_callbackEncoding()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CALLBACKENCODING_INVALID;
@@ -1213,8 +1213,10 @@ public class YNetwork : YFunction
     public int set_callbackEncoding(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("callbackEncoding", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("callbackEncoding", rest_val);
+        }
     }
 
     /**
@@ -1237,7 +1239,7 @@ public class YNetwork : YFunction
     public string get_callbackCredentials()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CALLBACKCREDENTIALS_INVALID;
@@ -1280,8 +1282,10 @@ public class YNetwork : YFunction
     public int set_callbackCredentials(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("callbackCredentials", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("callbackCredentials", rest_val);
+        }
     }
 
     /**
@@ -1336,7 +1340,7 @@ public class YNetwork : YFunction
     public int get_callbackInitialDelay()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CALLBACKINITIALDELAY_INVALID;
@@ -1370,8 +1374,10 @@ public class YNetwork : YFunction
     public int set_callbackInitialDelay(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("callbackInitialDelay", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("callbackInitialDelay", rest_val);
+        }
     }
 
     /**
@@ -1392,7 +1398,7 @@ public class YNetwork : YFunction
     public string get_callbackSchedule()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CALLBACKSCHEDULE_INVALID;
@@ -1426,8 +1432,10 @@ public class YNetwork : YFunction
     public int set_callbackSchedule(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("callbackSchedule", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("callbackSchedule", rest_val);
+        }
     }
 
     /**
@@ -1448,7 +1456,7 @@ public class YNetwork : YFunction
     public int get_callbackMinDelay()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CALLBACKMINDELAY_INVALID;
@@ -1482,8 +1490,10 @@ public class YNetwork : YFunction
     public int set_callbackMinDelay(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("callbackMinDelay", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("callbackMinDelay", rest_val);
+        }
     }
 
     /**
@@ -1504,7 +1514,7 @@ public class YNetwork : YFunction
     public int get_callbackMaxDelay()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CALLBACKMAXDELAY_INVALID;
@@ -1538,8 +1548,10 @@ public class YNetwork : YFunction
     public int set_callbackMaxDelay(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("callbackMaxDelay", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("callbackMaxDelay", rest_val);
+        }
     }
 
     /**
@@ -1562,7 +1574,7 @@ public class YNetwork : YFunction
     public int get_poeCurrent()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return POECURRENT_INVALID;

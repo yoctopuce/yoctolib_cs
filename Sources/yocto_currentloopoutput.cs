@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_currentloopoutput.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_currentloopoutput.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -93,29 +93,25 @@ public class YCurrentLoopOutput : YFunction
 
     //--- (YCurrentLoopOutput implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "current")
+        if (json_val.Has("current"))
         {
-            _current = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _current = Math.Round(json_val.GetDouble("current") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "currentTransition")
+        if (json_val.Has("currentTransition"))
         {
-            _currentTransition = member.svalue;
-            return;
+            _currentTransition = json_val.GetString("currentTransition");
         }
-        if (member.name == "currentAtStartUp")
+        if (json_val.Has("currentAtStartUp"))
         {
-            _currentAtStartUp = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _currentAtStartUp = Math.Round(json_val.GetDouble("currentAtStartUp") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "loopPower")
+        if (json_val.Has("loopPower"))
         {
-            _loopPower = (int)member.ivalue;
-            return;
+            _loopPower = json_val.GetInt("loopPower");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -144,8 +140,10 @@ public class YCurrentLoopOutput : YFunction
     public int set_current(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("current", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("current", rest_val);
+        }
     }
 
     /**
@@ -166,7 +164,7 @@ public class YCurrentLoopOutput : YFunction
     public double get_current()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CURRENT_INVALID;
@@ -180,7 +178,7 @@ public class YCurrentLoopOutput : YFunction
     public string get_currentTransition()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CURRENTTRANSITION_INVALID;
@@ -194,8 +192,10 @@ public class YCurrentLoopOutput : YFunction
     public int set_currentTransition(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("currentTransition", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("currentTransition", rest_val);
+        }
     }
 
     /**
@@ -223,8 +223,10 @@ public class YCurrentLoopOutput : YFunction
     public int set_currentAtStartUp(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("currentAtStartUp", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("currentAtStartUp", rest_val);
+        }
     }
 
     /**
@@ -245,7 +247,7 @@ public class YCurrentLoopOutput : YFunction
     public double get_currentAtStartUp()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CURRENTATSTARTUP_INVALID;
@@ -278,7 +280,7 @@ public class YCurrentLoopOutput : YFunction
     public int get_loopPower()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LOOPPOWER_INVALID;

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorled.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_colorled.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindColorLed(), the high-level API for ColorLed functions
  *
@@ -111,76 +111,63 @@ public class YColorLed : YFunction
 
     //--- (YColorLed implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "rgbColor")
+        if (json_val.Has("rgbColor"))
         {
-            _rgbColor = (int)member.ivalue;
-            return;
+            _rgbColor = json_val.GetInt("rgbColor");
         }
-        if (member.name == "hslColor")
+        if (json_val.Has("hslColor"))
         {
-            _hslColor = (int)member.ivalue;
-            return;
+            _hslColor = json_val.GetInt("hslColor");
         }
-        if (member.name == "rgbMove")
+        if (json_val.Has("rgbMove"))
         {
-            if (member.recordtype == YAPI.TJSONRECORDTYPE.JSON_STRUCT) {
-                YAPI.TJSONRECORD submemb;
-                for (int l=0 ; l<member.membercount ; l++)
-                {   submemb = member.members[l];
-                    if (submemb.name == "moving")
-                        _rgbMove.moving = (int) submemb.ivalue;
-                    else if (submemb.name == "target")
-                        _rgbMove.target = (int) submemb.ivalue;
-                    else if (submemb.name == "ms")
-                        _rgbMove.ms = (int) submemb.ivalue;
-                }
+            YAPI.YJSONObject subjson = json_val.GetYJSONObject("rgbMove");
+            if (subjson.Has("moving")) {
+                _rgbMove.moving = subjson.GetInt("moving");
             }
-            return;
-        }
-        if (member.name == "hslMove")
-        {
-            if (member.recordtype == YAPI.TJSONRECORDTYPE.JSON_STRUCT) {
-                YAPI.TJSONRECORD submemb;
-                for (int l=0 ; l<member.membercount ; l++)
-                {   submemb = member.members[l];
-                    if (submemb.name == "moving")
-                        _hslMove.moving = (int) submemb.ivalue;
-                    else if (submemb.name == "target")
-                        _hslMove.target = (int) submemb.ivalue;
-                    else if (submemb.name == "ms")
-                        _hslMove.ms = (int) submemb.ivalue;
-                }
+            if (subjson.Has("target")) {
+                _rgbMove.moving = subjson.GetInt("target");
             }
-            return;
+            if (subjson.Has("ms")) {
+                _rgbMove.moving = subjson.GetInt("ms");
+            }
         }
-        if (member.name == "rgbColorAtPowerOn")
+        if (json_val.Has("hslMove"))
         {
-            _rgbColorAtPowerOn = (int)member.ivalue;
-            return;
+            YAPI.YJSONObject subjson = json_val.GetYJSONObject("hslMove");
+            if (subjson.Has("moving")) {
+                _hslMove.moving = subjson.GetInt("moving");
+            }
+            if (subjson.Has("target")) {
+                _hslMove.moving = subjson.GetInt("target");
+            }
+            if (subjson.Has("ms")) {
+                _hslMove.moving = subjson.GetInt("ms");
+            }
         }
-        if (member.name == "blinkSeqSize")
+        if (json_val.Has("rgbColorAtPowerOn"))
         {
-            _blinkSeqSize = (int)member.ivalue;
-            return;
+            _rgbColorAtPowerOn = json_val.GetInt("rgbColorAtPowerOn");
         }
-        if (member.name == "blinkSeqMaxSize")
+        if (json_val.Has("blinkSeqSize"))
         {
-            _blinkSeqMaxSize = (int)member.ivalue;
-            return;
+            _blinkSeqSize = json_val.GetInt("blinkSeqSize");
         }
-        if (member.name == "blinkSeqSignature")
+        if (json_val.Has("blinkSeqMaxSize"))
         {
-            _blinkSeqSignature = (int)member.ivalue;
-            return;
+            _blinkSeqMaxSize = json_val.GetInt("blinkSeqMaxSize");
         }
-        if (member.name == "command")
+        if (json_val.Has("blinkSeqSignature"))
         {
-            _command = member.svalue;
-            return;
+            _blinkSeqSignature = json_val.GetInt("blinkSeqSignature");
         }
-        base._parseAttr(member);
+        if (json_val.Has("command"))
+        {
+            _command = json_val.GetString("command");
+        }
+        base._parseAttr(json_val);
     }
 
     /**
@@ -201,7 +188,7 @@ public class YColorLed : YFunction
     public int get_rgbColor()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return RGBCOLOR_INVALID;
@@ -236,8 +223,10 @@ public class YColorLed : YFunction
     public int set_rgbColor(int newval)
     {
         string rest_val;
-        rest_val = "0x"+(newval).ToString("X");
-        return _setAttr("rgbColor", rest_val);
+        lock (_thisLock) {
+            rest_val = "0x"+(newval).ToString("X");
+            return _setAttr("rgbColor", rest_val);
+        }
     }
 
     /**
@@ -258,7 +247,7 @@ public class YColorLed : YFunction
     public int get_hslColor()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return HSLCOLOR_INVALID;
@@ -293,14 +282,16 @@ public class YColorLed : YFunction
     public int set_hslColor(int newval)
     {
         string rest_val;
-        rest_val = "0x"+(newval).ToString("X");
-        return _setAttr("hslColor", rest_val);
+        lock (_thisLock) {
+            rest_val = "0x"+(newval).ToString("X");
+            return _setAttr("hslColor", rest_val);
+        }
     }
 
     public YColorLedMove get_rgbMove()
     {
         YColorLedMove res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return RGBMOVE_INVALID;
@@ -314,8 +305,10 @@ public class YColorLed : YFunction
     public int set_rgbMove(YColorLedMove newval)
     {
         string rest_val;
-        rest_val = (newval.target).ToString()+":"+(newval.ms).ToString();
-        return _setAttr("rgbMove", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval.target).ToString()+":"+(newval.ms).ToString();
+            return _setAttr("rgbMove", rest_val);
+        }
     }
 
     /**
@@ -351,7 +344,7 @@ public class YColorLed : YFunction
     public YColorLedMove get_hslMove()
     {
         YColorLedMove res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return HSLMOVE_INVALID;
@@ -365,8 +358,10 @@ public class YColorLed : YFunction
     public int set_hslMove(YColorLedMove newval)
     {
         string rest_val;
-        rest_val = (newval.target).ToString()+":"+(newval.ms).ToString();
-        return _setAttr("hslMove", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval.target).ToString()+":"+(newval.ms).ToString();
+            return _setAttr("hslMove", rest_val);
+        }
     }
 
     /**
@@ -417,7 +412,7 @@ public class YColorLed : YFunction
     public int get_rgbColorAtPowerOn()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return RGBCOLORATPOWERON_INVALID;
@@ -451,8 +446,10 @@ public class YColorLed : YFunction
     public int set_rgbColorAtPowerOn(int newval)
     {
         string rest_val;
-        rest_val = "0x"+(newval).ToString("X");
-        return _setAttr("rgbColorAtPowerOn", rest_val);
+        lock (_thisLock) {
+            rest_val = "0x"+(newval).ToString("X");
+            return _setAttr("rgbColorAtPowerOn", rest_val);
+        }
     }
 
     /**
@@ -473,7 +470,7 @@ public class YColorLed : YFunction
     public int get_blinkSeqSize()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return BLINKSEQSIZE_INVALID;
@@ -502,7 +499,7 @@ public class YColorLed : YFunction
     public int get_blinkSeqMaxSize()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration == 0) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return BLINKSEQMAXSIZE_INVALID;
@@ -535,7 +532,7 @@ public class YColorLed : YFunction
     public int get_blinkSeqSignature()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return BLINKSEQSIGNATURE_INVALID;
@@ -549,7 +546,7 @@ public class YColorLed : YFunction
     public string get_command()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
@@ -563,8 +560,10 @@ public class YColorLed : YFunction
     public int set_command(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("command", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("command", rest_val);
+        }
     }
 
     /**

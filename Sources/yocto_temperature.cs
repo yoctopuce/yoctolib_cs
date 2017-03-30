@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_temperature.cs 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: yocto_temperature.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindTemperature(), the high-level API for Temperature functions
  *
@@ -109,29 +109,25 @@ public class YTemperature : YSensor
 
     //--- (YTemperature implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "sensorType")
+        if (json_val.Has("sensorType"))
         {
-            _sensorType = (int)member.ivalue;
-            return;
+            _sensorType = json_val.GetInt("sensorType");
         }
-        if (member.name == "signalValue")
+        if (json_val.Has("signalValue"))
         {
-            _signalValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _signalValue = Math.Round(json_val.GetDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "signalUnit")
+        if (json_val.Has("signalUnit"))
         {
-            _signalUnit = member.svalue;
-            return;
+            _signalUnit = json_val.GetString("signalUnit");
         }
-        if (member.name == "command")
+        if (json_val.Has("command"))
         {
-            _command = member.svalue;
-            return;
+            _command = json_val.GetString("command");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -166,8 +162,10 @@ public class YTemperature : YSensor
     public int set_unit(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("unit", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("unit", rest_val);
+        }
     }
 
     /**
@@ -195,7 +193,7 @@ public class YTemperature : YSensor
     public int get_sensorType()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SENSORTYPE_INVALID;
@@ -240,8 +238,10 @@ public class YTemperature : YSensor
     public int set_sensorType(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("sensorType", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("sensorType", rest_val);
+        }
     }
 
     /**
@@ -262,7 +262,7 @@ public class YTemperature : YSensor
     public double get_signalValue()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SIGNALVALUE_INVALID;
@@ -291,7 +291,7 @@ public class YTemperature : YSensor
     public string get_signalUnit()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration == 0) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SIGNALUNIT_INVALID;
@@ -305,7 +305,7 @@ public class YTemperature : YSensor
     public string get_command()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
@@ -319,8 +319,10 @@ public class YTemperature : YSensor
     public int set_command(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("command", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("command", rest_val);
+        }
     }
 
     /**

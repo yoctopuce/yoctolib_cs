@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_digitalio.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_digitalio.cs 26988 2017-03-30 07:20:34Z seb $
  *
  * Implements yFindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -76,6 +76,7 @@ public class YDigitalIO : YFunction
     public const int PORTDIRECTION_INVALID = YAPI.INVALID_UINT;
     public const int PORTOPENDRAIN_INVALID = YAPI.INVALID_UINT;
     public const int PORTPOLARITY_INVALID = YAPI.INVALID_UINT;
+    public const int PORTDIAGS_INVALID = YAPI.INVALID_UINT;
     public const int PORTSIZE_INVALID = YAPI.INVALID_UINT;
     public const int OUTPUTVOLTAGE_USB_5V = 0;
     public const int OUTPUTVOLTAGE_USB_3V = 1;
@@ -86,6 +87,7 @@ public class YDigitalIO : YFunction
     protected int _portDirection = PORTDIRECTION_INVALID;
     protected int _portOpenDrain = PORTOPENDRAIN_INVALID;
     protected int _portPolarity = PORTPOLARITY_INVALID;
+    protected int _portDiags = PORTDIAGS_INVALID;
     protected int _portSize = PORTSIZE_INVALID;
     protected int _outputVoltage = OUTPUTVOLTAGE_INVALID;
     protected string _command = COMMAND_INVALID;
@@ -102,44 +104,41 @@ public class YDigitalIO : YFunction
 
     //--- (YDigitalIO implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "portState")
+        if (json_val.Has("portState"))
         {
-            _portState = (int)member.ivalue;
-            return;
+            _portState = json_val.GetInt("portState");
         }
-        if (member.name == "portDirection")
+        if (json_val.Has("portDirection"))
         {
-            _portDirection = (int)member.ivalue;
-            return;
+            _portDirection = json_val.GetInt("portDirection");
         }
-        if (member.name == "portOpenDrain")
+        if (json_val.Has("portOpenDrain"))
         {
-            _portOpenDrain = (int)member.ivalue;
-            return;
+            _portOpenDrain = json_val.GetInt("portOpenDrain");
         }
-        if (member.name == "portPolarity")
+        if (json_val.Has("portPolarity"))
         {
-            _portPolarity = (int)member.ivalue;
-            return;
+            _portPolarity = json_val.GetInt("portPolarity");
         }
-        if (member.name == "portSize")
+        if (json_val.Has("portDiags"))
         {
-            _portSize = (int)member.ivalue;
-            return;
+            _portDiags = json_val.GetInt("portDiags");
         }
-        if (member.name == "outputVoltage")
+        if (json_val.Has("portSize"))
         {
-            _outputVoltage = (int)member.ivalue;
-            return;
+            _portSize = json_val.GetInt("portSize");
         }
-        if (member.name == "command")
+        if (json_val.Has("outputVoltage"))
         {
-            _command = member.svalue;
-            return;
+            _outputVoltage = json_val.GetInt("outputVoltage");
         }
-        base._parseAttr(member);
+        if (json_val.Has("command"))
+        {
+            _command = json_val.GetString("command");
+        }
+        base._parseAttr(json_val);
     }
 
     /**
@@ -160,7 +159,7 @@ public class YDigitalIO : YFunction
     public int get_portState()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PORTSTATE_INVALID;
@@ -196,8 +195,10 @@ public class YDigitalIO : YFunction
     public int set_portState(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("portState", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("portState", rest_val);
+        }
     }
 
     /**
@@ -219,7 +220,7 @@ public class YDigitalIO : YFunction
     public int get_portDirection()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PORTDIRECTION_INVALID;
@@ -255,8 +256,10 @@ public class YDigitalIO : YFunction
     public int set_portDirection(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("portDirection", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("portDirection", rest_val);
+        }
     }
 
     /**
@@ -279,7 +282,7 @@ public class YDigitalIO : YFunction
     public int get_portOpenDrain()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PORTOPENDRAIN_INVALID;
@@ -316,8 +319,10 @@ public class YDigitalIO : YFunction
     public int set_portOpenDrain(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("portOpenDrain", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("portOpenDrain", rest_val);
+        }
     }
 
     /**
@@ -340,7 +345,7 @@ public class YDigitalIO : YFunction
     public int get_portPolarity()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PORTPOLARITY_INVALID;
@@ -378,8 +383,42 @@ public class YDigitalIO : YFunction
     public int set_portPolarity(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("portPolarity", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("portPolarity", rest_val);
+        }
+    }
+
+    /**
+     * <summary>
+     *   Returns the port state diagnostics (Yocto-IO and Yocto-MaxiIO-V2 only).
+     * <para>
+     *   Bit 0 indicates a shortcut on
+     *   output 0, etc. Bit 8 indicates a power failure, and bit 9 signals overheating (overcurrent).
+     *   During normal use, all diagnostic bits should stay clear.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the port state diagnostics (Yocto-IO and Yocto-MaxiIO-V2 only)
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YDigitalIO.PORTDIAGS_INVALID</c>.
+     * </para>
+     */
+    public int get_portDiags()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PORTDIAGS_INVALID;
+                }
+            }
+            res = this._portDiags;
+        }
+        return res;
     }
 
     /**
@@ -400,7 +439,7 @@ public class YDigitalIO : YFunction
     public int get_portSize()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PORTSIZE_INVALID;
@@ -430,7 +469,7 @@ public class YDigitalIO : YFunction
     public int get_outputVoltage()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return OUTPUTVOLTAGE_INVALID;
@@ -466,14 +505,16 @@ public class YDigitalIO : YFunction
     public int set_outputVoltage(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("outputVoltage", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("outputVoltage", rest_val);
+        }
     }
 
     public string get_command()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
@@ -487,8 +528,10 @@ public class YDigitalIO : YFunction
     public int set_command(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("command", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("command", rest_val);
+        }
     }
 
     /**

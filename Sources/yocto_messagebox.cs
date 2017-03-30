@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_messagebox.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_messagebox.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindMessageBox(), the high-level API for MessageBox functions
  *
@@ -1328,39 +1328,33 @@ public class YMessageBox : YFunction
 
     //--- (generated code: YMessageBox implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "slotsInUse")
+        if (json_val.Has("slotsInUse"))
         {
-            _slotsInUse = (int)member.ivalue;
-            return;
+            _slotsInUse = json_val.GetInt("slotsInUse");
         }
-        if (member.name == "slotsCount")
+        if (json_val.Has("slotsCount"))
         {
-            _slotsCount = (int)member.ivalue;
-            return;
+            _slotsCount = json_val.GetInt("slotsCount");
         }
-        if (member.name == "slotsBitmap")
+        if (json_val.Has("slotsBitmap"))
         {
-            _slotsBitmap = member.svalue;
-            return;
+            _slotsBitmap = json_val.GetString("slotsBitmap");
         }
-        if (member.name == "pduSent")
+        if (json_val.Has("pduSent"))
         {
-            _pduSent = (int)member.ivalue;
-            return;
+            _pduSent = json_val.GetInt("pduSent");
         }
-        if (member.name == "pduReceived")
+        if (json_val.Has("pduReceived"))
         {
-            _pduReceived = (int)member.ivalue;
-            return;
+            _pduReceived = json_val.GetInt("pduReceived");
         }
-        if (member.name == "command")
+        if (json_val.Has("command"))
         {
-            _command = member.svalue;
-            return;
+            _command = json_val.GetString("command");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -1381,7 +1375,7 @@ public class YMessageBox : YFunction
     public int get_slotsInUse()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SLOTSINUSE_INVALID;
@@ -1410,7 +1404,7 @@ public class YMessageBox : YFunction
     public int get_slotsCount()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SLOTSCOUNT_INVALID;
@@ -1424,7 +1418,7 @@ public class YMessageBox : YFunction
     public string get_slotsBitmap()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SLOTSBITMAP_INVALID;
@@ -1453,7 +1447,7 @@ public class YMessageBox : YFunction
     public int get_pduSent()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PDUSENT_INVALID;
@@ -1487,8 +1481,10 @@ public class YMessageBox : YFunction
     public int set_pduSent(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("pduSent", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("pduSent", rest_val);
+        }
     }
 
     /**
@@ -1509,7 +1505,7 @@ public class YMessageBox : YFunction
     public int get_pduReceived()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PDURECEIVED_INVALID;
@@ -1543,14 +1539,16 @@ public class YMessageBox : YFunction
     public int set_pduReceived(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("pduReceived", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("pduReceived", rest_val);
+        }
     }
 
     public string get_command()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
@@ -1564,8 +1562,10 @@ public class YMessageBox : YFunction
     public int set_command(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("command", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("command", rest_val);
+        }
     }
 
     /**

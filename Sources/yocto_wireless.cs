@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wireless.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_wireless.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -62,19 +62,13 @@ public class YWlanRecord
 
     public YWlanRecord(string data)
     {
-        YAPI.TJsonParser p;
-        Nullable<YAPI.TJSONRECORD> node;
         //--- (generated code: YWlanRecord attributes initialization)
         //--- (end of generated code: YWlanRecord attributes initialization)
-        p = new YAPI.TJsonParser(data, false);
-        node = p.GetChildNode(null, "ssid");
-        this._ssid = node.Value.svalue;
-        node = p.GetChildNode(null, "sec");
-        this._sec = node.Value.svalue;
-        node = p.GetChildNode(null, "rssi");
-        this._rssi = (int)node.Value.ivalue;
-        node = p.GetChildNode(null, "channel");
-        this._channel = (int)node.Value.ivalue;
+        YAPI.YJSONObject p = new YAPI.YJSONObject(data);
+        this._ssid = p.GetString("ssid");
+        this._sec = p.GetString("sec");
+        this._rssi = p.GetInt("rssi");
+        this._channel = p.GetInt("channel");
     }
 
   //--- (generated code: YWlanRecord implementation)
@@ -153,39 +147,33 @@ public class YWireless : YFunction
 
   //--- (generated code: YWireless implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "linkQuality")
+        if (json_val.Has("linkQuality"))
         {
-            _linkQuality = (int)member.ivalue;
-            return;
+            _linkQuality = json_val.GetInt("linkQuality");
         }
-        if (member.name == "ssid")
+        if (json_val.Has("ssid"))
         {
-            _ssid = member.svalue;
-            return;
+            _ssid = json_val.GetString("ssid");
         }
-        if (member.name == "channel")
+        if (json_val.Has("channel"))
         {
-            _channel = (int)member.ivalue;
-            return;
+            _channel = json_val.GetInt("channel");
         }
-        if (member.name == "security")
+        if (json_val.Has("security"))
         {
-            _security = (int)member.ivalue;
-            return;
+            _security = json_val.GetInt("security");
         }
-        if (member.name == "message")
+        if (json_val.Has("message"))
         {
-            _message = member.svalue;
-            return;
+            _message = json_val.GetString("message");
         }
-        if (member.name == "wlanConfig")
+        if (json_val.Has("wlanConfig"))
         {
-            _wlanConfig = member.svalue;
-            return;
+            _wlanConfig = json_val.GetString("wlanConfig");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -206,7 +194,7 @@ public class YWireless : YFunction
     public int get_linkQuality()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LINKQUALITY_INVALID;
@@ -235,7 +223,7 @@ public class YWireless : YFunction
     public string get_ssid()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SSID_INVALID;
@@ -264,7 +252,7 @@ public class YWireless : YFunction
     public int get_channel()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CHANNEL_INVALID;
@@ -295,7 +283,7 @@ public class YWireless : YFunction
     public int get_security()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SECURITY_INVALID;
@@ -324,7 +312,7 @@ public class YWireless : YFunction
     public string get_message()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return MESSAGE_INVALID;
@@ -338,7 +326,7 @@ public class YWireless : YFunction
     public string get_wlanConfig()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return WLANCONFIG_INVALID;
@@ -352,8 +340,10 @@ public class YWireless : YFunction
     public int set_wlanConfig(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("wlanConfig", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("wlanConfig", rest_val);
+        }
     }
 
     /**

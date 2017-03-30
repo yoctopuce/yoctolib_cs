@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 26849 2017-03-17 17:28:31Z seb $
+ * $Id: yocto_api.cs 26998 2017-03-30 16:20:06Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -45,7 +45,7 @@ using System.Security;
 
 
 using System.Diagnostics;
-
+using System.Linq;
 using YHANDLE = System.Int32;
 using YRETCODE = System.Int32;
 using s8 = System.SByte;
@@ -1048,669 +1048,10 @@ internal static class SafeNativeMethods
 }
 
 
+
+
 public class YAPI
 {
-
-    public enum TJSONRECORDTYPE
-    {
-        JSON_STRING,
-        JSON_INTEGER,
-        JSON_BOOLEAN,
-        JSON_STRUCT,
-        JSON_ARRAY
-    }
-
-    public struct TJSONRECORD
-    {
-        public string name;
-        public TJSONRECORDTYPE recordtype;
-        public string svalue;
-        public long ivalue;
-        public bool bvalue;
-        public int membercount;
-        public int memberAllocated;
-        public TJSONRECORD[] members;
-        public int itemcount;
-        public int itemAllocated;
-        public TJSONRECORD[] items;
-    }
-
-    public class TJsonParser
-    {
-        private enum Tjstate
-        {
-            JSTART,
-            JWAITFORNAME,
-            JWAITFORENDOFNAME,
-            JWAITFORCOLON,
-            JWAITFORDATA,
-            JWAITFORNEXTSTRUCTMEMBER,
-            JWAITFORNEXTARRAYITEM,
-            JSCOMPLETED,
-            JWAITFORSTRINGVALUE,
-            JWAITFORINTVALUE,
-            JWAITFORBOOLVALUE
-        }
-
-        private const int JSONGRANULARITY = 10;
-        public int httpcode;
-
-        private TJSONRECORD data;
-        public TJsonParser(string jsonData) : this(jsonData,true)
-          { }
-
-
-        public TJsonParser(string jsonData, bool withHTTPHeader )
-        {
-            const string httpheader = "HTTP/1.1 ";
-            const string okHeader = "OK\r\n";
-            string errmsg = null;
-            int p1 = 0;
-            int p2 = 0;
-            const string CR = "\r\n";
-            int start_struct, start_array;
-
-            if (withHTTPHeader)
-            {
-              if (jsonData.Substring(0, okHeader.Length) == okHeader)
-              {
-                httpcode = 200;
-
-              }
-              else
-              {
-                if (jsonData.Substring(0, httpheader.Length) != httpheader)
-                {
-                  errmsg = "data should start with " + httpheader;
-                  throw new System.Exception(errmsg);
-                }
-
-                p1 = jsonData.IndexOf(" ", httpheader.Length - 1);
-                p2 = jsonData.IndexOf(" ", p1 + 1);
-
-                httpcode = Convert.ToInt32(jsonData.Substring(p1, p2 - p1 + 1));
-
-                if (httpcode != 200)
-                  return;
-              }
-              p1 = jsonData.IndexOf(CR + CR + "{"); //json data is a structure
-              if (p1 < 0) p1 = jsonData.IndexOf(CR + CR + "["); // json data is an array
-
-              if (p1 < 0)
-              {
-                errmsg = "data  does not contain JSON data";
-                throw new System.Exception(errmsg);
-              }
-
-              jsonData = jsonData.Substring(p1 + 4, jsonData.Length - p1 - 4);
-            }
-            else
-            {
-              start_struct = jsonData.IndexOf( "{"); //json data is a structure
-              start_array = jsonData.IndexOf( "["); // json data is an array
-              if ((start_struct < 0) && (start_array < 0))
-              {
-                 errmsg = "data  does not contain JSON data";
-                 throw new System.Exception(errmsg);
-              }
-            }
-            data = (TJSONRECORD)Parse(jsonData);
-        }
-
-        public string  convertToString(Nullable<TJSONRECORD> p, bool showNamePrefix)
-        {
-            string buffer;
-
-            if (p==null)
-                p=data;
-
-            if  (p.Value.name!="" && showNamePrefix)
-                buffer= '"'+p.Value.name+"\":";
-            else
-                buffer="";
-            switch (p.Value.recordtype) {
-            case TJSONRECORDTYPE.JSON_STRING:
-                buffer = buffer + '"' + p.Value.svalue + '"';
-                break;
-            case TJSONRECORDTYPE.JSON_INTEGER:
-                buffer = buffer + p.Value.ivalue;
-                break;
-            case TJSONRECORDTYPE.JSON_BOOLEAN:
-                buffer = buffer + (p.Value.bvalue ? "TRUE" : "FALSE");
-                break;
-            case TJSONRECORDTYPE.JSON_STRUCT:
-                buffer = buffer + '{';
-                for (int i=0;i<p.Value.membercount;i++) {
-                    if (i>0)
-                        buffer=buffer+',';
-                    buffer=buffer+this.convertToString(p.Value.members[i],true);
-                }
-                buffer= buffer+'}';
-                break;
-             case TJSONRECORDTYPE.JSON_ARRAY:
-                buffer = buffer + '[';
-                for (int i=0;i<p.Value.itemcount;i++) {
-                    if (i>0)
-                        buffer=buffer+',';
-                    buffer=buffer+this.convertToString(p.Value.items[i],false);
-                }
-                buffer= buffer+']';
-               break;
-            }
-            return  buffer;
-        }
-
-
-        public void Dispose()
-        {
-            freestructure(ref data);
-        }
-
-        public TJSONRECORD GetRootNode()
-        {
-            return data;
-        }
-
-        private Nullable<TJSONRECORD> Parse(string st)
-        {
-            int i = 0;
-            st = "\"root\" : " + st + " ";
-            return ParseEx(Tjstate.JWAITFORNAME, "", ref st, ref i);
-        }
-
-        private void ParseError(ref string st, int i, string errmsg)
-        {
-            int ststart = 0;
-            int stend = 0;
-            ststart = i - 10;
-            stend = i + 10;
-            if (ststart < 0) ststart = 0;
-            if (stend > st.Length) stend = st.Length - 1;
-            errmsg = errmsg + " near " + st.Substring(ststart, i - ststart) + "*" + st.Substring(i, stend - i - 1);
-            throw new System.Exception(errmsg);
-        }
-
-        private TJSONRECORD createStructRecord(string name)
-        {
-            TJSONRECORD res = default(TJSONRECORD);
-            res.recordtype = TJSONRECORDTYPE.JSON_STRUCT;
-            res.name = name;
-            res.svalue = "";
-            res.ivalue = 0;
-            res.bvalue = false;
-            res.membercount = 0;
-            res.memberAllocated = JSONGRANULARITY;
-            Array.Resize(ref res.members, res.memberAllocated);
-            res.itemcount = 0;
-            res.itemAllocated = 0;
-            res.items = null;
-            return res;
-        }
-
-        private TJSONRECORD createArrayRecord(string name)
-        {
-            TJSONRECORD res = default(TJSONRECORD);
-            res.recordtype = TJSONRECORDTYPE.JSON_ARRAY;
-            res.name = name;
-            res.svalue = "";
-            res.ivalue = 0;
-            res.bvalue = false;
-            res.itemcount = 0;
-            res.itemAllocated = JSONGRANULARITY;
-            Array.Resize(ref res.items, res.itemAllocated);
-            res.membercount = 0;
-            res.memberAllocated = 0;
-            res.members = null;
-            return res;
-        }
-
-        private TJSONRECORD createStrRecord(string name, string value)
-        {
-            TJSONRECORD res = default(TJSONRECORD);
-            res.recordtype = TJSONRECORDTYPE.JSON_STRING;
-            res.name = name;
-            res.svalue = value;
-            res.ivalue = 0;
-            res.bvalue = false;
-            res.itemcount = 0;
-            res.itemAllocated = 0;
-            res.items = null;
-            res.membercount = 0;
-            res.memberAllocated = 0;
-            res.members = null;
-            return res;
-        }
-
-        private TJSONRECORD createIntRecord(string name, long value)
-        {
-            TJSONRECORD res = default(TJSONRECORD);
-            res.recordtype = TJSONRECORDTYPE.JSON_INTEGER;
-            res.name = name;
-            res.svalue = "";
-            res.ivalue = value;
-            res.bvalue = false;
-            res.itemcount = 0;
-            res.itemAllocated = 0;
-            res.items = null;
-            res.membercount = 0;
-            res.memberAllocated = 0;
-            res.members = null;
-            return res;
-        }
-
-        private TJSONRECORD createBoolRecord(string name, bool value)
-        {
-            TJSONRECORD res = default(TJSONRECORD);
-            res.recordtype = TJSONRECORDTYPE.JSON_BOOLEAN;
-            res.name = name;
-            res.svalue = "";
-            res.ivalue = 0;
-            res.bvalue = value;
-            res.itemcount = 0;
-            res.itemAllocated = 0;
-            res.items = null;
-            res.membercount = 0;
-            res.memberAllocated = 0;
-            res.members = null;
-            return res;
-        }
-
-        private void add2StructRecord(ref TJSONRECORD container, ref TJSONRECORD element)
-        {
-            if (container.recordtype != TJSONRECORDTYPE.JSON_STRUCT)
-                throw new System.Exception("container is not a struct type");
-            if ((container.membercount >= container.memberAllocated))
-            {
-                Array.Resize(ref container.members, container.memberAllocated + JSONGRANULARITY);
-                container.memberAllocated = container.memberAllocated + JSONGRANULARITY;
-            }
-            container.members[container.membercount] = element;
-            container.membercount = container.membercount + 1;
-        }
-
-        private void add2ArrayRecord(ref TJSONRECORD container, ref TJSONRECORD element)
-        {
-            if (container.recordtype != TJSONRECORDTYPE.JSON_ARRAY)
-                throw new System.Exception("container is not an array type");
-            if ((container.itemcount >= container.itemAllocated))
-            {
-                Array.Resize(ref container.items, container.itemAllocated + JSONGRANULARITY);
-                container.itemAllocated = container.itemAllocated + JSONGRANULARITY;
-            }
-            container.items[container.itemcount] = element;
-            container.itemcount = container.itemcount + 1;
-        }
-
-        private char Skipgarbage(ref string st, ref int i)
-        {
-            char sti = st[i];
-            while ((i < st.Length & (sti == '\n' | sti == '\r' | sti == ' ')))
-            {
-                i = i + 1;
-                if (i < st.Length) sti = st[i];
-            }
-            return sti;
-        }
-
-
-        private Nullable<TJSONRECORD> ParseEx(Tjstate initialstate, string defaultname, ref string st, ref int i)
-        {
-            Nullable<TJSONRECORD> functionReturnValue = default(Nullable<TJSONRECORD>);
-            TJSONRECORD res = default(TJSONRECORD);
-            TJSONRECORD value = default(TJSONRECORD);
-            Tjstate state = default(Tjstate);
-            string svalue = "";
-            long ivalue = 0;
-            long isign = 0;
-            char sti = '\0';
-
-            string name = null;
-
-            name = defaultname;
-            state = initialstate;
-            isign = 1;
-
-            ivalue = 0;
-
-            while (i < st.Length)
-            {
-                sti = st[i];
-                switch (state)
-                {
-                    case Tjstate.JWAITFORNAME:
-                        if (sti == '"')
-                        {
-                            state = Tjstate.JWAITFORENDOFNAME;
-                        }
-                        else
-                        {
-                            if (sti != ' ' & sti != '\n' & sti != ' ')
-                                ParseError(ref st, i, "invalid char: was expecting \"");
-                        }
-
-                        break;
-                    case Tjstate.JWAITFORENDOFNAME:
-
-                       if (sti == '"')
-                        {
-                            state = Tjstate.JWAITFORCOLON;
-                        }
-                        else
-                        {
-                            if (sti >= 32)
-                                name = name + sti;
-                            else
-                                ParseError(ref st, i, "invalid char: was expecting an identifier compliant char");
-                        }
-
-                        break;
-                    case Tjstate.JWAITFORCOLON:
-                        if (sti == ':')
-                        {
-                            state = Tjstate.JWAITFORDATA;
-                        }
-                        else
-                        {
-                            if (sti != ' ' & sti != '\n' & sti != ' ')
-                                ParseError(ref st, i, "invalid char: was expecting \"");
-                        }
-                        break;
-                    case Tjstate.JWAITFORDATA:
-                        if (sti == '{')
-                        {
-                            res = createStructRecord(name);
-                            state = Tjstate.JWAITFORNEXTSTRUCTMEMBER;
-                        }
-                        else if (sti == '[')
-                        {
-                            res = createArrayRecord(name);
-                            state = Tjstate.JWAITFORNEXTARRAYITEM;
-                        }
-                        else if (sti == '"')
-                        {
-                            svalue = "";
-                            state = Tjstate.JWAITFORSTRINGVALUE;
-                        }
-                        else if (sti >= '0' & sti <= '9')
-                        {
-                            state = Tjstate.JWAITFORINTVALUE;
-                            ivalue = sti - 48;
-                            isign = 1;
-                        }
-                        else if (sti == '-')
-                        {
-                            state = Tjstate.JWAITFORINTVALUE;
-                            ivalue = 0;
-                            isign = -1;
-                        }
-                        else if (sti == 't' || sti == 'f' || sti == 'T' || sti == 'F')
-                        {
-                            svalue = sti.ToString().ToUpper();
-                            state = Tjstate.JWAITFORBOOLVALUE;
-                        }
-                        else if (sti != ' ' & sti != '\n' & sti != ' ')
-                        {
-                            ParseError(ref st, i, "invalid char: was expecting  \",0..9,t or f");
-                        }
-                        break;
-                    case Tjstate.JWAITFORSTRINGVALUE:
-                        if ((sti == '\\') && (i+1 < st.Length))
-                        {
-                          svalue = svalue + st[i+1];
-                          i+=1;
-                         }
-                        else
-                       if (sti == '"')
-                        {
-                            state = Tjstate.JSCOMPLETED;
-                            res = createStrRecord(name, svalue);
-                        }
-                        else if (sti < 32)
-                        {
-                            ParseError(ref st, i, "invalid char: was expecting string value");
-                        }
-                        else
-                        {
-                            svalue = svalue + sti;
-                        }
-                        break;
-                    case Tjstate.JWAITFORINTVALUE:
-                        if (sti >= '0' & sti <= '9')
-                        {
-                            ivalue = (ivalue * 10) + sti - 48;
-                        }
-                        else
-                        {
-                            res = createIntRecord(name, isign * ivalue);
-                            state = Tjstate.JSCOMPLETED;
-                            i = i - 1;
-                        }
-                        break;
-                    case Tjstate.JWAITFORBOOLVALUE:
-                        if (sti < 'A' | sti > 'Z')
-                        {
-                            if (svalue != "TRUE" & svalue != "FALSE")
-                                ParseError(ref st, i, "unexpected value, was expecting \"true\" or \"false\"");
-                            if (svalue == "TRUE")
-                                res = createBoolRecord(name, true);
-                            else
-                                res = createBoolRecord(name, false);
-                            state = Tjstate.JSCOMPLETED;
-                            i = i - 1;
-                        }
-                        else
-                        {
-                            svalue = svalue + sti.ToString().ToUpper();
-                        }
-                        break;
-                    case Tjstate.JWAITFORNEXTSTRUCTMEMBER:
-                        sti = Skipgarbage(ref st, ref i);
-                        if (i < st.Length)
-                        {
-                            if (sti == '}')
-                            {
-                                functionReturnValue = res;
-                                i = i + 1;
-                                return functionReturnValue;
-                            }
-                            else
-                            {
-                                value = (TJSONRECORD)ParseEx(Tjstate.JWAITFORNAME, "", ref st, ref i);
-                                add2StructRecord(ref res, ref value);
-                                sti = Skipgarbage(ref st, ref i);
-                                if (i < st.Length)
-                                {
-                                    if (sti == '}' & i < st.Length)
-                                    {
-                                        i = i - 1;
-                                    }
-                                    else if (sti != ' ' & sti != '\n' & sti != ' ' & sti != ',')
-                                    {
-                                        ParseError(ref st, i, "invalid char: vas expecting , or }");
-                                    }
-                                }
-                            }
-
-                        }
-                        break;
-                    case Tjstate.JWAITFORNEXTARRAYITEM:
-                        sti = Skipgarbage(ref st, ref i);
-                        if (i < st.Length)
-                        {
-                            if (sti == ']')
-                            {
-                                functionReturnValue = res;
-                                i = i + 1;
-                                return functionReturnValue;
-                            }
-                            else
-                            {
-                                value = (TJSONRECORD)ParseEx(Tjstate.JWAITFORDATA, res.itemcount.ToString(), ref st, ref i);
-                                add2ArrayRecord(ref res, ref value);
-                                sti = Skipgarbage(ref st, ref i);
-                                if (i < st.Length)
-                                {
-                                    if (sti == ']' & i < st.Length)
-                                    {
-                                        i = i - 1;
-                                    }
-                                    else if (sti != ' ' & sti != '\n' & sti != ' ' & sti != ',')
-                                    {
-                                        ParseError(ref st, i, "invalid char: vas expecting , or ]");
-                                    }
-                                }
-                            }
-                        }
-                        break;
-                    case Tjstate.JSCOMPLETED:
-                        functionReturnValue = res;
-                        return functionReturnValue;
-                }
-                i++;
-            }
-            ParseError(ref st, i, "unexpected end of data");
-            functionReturnValue = null;
-            return functionReturnValue;
-        }
-
-        private void DumpStructureRec(ref TJSONRECORD p, ref int deep)
-        {
-            string line = null;
-            string indent = null;
-            int i = 0;
-            line = "";
-            indent = "";
-            for (i = 0; i <= deep * 2; i++)
-            {
-                indent = indent + " ";
-            }
-            line = indent + p.name + ":";
-            switch (p.recordtype)
-            {
-                case TJSONRECORDTYPE.JSON_STRING:
-                    line = line + " str=" + p.svalue;
-                    Console.WriteLine(line);
-                    break;
-                case TJSONRECORDTYPE.JSON_INTEGER:
-                    line = line + " int =" + p.ivalue.ToString();
-                    Console.WriteLine(line);
-                    break;
-                case TJSONRECORDTYPE.JSON_BOOLEAN:
-                    if (p.bvalue)
-                        line = line + " bool = TRUE";
-                    else
-                        line = line + " bool = FALSE";
-                    Console.WriteLine(line);
-                    break;
-                case TJSONRECORDTYPE.JSON_STRUCT:
-                    Console.WriteLine(line + " struct");
-                    for (i = 0; i <= p.membercount - 1; i++)
-                    {
-                        DumpStructureRec(ref p.members[i], ref deep);
-                    }
-
-                    break;
-                case TJSONRECORDTYPE.JSON_ARRAY:
-                    Console.WriteLine(line + " array");
-                    for (i = 0; i <= p.itemcount - 1; i++)
-                    {
-                        DumpStructureRec(ref p.items[i], ref deep);
-                    }
-
-                    break;
-            }
-        }
-
-
-        private void freestructure(ref TJSONRECORD p)
-        {
-            switch (p.recordtype)
-            {
-                case TJSONRECORDTYPE.JSON_STRUCT:
-                    for (int i = p.membercount - 1; i >= 0; i += -1)
-                    {
-                        freestructure(ref p.members[i]);
-                    }
-
-                    p.members = new TJSONRECORD[1];
-
-                    break;
-                case TJSONRECORDTYPE.JSON_ARRAY:
-                    for (int i = p.itemcount - 1; i >= 0; i += -1)
-                    {
-                        freestructure(ref p.items[i]);
-                    }
-
-                    p.items = new TJSONRECORD[1];
-                    break;
-            }
-        }
-
-
-        public void DumpStructure()
-        {
-            int i = 0;
-            DumpStructureRec(ref data, ref i);
-        }
-
-
-
-
-        public Nullable<TJSONRECORD> GetChildNode(Nullable<TJSONRECORD> parent, string nodename)
-        {
-            Nullable<TJSONRECORD> functionReturnValue = default(Nullable<TJSONRECORD>);
-            int i = 0;
-            int index = 0;
-            Nullable<TJSONRECORD> p = parent;
-
-            if (p == null)
-                p = data;
-
-            if (p.Value.recordtype == TJSONRECORDTYPE.JSON_STRUCT)
-            {
-                for (i = 0; i <= p.Value.membercount - 1; i++)
-                {
-                    if (p.Value.members[i].name == nodename)
-                    {
-                        functionReturnValue = p.Value.members[i];
-                        return functionReturnValue;
-                    }
-
-                }
-            }
-            else if (p.Value.recordtype == TJSONRECORDTYPE.JSON_ARRAY)
-            {
-                index = Convert.ToInt32(nodename);
-                if ((index >= p.Value.itemcount))
-                    throw new System.Exception("index out of bounds " + nodename + ">=" + p.Value.itemcount.ToString());
-                functionReturnValue = p.Value.items[index];
-                return functionReturnValue;
-            }
-
-            functionReturnValue = null;
-            return functionReturnValue;
-        }
-
-       public List<string> GetAllChilds(Nullable<TJSONRECORD> parent)
-         {
-            List<string> res = new List<string>();
-            Nullable<TJSONRECORD> p = parent;
-
-            if (p == null) p = data;
-
-            if  (p.Value.recordtype == TJSONRECORDTYPE.JSON_STRUCT)
-              {
-                 for (int i=0; i< p.Value.membercount;i++)
-                   res.Add(this.convertToString(p.Value.members[i],false));
-              }
-           else if  (p.Value.recordtype == TJSONRECORDTYPE.JSON_ARRAY)
-              {
-                 for (int i=0; i< p.Value.itemcount;i++)
-                   res.Add(this.convertToString(p.Value.items[i],false));
-              }
-           return res;
-         }
-    }
 
     public static Encoding DefaultEncoding = System.Text.Encoding.GetEncoding("iso-8859-1");
 
@@ -1739,14 +1080,20 @@ public class YAPI
     public const int Y_DETECT_USB = 1;
     public const int Y_DETECT_NET = 2;
     public const int Y_RESEND_MISSING_PKT = 4;
-
-
     public const int Y_DETECT_ALL = Y_DETECT_USB | Y_DETECT_NET;
+
+
+    public const int DETECT_NONE = 0;
+    public const int DETECT_USB = 1;
+    public const int DETECT_NET = 2;
+    public const int RESEND_MISSING_PKT = 4;
+    public const int DETECT_ALL = DETECT_USB | DETECT_NET;
+
 
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "26849";
+    public const string YOCTO_API_BUILD_NO = "26999";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -1857,11 +1204,744 @@ public class YAPI
         context.errmsg = errmsg;
     }
 
+
+
+
+    internal static int ParseHTTP(string data, int start, int stop, out int headerlen, out string errmsg)
+    {
+        const string httpheader = "HTTP/1.1 ";
+        const string okHeader = "OK\r\n";
+        int p1 = 0;
+        int p2 = 0;
+        const string CR = "\r\n";
+        int httpcode;
+
+        if ((stop-start) > okHeader.Length  && data.Substring(start, okHeader.Length) == okHeader) {
+            httpcode = 200;
+            errmsg = "";
+        }
+        else {
+            if ((stop - start) < httpheader.Length ||data.Substring(start, httpheader.Length) != httpheader) {
+                errmsg = "data should start with " + httpheader;
+                headerlen = 0;
+                return -1;
+            }
+
+            p1 = data.IndexOf(" ", start + httpheader.Length - 1);
+            p2 = data.IndexOf(" ", p1 + 1);
+            if (p1 < 0 || p2 < 0) {
+                errmsg = "Invalid HTTP header (invalid first line)";
+                headerlen = 0;
+                return -1;
+            }
+
+            httpcode = Convert.ToInt32(data.Substring(p1, p2 - p1 + 1));
+            if (httpcode != 200) {
+                errmsg = string.Format("Unexpected HTTP return code:{0}", httpcode);
+            }else {
+                errmsg = "";
+            }
+        }
+        p1 = data.IndexOf(CR + CR, start); //json data is a structure
+        if (p1 < 0) {
+            errmsg = "Invalid HTTP header (missing header end)";
+            headerlen = 0;
+            return -1;
+        }
+        headerlen = p1 + 4;
+        return httpcode;
+    }
+
+
+    public abstract class YJSONContent
+    {
+        protected string _data;
+        protected int _data_start;
+        protected int _data_len;
+        protected int _data_boundary;
+        protected YJSONType _type;
+        //protected string debug;
+
+        public enum YJSONType
+        {
+            STRING,
+            NUMBER,
+            ARRAY,
+            OBJECT
+        }
+
+        protected enum Tjstate
+        {
+            JSTART,
+            JWAITFORNAME,
+            JWAITFORENDOFNAME,
+            JWAITFORCOLON,
+            JWAITFORDATA,
+            JWAITFORNEXTSTRUCTMEMBER,
+            JWAITFORNEXTARRAYITEM,
+            JWAITFORSTRINGVALUE,
+            JWAITFORSTRINGVALUE_ESC,
+            JWAITFORINTVALUE,
+            JWAITFORBOOLVALUE
+        }
+
+        public static YJSONContent ParseJson(string data, int start, int stop)
+        {
+            int cur_pos = SkipGarbage(data, start, stop);
+            YJSONContent res;
+            if (data[cur_pos] == '[') {
+                res = new YJSONArray(data, start, stop);
+            } else if (data[cur_pos] == '{') {
+                res = new YJSONObject(data, start, stop);
+            } else if (data[cur_pos] == '"') {
+                res = new YJSONString(data, start, stop);
+            } else {
+                res = new GetYJSONNumber(data, start, stop);
+            }
+            res.Parse();
+            return res;
+        }
+
+        protected YJSONContent(string data, int start, int stop, YJSONType type)
+        {
+            _data = data;
+            _data_start = start;
+            _data_boundary = stop;
+            _type = type;
+        }
+
+        protected YJSONContent(YJSONType type)
+        {
+            _data = null;
+        }
+
+        public YJSONType GetJSONType()
+        {
+            return _type;
+        }
+        public abstract int Parse();
+
+        protected static int SkipGarbage(string data, int start, int stop)
+        {
+            if (data.Length <= start) {
+                return start;
+            }
+            char sti = data[start];
+            while (start < stop && (sti == '\n' || sti == '\r' || sti == ' ')) {
+                start++;
+            }
+            return start;
+        }
+
+        protected string FormatError(string errmsg, int cur_pos)
+        {
+            int ststart = cur_pos - 10;
+            int stend = cur_pos + 10;
+            if (ststart < 0)
+                ststart = 0;
+            if (stend > _data_boundary)
+                stend = _data_boundary;
+            if (_data == null) {
+                return errmsg;
+            }
+            return errmsg + " near " + _data.Substring(ststart, cur_pos - ststart) + _data.Substring(cur_pos, stend - cur_pos);
+        }
+
+        public abstract string ToJSON();
+    }
+
+    internal class YJSONArray : YJSONContent
+    {
+        private List<YJSONContent> _arrayValue = new List<YJSONContent>();
+
+        public YJSONArray(string data, int start, int stop) : base(data, start, stop, YJSONType.ARRAY)
+        { }
+
+        public YJSONArray(string data) : this(data, 0, data.Length)
+        { }
+
+        public YJSONArray() : base(YJSONType.ARRAY)
+        { }
+
+        public int Length {
+            get {
+                return _arrayValue.Count;
+            }
+        }
+
+        public override int Parse()
+        {
+            int cur_pos = SkipGarbage(_data, _data_start, _data_boundary);
+
+            if (_data[cur_pos] != '[') {
+                throw new System.Exception(FormatError("Opening braces was expected", cur_pos));
+            }
+            cur_pos++;
+            Tjstate state = Tjstate.JWAITFORDATA;
+
+            while (cur_pos < _data_boundary) {
+                char sti = _data[cur_pos];
+                switch (state) {
+                    case Tjstate.JWAITFORDATA:
+                        if (sti == '{') {
+                            YJSONObject jobj = new YJSONObject(_data, cur_pos, _data_boundary);
+                            int len = jobj.Parse();
+                            cur_pos += len;
+                            _arrayValue.Add(jobj);
+                            state = Tjstate.JWAITFORNEXTARRAYITEM;
+                            //cur_pos is already incremented
+                            continue;
+                        } else if (sti == '[') {
+                            YJSONArray jobj = new YJSONArray(_data, cur_pos, _data_boundary);
+                            int len = jobj.Parse();
+                            cur_pos += len;
+                            _arrayValue.Add(jobj);
+                            state = Tjstate.JWAITFORNEXTARRAYITEM;
+                            //cur_pos is already incremented
+                            continue;
+                        } else if (sti == '"') {
+                            YJSONString jobj = new YJSONString(_data, cur_pos, _data_boundary);
+                            int len = jobj.Parse();
+                            cur_pos += len;
+                            _arrayValue.Add(jobj);
+                            state = Tjstate.JWAITFORNEXTARRAYITEM;
+                            //cur_pos is already incremented
+                            continue;
+                        } else if (sti == '-' || (sti >= '0' && sti <= '9')) {
+                            GetYJSONNumber jobj = new GetYJSONNumber(_data, cur_pos, _data_boundary);
+                            int len = jobj.Parse();
+                            cur_pos += len;
+                            _arrayValue.Add(jobj);
+                            state = Tjstate.JWAITFORNEXTARRAYITEM;
+                            //cur_pos is already incremented
+                            continue;
+                        } else if (sti == ']') {
+                            _data_len = cur_pos + 1 - _data_start;
+                            return _data_len;
+                        } else if (sti != ' ' && sti != '\n' && sti != '\r') {
+                            throw new System.Exception(FormatError("invalid char: was expecting  \",0..9,t or f", cur_pos));
+                        }
+                        break;
+                    case Tjstate.JWAITFORNEXTARRAYITEM:
+                        if (sti == ',') {
+                            state = Tjstate.JWAITFORDATA;
+                        } else if (sti == ']') {
+                            _data_len = cur_pos + 1 - _data_start;
+                            return _data_len;
+                        } else {
+                            if (sti != ' ' && sti != '\n' && sti != '\r') {
+                                throw new System.Exception(FormatError("invalid char: was expecting ,", cur_pos));
+                            }
+                        }
+                        break;
+                    default:
+                        throw new System.Exception(FormatError("invalid state for YJSONObject", cur_pos));
+                }
+                cur_pos++;
+            }
+            throw new System.Exception(FormatError("unexpected end of data", cur_pos));
+        }
+
+        public YJSONObject GetYJSONObject(int i)
+        {
+            return (YJSONObject)_arrayValue[i];
+        }
+
+        public string GetString(int i)
+        {
+            YJSONString ystr = (YJSONString)_arrayValue[i];
+            return ystr.GetString();
+        }
+
+        public YJSONContent Get(int i)
+        {
+            return _arrayValue[i];
+        }
+
+        public YJSONArray GetYJSONArray(int i)
+        {
+            return (YJSONArray)_arrayValue[i];
+        }
+
+        public int GetInt(int i)
+        {
+            GetYJSONNumber ystr = (GetYJSONNumber)_arrayValue[i];
+            return ystr.GetInt();
+        }
+
+        public long GetLong(int i)
+        {
+            GetYJSONNumber ystr = (GetYJSONNumber)_arrayValue[i];
+            return ystr.GetLong();
+        }
+
+        public void Put(string flatAttr)
+        {
+            YJSONString strobj = new YJSONString();
+            strobj.setContent(flatAttr);
+            _arrayValue.Add(strobj);
+        }
+
+        public override string ToJSON()
+        {
+            StringBuilder res = new StringBuilder();
+            res.Append('[');
+            string sep = "";
+            foreach (YJSONContent yjsonContent in _arrayValue) {
+                string subres = yjsonContent.ToJSON();
+                res.Append(sep);
+                res.Append(subres);
+                sep = ",";
+            }
+            res.Append(']');
+            return res.ToString();
+        }
+
+        public override string ToString()
+        {
+            StringBuilder res = new StringBuilder();
+            res.Append('[');
+            string sep = "";
+            foreach (YJSONContent yjsonContent in _arrayValue) {
+                string subres = yjsonContent.ToString();
+                res.Append(sep);
+                res.Append(subres);
+                sep = ",";
+            }
+            res.Append(']');
+            return res.ToString();
+        }
+    }
+
+    internal class YJSONString : YJSONContent
+    {
+        private string _stringValue;
+
+        public YJSONString(string data, int start, int stop) : base(data, start, stop, YJSONType.STRING)
+        { }
+
+        public YJSONString(string data) : this(data, 0, data.Length)
+        { }
+
+        public YJSONString() : base(YJSONType.STRING)
+        { }
+
+        public override int Parse()
+        {
+            string value = "";
+            int cur_pos = SkipGarbage(_data, _data_start, _data_boundary);
+
+            if (_data[cur_pos] != '"') {
+                throw new System.Exception(FormatError("double quote was expected", cur_pos));
+            }
+            cur_pos++;
+            int str_start = cur_pos;
+            Tjstate state = Tjstate.JWAITFORSTRINGVALUE;
+
+            while (cur_pos < _data_boundary) {
+                char sti = _data[cur_pos];
+                switch (state) {
+                    case Tjstate.JWAITFORSTRINGVALUE:
+                        if (sti == '\\') {
+                            value += _data.Substring(str_start, cur_pos - str_start);
+                            str_start = cur_pos;
+                            state = Tjstate.JWAITFORSTRINGVALUE_ESC;
+                        } else if (sti == '"') {
+                            value += _data.Substring(str_start, cur_pos - str_start);
+                            _stringValue = value;
+                            _data_len = (cur_pos + 1) - _data_start;
+                            return _data_len;
+                        } else if (sti < 32) {
+                            throw new System.Exception(FormatError("invalid char: was expecting string value", cur_pos));
+                        }
+                        break;
+                    case Tjstate.JWAITFORSTRINGVALUE_ESC:
+                        value += sti;
+                        state = Tjstate.JWAITFORSTRINGVALUE;
+                        str_start = cur_pos + 1;
+                        break;
+                    default:
+                        throw new System.Exception(FormatError("invalid state for YJSONObject", cur_pos));
+                }
+                cur_pos++;
+            }
+            throw new System.Exception(FormatError("unexpected end of data", cur_pos));
+        }
+
+        public override string ToJSON()
+        {
+            StringBuilder res = new StringBuilder(_stringValue.Length * 2);
+            res.Append('"');
+            foreach (char c in _stringValue) {
+                switch (c) {
+                    case '"':
+                        res.Append("\\\"");
+                        break;
+                    case '\\':
+                        res.Append("\\\\");
+                        break;
+                    case '/':
+                        res.Append("\\/");
+                        break;
+                    case '\b':
+                        res.Append("\\b");
+                        break;
+                    case '\f':
+                        res.Append("\\f");
+                        break;
+                    case '\n':
+                        res.Append("\\n");
+                        break;
+                    case '\r':
+                        res.Append("\\r");
+                        break;
+                    case '\t':
+                        res.Append("\\t");
+                        break;
+                    default:
+                        res.Append(c);
+                        break;
+                }
+            }
+            res.Append('"');
+            return res.ToString();
+        }
+
+        public string GetString()
+        {
+            return _stringValue;
+        }
+
+        public override string ToString()
+        {
+            return _stringValue;
+        }
+
+        public void setContent(string value)
+        {
+            _stringValue = value;
+        }
+    }
+
+
+    internal class GetYJSONNumber : YJSONContent
+    {
+        private long _intValue = 0;
+        private double _doubleValue = 0;
+        private bool _isFloat = false;
+
+        public GetYJSONNumber(string data, int start, int stop) : base(data, start, stop, YJSONType.NUMBER)
+        { }
+
+        public override int Parse()
+        {
+
+            bool neg = false;
+            int start, dotPos;
+            char sti;
+            int cur_pos = SkipGarbage(_data, _data_start, _data_boundary);
+            sti = _data[cur_pos];
+            if (sti == '-') {
+                neg = true;
+                cur_pos++;
+            }
+            start = cur_pos;
+            dotPos = start;
+            while (cur_pos < _data_boundary) {
+                sti = _data[cur_pos];
+                if (sti == '.' && _isFloat == false) {
+                    string int_part = _data.Substring(start, cur_pos - start);
+                    _intValue = Convert.ToInt64(int_part);
+                    _isFloat = true;
+                } else if (sti < '0' || sti > '9') {
+                    string numberpart = _data.Substring(start, cur_pos - start);
+                    if (_isFloat) {
+                        _doubleValue = Convert.ToDouble(numberpart);
+                    } else {
+                        _intValue = Convert.ToInt64(numberpart);
+                    }
+                    if (neg) {
+                        _doubleValue = 0 - _doubleValue;
+                        _intValue = 0 - _intValue;
+                    }
+                    return cur_pos - _data_start;
+                }
+                cur_pos++;
+            }
+            throw new System.Exception(FormatError("unexpected end of data", cur_pos));
+        }
+
+        public override string ToJSON()
+        {
+            if (_isFloat)
+                return _doubleValue.ToString();
+            else
+                return _intValue.ToString();
+        }
+
+        public long GetLong()
+        {
+            if (_isFloat)
+                return (long)_doubleValue;
+            else
+                return _intValue;
+        }
+
+        public int GetInt()
+        {
+            if (_isFloat)
+                return (int)_doubleValue;
+            else
+                return (int)_intValue;
+        }
+
+        public double GetDouble()
+        {
+            if (_isFloat)
+                return _doubleValue;
+            else
+                return _intValue;
+        }
+
+        public override string ToString()
+        {
+            if (_isFloat)
+                return _doubleValue.ToString();
+            else
+                return _intValue.ToString();
+        }
+    }
+
+
+    public class YJSONObject : YJSONContent
+    {
+        readonly Dictionary<string, YJSONContent> parsed = new Dictionary<string, YJSONContent>();
+
+        public YJSONObject(string data) : base(data, 0, data.Length, YJSONType.OBJECT)
+        { }
+
+        public YJSONObject(string data, int start, int len) : base(data, start, len, YJSONType.OBJECT)
+        { }
+
+        public override int Parse()
+        {
+            string current_name = "";
+            int name_start = _data_start;
+            int cur_pos = SkipGarbage(_data, _data_start, _data_boundary);
+
+            if (_data.Length <= cur_pos || _data[cur_pos] != '{') {
+                throw new System.Exception(FormatError("Opening braces was expected", cur_pos));
+            }
+            cur_pos++;
+            Tjstate state = Tjstate.JWAITFORNAME;
+
+            while (cur_pos < _data_boundary) {
+                char sti = _data[cur_pos];
+                switch (state) {
+                    case Tjstate.JWAITFORNAME:
+                        if (sti == '"') {
+                            state = Tjstate.JWAITFORENDOFNAME;
+                            name_start = cur_pos + 1;
+                        } else if (sti == '}') {
+                            _data_len = cur_pos + 1 - _data_start;
+                            return _data_len;
+                        } else {
+                            if (sti != ' ' && sti != '\n' && sti != '\r') {
+                                throw new System.Exception(FormatError("invalid char: was expecting \"", cur_pos));
+                            }
+                        }
+                        break;
+                    case Tjstate.JWAITFORENDOFNAME:
+                        if (sti == '"') {
+                            current_name = _data.Substring(name_start, cur_pos - name_start);
+                            state = Tjstate.JWAITFORCOLON;
+
+                        } else {
+                            if (sti < 32) {
+                                throw new System.Exception(
+                                    FormatError("invalid char: was expecting an identifier compliant char", cur_pos));
+                            }
+                        }
+                        break;
+                    case Tjstate.JWAITFORCOLON:
+                        if (sti == ':') {
+                            state = Tjstate.JWAITFORDATA;
+                        } else {
+                            if (sti != ' ' && sti != '\n' && sti != '\r') {
+                                throw new System.Exception(
+                                    FormatError("invalid char: was expecting \"", cur_pos));
+                            }
+                        }
+                        break;
+                    case Tjstate.JWAITFORDATA:
+                        if (sti == '{') {
+                            YJSONObject jobj = new YJSONObject(_data, cur_pos, _data_boundary);
+                            int len = jobj.Parse();
+                            cur_pos += len;
+                            parsed.Add(current_name, jobj);
+                            state = Tjstate.JWAITFORNEXTSTRUCTMEMBER;
+                            //cur_pos is already incremented
+                            continue;
+                        } else if (sti == '[') {
+                            YJSONArray jobj = new YJSONArray(_data, cur_pos, _data_boundary);
+                            int len = jobj.Parse();
+                            cur_pos += len;
+                            parsed.Add(current_name, jobj);
+                            state = Tjstate.JWAITFORNEXTSTRUCTMEMBER;
+                            //cur_pos is already incremented
+                            continue;
+                        } else if (sti == '"') {
+                            YJSONString jobj = new YJSONString(_data, cur_pos, _data_boundary);
+                            int len = jobj.Parse();
+                            cur_pos += len;
+                            parsed.Add(current_name, jobj);
+                            state = Tjstate.JWAITFORNEXTSTRUCTMEMBER;
+                            //cur_pos is already incremented
+                            continue;
+                        } else if (sti == '-' || (sti >= '0' && sti <= '9')) {
+                            GetYJSONNumber jobj = new GetYJSONNumber(_data, cur_pos, _data_boundary);
+                            int len = jobj.Parse();
+                            cur_pos += len;
+                            parsed.Add(current_name, jobj);
+                            state = Tjstate.JWAITFORNEXTSTRUCTMEMBER;
+                            //cur_pos is already incremented
+                            continue;
+                        } else if (sti != ' ' && sti != '\n' && sti != '\r') {
+                            throw new System.Exception(FormatError("invalid char: was expecting  \",0..9,t or f", cur_pos));
+                        }
+                        break;
+                    case Tjstate.JWAITFORNEXTSTRUCTMEMBER:
+                        if (sti == ',') {
+                            state = Tjstate.JWAITFORNAME;
+                            name_start = cur_pos + 1;
+                        } else if (sti == '}') {
+                            _data_len = cur_pos + 1 - _data_start;
+                            return _data_len;
+                        } else {
+                            if (sti != ' ' && sti != '\n' && sti != '\r') {
+                                throw new System.Exception(FormatError("invalid char: was expecting ,", cur_pos));
+                            }
+                        }
+                        break;
+                    case Tjstate.JWAITFORNEXTARRAYITEM:
+                    case Tjstate.JWAITFORSTRINGVALUE:
+                    case Tjstate.JWAITFORINTVALUE:
+                    case Tjstate.JWAITFORBOOLVALUE:
+                        throw new System.Exception(FormatError("invalid state for YJSONObject", cur_pos));
+                }
+                cur_pos++;
+            }
+            throw new System.Exception(FormatError("unexpected end of data", cur_pos));
+        }
+
+        public bool Has(string key)
+        {
+            return parsed.ContainsKey(key);
+        }
+
+        public YJSONObject GetYJSONObject(string key)
+        {
+            return (YJSONObject)parsed[key];
+        }
+
+        internal YJSONString GetYJSONString(string key)
+        {
+            return (YJSONString)parsed[key];
+        }
+
+        internal YJSONArray GetYJSONArray(string key)
+        {
+            return (YJSONArray)parsed[key];
+        }
+
+        public List<string> Keys()
+        {
+            return parsed.Keys.ToList();
+        }
+
+        internal GetYJSONNumber GetYJSONNumber(string key)
+        {
+            return (GetYJSONNumber)parsed[key];
+        }
+
+        public void Remove(string key)
+        {
+            parsed.Remove(key);
+        }
+
+        public string GetString(string key)
+        {
+            YJSONString ystr = (YJSONString)parsed[key];
+            return ystr.GetString();
+        }
+
+        public int GetInt(string key)
+        {
+            GetYJSONNumber yint = (GetYJSONNumber)parsed[key];
+            return yint.GetInt();
+        }
+
+        public YJSONContent Get(string key)
+        {
+            return parsed[key];
+        }
+
+        public long GetLong(string key)
+        {
+            GetYJSONNumber yint = (GetYJSONNumber)parsed[key];
+            return yint.GetLong();
+        }
+
+        public double GetDouble(string key)
+        {
+            GetYJSONNumber yint = (GetYJSONNumber)parsed[key];
+            return yint.GetDouble();
+        }
+
+        public override string ToJSON()
+        {
+            StringBuilder res = new StringBuilder();
+            res.Append('{');
+            string sep = "";
+            foreach (string key in parsed.Keys.ToArray()) {
+                YJSONContent subContent = parsed[key];
+                string subres = subContent.ToJSON();
+                res.Append(sep);
+                res.Append('"');
+                res.Append(key);
+                res.Append("\":");
+                res.Append(subres);
+                sep = ",";
+            }
+            res.Append('}');
+            return res.ToString();
+        }
+
+        public override string ToString()
+        {
+            StringBuilder res = new StringBuilder();
+            res.Append('{');
+            string sep = "";
+            foreach (string key in parsed.Keys.ToArray()) {
+                YJSONContent subContent = parsed[key];
+                string subres = subContent.ToString();
+                res.Append(sep);
+                res.Append(key);
+                res.Append("=>");
+                res.Append(subres);
+                sep = ",";
+            }
+            res.Append('}');
+            return res.ToString();
+        }
+    }
+
+
     public class YDevice
     {
         private readonly YDEV_DESCR _devdescr;
         private ulong _cacheStamp;
-        private TJsonParser _cacheJson;
+        private YJSONObject _cacheJson;
         private readonly Object _lock = new Object();
         private readonly List<u32> _functions = new List<u32>();
 
@@ -1887,8 +1967,7 @@ public class YAPI
         internal void clearCache(bool clearSubpath)
         {
             lock (_lock) {
-                if (_cacheJson != null)
-                    _cacheJson.Dispose();
+                //todo: double check that we do not need to dispose _cacheJson
                 _cacheJson = null;
                 _cacheStamp = 0;
                 if (clearSubpath) {
@@ -2038,10 +2117,11 @@ public class YAPI
 
 
 
-        internal YRETCODE requestAPI(out TJsonParser apires, ref string errmsg)
+        internal YRETCODE requestAPI(out YJSONObject apires, ref string errmsg)
         {
             string buffer = "";
             int res = 0;
+            int http_headerlen;
 
             apires = null;
             lock (_lock) {
@@ -2063,21 +2143,22 @@ public class YAPI
                         return res;
                     }
                 }
-
+                int httpcode = YAPI.ParseHTTP(buffer, 0, buffer.Length, out http_headerlen, out errmsg);
+                if (httpcode != 200) {
+                    return YAPI.IO_ERROR;
+                }
                 try {
-                    apires = new TJsonParser(buffer);
+                    apires = new YJSONObject(buffer, http_headerlen, buffer.Length);
+                    apires.Parse();
                 }
                 catch (Exception E) {
                     errmsg = "unexpected JSON structure: " + E.Message;
                     return YAPI.IO_ERROR;
                 }
 
-                if (apires.httpcode != 200) {
-                    errmsg = string.Format("Unexpected HTTP return code:{0}", apires.httpcode);
-                    return YAPI.IO_ERROR;
-                }
-                // store result in cache
-                _cacheJson = apires;
+
+               // store result in cache
+               _cacheJson = apires;
                 _cacheStamp = YAPI.GetTickCount() + YAPI.DefaultCacheValidity;
             }
             return YAPI.SUCCESS;
@@ -4880,20 +4961,19 @@ public class YDataSet
 
     public int _parse(string data)
     {
-        YAPI.TJsonParser p;
+        YAPI.YJSONObject p = new YAPI.YJSONObject(data);
+        YAPI.YJSONArray arr;
 
-        if (!YAPI.ExceptionsDisabled)  p= new YAPI.TJsonParser(data, false);
-        else try
-        {
-            p = new YAPI.TJsonParser(data, false);
+        if (!YAPI.ExceptionsDisabled) {
+            p.Parse();
+        } else {
+            try {
+                p.Parse();
+            } catch {
+                return YAPI.IO_ERROR;
+            }
         }
-        catch
-        {
 
-            return YAPI.IO_ERROR;
-        }
-
-        Nullable<YAPI.TJSONRECORD> node, arr;
         YDataStream stream;
         long streamStartTime;
         long streamEndTime;
@@ -4904,28 +4984,21 @@ public class YDataSet
         double summaryTotalTime = 0;
         double summaryTotalAvg = 0;
 
-        node = p.GetChildNode(null, "id");
-        this._functionId = node.Value.svalue;
-        node = p.GetChildNode(null, "unit");
-        this._unit = node.Value.svalue;
-        node = p.GetChildNode(null, "calib");
-        if (node != null)
-        {
-            this._calib = YAPI._decodeFloats(node.Value.svalue);
-            this._calib[0] = this._calib[0] / 1000;
+        this._functionId = p.GetString("id");
+        this._unit = p.GetString("unit");
+        if (p.Has("calib")) {
+            this._calib = YAPI._decodeFloats(p.GetString("calib"));
+            this._calib[0] = this._calib[0]/1000;
+        } else {
+            this._calib = YAPI._decodeWords(p.GetString("cal"));
         }
-        else
-        {
-            node = p.GetChildNode(null, "cal");
-            this._calib = YAPI._decodeWords(node.Value.svalue);
-        }
-        arr = p.GetChildNode(null, "streams");
+        arr = p.GetYJSONArray("streams");
         this._streams = new List<YDataStream>();
         this._preview = new List<YMeasure>();
         this._measures = new List<YMeasure>();
-        for (int i = 0; i < arr.Value.itemcount; i++)
+        for (int i = 0; i < arr.Length; i++)
         {
-            stream = _parent._findDataStream(this, arr.Value.items[i].svalue);
+            stream = _parent._findDataStream(this, arr.GetString(i));
             streamStartTime = stream.get_startTimeUTC() - stream.get_dataSamplesIntervalMs() / 1000;
             streamEndTime = stream.get_startTimeUTC() + stream.get_duration();
             if (_startTime > 0 && streamEndTime <= _startTime)
@@ -5489,7 +5562,7 @@ public class YFunction
     public delegate void GenericUpdateCallback(YFunction func, string value);
 
     public const YFUN_DESCR FUNCTIONDESCRIPTOR_INVALID = -1;
-    protected Object thisLock = new Object();
+    protected Object _thisLock = new Object();
     protected string _className;
     protected string _func;
     protected YRETCODE _lastErrorType;
@@ -5981,13 +6054,9 @@ public class YFunction
         _dataStreams.Clear();
     }
 
-    protected int _parse(YAPI.TJSONRECORD j)
+    protected int _parse(YAPI.YJSONObject j)
     {
-        int i = 0;
-        if ((j.recordtype != YAPI.TJSONRECORDTYPE.JSON_STRUCT)) return -1;
-        for (i = 0; i < j.membercount; i++) {
-            _parseAttr(j.members[i]);
-        }
+        _parseAttr(j);
         _parserHelper();
         return 0;
     }
@@ -5995,17 +6064,15 @@ public class YFunction
 
     //--- (generated code: YFunction implementation)
 
-    protected virtual void _parseAttr(YAPI.TJSONRECORD member)
+    protected virtual void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "logicalName")
+        if (json_val.Has("logicalName"))
         {
-            _logicalName = member.svalue;
-            return;
+            _logicalName = json_val.GetString("logicalName");
         }
-        if (member.name == "advertisedValue")
+        if (json_val.Has("advertisedValue"))
         {
-            _advertisedValue = member.svalue;
-            return;
+            _advertisedValue = json_val.GetString("advertisedValue");
         }
     }
 
@@ -6027,7 +6094,7 @@ public class YFunction
     public string get_logicalName()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LOGICALNAME_INVALID;
@@ -6070,8 +6137,10 @@ public class YFunction
             _throw(YAPI.INVALID_ARGUMENT, "Invalid name :" + newval);
             return YAPI.INVALID_ARGUMENT;
         }
-        rest_val = newval;
-        return _setAttr("logicalName", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("logicalName", rest_val);
+        }
     }
 
     /**
@@ -6092,7 +6161,7 @@ public class YFunction
     public string get_advertisedValue()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ADVERTISEDVALUE_INVALID;
@@ -6106,8 +6175,10 @@ public class YFunction
     public int set_advertisedValue(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("advertisedValue", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("advertisedValue", rest_val);
+        }
     }
 
     /**
@@ -6382,15 +6453,17 @@ public class YFunction
         string funcId = "";
         string funcName = "";
         string funcValue = "";
-        fundescr = YAPI.yapiGetFunction(_className, _func, ref errmsg);
-        if ((!(YAPI.YISERR(fundescr))))
-        {
-            if ((!(YAPI.YISERR(YAPI.yapiGetFunctionInfo(fundescr, ref devdescr, ref serial, ref funcId, ref funcName, ref funcValue, ref errmsg)))))
+        lock (_thisLock) {
+            fundescr = YAPI.yapiGetFunction(_className, _func, ref errmsg);
+            if ((!(YAPI.YISERR(fundescr))))
             {
-                return _className + "(" + _func + ")=" + serial + "." + funcId;
+                if ((!(YAPI.YISERR(YAPI.yapiGetFunctionInfo(fundescr, ref devdescr, ref serial, ref funcId, ref funcName, ref funcValue, ref errmsg)))))
+                {
+                    return _className + "(" + _func + ")=" + serial + "." + funcId;
+                }
             }
+            return _className + "(" + _func + ")=unresolved";
         }
-        return _className + "(" + _func + ")=unresolved";
     }
 
 
@@ -6424,24 +6497,24 @@ public class YFunction
         string snum = "";
         string funcid = "";
 
+        lock (_thisLock) {
+            // Resolve the function name
+            retcode = _getDescriptor(ref fundesc, ref errmsg);
+            if (YAPI.YISERR(retcode))
+            {
+                _throw(retcode, errmsg);
+                return YAPI.HARDWAREID_INVALID;
+            }
 
+            retcode = YAPI.yapiGetFunctionInfo(fundesc, ref devdesc, ref snum, ref funcid, ref funcName, ref funcVal, ref errmsg);
+            if (YAPI.YISERR(retcode))
+            {
+                _throw(retcode, errmsg);
+                return YAPI.HARDWAREID_INVALID;
+            }
 
-        // Resolve the function name
-        retcode = _getDescriptor(ref fundesc, ref errmsg);
-        if (YAPI.YISERR(retcode))
-        {
-            _throw(retcode, errmsg);
-            return YAPI.HARDWAREID_INVALID;
+            return snum + '.' + funcid;
         }
-
-        retcode = YAPI.yapiGetFunctionInfo(fundesc, ref devdesc, ref snum, ref funcid, ref funcName, ref funcVal, ref errmsg);
-        if (YAPI.YISERR(retcode))
-        {
-            _throw(retcode, errmsg);
-            return YAPI.HARDWAREID_INVALID;
-        }
-
-        return snum + '.' + funcid;
     }
 
 
@@ -6475,24 +6548,24 @@ public class YFunction
         string snum = "";
         string funcid = "";
 
+        lock (_thisLock) {
+            // Resolve the function name
+            retcode = _getDescriptor(ref fundesc, ref errmsg);
+            if (YAPI.YISERR(retcode))
+            {
+                _throw(retcode, errmsg);
+                return YAPI.FUNCTIONID_INVALID;
+            }
 
+            retcode = YAPI.yapiGetFunctionInfo(fundesc, ref devdesc, ref snum, ref funcid, ref funcName, ref funcVal, ref errmsg);
+            if (YAPI.YISERR(retcode))
+            {
+                _throw(retcode, errmsg);
+                return YAPI.FUNCTIONID_INVALID;
+            }
 
-        // Resolve the function name
-        retcode = _getDescriptor(ref fundesc, ref errmsg);
-        if (YAPI.YISERR(retcode))
-        {
-            _throw(retcode, errmsg);
-            return YAPI.FUNCTIONID_INVALID;
+            return funcid;
         }
-
-        retcode = YAPI.yapiGetFunctionInfo(fundesc, ref devdesc, ref snum, ref funcid, ref funcName, ref funcVal, ref errmsg);
-        if (YAPI.YISERR(retcode))
-        {
-            _throw(retcode, errmsg);
-            return YAPI.FUNCTIONID_INVALID;
-        }
-
-        return funcid;
     }
 
 
@@ -6536,53 +6609,54 @@ public class YFunction
         string friendly = "";
         string mod_name = "";
 
-        // Resolve the function name
-        retcode = _getDescriptor(ref fundesc, ref errmsg);
-        if (YAPI.YISERR(retcode))
-        {
-            _throw(retcode, errmsg);
-            return YAPI.FRIENDLYNAME_INVALID;
-        }
+        lock (_thisLock) {
+            // Resolve the function name
+            retcode = _getDescriptor(ref fundesc, ref errmsg);
+            if (YAPI.YISERR(retcode))
+            {
+                _throw(retcode, errmsg);
+                return YAPI.FRIENDLYNAME_INVALID;
+            }
 
-        retcode = YAPI.yapiGetFunctionInfo(fundesc, ref devdesc, ref snum, ref funcid, ref funcName, ref dummy, ref errmsg);
-        if (YAPI.YISERR(retcode))
-        {
-            _throw(retcode, errmsg);
-            return YAPI.FRIENDLYNAME_INVALID;
-        }
+            retcode = YAPI.yapiGetFunctionInfo(fundesc, ref devdesc, ref snum, ref funcid, ref funcName, ref dummy, ref errmsg);
+            if (YAPI.YISERR(retcode))
+            {
+                _throw(retcode, errmsg);
+                return YAPI.FRIENDLYNAME_INVALID;
+            }
 
-        moddescr = YAPI.yapiGetFunction("Module", snum, ref errmsg);
-        if (YAPI.YISERR(moddescr))
-        {
-            _throw(retcode, errmsg);
-            return YAPI.FRIENDLYNAME_INVALID;
-        }
+            moddescr = YAPI.yapiGetFunction("Module", snum, ref errmsg);
+            if (YAPI.YISERR(moddescr))
+            {
+                _throw(retcode, errmsg);
+                return YAPI.FRIENDLYNAME_INVALID;
+            }
 
-        retcode = YAPI.yapiGetFunctionInfo(moddescr, ref devdesc, ref snum, ref dummy, ref mod_name, ref dummy, ref errmsg);
-        if (YAPI.YISERR(retcode))
-        {
-            _throw(retcode, errmsg);
-            return YAPI.FRIENDLYNAME_INVALID;
-        }
+            retcode = YAPI.yapiGetFunctionInfo(moddescr, ref devdesc, ref snum, ref dummy, ref mod_name, ref dummy, ref errmsg);
+            if (YAPI.YISERR(retcode))
+            {
+                _throw(retcode, errmsg);
+                return YAPI.FRIENDLYNAME_INVALID;
+            }
 
-        if (mod_name != "")
-        {
-            friendly = mod_name + '.';
+            if (mod_name != "")
+            {
+                friendly = mod_name + '.';
+            }
+            else
+            {
+                friendly = snum + '.';
+            }
+            if (funcName != "")
+            {
+                friendly += funcName;
+            }
+            else
+            {
+                friendly += funcid;
+            }
+            return friendly;
         }
-        else
-        {
-            friendly = snum + '.';
-        }
-        if (funcName != "")
-        {
-            friendly += funcName;
-        }
-        else
-        {
-            friendly += funcid;
-        }
-        return friendly;
-
     }
 
 
@@ -6668,101 +6742,124 @@ public class YFunction
     {
         YAPI.YDevice dev = null;
         string errmsg = "";
-        YAPI.TJsonParser apires;
+        YAPI.YJSONObject apires;
+        lock (_thisLock) {
 
-        //  A valid value in cache means that the device is online
-        if (_cacheExpiration > YAPI.GetTickCount())
-        {
+            //  A valid value in cache means that the device is online
+            if (_cacheExpiration > YAPI.GetTickCount())
+            {
+                return true;
+            }
+
+            // Check that the function is available, without throwing exceptions
+            if (YAPI.YISERR(_getDevice(ref dev, ref errmsg)))
+            {
+                return false;
+            }
+
+            // Try to execute a function request to be positively sure that the device is ready
+            if (YAPI.YISERR(dev.requestAPI(out apires, ref errmsg)))
+            {
+                return false;
+            }
+
+            // Preload the function data, since we have it in device cache
+            load(YAPI.DefaultCacheValidity);
             return true;
         }
-
-        // Check that the function is available, without throwing exceptions
-        if (YAPI.YISERR(_getDevice(ref dev, ref errmsg)))
-        {
-            return false;
-        }
-
-        // Try to execute a function request to be positively sure that the device is ready
-        if (YAPI.YISERR(dev.requestAPI(out apires, ref errmsg)))
-        {
-            return false;
-        }
-
-        // Preload the function data, since we have it in device cache
-        load(YAPI.DefaultCacheValidity);
-        return true;
     }
+
+
+
 
     protected string  _json_get_key(byte[] data, string key)
     {
-        Nullable<YAPI.TJSONRECORD> node;
-
-        string st = YAPI.DefaultEncoding.GetString(data);
-        YAPI.TJsonParser p;
-
-         if (!YAPI.ExceptionsDisabled)  p= new YAPI.TJsonParser(st, false);
-        else try
-        {
-            p = new YAPI.TJsonParser(st, false);
+        YAPI.YJSONObject obj = new YAPI.YJSONObject(YAPI.DefaultEncoding.GetString(data));
+        obj.Parse();
+        if (obj.Has(key)) {
+            string val = obj.GetString(key);
+            if (val == null) {
+                val = obj.ToString();
+            }
+            return val;
         }
-        catch
-        {
-            return "";
-        }
-
-
-
-
-        node = p.GetChildNode(null, key);
-
-        return node.Value.svalue;
+        throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "No key " + key + "in JSON struct");
     }
 
     protected List<string> _json_get_array(byte[] data)
     {
-        string st = YAPI.DefaultEncoding.GetString(data);
-        YAPI.TJsonParser p;
-
-        if (!YAPI.ExceptionsDisabled) p = new YAPI.TJsonParser(st, false);
-        else try
-            {
-                p = new YAPI.TJsonParser(st, false);
-            }
-            catch
-            {
-
-                return null;
-            }
-
-
-        return p.GetAllChilds(null);
+        YAPI.YJSONArray array = new YAPI.YJSONArray(YAPI.DefaultEncoding.GetString(data));
+        array.Parse();
+        List<string> list = new List<string>();
+        int len = array.Length;
+        for (int i = 0; i < len; i++) {
+            YAPI.YJSONContent o = array.Get(i);
+            list.Add(o.ToJSON());
+        }
+        return list;
     }
 
     public string _json_get_string(byte[] data)
     {
-        Nullable<YAPI.TJSONRECORD> node;
-        string json_str = YAPI.DefaultEncoding.GetString(data);
-        YAPI.TJsonParser p = new YAPI.TJsonParser('[' + json_str + ']', false);
-        node = p.GetRootNode();
-        return node.Value.items[0].svalue;
+        string s = YAPI.DefaultEncoding.GetString(data);
+        YAPI.YJSONString jstring = new YAPI.YJSONString(s, 0, s.Length);
+        jstring.Parse();
+        return jstring.GetString();
     }
 
+
+    private  string get_json_path_struct(YAPI.YJSONObject jsonObject, string[] paths, int ofs)
+    {
+
+        string key = paths[ofs];
+        if (!jsonObject.Has(key)) {
+            return "";
+        }
+
+        YAPI.YJSONContent obj = jsonObject.Get(key);
+        if (obj != null) {
+            if (paths.Length == ofs + 1) {
+                return obj.ToJSON();
+            }
+
+            if (obj is YAPI.YJSONArray) {
+                return get_json_path_array(jsonObject.GetYJSONArray(key), paths, ofs + 1);
+            } else if (obj is YAPI.YJSONObject) {
+                return get_json_path_struct(jsonObject.GetYJSONObject(key), paths, ofs + 1);
+            }
+        }
+        return "";
+    }
+
+    private string get_json_path_array(YAPI.YJSONArray jsonArray, string[] paths, int ofs)
+    {
+        int key = Convert.ToInt32(paths[ofs]);
+        if (jsonArray.Length <= key) {
+            return "";
+        }
+
+        YAPI.YJSONContent obj = jsonArray.Get(key);
+        if (obj != null) {
+            if (paths.Length == ofs + 1) {
+                return obj.ToString();
+            }
+
+            if (obj is YAPI.YJSONArray) {
+                return get_json_path_array(jsonArray.GetYJSONArray(key), paths, ofs + 1);
+            } else if (obj is YAPI.YJSONObject) {
+                return get_json_path_struct(jsonArray.GetYJSONObject(key), paths, ofs + 1);
+            }
+        }
+        return "";
+    }
     public string _get_json_path(string json, string path)
     {
 
-        StringBuilder errbuff = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
-        IntPtr p = default(IntPtr);
-        int dllres = 0;
-        string result = "";
-        dllres = SafeNativeMethods._yapiJsonGetPath(new StringBuilder(path), new StringBuilder(json), json.Length, ref p, errbuff);
-        if (dllres > 0)
-        {
-            byte[] reply = new byte[dllres];
-            Marshal.Copy(p, reply, 0, dllres);
-            SafeNativeMethods._yapiFreeMem(p);
-            result = YAPI.DefaultEncoding.GetString(reply);
-        }
-        return result;
+        YAPI.YJSONObject jsonObject = null;
+        jsonObject = new YAPI.YJSONObject(json);
+        jsonObject.Parse();
+        string[] split = path.Split(new char[] { '\\', '|' });
+        return get_json_path_struct(jsonObject, split, 0);
     }
 
     public string _decode_json_string(string json)
@@ -6800,10 +6897,9 @@ public class YFunction
     public YRETCODE load(ulong msValidity)
     {
         YRETCODE functionReturnValue = default(YRETCODE);
-
         YAPI.YDevice dev = null;
         string errmsg = "";
-        YAPI.TJsonParser apires = null;
+        YAPI.YJSONObject apires;
         YFUN_DESCR fundescr = default(YFUN_DESCR);
         int res = 0;
         string errbuf = "";
@@ -6812,58 +6908,58 @@ public class YFunction
         string serial = "";
         string funcName = "";
         string funcVal = "";
-        Nullable<YAPI.TJSONRECORD> node = default(Nullable<YAPI.TJSONRECORD>);
+        YAPI.YJSONObject node;
 
-        // Resolve our reference to our device, load REST API
-        res = _getDevice(ref dev, ref errmsg);
-        if ((YAPI.YISERR(res)))
-        {
-            _throw(res, errmsg);
-            functionReturnValue = res;
+        lock (_thisLock) {
+            // Resolve our reference to our device, load REST API
+            res = _getDevice(ref dev, ref errmsg);
+            if ((YAPI.YISERR(res))) {
+                _throw(res, errmsg);
+                functionReturnValue = res;
+                return functionReturnValue;
+            }
+
+            res = dev.requestAPI(out apires, ref errmsg);
+            if (YAPI.YISERR(res)) {
+                _throw(res, errmsg);
+                functionReturnValue = res;
+                return functionReturnValue;
+            }
+
+            // Get our function Id
+            fundescr = YAPI.yapiGetFunction(_className, _func, ref errmsg);
+            if (YAPI.YISERR(fundescr)) {
+                _throw(res, errmsg);
+                functionReturnValue = fundescr;
+                return functionReturnValue;
+            }
+
+            devdesc = 0;
+            res = YAPI.yapiGetFunctionInfo(fundescr, ref devdesc, ref serial, ref funcId, ref funcName, ref funcVal,
+                ref errbuf);
+            if (YAPI.YISERR(res)) {
+                _throw(res, errmsg);
+                functionReturnValue = res;
+                return functionReturnValue;
+            }
+            _cacheExpiration = YAPI.GetTickCount() + (ulong) msValidity;
+            _serial = serial;
+            _funId = funcId;
+            _hwId = _serial + '.' + _funId;
+
+            try {
+                node = apires.GetYJSONObject(funcId);
+            }
+            catch (Exception) {
+                _throw(YAPI.IO_ERROR, "unexpected JSON structure: missing function " + funcId);
+                functionReturnValue = YAPI.IO_ERROR;
+                return functionReturnValue;
+            }
+
+            _parse(node);
+            functionReturnValue = YAPI.SUCCESS;
             return functionReturnValue;
         }
-
-        res = dev.requestAPI(out apires, ref errmsg);
-        if (YAPI.YISERR(res))
-        {
-            _throw(res, errmsg);
-            functionReturnValue = res;
-            return functionReturnValue;
-        }
-
-        // Get our function Id
-        fundescr = YAPI.yapiGetFunction(_className, _func, ref errmsg);
-        if (YAPI.YISERR(fundescr))
-        {
-            _throw(res, errmsg);
-            functionReturnValue = fundescr;
-            return functionReturnValue;
-        }
-
-        devdesc = 0;
-        res = YAPI.yapiGetFunctionInfo(fundescr, ref devdesc, ref serial, ref funcId, ref funcName, ref funcVal, ref errbuf);
-        if (YAPI.YISERR(res))
-        {
-            _throw(res, errmsg);
-            functionReturnValue = res;
-            return functionReturnValue;
-        }
-        _cacheExpiration = YAPI.GetTickCount() + (ulong)msValidity;
-        _serial = serial;
-        _funId = funcId;
-        _hwId = _serial + '.' + _funId;
-
-        node = apires.GetChildNode(null, funcId);
-        if (!node.HasValue)
-        {
-            _throw(YAPI.IO_ERROR, "unexpected JSON structure: missing function " + funcId);
-            functionReturnValue = YAPI.IO_ERROR;
-            return functionReturnValue;
-        }
-
-        _parse(node.GetValueOrDefault());
-        functionReturnValue = YAPI.SUCCESS;
-        return functionReturnValue;
     }
 
     /**
@@ -6884,16 +6980,18 @@ public class YFunction
         YAPI.YDevice dev = null;
         string errmsg = "";
 
-        // Resolve our reference to our device, load REST API
-        res = _getDevice(ref dev, ref errmsg);
-        if ((YAPI.YISERR(res)))
-        {
-            return;
-        }
-        dev.clearCache(false);
-        if (_cacheExpiration != 0)
-        {
-            _cacheExpiration = YAPI.GetTickCount();
+        lock (_thisLock) {
+            // Resolve our reference to our device, load REST API
+            res = _getDevice(ref dev, ref errmsg);
+            if ((YAPI.YISERR(res)))
+            {
+                return;
+            }
+            dev.clearCache(false);
+            if (_cacheExpiration != 0)
+            {
+                _cacheExpiration = YAPI.GetTickCount();
+            }
         }
     }
 
@@ -6922,17 +7020,19 @@ public class YFunction
         string funcName = "";
         string funcValue = "";
 
-        fundescr = YAPI.yapiGetFunction(_className, _func, ref errmsg);
-        if (!YAPI.YISERR(fundescr))
-        {
-            if (!YAPI.YISERR(YAPI.yapiGetFunctionInfo(fundescr, ref devdescr, ref serial, ref funcId, ref funcName, ref funcValue, ref errmsg)))
+        lock (_thisLock) {
+            fundescr = YAPI.yapiGetFunction(_className, _func, ref errmsg);
+            if (!YAPI.YISERR(fundescr))
             {
-                return YModule.FindModule(serial + ".module");
+                if (!YAPI.YISERR(YAPI.yapiGetFunctionInfo(fundescr, ref devdescr, ref serial, ref funcId, ref funcName, ref funcValue, ref errmsg)))
+                {
+                    return YModule.FindModule(serial + ".module");
+                }
             }
-        }
 
-        // return a true YModule object even if it is not a module valid for communicating
-        return YModule.FindModule("module_of_" + _className + "_" + _func);
+            // return a true YModule object even if it is not a module valid for communicating
+            return YModule.FindModule("module_of_" + _className + "_" + _func);
+        }
     }
 
     public YModule module()
@@ -6982,7 +7082,9 @@ public class YFunction
      */
     public object get_userData()
     {
-        return _userData;
+        lock (_thisLock) {
+            return _userData;
+        }
     }
     public object userData()
     { return get_userData(); }
@@ -7003,7 +7105,9 @@ public class YFunction
      */
     public void set_userData(object data)
     {
-        _userData = data;
+        lock (_thisLock) {
+            _userData = data;
+        }
     }
     public void setUserData(object data)
     { set_userData(data); }
@@ -7093,85 +7197,77 @@ public class YModule : YFunction
      */
     public int registerLogCallback(LogCallback callback)
     {
-      _logCallback = callback;
-      if (_logCallback ==null){
-          SafeNativeMethods._yapiStartStopDeviceLogCallback(new StringBuilder(_serialNumber), 0);
-      } else {
-          SafeNativeMethods._yapiStartStopDeviceLogCallback(new StringBuilder(_serialNumber), 1);
-      }
-      return YAPI.SUCCESS;
+        lock (_thisLock) {
+            _logCallback = callback;
+            if (_logCallback ==null){
+                SafeNativeMethods._yapiStartStopDeviceLogCallback(new StringBuilder(_serialNumber), 0);
+            } else {
+                SafeNativeMethods._yapiStartStopDeviceLogCallback(new StringBuilder(_serialNumber), 1);
+            }
+            return YAPI.SUCCESS;
+        }
     }
 
     public LogCallback get_logCallback()
     {
-        return _logCallback;
+        lock (_thisLock) {
+            return _logCallback;
+        }
     }
 
     //--- (generated code: YModule implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "productName")
+        if (json_val.Has("productName"))
         {
-            _productName = member.svalue;
-            return;
+            _productName = json_val.GetString("productName");
         }
-        if (member.name == "serialNumber")
+        if (json_val.Has("serialNumber"))
         {
-            _serialNumber = member.svalue;
-            return;
+            _serialNumber = json_val.GetString("serialNumber");
         }
-        if (member.name == "productId")
+        if (json_val.Has("productId"))
         {
-            _productId = (int)member.ivalue;
-            return;
+            _productId = json_val.GetInt("productId");
         }
-        if (member.name == "productRelease")
+        if (json_val.Has("productRelease"))
         {
-            _productRelease = (int)member.ivalue;
-            return;
+            _productRelease = json_val.GetInt("productRelease");
         }
-        if (member.name == "firmwareRelease")
+        if (json_val.Has("firmwareRelease"))
         {
-            _firmwareRelease = member.svalue;
-            return;
+            _firmwareRelease = json_val.GetString("firmwareRelease");
         }
-        if (member.name == "persistentSettings")
+        if (json_val.Has("persistentSettings"))
         {
-            _persistentSettings = (int)member.ivalue;
-            return;
+            _persistentSettings = json_val.GetInt("persistentSettings");
         }
-        if (member.name == "luminosity")
+        if (json_val.Has("luminosity"))
         {
-            _luminosity = (int)member.ivalue;
-            return;
+            _luminosity = json_val.GetInt("luminosity");
         }
-        if (member.name == "beacon")
+        if (json_val.Has("beacon"))
         {
-            _beacon = member.ivalue > 0 ? 1 : 0;
-            return;
+            _beacon = json_val.GetInt("beacon") > 0 ? 1 : 0;
         }
-        if (member.name == "upTime")
+        if (json_val.Has("upTime"))
         {
-            _upTime = member.ivalue;
-            return;
+            _upTime = json_val.GetLong("upTime");
         }
-        if (member.name == "usbCurrent")
+        if (json_val.Has("usbCurrent"))
         {
-            _usbCurrent = (int)member.ivalue;
-            return;
+            _usbCurrent = json_val.GetInt("usbCurrent");
         }
-        if (member.name == "rebootCountdown")
+        if (json_val.Has("rebootCountdown"))
         {
-            _rebootCountdown = (int)member.ivalue;
-            return;
+            _rebootCountdown = json_val.GetInt("rebootCountdown");
         }
-        if (member.name == "userVar")
+        if (json_val.Has("userVar"))
         {
-            _userVar = (int)member.ivalue;
-            return;
+            _userVar = json_val.GetInt("userVar");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -7192,7 +7288,7 @@ public class YModule : YFunction
     public string get_productName()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration == 0) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PRODUCTNAME_INVALID;
@@ -7221,7 +7317,7 @@ public class YModule : YFunction
     public string get_serialNumber()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration == 0) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SERIALNUMBER_INVALID;
@@ -7250,7 +7346,7 @@ public class YModule : YFunction
     public int get_productId()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration == 0) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PRODUCTID_INVALID;
@@ -7279,7 +7375,7 @@ public class YModule : YFunction
     public int get_productRelease()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PRODUCTRELEASE_INVALID;
@@ -7308,7 +7404,7 @@ public class YModule : YFunction
     public string get_firmwareRelease()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return FIRMWARERELEASE_INVALID;
@@ -7338,7 +7434,7 @@ public class YModule : YFunction
     public int get_persistentSettings()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PERSISTENTSETTINGS_INVALID;
@@ -7352,8 +7448,10 @@ public class YModule : YFunction
     public int set_persistentSettings(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("persistentSettings", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("persistentSettings", rest_val);
+        }
     }
 
     /**
@@ -7374,7 +7472,7 @@ public class YModule : YFunction
     public int get_luminosity()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LUMINOSITY_INVALID;
@@ -7412,8 +7510,10 @@ public class YModule : YFunction
     public int set_luminosity(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("luminosity", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("luminosity", rest_val);
+        }
     }
 
     /**
@@ -7434,7 +7534,7 @@ public class YModule : YFunction
     public int get_beacon()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return BEACON_INVALID;
@@ -7468,8 +7568,10 @@ public class YModule : YFunction
     public int set_beacon(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("beacon", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("beacon", rest_val);
+        }
     }
 
     /**
@@ -7490,7 +7592,7 @@ public class YModule : YFunction
     public long get_upTime()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return UPTIME_INVALID;
@@ -7519,7 +7621,7 @@ public class YModule : YFunction
     public int get_usbCurrent()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return USBCURRENT_INVALID;
@@ -7550,7 +7652,7 @@ public class YModule : YFunction
     public int get_rebootCountdown()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return REBOOTCOUNTDOWN_INVALID;
@@ -7564,8 +7666,10 @@ public class YModule : YFunction
     public int set_rebootCountdown(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("rebootCountdown", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("rebootCountdown", rest_val);
+        }
     }
 
     /**
@@ -7587,7 +7691,7 @@ public class YModule : YFunction
     public int get_userVar()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return USERVAR_INVALID;
@@ -7622,8 +7726,10 @@ public class YModule : YFunction
     public int set_userVar(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("userVar", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("userVar", rest_val);
+        }
     }
 
     /**
@@ -8944,26 +9050,28 @@ public class YModule : YFunction
         string snum = "";
         string funcid = "";
 
-        // Resolve the function name
-        retcode = _getDescriptor(ref fundesc, ref errmsg);
-        if (YAPI.YISERR(retcode))
-        {
-            _throw(retcode, errmsg);
-            return YAPI.FRIENDLYNAME_INVALID;
-        }
+        lock (_thisLock) {
+            // Resolve the function name
+            retcode = _getDescriptor(ref fundesc, ref errmsg);
+            if (YAPI.YISERR(retcode))
+            {
+                _throw(retcode, errmsg);
+                return YAPI.FRIENDLYNAME_INVALID;
+            }
 
-        retcode = YAPI.yapiGetFunctionInfo(fundesc, ref devdesc, ref snum, ref funcid, ref funcName, ref dummy, ref errmsg);
-        if (YAPI.YISERR(retcode))
-        {
-            _throw(retcode, errmsg);
-            return YAPI.FRIENDLYNAME_INVALID;
-        }
+            retcode = YAPI.yapiGetFunctionInfo(fundesc, ref devdesc, ref snum, ref funcid, ref funcName, ref dummy, ref errmsg);
+            if (YAPI.YISERR(retcode))
+            {
+                _throw(retcode, errmsg);
+                return YAPI.FRIENDLYNAME_INVALID;
+            }
 
-        if (funcName != "")
-        {
-            return funcName;
+            if (funcName != "")
+            {
+                return funcName;
+            }
+            return snum;
         }
-        return snum;
     }
 
     internal void setImmutableAttributes(SafeNativeMethods.yDeviceSt infos)
@@ -9037,23 +9145,24 @@ public class YModule : YFunction
         YAPI.YDevice dev = null;
         string errmsg = "";
         int res;
+        lock (_thisLock) {
+            res = _getDevice(ref dev, ref errmsg);
+            if ((YAPI.YISERR(res)))
+            {
+                _throw(res, errmsg);
+                return res;
+            }
 
-        res = _getDevice(ref dev, ref errmsg);
-        if ((YAPI.YISERR(res)))
-        {
-            _throw(res, errmsg);
-            return res;
+            res = dev.getFunctions(ref functions, ref errmsg);
+            if ((YAPI.YISERR(res)))
+            {
+                functions = null;
+                _throw(res, errmsg);
+                return res;
+            }
+
+            return functions.Count;
         }
-
-        res = dev.getFunctions(ref functions, ref errmsg);
-        if ((YAPI.YISERR(res)))
-        {
-            functions = null;
-            _throw(res, errmsg);
-            return res;
-        }
-
-        return functions.Count;
     }
 
     /**
@@ -9081,13 +9190,15 @@ public class YModule : YFunction
         string funcVal = "";
         string errmsg = "";
         int res = 0;
-        res = _getFunction(functionIndex, ref serial, ref funcId, ref baseType, ref funcName, ref funcVal, ref errmsg);
-        if ((YAPI.YISERR(res)))
-        {
-            _throw(res, errmsg);
-            return YAPI.INVALID_STRING;
+        lock (_thisLock) {
+            res = _getFunction(functionIndex, ref serial, ref funcId, ref baseType, ref funcName, ref funcVal, ref errmsg);
+            if ((YAPI.YISERR(res)))
+            {
+                _throw(res, errmsg);
+                return YAPI.INVALID_STRING;
+            }
+            return funcId;
         }
-        return funcId;
     }
 
     /**
@@ -9115,22 +9226,24 @@ public class YModule : YFunction
         string funcVal = "";
         string errmsg = "";
         int res = 0;
-        res = _getFunction(functionIndex, ref serial, ref funcId, ref baseType, ref funcName, ref funcVal, ref errmsg);
-        if ((YAPI.YISERR(res)))
-        {
-            _throw(res, errmsg);
-            return YAPI.INVALID_STRING;
-        }
-        char first = funcId[0];
-        int i;
-        for (i = 1; i < funcId.Length; i++)
-        {
-            if (!Char.IsLetter(funcId[i]))
+        lock (_thisLock) {
+            res = _getFunction(functionIndex, ref serial, ref funcId, ref baseType, ref funcName, ref funcVal, ref errmsg);
+            if ((YAPI.YISERR(res)))
             {
-                break;
+                _throw(res, errmsg);
+                return YAPI.INVALID_STRING;
             }
+            char first = funcId[0];
+            int i;
+            for (i = 1; i < funcId.Length; i++)
+            {
+                if (!Char.IsLetter(funcId[i]))
+                {
+                    break;
+                }
+            }
+            return Char.ToUpper(first)+ funcId.Substring(1, i - 1);
         }
-        return Char.ToUpper(first)+ funcId.Substring(1, i - 1);
     }
 
 
@@ -9159,13 +9272,15 @@ public class YModule : YFunction
         string funcVal = "";
         string errmsg = "";
         int res = 0;
-        res = _getFunction(functionIndex, ref serial, ref funcId, ref baseType, ref funcName, ref funcVal, ref errmsg);
-        if ((YAPI.YISERR(res)))
-        {
-            _throw(res, errmsg);
-            return YAPI.INVALID_STRING;
+        lock (_thisLock) {
+            res = _getFunction(functionIndex, ref serial, ref funcId, ref baseType, ref funcName, ref funcVal, ref errmsg);
+            if ((YAPI.YISERR(res)))
+            {
+                _throw(res, errmsg);
+                return YAPI.INVALID_STRING;
+            }
+            return baseType;
         }
-        return baseType;
     }
 
 
@@ -9194,15 +9309,16 @@ public class YModule : YFunction
         string funcVal = "";
         string errmsg = "";
         int res = 0;
+        lock (_thisLock) {
+            res = _getFunction(functionIndex, ref serial, ref funcId, ref baseType, ref funcName, ref funcVal, ref errmsg);
+            if ((YAPI.YISERR(res)))
+            {
+                _throw(res, errmsg);
+                return YAPI.INVALID_STRING;
+            }
 
-        res = _getFunction(functionIndex, ref serial, ref funcId, ref baseType, ref funcName, ref funcVal, ref errmsg);
-        if ((YAPI.YISERR(res)))
-        {
-            _throw(res, errmsg);
-            return YAPI.INVALID_STRING;
+            return funcName;
         }
-
-        return funcName;
     }
 
     /**
@@ -9230,14 +9346,15 @@ public class YModule : YFunction
         string funcVal = "";
         string errmsg = "";
         int res = 0;
-
-        res = _getFunction(functionIndex, ref serial, ref funcId, ref baseType, ref funcName, ref funcVal, ref errmsg);
-        if ((YAPI.YISERR(res)))
-        {
-            _throw(res, errmsg);
-            return YAPI.INVALID_STRING;
+        lock (_thisLock) {
+            res = _getFunction(functionIndex, ref serial, ref funcId, ref baseType, ref funcName, ref funcVal, ref errmsg);
+            if ((YAPI.YISERR(res)))
+            {
+                _throw(res, errmsg);
+                return YAPI.INVALID_STRING;
+            }
+            return funcVal;
         }
-        return funcVal;
     }
 
     //--- (generated code: Module functions)
@@ -9364,59 +9481,49 @@ public class YSensor : YFunction
 
     //--- (generated code: YSensor implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "unit")
+        if (json_val.Has("unit"))
         {
-            _unit = member.svalue;
-            return;
+            _unit = json_val.GetString("unit");
         }
-        if (member.name == "currentValue")
+        if (json_val.Has("currentValue"))
         {
-            _currentValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _currentValue = Math.Round(json_val.GetDouble("currentValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "lowestValue")
+        if (json_val.Has("lowestValue"))
         {
-            _lowestValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _lowestValue = Math.Round(json_val.GetDouble("lowestValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "highestValue")
+        if (json_val.Has("highestValue"))
         {
-            _highestValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _highestValue = Math.Round(json_val.GetDouble("highestValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "currentRawValue")
+        if (json_val.Has("currentRawValue"))
         {
-            _currentRawValue = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _currentRawValue = Math.Round(json_val.GetDouble("currentRawValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "logFrequency")
+        if (json_val.Has("logFrequency"))
         {
-            _logFrequency = member.svalue;
-            return;
+            _logFrequency = json_val.GetString("logFrequency");
         }
-        if (member.name == "reportFrequency")
+        if (json_val.Has("reportFrequency"))
         {
-            _reportFrequency = member.svalue;
-            return;
+            _reportFrequency = json_val.GetString("reportFrequency");
         }
-        if (member.name == "calibrationParam")
+        if (json_val.Has("calibrationParam"))
         {
-            _calibrationParam = member.svalue;
-            return;
+            _calibrationParam = json_val.GetString("calibrationParam");
         }
-        if (member.name == "resolution")
+        if (json_val.Has("resolution"))
         {
-            _resolution = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _resolution = Math.Round(json_val.GetDouble("resolution") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "sensorState")
+        if (json_val.Has("sensorState"))
         {
-            _sensorState = (int)member.ivalue;
-            return;
+            _sensorState = json_val.GetInt("sensorState");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -9437,7 +9544,7 @@ public class YSensor : YFunction
     public string get_unit()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return UNIT_INVALID;
@@ -9467,7 +9574,7 @@ public class YSensor : YFunction
     public double get_currentValue()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CURRENTVALUE_INVALID;
@@ -9506,8 +9613,10 @@ public class YSensor : YFunction
     public int set_lowestValue(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("lowestValue", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("lowestValue", rest_val);
+        }
     }
 
     /**
@@ -9528,7 +9637,7 @@ public class YSensor : YFunction
     public double get_lowestValue()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LOWESTVALUE_INVALID;
@@ -9563,8 +9672,10 @@ public class YSensor : YFunction
     public int set_highestValue(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("highestValue", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("highestValue", rest_val);
+        }
     }
 
     /**
@@ -9585,7 +9696,7 @@ public class YSensor : YFunction
     public double get_highestValue()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return HIGHESTVALUE_INVALID;
@@ -9616,7 +9727,7 @@ public class YSensor : YFunction
     public double get_currentRawValue()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CURRENTRAWVALUE_INVALID;
@@ -9647,7 +9758,7 @@ public class YSensor : YFunction
     public string get_logFrequency()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LOGFREQUENCY_INVALID;
@@ -9685,8 +9796,10 @@ public class YSensor : YFunction
     public int set_logFrequency(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("logFrequency", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("logFrequency", rest_val);
+        }
     }
 
     /**
@@ -9709,7 +9822,7 @@ public class YSensor : YFunction
     public string get_reportFrequency()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return REPORTFREQUENCY_INVALID;
@@ -9747,14 +9860,16 @@ public class YSensor : YFunction
     public int set_reportFrequency(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("reportFrequency", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("reportFrequency", rest_val);
+        }
     }
 
     public string get_calibrationParam()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CALIBRATIONPARAM_INVALID;
@@ -9768,8 +9883,10 @@ public class YSensor : YFunction
     public int set_calibrationParam(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("calibrationParam", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("calibrationParam", rest_val);
+        }
     }
 
     /**
@@ -9797,8 +9914,10 @@ public class YSensor : YFunction
     public int set_resolution(double newval)
     {
         string rest_val;
-        rest_val = Math.Round(newval * 65536.0).ToString();
-        return _setAttr("resolution", rest_val);
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("resolution", rest_val);
+        }
     }
 
     /**
@@ -9821,7 +9940,7 @@ public class YSensor : YFunction
     public double get_resolution()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return RESOLUTION_INVALID;
@@ -9852,7 +9971,7 @@ public class YSensor : YFunction
     public int get_sensorState()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SENSORSTATE_INVALID;
@@ -10291,8 +10410,10 @@ public class YSensor : YFunction
     {
         string rest_val;
         // may throw an exception
-        rest_val = this._encodeCalibrationPoints(rawValues, refValues);
-        return this._setAttr("calibrationParam", rest_val);
+        lock (_thisLock) {
+            rest_val = this._encodeCalibrationPoints(rawValues, refValues);
+            return this._setAttr("calibrationParam", rest_val);
+        }
     }
 
     /**
@@ -10324,22 +10445,24 @@ public class YSensor : YFunction
         rawValues.Clear();
         refValues.Clear();
         // Load function parameters if not yet loaded
-        if (this._scale == 0) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return YAPI.DEVICE_NOT_FOUND;
+        lock (_thisLock) {
+            if (this._scale == 0) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return YAPI.DEVICE_NOT_FOUND;
+                }
             }
-        }
-        if (this._caltyp < 0) {
-            this._throw(YAPI.NOT_SUPPORTED, "Calibration parameters format mismatch. Please upgrade your library or firmware.");
-            return YAPI.NOT_SUPPORTED;
-        }
-        rawValues.Clear();
-        refValues.Clear();
-        for (int ii = 0; ii < this._calraw.Count; ii++) {
-            rawValues.Add(this._calraw[ii]);
-        }
-        for (int ii = 0; ii < this._calref.Count; ii++) {
-            refValues.Add(this._calref[ii]);
+            if (this._caltyp < 0) {
+                this._throw(YAPI.NOT_SUPPORTED, "Calibration parameters format mismatch. Please upgrade your library or firmware.");
+                return YAPI.NOT_SUPPORTED;
+            }
+            rawValues.Clear();
+            refValues.Clear();
+            for (int ii = 0; ii < this._calraw.Count; ii++) {
+                rawValues.Add(this._calraw[ii]);
+            }
+            for (int ii = 0; ii < this._calref.Count; ii++) {
+                refValues.Add(this._calref[ii]);
+            }
         }
         return YAPI.SUCCESS;
     }

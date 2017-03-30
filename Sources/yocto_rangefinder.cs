@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_rangefinder.cs 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: yocto_rangefinder.cs 26993 2017-03-30 15:54:10Z seb $
  *
  * Implements yFindRangeFinder(), the high-level API for RangeFinder functions
  *
@@ -99,29 +99,25 @@ public class YRangeFinder : YSensor
 
     //--- (YRangeFinder implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "rangeFinderMode")
+        if (json_val.Has("rangeFinderMode"))
         {
-            _rangeFinderMode = (int)member.ivalue;
-            return;
+            _rangeFinderMode = json_val.GetInt("rangeFinderMode");
         }
-        if (member.name == "hardwareCalibration")
+        if (json_val.Has("hardwareCalibration"))
         {
-            _hardwareCalibration = member.svalue;
-            return;
+            _hardwareCalibration = json_val.GetString("hardwareCalibration");
         }
-        if (member.name == "currentTemperature")
+        if (json_val.Has("currentTemperature"))
         {
-            _currentTemperature = Math.Round(member.ivalue * 1000.0 / 65536.0) / 1000.0;
-            return;
+            _currentTemperature = Math.Round(json_val.GetDouble("currentTemperature") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (member.name == "command")
+        if (json_val.Has("command"))
         {
-            _command = member.svalue;
-            return;
+            _command = json_val.GetString("command");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -152,8 +148,10 @@ public class YRangeFinder : YSensor
     public int set_unit(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("unit", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("unit", rest_val);
+        }
     }
 
     /**
@@ -178,7 +176,7 @@ public class YRangeFinder : YSensor
     public int get_rangeFinderMode()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return RANGEFINDERMODE_INVALID;
@@ -216,14 +214,16 @@ public class YRangeFinder : YSensor
     public int set_rangeFinderMode(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("rangeFinderMode", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("rangeFinderMode", rest_val);
+        }
     }
 
     public string get_hardwareCalibration()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return HARDWARECALIBRATION_INVALID;
@@ -237,8 +237,10 @@ public class YRangeFinder : YSensor
     public int set_hardwareCalibration(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("hardwareCalibration", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("hardwareCalibration", rest_val);
+        }
     }
 
     /**
@@ -259,7 +261,7 @@ public class YRangeFinder : YSensor
     public double get_currentTemperature()
     {
         double res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CURRENTTEMPERATURE_INVALID;
@@ -273,7 +275,7 @@ public class YRangeFinder : YSensor
     public string get_command()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
@@ -287,8 +289,10 @@ public class YRangeFinder : YSensor
     public int set_command(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("command", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("command", rest_val);
+        }
     }
 
     /**
@@ -450,7 +454,6 @@ public class YRangeFinder : YSensor
     public virtual double get_hardwareCalibrationTemperature()
     {
         string hwcal;
-        
         hwcal = this.get_hardwareCalibration();
         if (!((hwcal).Substring(0, 1) == "@")) {
             return YAPI.INVALID_DOUBLE;
@@ -518,7 +521,6 @@ public class YRangeFinder : YSensor
     public virtual int triggerOffsetCalibration(double targetDist)
     {
         int distmm;
-        
         if (this.get_unit() == "\"") {
             distmm = (int) Math.Round(targetDist * 25.4);
         } else {
@@ -548,7 +550,6 @@ public class YRangeFinder : YSensor
     public virtual int triggerXTalkCalibration(double targetDist)
     {
         int distmm;
-        
         if (this.get_unit() == "\"") {
             distmm = (int) Math.Round(targetDist * 25.4);
         } else {

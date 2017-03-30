@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_realtimeclock.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_realtimeclock.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -95,29 +95,25 @@ public class YRealTimeClock : YFunction
 
     //--- (YRealTimeClock implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "unixTime")
+        if (json_val.Has("unixTime"))
         {
-            _unixTime = member.ivalue;
-            return;
+            _unixTime = json_val.GetLong("unixTime");
         }
-        if (member.name == "dateTime")
+        if (json_val.Has("dateTime"))
         {
-            _dateTime = member.svalue;
-            return;
+            _dateTime = json_val.GetString("dateTime");
         }
-        if (member.name == "utcOffset")
+        if (json_val.Has("utcOffset"))
         {
-            _utcOffset = (int)member.ivalue;
-            return;
+            _utcOffset = json_val.GetInt("utcOffset");
         }
-        if (member.name == "timeSet")
+        if (json_val.Has("timeSet"))
         {
-            _timeSet = member.ivalue > 0 ? 1 : 0;
-            return;
+            _timeSet = json_val.GetInt("timeSet") > 0 ? 1 : 0;
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -138,7 +134,7 @@ public class YRealTimeClock : YFunction
     public long get_unixTime()
     {
         long res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return UNIXTIME_INVALID;
@@ -173,8 +169,10 @@ public class YRealTimeClock : YFunction
     public int set_unixTime(long newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("unixTime", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("unixTime", rest_val);
+        }
     }
 
     /**
@@ -195,7 +193,7 @@ public class YRealTimeClock : YFunction
     public string get_dateTime()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DATETIME_INVALID;
@@ -224,7 +222,7 @@ public class YRealTimeClock : YFunction
     public int get_utcOffset()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return UTCOFFSET_INVALID;
@@ -259,8 +257,10 @@ public class YRealTimeClock : YFunction
     public int set_utcOffset(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("utcOffset", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("utcOffset", rest_val);
+        }
     }
 
     /**
@@ -282,7 +282,7 @@ public class YRealTimeClock : YFunction
     public int get_timeSet()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return TIMESET_INVALID;

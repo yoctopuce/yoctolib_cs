@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_segmenteddisplay.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_segmenteddisplay.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
  *
@@ -89,19 +89,17 @@ public class YSegmentedDisplay : YFunction
 
     //--- (YSegmentedDisplay implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "displayedText")
+        if (json_val.Has("displayedText"))
         {
-            _displayedText = member.svalue;
-            return;
+            _displayedText = json_val.GetString("displayedText");
         }
-        if (member.name == "displayMode")
+        if (json_val.Has("displayMode"))
         {
-            _displayMode = (int)member.ivalue;
-            return;
+            _displayMode = json_val.GetInt("displayMode");
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -122,7 +120,7 @@ public class YSegmentedDisplay : YFunction
     public string get_displayedText()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DISPLAYEDTEXT_INVALID;
@@ -156,14 +154,16 @@ public class YSegmentedDisplay : YFunction
     public int set_displayedText(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("displayedText", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("displayedText", rest_val);
+        }
     }
 
     public int get_displayMode()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return DISPLAYMODE_INVALID;
@@ -177,8 +177,10 @@ public class YSegmentedDisplay : YFunction
     public int set_displayMode(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("displayMode", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("displayMode", rest_val);
+        }
     }
 
     /**

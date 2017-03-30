@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_spiport.cs 26751 2017-03-14 08:04:50Z seb $
+ * $Id: yocto_spiport.cs 26947 2017-03-28 11:50:22Z seb $
  *
  * Implements yFindSpiPort(), the high-level API for SpiPort functions
  *
@@ -127,79 +127,65 @@ public class YSpiPort : YFunction
 
     //--- (YSpiPort implementation)
 
-    protected override void _parseAttr(YAPI.TJSONRECORD member)
+    protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (member.name == "rxCount")
+        if (json_val.Has("rxCount"))
         {
-            _rxCount = (int)member.ivalue;
-            return;
+            _rxCount = json_val.GetInt("rxCount");
         }
-        if (member.name == "txCount")
+        if (json_val.Has("txCount"))
         {
-            _txCount = (int)member.ivalue;
-            return;
+            _txCount = json_val.GetInt("txCount");
         }
-        if (member.name == "errCount")
+        if (json_val.Has("errCount"))
         {
-            _errCount = (int)member.ivalue;
-            return;
+            _errCount = json_val.GetInt("errCount");
         }
-        if (member.name == "rxMsgCount")
+        if (json_val.Has("rxMsgCount"))
         {
-            _rxMsgCount = (int)member.ivalue;
-            return;
+            _rxMsgCount = json_val.GetInt("rxMsgCount");
         }
-        if (member.name == "txMsgCount")
+        if (json_val.Has("txMsgCount"))
         {
-            _txMsgCount = (int)member.ivalue;
-            return;
+            _txMsgCount = json_val.GetInt("txMsgCount");
         }
-        if (member.name == "lastMsg")
+        if (json_val.Has("lastMsg"))
         {
-            _lastMsg = member.svalue;
-            return;
+            _lastMsg = json_val.GetString("lastMsg");
         }
-        if (member.name == "currentJob")
+        if (json_val.Has("currentJob"))
         {
-            _currentJob = member.svalue;
-            return;
+            _currentJob = json_val.GetString("currentJob");
         }
-        if (member.name == "startupJob")
+        if (json_val.Has("startupJob"))
         {
-            _startupJob = member.svalue;
-            return;
+            _startupJob = json_val.GetString("startupJob");
         }
-        if (member.name == "command")
+        if (json_val.Has("command"))
         {
-            _command = member.svalue;
-            return;
+            _command = json_val.GetString("command");
         }
-        if (member.name == "voltageLevel")
+        if (json_val.Has("voltageLevel"))
         {
-            _voltageLevel = (int)member.ivalue;
-            return;
+            _voltageLevel = json_val.GetInt("voltageLevel");
         }
-        if (member.name == "protocol")
+        if (json_val.Has("protocol"))
         {
-            _protocol = member.svalue;
-            return;
+            _protocol = json_val.GetString("protocol");
         }
-        if (member.name == "spiMode")
+        if (json_val.Has("spiMode"))
         {
-            _spiMode = member.svalue;
-            return;
+            _spiMode = json_val.GetString("spiMode");
         }
-        if (member.name == "ssPolarity")
+        if (json_val.Has("ssPolarity"))
         {
-            _ssPolarity = member.ivalue > 0 ? 1 : 0;
-            return;
+            _ssPolarity = json_val.GetInt("ssPolarity") > 0 ? 1 : 0;
         }
-        if (member.name == "shitftSampling")
+        if (json_val.Has("shitftSampling"))
         {
-            _shitftSampling = member.ivalue > 0 ? 1 : 0;
-            return;
+            _shitftSampling = json_val.GetInt("shitftSampling") > 0 ? 1 : 0;
         }
-        base._parseAttr(member);
+        base._parseAttr(json_val);
     }
 
     /**
@@ -220,7 +206,7 @@ public class YSpiPort : YFunction
     public int get_rxCount()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return RXCOUNT_INVALID;
@@ -249,7 +235,7 @@ public class YSpiPort : YFunction
     public int get_txCount()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return TXCOUNT_INVALID;
@@ -278,7 +264,7 @@ public class YSpiPort : YFunction
     public int get_errCount()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return ERRCOUNT_INVALID;
@@ -307,7 +293,7 @@ public class YSpiPort : YFunction
     public int get_rxMsgCount()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return RXMSGCOUNT_INVALID;
@@ -336,7 +322,7 @@ public class YSpiPort : YFunction
     public int get_txMsgCount()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return TXMSGCOUNT_INVALID;
@@ -365,7 +351,7 @@ public class YSpiPort : YFunction
     public string get_lastMsg()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return LASTMSG_INVALID;
@@ -394,7 +380,7 @@ public class YSpiPort : YFunction
     public string get_currentJob()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return CURRENTJOB_INVALID;
@@ -430,8 +416,10 @@ public class YSpiPort : YFunction
     public int set_currentJob(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("currentJob", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("currentJob", rest_val);
+        }
     }
 
     /**
@@ -452,7 +440,7 @@ public class YSpiPort : YFunction
     public string get_startupJob()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return STARTUPJOB_INVALID;
@@ -488,14 +476,16 @@ public class YSpiPort : YFunction
     public int set_startupJob(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("startupJob", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("startupJob", rest_val);
+        }
     }
 
     public string get_command()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
@@ -509,8 +499,10 @@ public class YSpiPort : YFunction
     public int set_command(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("command", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("command", rest_val);
+        }
     }
 
     /**
@@ -534,7 +526,7 @@ public class YSpiPort : YFunction
     public int get_voltageLevel()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return VOLTAGELEVEL_INVALID;
@@ -576,8 +568,10 @@ public class YSpiPort : YFunction
     public int set_voltageLevel(int newval)
     {
         string rest_val;
-        rest_val = (newval).ToString();
-        return _setAttr("voltageLevel", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("voltageLevel", rest_val);
+        }
     }
 
     /**
@@ -602,7 +596,7 @@ public class YSpiPort : YFunction
     public string get_protocol()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PROTOCOL_INVALID;
@@ -642,8 +636,10 @@ public class YSpiPort : YFunction
     public int set_protocol(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("protocol", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("protocol", rest_val);
+        }
     }
 
     /**
@@ -668,7 +664,7 @@ public class YSpiPort : YFunction
     public string get_spiMode()
     {
         string res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SPIMODE_INVALID;
@@ -706,8 +702,10 @@ public class YSpiPort : YFunction
     public int set_spiMode(string newval)
     {
         string rest_val;
-        rest_val = newval;
-        return _setAttr("spiMode", rest_val);
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("spiMode", rest_val);
+        }
     }
 
     /**
@@ -729,7 +727,7 @@ public class YSpiPort : YFunction
     public int get_ssPolarity()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SSPOLARITY_INVALID;
@@ -764,8 +762,10 @@ public class YSpiPort : YFunction
     public int set_ssPolarity(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("ssPolarity", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("ssPolarity", rest_val);
+        }
     }
 
     /**
@@ -787,7 +787,7 @@ public class YSpiPort : YFunction
     public int get_shitftSampling()
     {
         int res;
-        lock (thisLock) {
+        lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SHITFTSAMPLING_INVALID;
@@ -825,8 +825,10 @@ public class YSpiPort : YFunction
     public int set_shitftSampling(int newval)
     {
         string rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        return _setAttr("shitftSampling", rest_val);
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("shitftSampling", rest_val);
+        }
     }
 
     /**
