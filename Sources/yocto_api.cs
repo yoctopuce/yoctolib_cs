@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 26998 2017-03-30 16:20:06Z seb $
+ * $Id: yocto_api.cs 27013 2017-03-31 12:53:30Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1093,7 +1093,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "26999";
+    public const string YOCTO_API_BUILD_NO = "27033";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -10409,11 +10409,13 @@ public class YSensor : YFunction
     public virtual int calibrateFromPoints(List<double> rawValues, List<double> refValues)
     {
         string rest_val;
+        int res;
         // may throw an exception
         lock (_thisLock) {
             rest_val = this._encodeCalibrationPoints(rawValues, refValues);
-            return this._setAttr("calibrationParam", rest_val);
+            res = this._setAttr("calibrationParam", rest_val);
         }
+        return res;
     }
 
     /**

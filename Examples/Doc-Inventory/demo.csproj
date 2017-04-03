@@ -101,6 +101,9 @@
 <Compile Include="..\..\Sources\yocto_bluetoothlink.cs">
 <Link>yocto_api\yocto_bluetoothlink.cs</Link>
 </Compile>
+<Compile Include="..\..\Sources\yocto_bridgecontrol.cs">
+<Link>yocto_api\yocto_bridgecontrol.cs</Link>
+</Compile>
 <Compile Include="..\..\Sources\yocto_buzzer.cs">
 <Link>yocto_api\yocto_buzzer.cs</Link>
 </Compile>
