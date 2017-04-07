@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_refframe.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_refframe.cs 27111 2017-04-06 22:19:25Z seb $
  *
  * Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -507,7 +507,7 @@ public enum   MOUNTORIENTATION
         List<int> iCalib = new List<int>();
         int caltyp;
         int res;
-        // may throw an exception
+        
         calibParam = this.get_calibrationParam();
         iCalib = YAPI._decodeFloats(calibParam);
         caltyp = ((iCalib[0]) / (1000));
@@ -544,7 +544,7 @@ public enum   MOUNTORIENTATION
         List<int> iCalib = new List<int>();
         int caltyp;
         int res;
-        // may throw an exception
+        
         calibParam = this.get_calibrationParam();
         iCalib = YAPI._decodeFloats(calibParam);
         caltyp = ((iCalib[0]) / (1000));
@@ -753,6 +753,7 @@ public enum   MOUNTORIENTATION
         }
         // Discard measures that are not in the proper orientation
         if (this._calibStageProgress == 0) {
+            // New stage, check that this orientation is not yet done
             idx = 0;
             err = 0;
             while (idx + 1 < this._calibStage) {
@@ -767,6 +768,7 @@ public enum   MOUNTORIENTATION
             }
             this._calibOrient.Add(orient);
         } else {
+            // Make sure device is not turned before stage is completed
             if (orient != this._calibOrient[this._calibStage-1]) {
                 this._calibStageHint = "Not yet done, please move back to the previous face";
                 return YAPI.SUCCESS;
@@ -893,7 +895,7 @@ public enum   MOUNTORIENTATION
                 return YAPI.SUCCESS;
             }
         }
-        // may throw an exception
+        
         calibParam = this._download("api/refFrame/calibrationParam.txt");
         iCalib = YAPI._decodeFloats(YAPI.DefaultEncoding.GetString(calibParam));
         cal3 = ((iCalib[1]) / (1000));
@@ -1114,7 +1116,7 @@ public enum   MOUNTORIENTATION
         if (this._calibStage == 0) {
             return YAPI.SUCCESS;
         }
-        // may throw an exception
+        
         this._calibStage = 0;
         return this.set_calibrationParam(this._calibSavedParams);
     }

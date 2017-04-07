@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 27013 2017-03-31 12:53:30Z seb $
+ * $Id: yocto_api.cs 27111 2017-04-06 22:19:25Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1093,7 +1093,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "27033";
+    public const string YOCTO_API_BUILD_NO = "27127";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -4270,7 +4270,7 @@ public class YDataStream
             this._nRows = 0;
             return YAPI.SUCCESS;
         }
-        // may throw an exception
+        
         udat = YAPI._decodeWords(this._parent._json_get_string(sdata));
         this._values.Clear();
         idx = 0;
@@ -5083,7 +5083,7 @@ public class YDataSet
         int minCol;
         int avgCol;
         int maxCol;
-        // may throw an exception
+        
         if (progress != this._progress) {
             return this._progress;
         }
@@ -5409,7 +5409,7 @@ public class YDataSet
         int minCol;
         int avgCol;
         int maxCol;
-        // may throw an exception
+        
         startUtc = (long) Math.Round(measure.get_startTimeUTC());
         stream = null;
         for (int ii = 0; ii < this._streams.Count; ii++) {
@@ -7969,7 +7969,7 @@ public class YModule : YFunction
     {
         string serial;
         byte[] settings;
-        // may throw an exception
+        
         serial = this.get_serialNumber();
         settings = this.get_allSettings();
         if ((settings).Length == 0) {
@@ -8035,7 +8035,7 @@ public class YModule : YFunction
         string ext_settings;
         List<string> filelist = new List<string>();
         List<string> templist = new List<string>();
-        // may throw an exception
+        
         settings = this._download("api.json");
         if ((settings).Length == 0) {
             return settings;
@@ -8091,7 +8091,7 @@ public class YModule : YFunction
         int ofs;
         int size;
         url = "api/" + funcId + ".json?command=Z";
-        // may throw an exception
+        
         this._download(url);
         // add records in growing resistance value
         values = this._json_get_array(YAPI.DefaultEncoding.GetBytes(jsonExtra));
@@ -8207,7 +8207,7 @@ public class YModule : YFunction
         int count;
         int i;
         string fid;
-        // may throw an exception
+        
         count  = this.functionCount();
         i = 0;
         while (i < count) {
@@ -8241,7 +8241,7 @@ public class YModule : YFunction
         int i;
         string ftype;
         List<string> res = new List<string>();
-        // may throw an exception
+        
         count = this.functionCount();
         i = 0;
         while (i < count) {
@@ -8372,9 +8372,11 @@ public class YModule : YFunction
         paramScale = funScale;
         paramOffset = funOffset;
         if (funVer < 3) {
+            // Read the effective device scale if available
             if (funVer == 2) {
                 words = YAPI._decodeWords(currentFuncValue);
                 if ((words[0] == 1366) && (words[1] == 12500)) {
+                    // Yocto-3D RefFrame used a special encoding
                     funScale = 1;
                     funOffset = 0;
                 } else {
@@ -8392,9 +8394,11 @@ public class YModule : YFunction
         calibData.Clear();
         calibType = 0;
         if (paramVer < 3) {
+            // Handle old 16 bit parameters formats
             if (paramVer == 2) {
                 words = YAPI._decodeWords(param);
                 if ((words[0] == 1366) && (words[1] == 12500)) {
+                    // Yocto-3D RefFrame used a special encoding
                     paramScale = 1;
                     paramOffset = 0;
                 } else {
@@ -8447,13 +8451,16 @@ public class YModule : YFunction
             i = 0;
             while (i < calibData.Count) {
                 if (paramScale > 0) {
+                    // scalar decoding
                     calibData[i] = (calibData[i] - paramOffset) / paramScale;
                 } else {
+                    // floating-point decoding
                     calibData[i] = YAPI._decimalToDouble((int) Math.Round(calibData[i]));
                 }
                 i = i + 1;
             }
         } else {
+            // Handle latest 32bit parameter format
             iCalib = YAPI._decodeFloats(param);
             calibType = (int) Math.Round(iCalib[0] / 1000.0);
             if (calibType >= 30) {
@@ -8466,6 +8473,7 @@ public class YModule : YFunction
             }
         }
         if (funVer >= 3) {
+            // Encode parameters in new format
             if (calibData.Count == 0) {
                 param = "0,";
             } else {
@@ -8484,6 +8492,7 @@ public class YModule : YFunction
             }
         } else {
             if (funVer >= 1) {
+                // Encode parameters for older devices
                 nPoints = ((calibData.Count) / (2));
                 param = (nPoints).ToString();
                 i = 0;
@@ -8497,6 +8506,7 @@ public class YModule : YFunction
                     i = i + 1;
                 }
             } else {
+                // Initial V0 encoding used for old Yocto-Light
                 if (calibData.Count == 4) {
                     param = (Math.Round(1000 * (calibData[3] - calibData[1]) / calibData[2] - calibData[0])).ToString();
                 }
@@ -8571,6 +8581,7 @@ public class YModule : YFunction
         old_dslist = this._json_get_array(old_json_flat);
         for (int ii = 0; ii < old_dslist.Count; ii++) {
             each_str = this._json_get_string(YAPI.DefaultEncoding.GetBytes(old_dslist[ii]));
+            // split json path and attr
             leng = (each_str).Length;
             eqpos = (each_str).IndexOf("=");
             if ((eqpos < 0) || (leng == 0)) {
@@ -8584,12 +8595,14 @@ public class YModule : YFunction
             old_jpath_len.Add((jpath).Length);
             old_val_arr.Add(value);
         }
-        // may throw an exception
+        
         actualSettings = this._download("api.json");
         actualSettings = this._flattenJsonStruct(actualSettings);
         new_dslist = this._json_get_array(actualSettings);
         for (int ii = 0; ii < new_dslist.Count; ii++) {
+            // remove quotes
             each_str = this._json_get_string(YAPI.DefaultEncoding.GetBytes(new_dslist[ii]));
+            // split json path and attr
             leng = (each_str).Length;
             eqpos = (each_str).IndexOf("=");
             if ((eqpos < 0) || (leng == 0)) {
@@ -8856,7 +8869,7 @@ public class YModule : YFunction
     public virtual string get_lastLogs()
     {
         byte[] content;
-        // may throw an exception
+        
         content = this._download("logs.txt");
         return YAPI.DefaultEncoding.GetString(content);
     }
@@ -8908,7 +8921,7 @@ public class YModule : YFunction
         string subdevice_list;
         List<string> subdevices = new List<string>();
         string serial;
-        // may throw an exception
+        
         serial = this.get_serialNumber();
         fullsize = 0;
         yapi_res = SafeNativeMethods._yapiGetSubdevices(new StringBuilder(serial), smallbuff, 1024, ref fullsize, errmsg);
@@ -8954,7 +8967,7 @@ public class YModule : YFunction
         int pathsize;
         int yapi_res;
         string serial;
-        // may throw an exception
+        
         serial = this.get_serialNumber();
         // retrieve device object
         pathsize = 0;
@@ -8984,7 +8997,7 @@ public class YModule : YFunction
         int pathsize;
         int yapi_res;
         string serial;
-        // may throw an exception
+        
         serial = this.get_serialNumber();
         // retrieve device object
         pathsize = 0;
@@ -10112,19 +10125,23 @@ public class YSensor : YFunction
             return 0;
         }
         if ((this._calibrationParam).IndexOf(",") >= 0) {
+            // Plain text format
             iCalib = YAPI._decodeFloats(this._calibrationParam);
             this._caltyp = ((iCalib[0]) / (1000));
             if (this._caltyp > 0) {
                 if (this._caltyp < YAPI.YOCTO_CALIB_TYPE_OFS) {
+                    // Unknown calibration type: calibrated value will be provided by the device
                     this._caltyp = -1;
                     return 0;
                 }
                 this._calhdl = YAPI._getCalibrationHandler(this._caltyp);
                 if (!(this._calhdl != null)) {
+                    // Unknown calibration type: calibrated value will be provided by the device
                     this._caltyp = -1;
                     return 0;
                 }
             }
+            // New 32bit text format
             this._isScal = true;
             this._isScal32 = true;
             this._offset = 0;
@@ -10149,11 +10166,14 @@ public class YSensor : YFunction
                 position = position + 2;
             }
         } else {
+            // Recorder-encoded format, including encoding
             iCalib = YAPI._decodeWords(this._calibrationParam);
+            // In case of unknown format, calibrated value will be provided by the device
             if (iCalib.Count < 2) {
                 this._caltyp = -1;
                 return 0;
             }
+            // Save variable format (scale for scalar, or decimal exponent)
             this._isScal = (iCalib[1] > 0);
             if (this._isScal) {
                 this._offset = iCalib[0];
@@ -10172,12 +10192,14 @@ public class YSensor : YFunction
                     position = position - 1;
                 }
             }
+            // Shortcut when there is no calibration parameter
             if (iCalib.Count == 2) {
                 this._caltyp = 0;
                 return 0;
             }
             this._caltyp = iCalib[2];
             this._calhdl = YAPI._getCalibrationHandler(this._caltyp);
+            // parse calibration points
             if (this._caltyp <= 10) {
                 maxpos = this._caltyp;
             } else {
@@ -10259,7 +10281,7 @@ public class YSensor : YFunction
     public virtual int startDataLogger()
     {
         byte[] res;
-        // may throw an exception
+        
         res = this._download("api/dataLogger/recording?recording=1");
         if (!((res).Length>0)) { this._throw( YAPI.IO_ERROR, "unable to start datalogger"); return YAPI.IO_ERROR; }
         return YAPI.SUCCESS;
@@ -10278,7 +10300,7 @@ public class YSensor : YFunction
     public virtual int stopDataLogger()
     {
         byte[] res;
-        // may throw an exception
+        
         res = this._download("api/dataLogger/recording?recording=0");
         if (!((res).Length>0)) { this._throw( YAPI.IO_ERROR, "unable to stop datalogger"); return YAPI.IO_ERROR; }
         return YAPI.SUCCESS;
@@ -10326,7 +10348,7 @@ public class YSensor : YFunction
     {
         string funcid;
         string funit;
-        // may throw an exception
+        
         funcid = this.get_functionId();
         funit = this.get_unit();
         return new YDataSet(this, funcid, funit, startTime, endTime);
@@ -10410,7 +10432,7 @@ public class YSensor : YFunction
     {
         string rest_val;
         int res;
-        // may throw an exception
+        
         lock (_thisLock) {
             rest_val = this._encodeCalibrationPoints(rawValues, refValues);
             res = this._setAttr("calibrationParam", rest_val);
@@ -10497,6 +10519,7 @@ public class YSensor : YFunction
             return "0";
         }
         if (this._isScal32) {
+            // 32-bit fixed-point encoding
             res = ""+Convert.ToString(YAPI.YOCTO_CALIB_TYPE_OFS);
             idx = 0;
             while (idx < npt) {
@@ -10505,6 +10528,7 @@ public class YSensor : YFunction
             }
         } else {
             if (this._isScal) {
+                // 16-bit fixed-point encoding
                 res = ""+Convert.ToString(npt);
                 idx = 0;
                 while (idx < npt) {
@@ -10514,6 +10538,7 @@ public class YSensor : YFunction
                     idx = idx + 1;
                 }
             } else {
+                // 16-bit floating-point decimal encoding
                 res = ""+Convert.ToString(10 + npt);
                 idx = 0;
                 while (idx < npt) {
@@ -10566,7 +10591,9 @@ public class YSensor : YFunction
             startTime = endTime;
         }
         if (report[0] == 2) {
+            // 32bit timed report format
             if (report.Count <= 5) {
+                // sub-second report, 1-4 bytes
                 poww = 1;
                 avgRaw = 0;
                 byteVal = 0;
@@ -10589,6 +10616,7 @@ public class YSensor : YFunction
                 minVal = avgVal;
                 maxVal = avgVal;
             } else {
+                // averaged report: avg,avg-min,max-avg
                 sublen = 1 + ((report[1]) & (3));
                 poww = 1;
                 avgRaw = 0;
@@ -10638,7 +10666,9 @@ public class YSensor : YFunction
                 }
             }
         } else {
+            // 16bit timed report format
             if (report[0] == 0) {
+                // sub-second report, 1-4 bytes
                 poww = 1;
                 avgRaw = 0;
                 byteVal = 0;
@@ -10660,6 +10690,7 @@ public class YSensor : YFunction
                 minVal = avgVal;
                 maxVal = avgVal;
             } else {
+                // averaged report 2+4+2 bytes
                 minRaw = report[1] + 0x100 * report[2];
                 maxRaw = report[3] + 0x100 * report[4];
                 avgRaw = report[5] + 0x100 * report[6] + 0x10000 * report[7];

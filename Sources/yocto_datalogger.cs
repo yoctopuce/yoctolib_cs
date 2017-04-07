@@ -1,6 +1,6 @@
 /********************************************************************
  *
- * $Id: yocto_datalogger.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_datalogger.cs 27111 2017-04-06 22:19:25Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -816,7 +816,7 @@ public class YDataLogger : YFunction
         List<string> dslist = new List<string>();
         YDataSet dataset;
         List<YDataSet> res = new List<YDataSet>();
-        // may throw an exception
+        
         dslist = this._json_get_array(json);
         res.Clear();
         for (int ii = 0; ii < dslist.Count; ii++) {

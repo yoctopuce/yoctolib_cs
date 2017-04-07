@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_messagebox.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_messagebox.cs 27111 2017-04-06 22:19:25Z seb $
  *
  * Implements yFindMessageBox(), the high-level API for MessageBox functions
  *
@@ -169,9 +169,11 @@ public class YSms
         int i;
         
         if (this._alphab == 0) {
+            // using GSM standard 7-bit alphabet
             return this._mbox.gsm2str(this._udata);
         }
         if (this._alphab == 2) {
+            // using UCS-2 alphabet
             isosize = (((this._udata).Length) >> (1));
             isolatin = new byte[isosize];
             i = 0;
@@ -194,9 +196,11 @@ public class YSms
         int i;
         
         if (this._alphab == 0) {
+            // using GSM standard 7-bit alphabet
             return this._mbox.gsm2unicode(this._udata);
         }
         if (this._alphab == 2) {
+            // using UCS-2 alphabet
             unisize = (((this._udata).Length) >> (1));
             res.Clear();
             i = 0;
@@ -206,6 +210,7 @@ public class YSms
                 i = i + 1;
             }
         } else {
+            // return straight 8-bit values
             unisize = (this._udata).Length;
             res.Clear();
             i = 0;
@@ -402,9 +407,11 @@ public class YSms
         }
         
         if (this._alphab == 0) {
+            // Try to append using GSM 7-bit alphabet
             newdata = this._mbox.str2gsm(val);
             newdatalen = (newdata).Length;
             if (newdatalen == 0) {
+                // 7-bit not possible, switch to unicode
                 this.convertToUnicode();
                 newdata = YAPI.DefaultEncoding.GetBytes(val);
                 newdatalen = (newdata).Length;
@@ -415,6 +422,7 @@ public class YSms
         }
         udatalen = (this._udata).Length;
         if (this._alphab == 2) {
+            // Append in unicode directly
             udata = new byte[udatalen + 2*newdatalen];
             i = 0;
             while (i < udatalen) {
@@ -428,6 +436,7 @@ public class YSms
                 i = i + 1;
             }
         } else {
+            // Append binary buffers
             udata = new byte[udatalen+newdatalen];
             i = 0;
             while (i < udatalen) {
@@ -642,6 +651,7 @@ public class YSms
         res = "";
         addrType = ((addr[ofs]) & (112));
         if (addrType == 80) {
+            // alphanumeric number
             siz = ((4*siz) / (7));
             gsm7 = new byte[siz];
             rpos = 1;
@@ -664,6 +674,7 @@ public class YSms
             }
             return this._mbox.gsm2str(gsm7);
         } else {
+            // standard phone number
             if (addrType == 16) {
                 res = "+";
             }
@@ -674,6 +685,7 @@ public class YSms
                 res = ""+ res+""+String.Format("{0:X}", ((byt) & (15)))+""+String.Format("{0:X}",((byt) >> (4)));
                 i = i + 1;
             }
+            // remove padding digit if needed
             if (((addr[ofs+siz]) >> (4)) == 15) {
                 res = (res).Substring( 0, (res).Length-1);
             }
@@ -718,6 +730,7 @@ public class YSms
             return res;
         }
         if ((exp).Substring(4, 1) == "-" || (exp).Substring(4, 1) == "/") {
+            // ignore century
             exp = (exp).Substring( 2, explen-2);
             explen = (exp).Length;
         }
@@ -744,6 +757,7 @@ public class YSms
             n = n + 1;
         }
         if (i+2 < explen) {
+            // convert for timezone in cleartext ISO format +/-nn:nn
             v1 = expasc[i-3];
             v2 = expasc[i];
             if (((v1 == 43) || (v1 == 45)) && (v2 == 58)) {
@@ -872,12 +886,14 @@ public class YSms
         carry = 0;
         // 1. Encode UDL
         if (this._alphab == 0) {
+            // 7-bit encoding
             if (udhsize > 0) {
                 udhlen = (((8 + 8*udhsize + 6)) / (7));
                 nbits = 7*udhlen - 8 - 8*udhsize;
             }
             res[0] = (byte)(udhlen+udlen & 0xff);
         } else {
+            // 8-bit encoding
             res[0] = (byte)(udsize & 0xff);
         }
         // 2. Encode UDHL and UDL
@@ -894,6 +910,7 @@ public class YSms
         }
         // 3. Encode UD
         if (this._alphab == 0) {
+            // 7-bit encoding
             i = 0;
             while (i < udlen) {
                 if (nbits == 0) {
@@ -912,6 +929,7 @@ public class YSms
                 res[wpos] = (byte)(carry & 0xff);
             }
         } else {
+            // 8-bit encoding
             i = 0;
             while (i < udlen) {
                 res[wpos] = (byte)(this._udata[i] & 0xff);
@@ -947,8 +965,8 @@ public class YSms
         while (wpos < udlen) {
             partno = partno + 1;
             newudh = new byte[5+udhsize];
-            newudh[0] = (byte)(0 & 0xff);
-            newudh[1] = (byte)(3 & 0xff);
+            newudh[0] = (byte)(0 & 0xff);           // IEI: concatenated message
+            newudh[1] = (byte)(3 & 0xff);           // IEDL: 3 bytes
             newudh[2] = (byte)(this._mref & 0xff);
             newudh[3] = (byte)(this._npdu & 0xff);
             newudh[4] = (byte)(partno & 0xff);
@@ -998,6 +1016,7 @@ public class YSms
         // Determine if the message can fit within a single PDU
         this._parts.Clear();
         if (this.udataSize() > 140) {
+            // multiple PDU are needed
             this._pdu = new byte[0];
             return this.generateParts();
         }
@@ -1088,6 +1107,7 @@ public class YSms
             i = i + 2;
             if (i + ielen <= udhlen) {
                 if ((iei == 0) && (ielen == 3)) {
+                    // concatenated SMS, 8-bit ref
                     sig = ""+ this._orig+"-"+ this._dest+"-"+String.Format("{0:X02}",
                     this._mref)+"-"+String.Format("{0:X02}",this._udh[i]);
                     this._aggSig = sig;
@@ -1095,6 +1115,7 @@ public class YSms
                     this._aggIdx = this._udh[i+2];
                 }
                 if ((iei == 8) && (ielen == 4)) {
+                    // concatenated SMS, 16-bit ref
                     sig = ""+ this._orig+"-"+ this._dest+"-"+String.Format("{0:X02}",
                     this._mref)+"-"+String.Format("{0:X02}", this._udh[i])+""+String.Format("{0:X02}",this._udh[i+1]);
                     this._aggSig = sig;
@@ -1180,6 +1201,7 @@ public class YSms
                 i = i + 1;
             }
             if (this._alphab == 0) {
+                // 7-bit encoding
                 udhlen = (((8 + 8*udhsize + 6)) / (7));
                 nbits = 7*udhlen - 8 - 8*udhsize;
                 if (nbits > 0) {
@@ -1189,6 +1211,7 @@ public class YSms
                     nbits = 8 - nbits;
                 }
             } else {
+                // byte encoding
                 udhlen = 1+udhsize;
             }
             udlen = udlen - udhlen;
@@ -1198,6 +1221,7 @@ public class YSms
         }
         this._udata = new byte[udlen];
         if (this._alphab == 0) {
+            // 7-bit encoding
             i = 0;
             while (i < udlen) {
                 if (nbits == 7) {
@@ -1214,6 +1238,7 @@ public class YSms
                 i = i + 1;
             }
         } else {
+            // 8-bit encoding
             i = 0;
             while (i < udlen) {
                 this._udata[i] = (byte)(pdu[rpos] & 0xff);
@@ -1231,7 +1256,7 @@ public class YSms
         int i;
         int retcode;
         YSms pdu;
-        // may throw an exception
+        
         if (this._npdu == 0) {
             this.generatePdu();
         }
@@ -1253,7 +1278,7 @@ public class YSms
         int i;
         int retcode;
         YSms pdu;
-        // may throw an exception
+        
         if (this._slot > 0) {
             return this._mbox.clearSIMSlot(this._slot);
         }
@@ -1689,7 +1714,7 @@ public class YMessageBox : YFunction
         string hexPdu;
         YSms sms;
         
-        // may throw an exception
+        
         binPdu = this._download("sms.json?pos="+Convert.ToString(slot)+"&len=1");
         arrPdu = this._json_get_array(binPdu);
         hexPdu = this._decode_json_string(arrPdu[0]);
@@ -1774,6 +1799,7 @@ public class YMessageBox : YFunction
         }
         i = 0;
         while (i < 4) {
+            // mark escape sequences
             this._iso2gsm[91+i] = (byte)(27 & 0xff);
             this._iso2gsm[123+i] = (byte)(27 & 0xff);
             i = i + 1;
@@ -1986,6 +2012,7 @@ public class YMessageBox : YFunction
                 extra = extra + 1;
             }
             if (gsm7 == 0) {
+                // cannot use standard GSM encoding
                 res = new byte[0];
                 return res;
             }
@@ -2058,7 +2085,7 @@ public class YMessageBox : YFunction
         List<string> signatures = new List<string>();
         YSms sms;
         
-        // may throw an exception
+        
         bitmapStr = this.get_slotsBitmap();
         if (bitmapStr == this._prevBitmapStr) {
             return YAPI.SUCCESS;
@@ -2188,7 +2215,7 @@ public class YMessageBox : YFunction
     public virtual int clearPduCounters()
     {
         int retcode;
-        // may throw an exception
+        
         retcode = this.set_pduReceived(0);
         if (retcode != YAPI.SUCCESS) {
             return retcode;
@@ -2225,7 +2252,7 @@ public class YMessageBox : YFunction
     public virtual int sendTextMessage(string recipient, string message)
     {
         YSms sms;
-        // may throw an exception
+        
         sms = new YSms(this);
         sms.set_recipient(recipient);
         sms.addText(message);
@@ -2261,7 +2288,7 @@ public class YMessageBox : YFunction
     public virtual int sendFlashMessage(string recipient, string message)
     {
         YSms sms;
-        // may throw an exception
+        
         sms = new YSms(this);
         sms.set_recipient(recipient);
         sms.set_msgClass(0);

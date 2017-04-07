@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_serialport.cs 27111 2017-04-06 22:19:25Z seb $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
@@ -829,7 +829,7 @@ public class YSerialPort : YFunction
         this._rxptr = 0;
         this._rxbuffptr = 0;
         this._rxbuff = new byte[0];
-        // may throw an exception
+        
         return this.sendCommand("Z");
     }
 
@@ -879,6 +879,7 @@ public class YSerialPort : YFunction
         buff = YAPI.DefaultEncoding.GetBytes(text);
         bufflen = (buff).Length;
         if (bufflen < 100) {
+            // if string is pure text, we can send it as a simple command (faster)
             ch = 0x20;
             idx = 0;
             while ((idx < bufflen) && (ch != 0)) {
@@ -949,7 +950,7 @@ public class YSerialPort : YFunction
             buff[idx] = (byte)(hexb & 0xff);
             idx = idx + 1;
         }
-        // may throw an exception
+        
         res = this._upload("txdata", buff);
         return res;
     }
@@ -989,7 +990,7 @@ public class YSerialPort : YFunction
             buff[idx] = (byte)(hexb & 0xff);
             idx = idx + 1;
         }
-        // may throw an exception
+        
         res = this._upload("txdata", buff);
         return res;
     }
@@ -1019,6 +1020,7 @@ public class YSerialPort : YFunction
         buff = YAPI.DefaultEncoding.GetBytes(""+text+"\r\n");
         bufflen = (buff).Length-2;
         if (bufflen < 100) {
+            // if string is pure text, we can send it as a simple command (faster)
             ch = 0x20;
             idx = 0;
             while ((idx < bufflen) && (ch != 0)) {
@@ -1097,7 +1099,7 @@ public class YSerialPort : YFunction
         // still mixed, need to process character by character
         this._rxptr = currpos;
         
-        // may throw an exception
+        
         buff = this._download("rxdata.bin?pos="+Convert.ToString(this._rxptr)+"&len=1");
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1143,7 +1145,7 @@ public class YSerialPort : YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        // may throw an exception
+        
         buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nChars));
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1187,7 +1189,7 @@ public class YSerialPort : YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        // may throw an exception
+        
         buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nChars));
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1237,7 +1239,7 @@ public class YSerialPort : YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        // may throw an exception
+        
         buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nChars));
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1287,7 +1289,7 @@ public class YSerialPort : YFunction
         if (nBytes > 65535) {
             nBytes = 65535;
         }
-        // may throw an exception
+        
         buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nBytes));
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1338,7 +1340,7 @@ public class YSerialPort : YFunction
         List<string> msgarr = new List<string>();
         int msglen;
         string res;
-        // may throw an exception
+        
         url = "rxmsg.json?pos="+Convert.ToString(this._rxptr)+"&len=1&maxw=1";
         msgbin = this._download(url);
         msgarr = this._json_get_array(msgbin);
@@ -1396,7 +1398,7 @@ public class YSerialPort : YFunction
         int msglen;
         List<string> res = new List<string>();
         int idx;
-        // may throw an exception
+        
         url = "rxmsg.json?pos="+Convert.ToString( this._rxptr)+"&maxw="+Convert.ToString( maxWait)+"&pat="+pattern;
         msgbin = this._download(url);
         msgarr = this._json_get_array(msgbin);
@@ -1468,7 +1470,7 @@ public class YSerialPort : YFunction
         byte[] buff;
         int bufflen;
         int res;
-        // may throw an exception
+        
         buff = this._download("rxcnt.bin?pos="+Convert.ToString(this._rxptr));
         bufflen = (buff).Length - 1;
         while ((bufflen > 0) && (buff[bufflen] != 64)) {
@@ -1506,7 +1508,7 @@ public class YSerialPort : YFunction
         List<string> msgarr = new List<string>();
         int msglen;
         string res;
-        // may throw an exception
+        
         url = "rxmsg.json?len=1&maxw="+Convert.ToString( maxWait)+"&cmd=!"+query;
         msgbin = this._download(url);
         msgarr = this._json_get_array(msgbin);
@@ -1622,7 +1624,7 @@ public class YSerialPort : YFunction
     {
         byte[] buff;
         int res;
-        // may throw an exception
+        
         buff = this._download("cts.txt");
         if (!((buff).Length == 1)) { this._throw( YAPI.IO_ERROR, "invalid CTS reply"); return YAPI.IO_ERROR; }
         res = buff[0] - 48;
@@ -1697,7 +1699,7 @@ public class YSerialPort : YFunction
             cmd = ""+ cmd+""+String.Format("{0:X02}",((pduBytes[i]) & (0xff)));
             i = i + 1;
         }
-        // may throw an exception
+        
         url = "rxmsg.json?cmd=:"+ cmd+"&pat=:"+pat;
         msgs = this._download(url);
         reps = this._json_get_array(msgs);
@@ -1759,7 +1761,7 @@ public class YSerialPort : YFunction
         pdu.Add(((pduAddr) & (0xff)));
         pdu.Add(((nBits) >> (8)));
         pdu.Add(((nBits) & (0xff)));
-        // may throw an exception
+        
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;
@@ -1826,7 +1828,7 @@ public class YSerialPort : YFunction
         pdu.Add(((pduAddr) & (0xff)));
         pdu.Add(((nBits) >> (8)));
         pdu.Add(((nBits) & (0xff)));
-        // may throw an exception
+        
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;
@@ -1892,7 +1894,7 @@ public class YSerialPort : YFunction
         pdu.Add(((pduAddr) & (0xff)));
         pdu.Add(((nWords) >> (8)));
         pdu.Add(((nWords) & (0xff)));
-        // may throw an exception
+        
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;
@@ -1949,7 +1951,7 @@ public class YSerialPort : YFunction
         pdu.Add(((pduAddr) & (0xff)));
         pdu.Add(((nWords) >> (8)));
         pdu.Add(((nWords) & (0xff)));
-        // may throw an exception
+        
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;
@@ -2007,7 +2009,7 @@ public class YSerialPort : YFunction
         pdu.Add(((pduAddr) & (0xff)));
         pdu.Add(value);
         pdu.Add(0x00);
-        // may throw an exception
+        
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;
@@ -2080,7 +2082,7 @@ public class YSerialPort : YFunction
         if (mask != 1) {
             pdu.Add(val);
         }
-        // may throw an exception
+        
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;
@@ -2127,7 +2129,7 @@ public class YSerialPort : YFunction
         pdu.Add(((pduAddr) & (0xff)));
         pdu.Add(((value) >> (8)));
         pdu.Add(((value) & (0xff)));
-        // may throw an exception
+        
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;
@@ -2187,7 +2189,7 @@ public class YSerialPort : YFunction
             pdu.Add(((val) & (0xff)));
             regpos = regpos + 1;
         }
-        // may throw an exception
+        
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;
@@ -2259,7 +2261,7 @@ public class YSerialPort : YFunction
             pdu.Add(((val) & (0xff)));
             regpos = regpos + 1;
         }
-        // may throw an exception
+        
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;

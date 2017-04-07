@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wakeupschedule.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_wakeupschedule.cs 27111 2017-04-06 22:19:25Z seb $
  *
  * Implements yFindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -620,7 +620,7 @@ public class YWakeUpSchedule : YFunction
     public virtual long get_minutes()
     {
         long res;
-        // may throw an exception
+        
         res = this.get_minutesB();
         res = ((res) << (30));
         res = res + this.get_minutesA();

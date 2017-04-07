@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_watchdog.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_watchdog.cs 27118 2017-04-06 22:38:36Z seb $
  *
  * Implements yFindWatchdog(), the high-level API for Watchdog functions
  *

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_temperature.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_temperature.cs 27111 2017-04-06 22:19:25Z seb $
  *
  * Implements yFindTemperature(), the high-level API for Temperature functions
  *
@@ -553,7 +553,7 @@ public class YTemperature : YSensor
         siz = tempValues.Count;
         if (!(siz >= 2)) { this._throw( YAPI.INVALID_ARGUMENT, "thermistor response table must have at least two points"); return YAPI.INVALID_ARGUMENT; }
         if (!(siz == resValues.Count)) { this._throw( YAPI.INVALID_ARGUMENT, "table sizes mismatch"); return YAPI.INVALID_ARGUMENT; }
-        // may throw an exception
+        
         res = this.set_command("Z");
         if (!(res==YAPI.SUCCESS)) { this._throw( YAPI.IO_ERROR, "unable to reset thermistor parameters"); return YAPI.IO_ERROR; }
         // add records in growing resistance value
@@ -625,7 +625,7 @@ public class YTemperature : YSensor
         double currRes;
         tempValues.Clear();
         resValues.Clear();
-        // may throw an exception
+        
         id = this.get_functionId();
         id = (id).Substring( 11, (id).Length - 11);
         bin_json = this._download("extra.json?page="+id);

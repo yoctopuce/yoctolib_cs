@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_display.cs 27083 2017-04-06 20:48:17Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -228,7 +228,7 @@ public enum   ALIGN
      * </para>
      * </summary>
      * <param name="mode">
-     *   <t>true</t> to enable antialiasing, <t>false</t> to
+     *   <c>true</c> to enable antialiasing, <c>false</c> to
      *   disable it.
      * </param>
      * <returns>

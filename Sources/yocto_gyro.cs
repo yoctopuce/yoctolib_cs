@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_gyro.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_gyro.cs 27111 2017-04-06 22:19:25Z seb $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -763,7 +763,7 @@ public class YGyro : YSensor
         double sqz;
         double norm;
         double delta;
-        // may throw an exception
+        
         if (this._loadQuaternion() != YAPI.SUCCESS) {
             return YAPI.DEVICE_NOT_FOUND;
         }
@@ -775,10 +775,12 @@ public class YGyro : YSensor
             norm = sqx + sqy + sqz + sqw;
             delta = this._y * this._w - this._x * this._z;
             if (delta > 0.499 * norm) {
+                // singularity at north pole
                 this._pitch = 90.0;
                 this._head  = Math.Round(2.0 * 1800.0/Math.PI * Math.Atan2(this._x,-this._w)) / 10.0;
             } else {
                 if (delta < -0.499 * norm) {
+                    // singularity at south pole
                     this._pitch = -90.0;
                     this._head  = Math.Round(-2.0 * 1800.0/Math.PI * Math.Atan2(this._x,-this._w)) / 10.0;
                 } else {
