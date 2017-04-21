@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_temperature.cs 27111 2017-04-06 22:19:25Z seb $
+ * $Id: yocto_temperature.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindTemperature(), the high-level API for Temperature functions
  *
@@ -111,21 +111,21 @@ public class YTemperature : YSensor
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("sensorType"))
+        if (json_val.has("sensorType"))
         {
-            _sensorType = json_val.GetInt("sensorType");
+            _sensorType = json_val.getInt("sensorType");
         }
-        if (json_val.Has("signalValue"))
+        if (json_val.has("signalValue"))
         {
-            _signalValue = Math.Round(json_val.GetDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
+            _signalValue = Math.Round(json_val.getDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("signalUnit"))
+        if (json_val.has("signalUnit"))
         {
-            _signalUnit = json_val.GetString("signalUnit");
+            _signalUnit = json_val.getString("signalUnit");
         }
-        if (json_val.Has("command"))
+        if (json_val.has("command"))
         {
-            _command = json_val.GetString("command");
+            _command = json_val.getString("command");
         }
         base._parseAttr(json_val);
     }

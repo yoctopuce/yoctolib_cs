@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_steppermotor.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_steppermotor.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -124,65 +124,65 @@ public class YStepperMotor : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("motorState"))
+        if (json_val.has("motorState"))
         {
-            _motorState = json_val.GetInt("motorState");
+            _motorState = json_val.getInt("motorState");
         }
-        if (json_val.Has("diags"))
+        if (json_val.has("diags"))
         {
-            _diags = json_val.GetInt("diags");
+            _diags = json_val.getInt("diags");
         }
-        if (json_val.Has("stepPos"))
+        if (json_val.has("stepPos"))
         {
-            _stepPos = json_val.GetDouble("stepPos") / 16.0;
+            _stepPos = json_val.getDouble("stepPos") / 16.0;
         }
-        if (json_val.Has("speed"))
+        if (json_val.has("speed"))
         {
-            _speed = Math.Round(json_val.GetDouble("speed") * 1000.0 / 65536.0) / 1000.0;
+            _speed = Math.Round(json_val.getDouble("speed") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("pullinSpeed"))
+        if (json_val.has("pullinSpeed"))
         {
-            _pullinSpeed = Math.Round(json_val.GetDouble("pullinSpeed") * 1000.0 / 65536.0) / 1000.0;
+            _pullinSpeed = Math.Round(json_val.getDouble("pullinSpeed") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("maxAccel"))
+        if (json_val.has("maxAccel"))
         {
-            _maxAccel = Math.Round(json_val.GetDouble("maxAccel") * 1000.0 / 65536.0) / 1000.0;
+            _maxAccel = Math.Round(json_val.getDouble("maxAccel") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("maxSpeed"))
+        if (json_val.has("maxSpeed"))
         {
-            _maxSpeed = Math.Round(json_val.GetDouble("maxSpeed") * 1000.0 / 65536.0) / 1000.0;
+            _maxSpeed = Math.Round(json_val.getDouble("maxSpeed") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("stepping"))
+        if (json_val.has("stepping"))
         {
-            _stepping = json_val.GetInt("stepping");
+            _stepping = json_val.getInt("stepping");
         }
-        if (json_val.Has("overcurrent"))
+        if (json_val.has("overcurrent"))
         {
-            _overcurrent = json_val.GetInt("overcurrent");
+            _overcurrent = json_val.getInt("overcurrent");
         }
-        if (json_val.Has("tCurrStop"))
+        if (json_val.has("tCurrStop"))
         {
-            _tCurrStop = json_val.GetInt("tCurrStop");
+            _tCurrStop = json_val.getInt("tCurrStop");
         }
-        if (json_val.Has("tCurrRun"))
+        if (json_val.has("tCurrRun"))
         {
-            _tCurrRun = json_val.GetInt("tCurrRun");
+            _tCurrRun = json_val.getInt("tCurrRun");
         }
-        if (json_val.Has("alertMode"))
+        if (json_val.has("alertMode"))
         {
-            _alertMode = json_val.GetString("alertMode");
+            _alertMode = json_val.getString("alertMode");
         }
-        if (json_val.Has("auxMode"))
+        if (json_val.has("auxMode"))
         {
-            _auxMode = json_val.GetString("auxMode");
+            _auxMode = json_val.getString("auxMode");
         }
-        if (json_val.Has("auxSignal"))
+        if (json_val.has("auxSignal"))
         {
-            _auxSignal = json_val.GetInt("auxSignal");
+            _auxSignal = json_val.getInt("auxSignal");
         }
-        if (json_val.Has("command"))
+        if (json_val.has("command"))
         {
-            _command = json_val.GetString("command");
+            _command = json_val.getString("command");
         }
         base._parseAttr(json_val);
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_network.cs 27111 2017-04-06 22:19:25Z seb $
+ * $Id: yocto_network.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindNetwork(), the high-level API for Network functions
  *
@@ -152,101 +152,101 @@ public class YNetwork : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("readiness"))
+        if (json_val.has("readiness"))
         {
-            _readiness = json_val.GetInt("readiness");
+            _readiness = json_val.getInt("readiness");
         }
-        if (json_val.Has("macAddress"))
+        if (json_val.has("macAddress"))
         {
-            _macAddress = json_val.GetString("macAddress");
+            _macAddress = json_val.getString("macAddress");
         }
-        if (json_val.Has("ipAddress"))
+        if (json_val.has("ipAddress"))
         {
-            _ipAddress = json_val.GetString("ipAddress");
+            _ipAddress = json_val.getString("ipAddress");
         }
-        if (json_val.Has("subnetMask"))
+        if (json_val.has("subnetMask"))
         {
-            _subnetMask = json_val.GetString("subnetMask");
+            _subnetMask = json_val.getString("subnetMask");
         }
-        if (json_val.Has("router"))
+        if (json_val.has("router"))
         {
-            _router = json_val.GetString("router");
+            _router = json_val.getString("router");
         }
-        if (json_val.Has("ipConfig"))
+        if (json_val.has("ipConfig"))
         {
-            _ipConfig = json_val.GetString("ipConfig");
+            _ipConfig = json_val.getString("ipConfig");
         }
-        if (json_val.Has("primaryDNS"))
+        if (json_val.has("primaryDNS"))
         {
-            _primaryDNS = json_val.GetString("primaryDNS");
+            _primaryDNS = json_val.getString("primaryDNS");
         }
-        if (json_val.Has("secondaryDNS"))
+        if (json_val.has("secondaryDNS"))
         {
-            _secondaryDNS = json_val.GetString("secondaryDNS");
+            _secondaryDNS = json_val.getString("secondaryDNS");
         }
-        if (json_val.Has("ntpServer"))
+        if (json_val.has("ntpServer"))
         {
-            _ntpServer = json_val.GetString("ntpServer");
+            _ntpServer = json_val.getString("ntpServer");
         }
-        if (json_val.Has("userPassword"))
+        if (json_val.has("userPassword"))
         {
-            _userPassword = json_val.GetString("userPassword");
+            _userPassword = json_val.getString("userPassword");
         }
-        if (json_val.Has("adminPassword"))
+        if (json_val.has("adminPassword"))
         {
-            _adminPassword = json_val.GetString("adminPassword");
+            _adminPassword = json_val.getString("adminPassword");
         }
-        if (json_val.Has("httpPort"))
+        if (json_val.has("httpPort"))
         {
-            _httpPort = json_val.GetInt("httpPort");
+            _httpPort = json_val.getInt("httpPort");
         }
-        if (json_val.Has("defaultPage"))
+        if (json_val.has("defaultPage"))
         {
-            _defaultPage = json_val.GetString("defaultPage");
+            _defaultPage = json_val.getString("defaultPage");
         }
-        if (json_val.Has("discoverable"))
+        if (json_val.has("discoverable"))
         {
-            _discoverable = json_val.GetInt("discoverable") > 0 ? 1 : 0;
+            _discoverable = json_val.getInt("discoverable") > 0 ? 1 : 0;
         }
-        if (json_val.Has("wwwWatchdogDelay"))
+        if (json_val.has("wwwWatchdogDelay"))
         {
-            _wwwWatchdogDelay = json_val.GetInt("wwwWatchdogDelay");
+            _wwwWatchdogDelay = json_val.getInt("wwwWatchdogDelay");
         }
-        if (json_val.Has("callbackUrl"))
+        if (json_val.has("callbackUrl"))
         {
-            _callbackUrl = json_val.GetString("callbackUrl");
+            _callbackUrl = json_val.getString("callbackUrl");
         }
-        if (json_val.Has("callbackMethod"))
+        if (json_val.has("callbackMethod"))
         {
-            _callbackMethod = json_val.GetInt("callbackMethod");
+            _callbackMethod = json_val.getInt("callbackMethod");
         }
-        if (json_val.Has("callbackEncoding"))
+        if (json_val.has("callbackEncoding"))
         {
-            _callbackEncoding = json_val.GetInt("callbackEncoding");
+            _callbackEncoding = json_val.getInt("callbackEncoding");
         }
-        if (json_val.Has("callbackCredentials"))
+        if (json_val.has("callbackCredentials"))
         {
-            _callbackCredentials = json_val.GetString("callbackCredentials");
+            _callbackCredentials = json_val.getString("callbackCredentials");
         }
-        if (json_val.Has("callbackInitialDelay"))
+        if (json_val.has("callbackInitialDelay"))
         {
-            _callbackInitialDelay = json_val.GetInt("callbackInitialDelay");
+            _callbackInitialDelay = json_val.getInt("callbackInitialDelay");
         }
-        if (json_val.Has("callbackSchedule"))
+        if (json_val.has("callbackSchedule"))
         {
-            _callbackSchedule = json_val.GetString("callbackSchedule");
+            _callbackSchedule = json_val.getString("callbackSchedule");
         }
-        if (json_val.Has("callbackMinDelay"))
+        if (json_val.has("callbackMinDelay"))
         {
-            _callbackMinDelay = json_val.GetInt("callbackMinDelay");
+            _callbackMinDelay = json_val.getInt("callbackMinDelay");
         }
-        if (json_val.Has("callbackMaxDelay"))
+        if (json_val.has("callbackMaxDelay"))
         {
-            _callbackMaxDelay = json_val.GetInt("callbackMaxDelay");
+            _callbackMaxDelay = json_val.getInt("callbackMaxDelay");
         }
-        if (json_val.Has("poeCurrent"))
+        if (json_val.has("poeCurrent"))
         {
-            _poeCurrent = json_val.GetInt("poeCurrent");
+            _poeCurrent = json_val.getInt("poeCurrent");
         }
         base._parseAttr(json_val);
     }

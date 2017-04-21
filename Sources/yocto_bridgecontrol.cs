@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_bridgecontrol.cs 27017 2017-03-31 14:47:59Z seb $
+ * $Id: yocto_bridgecontrol.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindBridgeControl(), the high-level API for BridgeControl functions
  *
@@ -98,21 +98,21 @@ public class YBridgeControl : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("excitationMode"))
+        if (json_val.has("excitationMode"))
         {
-            _excitationMode = json_val.GetInt("excitationMode");
+            _excitationMode = json_val.getInt("excitationMode");
         }
-        if (json_val.Has("bridgeLatency"))
+        if (json_val.has("bridgeLatency"))
         {
-            _bridgeLatency = json_val.GetInt("bridgeLatency");
+            _bridgeLatency = json_val.getInt("bridgeLatency");
         }
-        if (json_val.Has("adValue"))
+        if (json_val.has("adValue"))
         {
-            _adValue = json_val.GetInt("adValue");
+            _adValue = json_val.getInt("adValue");
         }
-        if (json_val.Has("adGain"))
+        if (json_val.has("adGain"))
         {
-            _adGain = json_val.GetInt("adGain");
+            _adGain = json_val.getInt("adGain");
         }
         base._parseAttr(json_val);
     }

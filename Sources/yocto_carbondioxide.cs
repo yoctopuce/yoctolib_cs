@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_carbondioxide.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_carbondioxide.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -92,13 +92,13 @@ public class YCarbonDioxide : YSensor
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("abcPeriod"))
+        if (json_val.has("abcPeriod"))
         {
-            _abcPeriod = json_val.GetInt("abcPeriod");
+            _abcPeriod = json_val.getInt("abcPeriod");
         }
-        if (json_val.Has("command"))
+        if (json_val.has("command"))
         {
-            _command = json_val.GetString("command");
+            _command = json_val.getString("command");
         }
         base._parseAttr(json_val);
     }

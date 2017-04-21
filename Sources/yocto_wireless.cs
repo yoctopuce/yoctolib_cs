@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wireless.cs 27111 2017-04-06 22:19:25Z seb $
+ * $Id: yocto_wireless.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -65,10 +65,10 @@ public class YWlanRecord
         //--- (generated code: YWlanRecord attributes initialization)
         //--- (end of generated code: YWlanRecord attributes initialization)
         YAPI.YJSONObject p = new YAPI.YJSONObject(data);
-        this._ssid = p.GetString("ssid");
-        this._sec = p.GetString("sec");
-        this._rssi = p.GetInt("rssi");
-        this._channel = p.GetInt("channel");
+        this._ssid = p.getString("ssid");
+        this._sec = p.getString("sec");
+        this._rssi = p.getInt("rssi");
+        this._channel = p.getInt("channel");
     }
 
   //--- (generated code: YWlanRecord implementation)
@@ -149,29 +149,29 @@ public class YWireless : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("linkQuality"))
+        if (json_val.has("linkQuality"))
         {
-            _linkQuality = json_val.GetInt("linkQuality");
+            _linkQuality = json_val.getInt("linkQuality");
         }
-        if (json_val.Has("ssid"))
+        if (json_val.has("ssid"))
         {
-            _ssid = json_val.GetString("ssid");
+            _ssid = json_val.getString("ssid");
         }
-        if (json_val.Has("channel"))
+        if (json_val.has("channel"))
         {
-            _channel = json_val.GetInt("channel");
+            _channel = json_val.getInt("channel");
         }
-        if (json_val.Has("security"))
+        if (json_val.has("security"))
         {
-            _security = json_val.GetInt("security");
+            _security = json_val.getInt("security");
         }
-        if (json_val.Has("message"))
+        if (json_val.has("message"))
         {
-            _message = json_val.GetString("message");
+            _message = json_val.getString("message");
         }
-        if (json_val.Has("wlanConfig"))
+        if (json_val.has("wlanConfig"))
         {
-            _wlanConfig = json_val.GetString("wlanConfig");
+            _wlanConfig = json_val.getString("wlanConfig");
         }
         base._parseAttr(json_val);
     }

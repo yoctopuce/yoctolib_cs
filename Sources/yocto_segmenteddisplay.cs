@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_segmenteddisplay.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_segmenteddisplay.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
  *
@@ -91,13 +91,13 @@ public class YSegmentedDisplay : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("displayedText"))
+        if (json_val.has("displayedText"))
         {
-            _displayedText = json_val.GetString("displayedText");
+            _displayedText = json_val.getString("displayedText");
         }
-        if (json_val.Has("displayMode"))
+        if (json_val.has("displayMode"))
         {
-            _displayMode = json_val.GetInt("displayMode");
+            _displayMode = json_val.getInt("displayMode");
         }
         base._parseAttr(json_val);
     }

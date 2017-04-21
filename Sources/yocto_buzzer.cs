@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_buzzer.cs 27083 2017-04-06 20:48:17Z seb $
+ * $Id: yocto_buzzer.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindBuzzer(), the high-level API for Buzzer functions
  *
@@ -97,29 +97,29 @@ public class YBuzzer : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("frequency"))
+        if (json_val.has("frequency"))
         {
-            _frequency = Math.Round(json_val.GetDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
+            _frequency = Math.Round(json_val.getDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("volume"))
+        if (json_val.has("volume"))
         {
-            _volume = json_val.GetInt("volume");
+            _volume = json_val.getInt("volume");
         }
-        if (json_val.Has("playSeqSize"))
+        if (json_val.has("playSeqSize"))
         {
-            _playSeqSize = json_val.GetInt("playSeqSize");
+            _playSeqSize = json_val.getInt("playSeqSize");
         }
-        if (json_val.Has("playSeqMaxSize"))
+        if (json_val.has("playSeqMaxSize"))
         {
-            _playSeqMaxSize = json_val.GetInt("playSeqMaxSize");
+            _playSeqMaxSize = json_val.getInt("playSeqMaxSize");
         }
-        if (json_val.Has("playSeqSignature"))
+        if (json_val.has("playSeqSignature"))
         {
-            _playSeqSignature = json_val.GetInt("playSeqSignature");
+            _playSeqSignature = json_val.getInt("playSeqSignature");
         }
-        if (json_val.Has("command"))
+        if (json_val.has("command"))
         {
-            _command = json_val.GetString("command");
+            _command = json_val.getString("command");
         }
         base._parseAttr(json_val);
     }

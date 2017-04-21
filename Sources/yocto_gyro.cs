@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_gyro.cs 27111 2017-04-06 22:19:25Z seb $
+ * $Id: yocto_gyro.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -406,21 +406,21 @@ public class YGyro : YSensor
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("bandwidth"))
+        if (json_val.has("bandwidth"))
         {
-            _bandwidth = json_val.GetInt("bandwidth");
+            _bandwidth = json_val.getInt("bandwidth");
         }
-        if (json_val.Has("xValue"))
+        if (json_val.has("xValue"))
         {
-            _xValue = Math.Round(json_val.GetDouble("xValue") * 1000.0 / 65536.0) / 1000.0;
+            _xValue = Math.Round(json_val.getDouble("xValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("yValue"))
+        if (json_val.has("yValue"))
         {
-            _yValue = Math.Round(json_val.GetDouble("yValue") * 1000.0 / 65536.0) / 1000.0;
+            _yValue = Math.Round(json_val.getDouble("yValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("zValue"))
+        if (json_val.has("zValue"))
         {
-            _zValue = Math.Round(json_val.GetDouble("zValue") * 1000.0 / 65536.0) / 1000.0;
+            _zValue = Math.Round(json_val.getDouble("zValue") * 1000.0 / 65536.0) / 1000.0;
         }
         base._parseAttr(json_val);
     }

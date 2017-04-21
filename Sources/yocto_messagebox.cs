@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_messagebox.cs 27111 2017-04-06 22:19:25Z seb $
+ * $Id: yocto_messagebox.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindMessageBox(), the high-level API for MessageBox functions
  *
@@ -1355,29 +1355,29 @@ public class YMessageBox : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("slotsInUse"))
+        if (json_val.has("slotsInUse"))
         {
-            _slotsInUse = json_val.GetInt("slotsInUse");
+            _slotsInUse = json_val.getInt("slotsInUse");
         }
-        if (json_val.Has("slotsCount"))
+        if (json_val.has("slotsCount"))
         {
-            _slotsCount = json_val.GetInt("slotsCount");
+            _slotsCount = json_val.getInt("slotsCount");
         }
-        if (json_val.Has("slotsBitmap"))
+        if (json_val.has("slotsBitmap"))
         {
-            _slotsBitmap = json_val.GetString("slotsBitmap");
+            _slotsBitmap = json_val.getString("slotsBitmap");
         }
-        if (json_val.Has("pduSent"))
+        if (json_val.has("pduSent"))
         {
-            _pduSent = json_val.GetInt("pduSent");
+            _pduSent = json_val.getInt("pduSent");
         }
-        if (json_val.Has("pduReceived"))
+        if (json_val.has("pduReceived"))
         {
-            _pduReceived = json_val.GetInt("pduReceived");
+            _pduReceived = json_val.getInt("pduReceived");
         }
-        if (json_val.Has("command"))
+        if (json_val.has("command"))
         {
-            _command = json_val.GetString("command");
+            _command = json_val.getString("command");
         }
         base._parseAttr(json_val);
     }

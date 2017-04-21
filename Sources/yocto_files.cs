@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs 27111 2017-04-06 22:19:25Z seb $
+ * $Id: yocto_files.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -63,9 +63,9 @@ public class YFileRecord
         //--- (generated code: YFileRecord attributes initialization)
         //--- (end of generated code: YFileRecord attributes initialization)
         YAPI.YJSONObject p  = new YAPI.YJSONObject(data);
-        this._name = p.GetString("name");
-        this._size = p.GetInt("size");
-        this._crc = p.GetInt("crc");
+        this._name = p.getString("name");
+        this._size = p.getInt("size");
+        this._crc = p.getInt("crc");
     }
     
     //--- (generated code: YFileRecord implementation)
@@ -131,13 +131,13 @@ public class YFiles : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("filesCount"))
+        if (json_val.has("filesCount"))
         {
-            _filesCount = json_val.GetInt("filesCount");
+            _filesCount = json_val.getInt("filesCount");
         }
-        if (json_val.Has("freeSpace"))
+        if (json_val.has("freeSpace"))
         {
-            _freeSpace = json_val.GetInt("freeSpace");
+            _freeSpace = json_val.getInt("freeSpace");
         }
         base._parseAttr(json_val);
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_lightsensor.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_lightsensor.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindLightSensor(), the high-level API for LightSensor functions
  *
@@ -98,9 +98,9 @@ public class YLightSensor : YSensor
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("measureType"))
+        if (json_val.has("measureType"))
         {
-            _measureType = json_val.GetInt("measureType");
+            _measureType = json_val.getInt("measureType");
         }
         base._parseAttr(json_val);
     }

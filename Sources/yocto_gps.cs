@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_gps.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_gps.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindGps(), the high-level API for Gps functions
  *
@@ -119,57 +119,57 @@ public class YGps : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("isFixed"))
+        if (json_val.has("isFixed"))
         {
-            _isFixed = json_val.GetInt("isFixed") > 0 ? 1 : 0;
+            _isFixed = json_val.getInt("isFixed") > 0 ? 1 : 0;
         }
-        if (json_val.Has("satCount"))
+        if (json_val.has("satCount"))
         {
-            _satCount = json_val.GetLong("satCount");
+            _satCount = json_val.getLong("satCount");
         }
-        if (json_val.Has("coordSystem"))
+        if (json_val.has("coordSystem"))
         {
-            _coordSystem = json_val.GetInt("coordSystem");
+            _coordSystem = json_val.getInt("coordSystem");
         }
-        if (json_val.Has("latitude"))
+        if (json_val.has("latitude"))
         {
-            _latitude = json_val.GetString("latitude");
+            _latitude = json_val.getString("latitude");
         }
-        if (json_val.Has("longitude"))
+        if (json_val.has("longitude"))
         {
-            _longitude = json_val.GetString("longitude");
+            _longitude = json_val.getString("longitude");
         }
-        if (json_val.Has("dilution"))
+        if (json_val.has("dilution"))
         {
-            _dilution = Math.Round(json_val.GetDouble("dilution") * 1000.0 / 65536.0) / 1000.0;
+            _dilution = Math.Round(json_val.getDouble("dilution") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("altitude"))
+        if (json_val.has("altitude"))
         {
-            _altitude = Math.Round(json_val.GetDouble("altitude") * 1000.0 / 65536.0) / 1000.0;
+            _altitude = Math.Round(json_val.getDouble("altitude") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("groundSpeed"))
+        if (json_val.has("groundSpeed"))
         {
-            _groundSpeed = Math.Round(json_val.GetDouble("groundSpeed") * 1000.0 / 65536.0) / 1000.0;
+            _groundSpeed = Math.Round(json_val.getDouble("groundSpeed") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("direction"))
+        if (json_val.has("direction"))
         {
-            _direction = Math.Round(json_val.GetDouble("direction") * 1000.0 / 65536.0) / 1000.0;
+            _direction = Math.Round(json_val.getDouble("direction") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("unixTime"))
+        if (json_val.has("unixTime"))
         {
-            _unixTime = json_val.GetLong("unixTime");
+            _unixTime = json_val.getLong("unixTime");
         }
-        if (json_val.Has("dateTime"))
+        if (json_val.has("dateTime"))
         {
-            _dateTime = json_val.GetString("dateTime");
+            _dateTime = json_val.getString("dateTime");
         }
-        if (json_val.Has("utcOffset"))
+        if (json_val.has("utcOffset"))
         {
-            _utcOffset = json_val.GetInt("utcOffset");
+            _utcOffset = json_val.getInt("utcOffset");
         }
-        if (json_val.Has("command"))
+        if (json_val.has("command"))
         {
-            _command = json_val.GetString("command");
+            _command = json_val.getString("command");
         }
         base._parseAttr(json_val);
     }

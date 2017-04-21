@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_hubport.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_hubport.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindHubPort(), the high-level API for HubPort functions
  *
@@ -99,17 +99,17 @@ public class YHubPort : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("enabled"))
+        if (json_val.has("enabled"))
         {
-            _enabled = json_val.GetInt("enabled") > 0 ? 1 : 0;
+            _enabled = json_val.getInt("enabled") > 0 ? 1 : 0;
         }
-        if (json_val.Has("portState"))
+        if (json_val.has("portState"))
         {
-            _portState = json_val.GetInt("portState");
+            _portState = json_val.getInt("portState");
         }
-        if (json_val.Has("baudRate"))
+        if (json_val.has("baudRate"))
         {
-            _baudRate = json_val.GetInt("baudRate");
+            _baudRate = json_val.getInt("baudRate");
         }
         base._parseAttr(json_val);
     }

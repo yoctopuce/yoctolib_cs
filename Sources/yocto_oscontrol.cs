@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_oscontrol.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_oscontrol.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindOsControl(), the high-level API for OsControl functions
  *
@@ -87,9 +87,9 @@ public class YOsControl : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("shutdownCountdown"))
+        if (json_val.has("shutdownCountdown"))
         {
-            _shutdownCountdown = json_val.GetInt("shutdownCountdown");
+            _shutdownCountdown = json_val.getInt("shutdownCountdown");
         }
         base._parseAttr(json_val);
     }

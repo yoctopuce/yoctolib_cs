@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_digitalio.cs 26988 2017-03-30 07:20:34Z seb $
+ * $Id: yocto_digitalio.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -106,37 +106,37 @@ public class YDigitalIO : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("portState"))
+        if (json_val.has("portState"))
         {
-            _portState = json_val.GetInt("portState");
+            _portState = json_val.getInt("portState");
         }
-        if (json_val.Has("portDirection"))
+        if (json_val.has("portDirection"))
         {
-            _portDirection = json_val.GetInt("portDirection");
+            _portDirection = json_val.getInt("portDirection");
         }
-        if (json_val.Has("portOpenDrain"))
+        if (json_val.has("portOpenDrain"))
         {
-            _portOpenDrain = json_val.GetInt("portOpenDrain");
+            _portOpenDrain = json_val.getInt("portOpenDrain");
         }
-        if (json_val.Has("portPolarity"))
+        if (json_val.has("portPolarity"))
         {
-            _portPolarity = json_val.GetInt("portPolarity");
+            _portPolarity = json_val.getInt("portPolarity");
         }
-        if (json_val.Has("portDiags"))
+        if (json_val.has("portDiags"))
         {
-            _portDiags = json_val.GetInt("portDiags");
+            _portDiags = json_val.getInt("portDiags");
         }
-        if (json_val.Has("portSize"))
+        if (json_val.has("portSize"))
         {
-            _portSize = json_val.GetInt("portSize");
+            _portSize = json_val.getInt("portSize");
         }
-        if (json_val.Has("outputVoltage"))
+        if (json_val.has("outputVoltage"))
         {
-            _outputVoltage = json_val.GetInt("outputVoltage");
+            _outputVoltage = json_val.getInt("outputVoltage");
         }
-        if (json_val.Has("command"))
+        if (json_val.has("command"))
         {
-            _command = json_val.GetString("command");
+            _command = json_val.getString("command");
         }
         base._parseAttr(json_val);
     }

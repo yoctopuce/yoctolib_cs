@@ -110,37 +110,37 @@ public class YProximity : YSensor
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("signalValue"))
+        if (json_val.has("signalValue"))
         {
-            _signalValue = Math.Round(json_val.GetDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
+            _signalValue = Math.Round(json_val.getDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("detectionThreshold"))
+        if (json_val.has("detectionThreshold"))
         {
-            _detectionThreshold = json_val.GetInt("detectionThreshold");
+            _detectionThreshold = json_val.getInt("detectionThreshold");
         }
-        if (json_val.Has("isPresent"))
+        if (json_val.has("isPresent"))
         {
-            _isPresent = json_val.GetInt("isPresent") > 0 ? 1 : 0;
+            _isPresent = json_val.getInt("isPresent") > 0 ? 1 : 0;
         }
-        if (json_val.Has("lastTimeApproached"))
+        if (json_val.has("lastTimeApproached"))
         {
-            _lastTimeApproached = json_val.GetLong("lastTimeApproached");
+            _lastTimeApproached = json_val.getLong("lastTimeApproached");
         }
-        if (json_val.Has("lastTimeRemoved"))
+        if (json_val.has("lastTimeRemoved"))
         {
-            _lastTimeRemoved = json_val.GetLong("lastTimeRemoved");
+            _lastTimeRemoved = json_val.getLong("lastTimeRemoved");
         }
-        if (json_val.Has("pulseCounter"))
+        if (json_val.has("pulseCounter"))
         {
-            _pulseCounter = json_val.GetLong("pulseCounter");
+            _pulseCounter = json_val.getLong("pulseCounter");
         }
-        if (json_val.Has("pulseTimer"))
+        if (json_val.has("pulseTimer"))
         {
-            _pulseTimer = json_val.GetLong("pulseTimer");
+            _pulseTimer = json_val.getLong("pulseTimer");
         }
-        if (json_val.Has("proximityReportMode"))
+        if (json_val.has("proximityReportMode"))
         {
-            _proximityReportMode = json_val.GetInt("proximityReportMode");
+            _proximityReportMode = json_val.getInt("proximityReportMode");
         }
         base._parseAttr(json_val);
     }

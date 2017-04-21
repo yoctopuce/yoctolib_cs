@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_altitude.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_altitude.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindAltitude(), the high-level API for Altitude functions
  *
@@ -93,13 +93,13 @@ public class YAltitude : YSensor
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("qnh"))
+        if (json_val.has("qnh"))
         {
-            _qnh = Math.Round(json_val.GetDouble("qnh") * 1000.0 / 65536.0) / 1000.0;
+            _qnh = Math.Round(json_val.getDouble("qnh") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("technology"))
+        if (json_val.has("technology"))
         {
-            _technology = json_val.GetString("technology");
+            _technology = json_val.getString("technology");
         }
         base._parseAttr(json_val);
     }

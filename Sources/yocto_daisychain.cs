@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_daisychain.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_daisychain.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindDaisyChain(), the high-level API for DaisyChain functions
  *
@@ -96,17 +96,17 @@ public class YDaisyChain : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("daisyState"))
+        if (json_val.has("daisyState"))
         {
-            _daisyState = json_val.GetInt("daisyState");
+            _daisyState = json_val.getInt("daisyState");
         }
-        if (json_val.Has("childCount"))
+        if (json_val.has("childCount"))
         {
-            _childCount = json_val.GetInt("childCount");
+            _childCount = json_val.getInt("childCount");
         }
-        if (json_val.Has("requiredChildCount"))
+        if (json_val.has("requiredChildCount"))
         {
-            _requiredChildCount = json_val.GetInt("requiredChildCount");
+            _requiredChildCount = json_val.getInt("requiredChildCount");
         }
         base._parseAttr(json_val);
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_currentloopoutput.cs 27111 2017-04-06 22:19:25Z seb $
+ * $Id: yocto_currentloopoutput.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -95,21 +95,21 @@ public class YCurrentLoopOutput : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("current"))
+        if (json_val.has("current"))
         {
-            _current = Math.Round(json_val.GetDouble("current") * 1000.0 / 65536.0) / 1000.0;
+            _current = Math.Round(json_val.getDouble("current") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("currentTransition"))
+        if (json_val.has("currentTransition"))
         {
-            _currentTransition = json_val.GetString("currentTransition");
+            _currentTransition = json_val.getString("currentTransition");
         }
-        if (json_val.Has("currentAtStartUp"))
+        if (json_val.has("currentAtStartUp"))
         {
-            _currentAtStartUp = Math.Round(json_val.GetDouble("currentAtStartUp") * 1000.0 / 65536.0) / 1000.0;
+            _currentAtStartUp = Math.Round(json_val.getDouble("currentAtStartUp") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("loopPower"))
+        if (json_val.has("loopPower"))
         {
-            _loopPower = json_val.GetInt("loopPower");
+            _loopPower = json_val.getInt("loopPower");
         }
         base._parseAttr(json_val);
     }

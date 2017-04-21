@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_multiaxiscontroller.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_multiaxiscontroller.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -95,17 +95,17 @@ public class YMultiAxisController : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("nAxis"))
+        if (json_val.has("nAxis"))
         {
-            _nAxis = json_val.GetInt("nAxis");
+            _nAxis = json_val.getInt("nAxis");
         }
-        if (json_val.Has("globalState"))
+        if (json_val.has("globalState"))
         {
-            _globalState = json_val.GetInt("globalState");
+            _globalState = json_val.getInt("globalState");
         }
-        if (json_val.Has("command"))
+        if (json_val.has("command"))
         {
-            _command = json_val.GetString("command");
+            _command = json_val.getString("command");
         }
         base._parseAttr(json_val);
     }
@@ -368,7 +368,7 @@ public class YMultiAxisController : YFunction
         ndim = speed.Count;
         cmd = "H"+Convert.ToString((int) Math.Round(1000*speed[0]));
         i = 1;
-        while (i + 1 < ndim) {
+        while (i < ndim) {
             cmd = ""+ cmd+","+Convert.ToString((int) Math.Round(1000*speed[i]));
             i = i + 1;
         }
@@ -400,7 +400,7 @@ public class YMultiAxisController : YFunction
         ndim = absPos.Count;
         cmd = "M"+Convert.ToString((int) Math.Round(16*absPos[0]));
         i = 1;
-        while (i + 1 < ndim) {
+        while (i < ndim) {
             cmd = ""+ cmd+","+Convert.ToString((int) Math.Round(16*absPos[i]));
             i = i + 1;
         }
@@ -432,7 +432,7 @@ public class YMultiAxisController : YFunction
         ndim = relPos.Count;
         cmd = "m"+Convert.ToString((int) Math.Round(16*relPos[0]));
         i = 1;
-        while (i + 1 < ndim) {
+        while (i < ndim) {
             cmd = ""+ cmd+","+Convert.ToString((int) Math.Round(16*relPos[i]));
             i = i + 1;
         }

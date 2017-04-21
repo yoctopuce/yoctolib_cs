@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_realtimeclock.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_realtimeclock.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -97,21 +97,21 @@ public class YRealTimeClock : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("unixTime"))
+        if (json_val.has("unixTime"))
         {
-            _unixTime = json_val.GetLong("unixTime");
+            _unixTime = json_val.getLong("unixTime");
         }
-        if (json_val.Has("dateTime"))
+        if (json_val.has("dateTime"))
         {
-            _dateTime = json_val.GetString("dateTime");
+            _dateTime = json_val.getString("dateTime");
         }
-        if (json_val.Has("utcOffset"))
+        if (json_val.has("utcOffset"))
         {
-            _utcOffset = json_val.GetInt("utcOffset");
+            _utcOffset = json_val.getInt("utcOffset");
         }
-        if (json_val.Has("timeSet"))
+        if (json_val.has("timeSet"))
         {
-            _timeSet = json_val.GetInt("timeSet") > 0 ? 1 : 0;
+            _timeSet = json_val.getInt("timeSet") > 0 ? 1 : 0;
         }
         base._parseAttr(json_val);
     }

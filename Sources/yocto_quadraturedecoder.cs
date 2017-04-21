@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_quadraturedecoder.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_quadraturedecoder.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -93,13 +93,13 @@ public class YQuadratureDecoder : YSensor
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("speed"))
+        if (json_val.has("speed"))
         {
-            _speed = Math.Round(json_val.GetDouble("speed") * 1000.0 / 65536.0) / 1000.0;
+            _speed = Math.Round(json_val.getDouble("speed") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("decoding"))
+        if (json_val.has("decoding"))
         {
-            _decoding = json_val.GetInt("decoding") > 0 ? 1 : 0;
+            _decoding = json_val.getInt("decoding") > 0 ? 1 : 0;
         }
         base._parseAttr(json_val);
     }

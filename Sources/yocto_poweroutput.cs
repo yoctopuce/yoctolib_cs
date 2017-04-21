@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_poweroutput.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_poweroutput.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindPowerOutput(), the high-level API for PowerOutput functions
  *
@@ -89,9 +89,9 @@ public class YPowerOutput : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("voltage"))
+        if (json_val.has("voltage"))
         {
-            _voltage = json_val.GetInt("voltage");
+            _voltage = json_val.getInt("voltage");
         }
         base._parseAttr(json_val);
     }

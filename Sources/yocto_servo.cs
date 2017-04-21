@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_servo.cs 27118 2017-04-06 22:38:36Z seb $
+ * $Id: yocto_servo.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindServo(), the high-level API for Servo functions
  *
@@ -112,42 +112,42 @@ public class YServo : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("position"))
+        if (json_val.has("position"))
         {
-            _position = json_val.GetInt("position");
+            _position = json_val.getInt("position");
         }
-        if (json_val.Has("enabled"))
+        if (json_val.has("enabled"))
         {
-            _enabled = json_val.GetInt("enabled") > 0 ? 1 : 0;
+            _enabled = json_val.getInt("enabled") > 0 ? 1 : 0;
         }
-        if (json_val.Has("range"))
+        if (json_val.has("range"))
         {
-            _range = json_val.GetInt("range");
+            _range = json_val.getInt("range");
         }
-        if (json_val.Has("neutral"))
+        if (json_val.has("neutral"))
         {
-            _neutral = json_val.GetInt("neutral");
+            _neutral = json_val.getInt("neutral");
         }
-        if (json_val.Has("move"))
+        if (json_val.has("move"))
         {
-            YAPI.YJSONObject subjson = json_val.GetYJSONObject("move");
-            if (subjson.Has("moving")) {
-                _move.moving = subjson.GetInt("moving");
+            YAPI.YJSONObject subjson = json_val.getYJSONObject("move");
+            if (subjson.has("moving")) {
+                _move.moving = subjson.getInt("moving");
             }
-            if (subjson.Has("target")) {
-                _move.moving = subjson.GetInt("target");
+            if (subjson.has("target")) {
+                _move.target = subjson.getInt("target");
             }
-            if (subjson.Has("ms")) {
-                _move.moving = subjson.GetInt("ms");
+            if (subjson.has("ms")) {
+                _move.ms = subjson.getInt("ms");
             }
         }
-        if (json_val.Has("positionAtPowerOn"))
+        if (json_val.has("positionAtPowerOn"))
         {
-            _positionAtPowerOn = json_val.GetInt("positionAtPowerOn");
+            _positionAtPowerOn = json_val.getInt("positionAtPowerOn");
         }
-        if (json_val.Has("enabledAtPowerOn"))
+        if (json_val.has("enabledAtPowerOn"))
         {
-            _enabledAtPowerOn = json_val.GetInt("enabledAtPowerOn") > 0 ? 1 : 0;
+            _enabledAtPowerOn = json_val.getInt("enabledAtPowerOn") > 0 ? 1 : 0;
         }
         base._parseAttr(json_val);
     }

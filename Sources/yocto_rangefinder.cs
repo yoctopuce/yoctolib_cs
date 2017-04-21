@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_rangefinder.cs 26993 2017-03-30 15:54:10Z seb $
+ * $Id: yocto_rangefinder.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindRangeFinder(), the high-level API for RangeFinder functions
  *
@@ -101,21 +101,21 @@ public class YRangeFinder : YSensor
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("rangeFinderMode"))
+        if (json_val.has("rangeFinderMode"))
         {
-            _rangeFinderMode = json_val.GetInt("rangeFinderMode");
+            _rangeFinderMode = json_val.getInt("rangeFinderMode");
         }
-        if (json_val.Has("hardwareCalibration"))
+        if (json_val.has("hardwareCalibration"))
         {
-            _hardwareCalibration = json_val.GetString("hardwareCalibration");
+            _hardwareCalibration = json_val.getString("hardwareCalibration");
         }
-        if (json_val.Has("currentTemperature"))
+        if (json_val.has("currentTemperature"))
         {
-            _currentTemperature = Math.Round(json_val.GetDouble("currentTemperature") * 1000.0 / 65536.0) / 1000.0;
+            _currentTemperature = Math.Round(json_val.getDouble("currentTemperature") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("command"))
+        if (json_val.has("command"))
         {
-            _command = json_val.GetString("command");
+            _command = json_val.getString("command");
         }
         base._parseAttr(json_val);
     }

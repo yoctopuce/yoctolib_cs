@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_dualpower.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_dualpower.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindDualPower(), the high-level API for DualPower functions
  *
@@ -100,17 +100,17 @@ public class YDualPower : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("powerState"))
+        if (json_val.has("powerState"))
         {
-            _powerState = json_val.GetInt("powerState");
+            _powerState = json_val.getInt("powerState");
         }
-        if (json_val.Has("powerControl"))
+        if (json_val.has("powerControl"))
         {
-            _powerControl = json_val.GetInt("powerControl");
+            _powerControl = json_val.getInt("powerControl");
         }
-        if (json_val.Has("extVoltage"))
+        if (json_val.has("extVoltage"))
         {
-            _extVoltage = json_val.GetInt("extVoltage");
+            _extVoltage = json_val.getInt("extVoltage");
         }
         base._parseAttr(json_val);
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wakeupmonitor.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_wakeupmonitor.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -105,29 +105,29 @@ public class YWakeUpMonitor : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("powerDuration"))
+        if (json_val.has("powerDuration"))
         {
-            _powerDuration = json_val.GetInt("powerDuration");
+            _powerDuration = json_val.getInt("powerDuration");
         }
-        if (json_val.Has("sleepCountdown"))
+        if (json_val.has("sleepCountdown"))
         {
-            _sleepCountdown = json_val.GetInt("sleepCountdown");
+            _sleepCountdown = json_val.getInt("sleepCountdown");
         }
-        if (json_val.Has("nextWakeUp"))
+        if (json_val.has("nextWakeUp"))
         {
-            _nextWakeUp = json_val.GetLong("nextWakeUp");
+            _nextWakeUp = json_val.getLong("nextWakeUp");
         }
-        if (json_val.Has("wakeUpReason"))
+        if (json_val.has("wakeUpReason"))
         {
-            _wakeUpReason = json_val.GetInt("wakeUpReason");
+            _wakeUpReason = json_val.getInt("wakeUpReason");
         }
-        if (json_val.Has("wakeUpState"))
+        if (json_val.has("wakeUpState"))
         {
-            _wakeUpState = json_val.GetInt("wakeUpState");
+            _wakeUpState = json_val.getInt("wakeUpState");
         }
-        if (json_val.Has("rtcTime"))
+        if (json_val.has("rtcTime"))
         {
-            _rtcTime = json_val.GetLong("rtcTime");
+            _rtcTime = json_val.getLong("rtcTime");
         }
         base._parseAttr(json_val);
     }

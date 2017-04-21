@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_led.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_led.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindLed(), the high-level API for Led functions
  *
@@ -99,17 +99,17 @@ public class YLed : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("power"))
+        if (json_val.has("power"))
         {
-            _power = json_val.GetInt("power") > 0 ? 1 : 0;
+            _power = json_val.getInt("power") > 0 ? 1 : 0;
         }
-        if (json_val.Has("luminosity"))
+        if (json_val.has("luminosity"))
         {
-            _luminosity = json_val.GetInt("luminosity");
+            _luminosity = json_val.getInt("luminosity");
         }
-        if (json_val.Has("blinking"))
+        if (json_val.has("blinking"))
         {
-            _blinking = json_val.GetInt("blinking");
+            _blinking = json_val.getInt("blinking");
         }
         base._parseAttr(json_val);
     }

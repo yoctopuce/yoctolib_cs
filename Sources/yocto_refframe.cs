@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_refframe.cs 27111 2017-04-06 22:19:25Z seb $
+ * $Id: yocto_refframe.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -131,17 +131,17 @@ public enum   MOUNTORIENTATION
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("mountPos"))
+        if (json_val.has("mountPos"))
         {
-            _mountPos = json_val.GetInt("mountPos");
+            _mountPos = json_val.getInt("mountPos");
         }
-        if (json_val.Has("bearing"))
+        if (json_val.has("bearing"))
         {
-            _bearing = Math.Round(json_val.GetDouble("bearing") * 1000.0 / 65536.0) / 1000.0;
+            _bearing = Math.Round(json_val.getDouble("bearing") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("calibrationParam"))
+        if (json_val.has("calibrationParam"))
         {
-            _calibrationParam = json_val.GetString("calibrationParam");
+            _calibrationParam = json_val.getString("calibrationParam");
         }
         base._parseAttr(json_val);
     }

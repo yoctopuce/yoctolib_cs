@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_compass.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_compass.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindCompass(), the high-level API for Compass functions
  *
@@ -102,17 +102,17 @@ public class YCompass : YSensor
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("bandwidth"))
+        if (json_val.has("bandwidth"))
         {
-            _bandwidth = json_val.GetInt("bandwidth");
+            _bandwidth = json_val.getInt("bandwidth");
         }
-        if (json_val.Has("axis"))
+        if (json_val.has("axis"))
         {
-            _axis = json_val.GetInt("axis");
+            _axis = json_val.getInt("axis");
         }
-        if (json_val.Has("magneticHeading"))
+        if (json_val.has("magneticHeading"))
         {
-            _magneticHeading = Math.Round(json_val.GetDouble("magneticHeading") * 1000.0 / 65536.0) / 1000.0;
+            _magneticHeading = Math.Round(json_val.getDouble("magneticHeading") * 1000.0 / 65536.0) / 1000.0;
         }
         base._parseAttr(json_val);
     }

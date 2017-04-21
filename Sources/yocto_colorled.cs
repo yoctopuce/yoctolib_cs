@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorled.cs 27118 2017-04-06 22:38:36Z seb $
+ * $Id: yocto_colorled.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindColorLed(), the high-level API for ColorLed functions
  *
@@ -113,59 +113,59 @@ public class YColorLed : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("rgbColor"))
+        if (json_val.has("rgbColor"))
         {
-            _rgbColor = json_val.GetInt("rgbColor");
+            _rgbColor = json_val.getInt("rgbColor");
         }
-        if (json_val.Has("hslColor"))
+        if (json_val.has("hslColor"))
         {
-            _hslColor = json_val.GetInt("hslColor");
+            _hslColor = json_val.getInt("hslColor");
         }
-        if (json_val.Has("rgbMove"))
+        if (json_val.has("rgbMove"))
         {
-            YAPI.YJSONObject subjson = json_val.GetYJSONObject("rgbMove");
-            if (subjson.Has("moving")) {
-                _rgbMove.moving = subjson.GetInt("moving");
+            YAPI.YJSONObject subjson = json_val.getYJSONObject("rgbMove");
+            if (subjson.has("moving")) {
+                _rgbMove.moving = subjson.getInt("moving");
             }
-            if (subjson.Has("target")) {
-                _rgbMove.moving = subjson.GetInt("target");
+            if (subjson.has("target")) {
+                _rgbMove.target = subjson.getInt("target");
             }
-            if (subjson.Has("ms")) {
-                _rgbMove.moving = subjson.GetInt("ms");
-            }
-        }
-        if (json_val.Has("hslMove"))
-        {
-            YAPI.YJSONObject subjson = json_val.GetYJSONObject("hslMove");
-            if (subjson.Has("moving")) {
-                _hslMove.moving = subjson.GetInt("moving");
-            }
-            if (subjson.Has("target")) {
-                _hslMove.moving = subjson.GetInt("target");
-            }
-            if (subjson.Has("ms")) {
-                _hslMove.moving = subjson.GetInt("ms");
+            if (subjson.has("ms")) {
+                _rgbMove.ms = subjson.getInt("ms");
             }
         }
-        if (json_val.Has("rgbColorAtPowerOn"))
+        if (json_val.has("hslMove"))
         {
-            _rgbColorAtPowerOn = json_val.GetInt("rgbColorAtPowerOn");
+            YAPI.YJSONObject subjson = json_val.getYJSONObject("hslMove");
+            if (subjson.has("moving")) {
+                _hslMove.moving = subjson.getInt("moving");
+            }
+            if (subjson.has("target")) {
+                _hslMove.target = subjson.getInt("target");
+            }
+            if (subjson.has("ms")) {
+                _hslMove.ms = subjson.getInt("ms");
+            }
         }
-        if (json_val.Has("blinkSeqSize"))
+        if (json_val.has("rgbColorAtPowerOn"))
         {
-            _blinkSeqSize = json_val.GetInt("blinkSeqSize");
+            _rgbColorAtPowerOn = json_val.getInt("rgbColorAtPowerOn");
         }
-        if (json_val.Has("blinkSeqMaxSize"))
+        if (json_val.has("blinkSeqSize"))
         {
-            _blinkSeqMaxSize = json_val.GetInt("blinkSeqMaxSize");
+            _blinkSeqSize = json_val.getInt("blinkSeqSize");
         }
-        if (json_val.Has("blinkSeqSignature"))
+        if (json_val.has("blinkSeqMaxSize"))
         {
-            _blinkSeqSignature = json_val.GetInt("blinkSeqSignature");
+            _blinkSeqMaxSize = json_val.getInt("blinkSeqMaxSize");
         }
-        if (json_val.Has("command"))
+        if (json_val.has("blinkSeqSignature"))
         {
-            _command = json_val.GetString("command");
+            _blinkSeqSignature = json_val.getInt("blinkSeqSignature");
+        }
+        if (json_val.has("command"))
+        {
+            _command = json_val.getString("command");
         }
         base._parseAttr(json_val);
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_watchdog.cs 27118 2017-04-06 22:38:36Z seb $
+ * $Id: yocto_watchdog.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindWatchdog(), the high-level API for Watchdog functions
  *
@@ -131,62 +131,62 @@ public class YWatchdog : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("state"))
+        if (json_val.has("state"))
         {
-            _state = json_val.GetInt("state") > 0 ? 1 : 0;
+            _state = json_val.getInt("state") > 0 ? 1 : 0;
         }
-        if (json_val.Has("stateAtPowerOn"))
+        if (json_val.has("stateAtPowerOn"))
         {
-            _stateAtPowerOn = json_val.GetInt("stateAtPowerOn");
+            _stateAtPowerOn = json_val.getInt("stateAtPowerOn");
         }
-        if (json_val.Has("maxTimeOnStateA"))
+        if (json_val.has("maxTimeOnStateA"))
         {
-            _maxTimeOnStateA = json_val.GetLong("maxTimeOnStateA");
+            _maxTimeOnStateA = json_val.getLong("maxTimeOnStateA");
         }
-        if (json_val.Has("maxTimeOnStateB"))
+        if (json_val.has("maxTimeOnStateB"))
         {
-            _maxTimeOnStateB = json_val.GetLong("maxTimeOnStateB");
+            _maxTimeOnStateB = json_val.getLong("maxTimeOnStateB");
         }
-        if (json_val.Has("output"))
+        if (json_val.has("output"))
         {
-            _output = json_val.GetInt("output") > 0 ? 1 : 0;
+            _output = json_val.getInt("output") > 0 ? 1 : 0;
         }
-        if (json_val.Has("pulseTimer"))
+        if (json_val.has("pulseTimer"))
         {
-            _pulseTimer = json_val.GetLong("pulseTimer");
+            _pulseTimer = json_val.getLong("pulseTimer");
         }
-        if (json_val.Has("delayedPulseTimer"))
+        if (json_val.has("delayedPulseTimer"))
         {
-            YAPI.YJSONObject subjson = json_val.GetYJSONObject("delayedPulseTimer");
-            if (subjson.Has("moving")) {
-                _delayedPulseTimer.moving = subjson.GetInt("moving");
+            YAPI.YJSONObject subjson = json_val.getYJSONObject("delayedPulseTimer");
+            if (subjson.has("moving")) {
+                _delayedPulseTimer.moving = subjson.getInt("moving");
             }
-            if (subjson.Has("target")) {
-                _delayedPulseTimer.moving = subjson.GetInt("target");
+            if (subjson.has("target")) {
+                _delayedPulseTimer.target = subjson.getInt("target");
             }
-            if (subjson.Has("ms")) {
-                _delayedPulseTimer.moving = subjson.GetInt("ms");
+            if (subjson.has("ms")) {
+                _delayedPulseTimer.ms = subjson.getInt("ms");
             }
         }
-        if (json_val.Has("countdown"))
+        if (json_val.has("countdown"))
         {
-            _countdown = json_val.GetLong("countdown");
+            _countdown = json_val.getLong("countdown");
         }
-        if (json_val.Has("autoStart"))
+        if (json_val.has("autoStart"))
         {
-            _autoStart = json_val.GetInt("autoStart") > 0 ? 1 : 0;
+            _autoStart = json_val.getInt("autoStart") > 0 ? 1 : 0;
         }
-        if (json_val.Has("running"))
+        if (json_val.has("running"))
         {
-            _running = json_val.GetInt("running") > 0 ? 1 : 0;
+            _running = json_val.getInt("running") > 0 ? 1 : 0;
         }
-        if (json_val.Has("triggerDelay"))
+        if (json_val.has("triggerDelay"))
         {
-            _triggerDelay = json_val.GetLong("triggerDelay");
+            _triggerDelay = json_val.getLong("triggerDelay");
         }
-        if (json_val.Has("triggerDuration"))
+        if (json_val.has("triggerDuration"))
         {
-            _triggerDuration = json_val.GetLong("triggerDuration");
+            _triggerDuration = json_val.getLong("triggerDuration");
         }
         base._parseAttr(json_val);
     }

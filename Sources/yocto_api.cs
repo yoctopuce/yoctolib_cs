@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 27111 2017-04-06 22:19:25Z seb $
+ * $Id: yocto_api.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1093,7 +1093,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "27127";
+    public const string YOCTO_API_BUILD_NO = "27216";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -1255,10 +1255,10 @@ public class YAPI
 
     public abstract class YJSONContent
     {
-        protected string _data;
-        protected int _data_start;
+        internal string _data;
+        internal int _data_start;
         protected int _data_len;
-        protected int _data_boundary;
+        internal int _data_boundary;
         protected YJSONType _type;
         //protected string debug;
 
@@ -1296,9 +1296,9 @@ public class YAPI
             } else if (data[cur_pos] == '"') {
                 res = new YJSONString(data, start, stop);
             } else {
-                res = new GetYJSONNumber(data, start, stop);
+                res = new YJSONNumber(data, start, stop);
             }
-            res.Parse();
+            res.parse();
             return res;
         }
 
@@ -1315,11 +1315,11 @@ public class YAPI
             _data = null;
         }
 
-        public YJSONType GetJSONType()
+        public YJSONType getJSONType()
         {
             return _type;
         }
-        public abstract int Parse();
+        public abstract int parse();
 
         protected static int SkipGarbage(string data, int start, int stop)
         {
@@ -1347,7 +1347,7 @@ public class YAPI
             return errmsg + " near " + _data.Substring(ststart, cur_pos - ststart) + _data.Substring(cur_pos, stend - cur_pos);
         }
 
-        public abstract string ToJSON();
+        public abstract string toJSON();
     }
 
     internal class YJSONArray : YJSONContent
@@ -1369,7 +1369,7 @@ public class YAPI
             }
         }
 
-        public override int Parse()
+        public override int parse()
         {
             int cur_pos = SkipGarbage(_data, _data_start, _data_boundary);
 
@@ -1385,7 +1385,7 @@ public class YAPI
                     case Tjstate.JWAITFORDATA:
                         if (sti == '{') {
                             YJSONObject jobj = new YJSONObject(_data, cur_pos, _data_boundary);
-                            int len = jobj.Parse();
+                            int len = jobj.parse();
                             cur_pos += len;
                             _arrayValue.Add(jobj);
                             state = Tjstate.JWAITFORNEXTARRAYITEM;
@@ -1393,7 +1393,7 @@ public class YAPI
                             continue;
                         } else if (sti == '[') {
                             YJSONArray jobj = new YJSONArray(_data, cur_pos, _data_boundary);
-                            int len = jobj.Parse();
+                            int len = jobj.parse();
                             cur_pos += len;
                             _arrayValue.Add(jobj);
                             state = Tjstate.JWAITFORNEXTARRAYITEM;
@@ -1401,15 +1401,15 @@ public class YAPI
                             continue;
                         } else if (sti == '"') {
                             YJSONString jobj = new YJSONString(_data, cur_pos, _data_boundary);
-                            int len = jobj.Parse();
+                            int len = jobj.parse();
                             cur_pos += len;
                             _arrayValue.Add(jobj);
                             state = Tjstate.JWAITFORNEXTARRAYITEM;
                             //cur_pos is already incremented
                             continue;
                         } else if (sti == '-' || (sti >= '0' && sti <= '9')) {
-                            GetYJSONNumber jobj = new GetYJSONNumber(_data, cur_pos, _data_boundary);
-                            int len = jobj.Parse();
+                            YJSONNumber jobj = new YJSONNumber(_data, cur_pos, _data_boundary);
+                            int len = jobj.parse();
                             cur_pos += len;
                             _arrayValue.Add(jobj);
                             state = Tjstate.JWAITFORNEXTARRAYITEM;
@@ -1442,53 +1442,53 @@ public class YAPI
             throw new System.Exception(FormatError("unexpected end of data", cur_pos));
         }
 
-        public YJSONObject GetYJSONObject(int i)
+        public YJSONObject getYJSONObject(int i)
         {
             return (YJSONObject)_arrayValue[i];
         }
 
-        public string GetString(int i)
+        public string getString(int i)
         {
             YJSONString ystr = (YJSONString)_arrayValue[i];
-            return ystr.GetString();
+            return ystr.getString();
         }
 
-        public YJSONContent Get(int i)
+        public YJSONContent get(int i)
         {
             return _arrayValue[i];
         }
 
-        public YJSONArray GetYJSONArray(int i)
+        public YJSONArray getYJSONArray(int i)
         {
             return (YJSONArray)_arrayValue[i];
         }
 
-        public int GetInt(int i)
+        public int getInt(int i)
         {
-            GetYJSONNumber ystr = (GetYJSONNumber)_arrayValue[i];
-            return ystr.GetInt();
+            YJSONNumber ystr = (YJSONNumber)_arrayValue[i];
+            return ystr.getInt();
         }
 
-        public long GetLong(int i)
+        public long getLong(int i)
         {
-            GetYJSONNumber ystr = (GetYJSONNumber)_arrayValue[i];
-            return ystr.GetLong();
+            YJSONNumber ystr = (YJSONNumber)_arrayValue[i];
+            return ystr.getLong();
         }
 
-        public void Put(string flatAttr)
+        public void put(string flatAttr)
         {
             YJSONString strobj = new YJSONString();
             strobj.setContent(flatAttr);
             _arrayValue.Add(strobj);
         }
 
-        public override string ToJSON()
+        public override string toJSON()
         {
             StringBuilder res = new StringBuilder();
             res.Append('[');
             string sep = "";
             foreach (YJSONContent yjsonContent in _arrayValue) {
-                string subres = yjsonContent.ToJSON();
+                string subres = yjsonContent.toJSON();
                 res.Append(sep);
                 res.Append(subres);
                 sep = ",";
@@ -1526,7 +1526,7 @@ public class YAPI
         public YJSONString() : base(YJSONType.STRING)
         { }
 
-        public override int Parse()
+        public override int parse()
         {
             string value = "";
             int cur_pos = SkipGarbage(_data, _data_start, _data_boundary);
@@ -1568,7 +1568,7 @@ public class YAPI
             throw new System.Exception(FormatError("unexpected end of data", cur_pos));
         }
 
-        public override string ToJSON()
+        public override string toJSON()
         {
             StringBuilder res = new StringBuilder(_stringValue.Length * 2);
             res.Append('"');
@@ -1607,7 +1607,7 @@ public class YAPI
             return res.ToString();
         }
 
-        public string GetString()
+        public string getString()
         {
             return _stringValue;
         }
@@ -1624,16 +1624,16 @@ public class YAPI
     }
 
 
-    internal class GetYJSONNumber : YJSONContent
+    internal class YJSONNumber : YJSONContent
     {
         private long _intValue = 0;
         private double _doubleValue = 0;
         private bool _isFloat = false;
 
-        public GetYJSONNumber(string data, int start, int stop) : base(data, start, stop, YJSONType.NUMBER)
+        public YJSONNumber(string data, int start, int stop) : base(data, start, stop, YJSONType.NUMBER)
         { }
 
-        public override int Parse()
+        public override int parse()
         {
 
             bool neg = false;
@@ -1671,7 +1671,7 @@ public class YAPI
             throw new System.Exception(FormatError("unexpected end of data", cur_pos));
         }
 
-        public override string ToJSON()
+        public override string toJSON()
         {
             if (_isFloat)
                 return _doubleValue.ToString();
@@ -1679,7 +1679,7 @@ public class YAPI
                 return _intValue.ToString();
         }
 
-        public long GetLong()
+        public long getLong()
         {
             if (_isFloat)
                 return (long)_doubleValue;
@@ -1687,7 +1687,7 @@ public class YAPI
                 return _intValue;
         }
 
-        public int GetInt()
+        public int getInt()
         {
             if (_isFloat)
                 return (int)_doubleValue;
@@ -1695,7 +1695,7 @@ public class YAPI
                 return (int)_intValue;
         }
 
-        public double GetDouble()
+        public double getDouble()
         {
             if (_isFloat)
                 return _doubleValue;
@@ -1716,6 +1716,7 @@ public class YAPI
     public class YJSONObject : YJSONContent
     {
         readonly Dictionary<string, YJSONContent> parsed = new Dictionary<string, YJSONContent>();
+        readonly List<string> _keys = new List<string>(16);
 
         public YJSONObject(string data) : base(data, 0, data.Length, YJSONType.OBJECT)
         { }
@@ -1723,7 +1724,7 @@ public class YAPI
         public YJSONObject(string data, int start, int len) : base(data, start, len, YJSONType.OBJECT)
         { }
 
-        public override int Parse()
+        public override int parse()
         {
             string current_name = "";
             int name_start = _data_start;
@@ -1776,33 +1777,37 @@ public class YAPI
                     case Tjstate.JWAITFORDATA:
                         if (sti == '{') {
                             YJSONObject jobj = new YJSONObject(_data, cur_pos, _data_boundary);
-                            int len = jobj.Parse();
+                            int len = jobj.parse();
                             cur_pos += len;
                             parsed.Add(current_name, jobj);
+                            _keys.Add(current_name);
                             state = Tjstate.JWAITFORNEXTSTRUCTMEMBER;
                             //cur_pos is already incremented
                             continue;
                         } else if (sti == '[') {
                             YJSONArray jobj = new YJSONArray(_data, cur_pos, _data_boundary);
-                            int len = jobj.Parse();
+                            int len = jobj.parse();
                             cur_pos += len;
                             parsed.Add(current_name, jobj);
+                            _keys.Add(current_name);
                             state = Tjstate.JWAITFORNEXTSTRUCTMEMBER;
                             //cur_pos is already incremented
                             continue;
                         } else if (sti == '"') {
                             YJSONString jobj = new YJSONString(_data, cur_pos, _data_boundary);
-                            int len = jobj.Parse();
+                            int len = jobj.parse();
                             cur_pos += len;
                             parsed.Add(current_name, jobj);
+                            _keys.Add(current_name);
                             state = Tjstate.JWAITFORNEXTSTRUCTMEMBER;
                             //cur_pos is already incremented
                             continue;
                         } else if (sti == '-' || (sti >= '0' && sti <= '9')) {
-                            GetYJSONNumber jobj = new GetYJSONNumber(_data, cur_pos, _data_boundary);
-                            int len = jobj.Parse();
+                            YJSONNumber jobj = new YJSONNumber(_data, cur_pos, _data_boundary);
+                            int len = jobj.parse();
                             cur_pos += len;
                             parsed.Add(current_name, jobj);
+                            _keys.Add(current_name);
                             state = Tjstate.JWAITFORNEXTSTRUCTMEMBER;
                             //cur_pos is already incremented
                             continue;
@@ -1834,78 +1839,78 @@ public class YAPI
             throw new System.Exception(FormatError("unexpected end of data", cur_pos));
         }
 
-        public bool Has(string key)
+        public bool has(string key)
         {
             return parsed.ContainsKey(key);
         }
 
-        public YJSONObject GetYJSONObject(string key)
+        public YJSONObject getYJSONObject(string key)
         {
             return (YJSONObject)parsed[key];
         }
 
-        internal YJSONString GetYJSONString(string key)
+        internal YJSONString getYJSONString(string key)
         {
             return (YJSONString)parsed[key];
         }
 
-        internal YJSONArray GetYJSONArray(string key)
+        internal YJSONArray getYJSONArray(string key)
         {
             return (YJSONArray)parsed[key];
         }
 
-        public List<string> Keys()
+        public List<string> keys()
         {
             return parsed.Keys.ToList();
         }
 
-        internal GetYJSONNumber GetYJSONNumber(string key)
+        internal YJSONNumber getYJSONNumber(string key)
         {
-            return (GetYJSONNumber)parsed[key];
+            return (YJSONNumber)parsed[key];
         }
 
-        public void Remove(string key)
+        public void remove(string key)
         {
             parsed.Remove(key);
         }
 
-        public string GetString(string key)
+        public string getString(string key)
         {
             YJSONString ystr = (YJSONString)parsed[key];
-            return ystr.GetString();
+            return ystr.getString();
         }
 
-        public int GetInt(string key)
+        public int getInt(string key)
         {
-            GetYJSONNumber yint = (GetYJSONNumber)parsed[key];
-            return yint.GetInt();
+            YJSONNumber yint = (YJSONNumber)parsed[key];
+            return yint.getInt();
         }
 
-        public YJSONContent Get(string key)
+        public YJSONContent get(string key)
         {
             return parsed[key];
         }
 
-        public long GetLong(string key)
+        public long getLong(string key)
         {
-            GetYJSONNumber yint = (GetYJSONNumber)parsed[key];
-            return yint.GetLong();
+            YJSONNumber yint = (YJSONNumber)parsed[key];
+            return yint.getLong();
         }
 
-        public double GetDouble(string key)
+        public double getDouble(string key)
         {
-            GetYJSONNumber yint = (GetYJSONNumber)parsed[key];
-            return yint.GetDouble();
+            YJSONNumber yint = (YJSONNumber)parsed[key];
+            return yint.getDouble();
         }
 
-        public override string ToJSON()
+        public override string toJSON()
         {
             StringBuilder res = new StringBuilder();
             res.Append('{');
             string sep = "";
             foreach (string key in parsed.Keys.ToArray()) {
                 YJSONContent subContent = parsed[key];
-                string subres = subContent.ToJSON();
+                string subres = subContent.toJSON();
                 res.Append(sep);
                 res.Append('"');
                 res.Append(key);
@@ -1934,6 +1939,52 @@ public class YAPI
             res.Append('}');
             return res.ToString();
         }
+
+
+
+        public void parseWithRef(YJSONObject reference)
+        {
+            if (reference != null) {
+                try {
+                    YJSONArray yzon = new YJSONArray(_data, _data_start, _data_boundary);
+                    yzon.parse();
+                    convert(reference, yzon);
+                    return;
+                } catch (Exception) {
+
+                }
+            }
+            this.parse();
+        }
+
+        private void convert(YJSONObject reference, YJSONArray newArray)
+        {
+            int length = newArray.Length;
+            for (int i = 0; i < length; i++) {
+                string key = reference.getKeyFromIdx(i);
+                YJSONContent new_item = newArray.get(i);
+                YJSONContent reference_item = reference.get(key);
+
+                if (new_item.getJSONType() == reference_item.getJSONType()) {
+                    parsed.Add(key, new_item);
+                    _keys.Add(key);
+                } else if (new_item.getJSONType() == YJSONType.ARRAY && reference_item.getJSONType() == YJSONType.OBJECT) {
+                    YJSONObject jobj = new YJSONObject(new_item._data, new_item._data_start, reference_item._data_boundary);
+                    jobj.convert((YJSONObject) reference_item, (YJSONArray) new_item);
+                    parsed.Add(key, jobj);
+                    _keys.Add(key);
+                } else {
+                    throw new System.Exception("Unable to convert "+ new_item.getJSONType().ToString() + " to "+ reference.getJSONType().ToString());
+
+                }
+            }
+        }
+
+        private string getKeyFromIdx(int i)
+        {
+            return _keys[i];
+        }
+
     }
 
 
@@ -1967,10 +2018,9 @@ public class YAPI
         internal void clearCache(bool clearSubpath)
         {
             lock (_lock) {
-                //todo: double check that we do not need to dispose _cacheJson
-                _cacheJson = null;
                 _cacheStamp = 0;
                 if (clearSubpath) {
+                    _cacheJson = null;
                     _subpathinit = false;
                 }
             }
@@ -2115,8 +2165,7 @@ public class YAPI
             return YAPI.SUCCESS;
         }
 
-
-
+        
         internal YRETCODE requestAPI(out YJSONObject apires, ref string errmsg)
         {
             string buffer = "";
@@ -2125,20 +2174,25 @@ public class YAPI
 
             apires = null;
             lock (_lock) {
-
                 // Check if we have a valid cache value
                 if (_cacheStamp > YAPI.GetTickCount()) {
                     apires = _cacheJson;
                     return YAPI.SUCCESS;
                 }
-                res = HTTPRequest("GET /api.json \r\n\r\n", out buffer, ref errmsg);
+                string request;
+                if (_cacheJson == null) {
+                    request = "GET /api.json \r\n\r\n";
+                } else {
+                    request = "GET /api.json?fw="+_cacheJson.getYJSONObject("module").getString("firmwareRelease")+" \r\n\r\n";
+                }
+                res = HTTPRequest(request, out buffer, ref errmsg);
                 if (YAPI.YISERR(res)) {
                     // make sure a device scan does not solve the issue
                     res = YAPI.yapiUpdateDeviceList(1, ref errmsg);
                     if (YAPI.YISERR(res)) {
                         return res;
                     }
-                    res = HTTPRequest("GET /api.json \r\n\r\n", out buffer, ref errmsg);
+                    res = HTTPRequest(request, out buffer, ref errmsg);
                     if (YAPI.YISERR(res)) {
                         return res;
                     }
@@ -2149,7 +2203,7 @@ public class YAPI
                 }
                 try {
                     apires = new YJSONObject(buffer, http_headerlen, buffer.Length);
-                    apires.Parse();
+                    apires.parseWithRef(_cacheJson);
                 }
                 catch (Exception E) {
                     errmsg = "unexpected JSON structure: " + E.Message;
@@ -4965,10 +5019,10 @@ public class YDataSet
         YAPI.YJSONArray arr;
 
         if (!YAPI.ExceptionsDisabled) {
-            p.Parse();
+            p.parse();
         } else {
             try {
-                p.Parse();
+                p.parse();
             } catch {
                 return YAPI.IO_ERROR;
             }
@@ -4984,21 +5038,21 @@ public class YDataSet
         double summaryTotalTime = 0;
         double summaryTotalAvg = 0;
 
-        this._functionId = p.GetString("id");
-        this._unit = p.GetString("unit");
-        if (p.Has("calib")) {
-            this._calib = YAPI._decodeFloats(p.GetString("calib"));
+        this._functionId = p.getString("id");
+        this._unit = p.getString("unit");
+        if (p.has("calib")) {
+            this._calib = YAPI._decodeFloats(p.getString("calib"));
             this._calib[0] = this._calib[0]/1000;
         } else {
-            this._calib = YAPI._decodeWords(p.GetString("cal"));
+            this._calib = YAPI._decodeWords(p.getString("cal"));
         }
-        arr = p.GetYJSONArray("streams");
+        arr = p.getYJSONArray("streams");
         this._streams = new List<YDataStream>();
         this._preview = new List<YMeasure>();
         this._measures = new List<YMeasure>();
         for (int i = 0; i < arr.Length; i++)
         {
-            stream = _parent._findDataStream(this, arr.GetString(i));
+            stream = _parent._findDataStream(this, arr.getString(i));
             streamStartTime = stream.get_startTimeUTC() - stream.get_dataSamplesIntervalMs() / 1000;
             streamEndTime = stream.get_startTimeUTC() + stream.get_duration();
             if (_startTime > 0 && streamEndTime <= _startTime)
@@ -6066,13 +6120,13 @@ public class YFunction
 
     protected virtual void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("logicalName"))
+        if (json_val.has("logicalName"))
         {
-            _logicalName = json_val.GetString("logicalName");
+            _logicalName = json_val.getString("logicalName");
         }
-        if (json_val.Has("advertisedValue"))
+        if (json_val.has("advertisedValue"))
         {
-            _advertisedValue = json_val.GetString("advertisedValue");
+            _advertisedValue = json_val.getString("advertisedValue");
         }
     }
 
@@ -6775,9 +6829,9 @@ public class YFunction
     protected string  _json_get_key(byte[] data, string key)
     {
         YAPI.YJSONObject obj = new YAPI.YJSONObject(YAPI.DefaultEncoding.GetString(data));
-        obj.Parse();
-        if (obj.Has(key)) {
-            string val = obj.GetString(key);
+        obj.parse();
+        if (obj.has(key)) {
+            string val = obj.getString(key);
             if (val == null) {
                 val = obj.ToString();
             }
@@ -6789,12 +6843,12 @@ public class YFunction
     protected List<string> _json_get_array(byte[] data)
     {
         YAPI.YJSONArray array = new YAPI.YJSONArray(YAPI.DefaultEncoding.GetString(data));
-        array.Parse();
+        array.parse();
         List<string> list = new List<string>();
         int len = array.Length;
         for (int i = 0; i < len; i++) {
-            YAPI.YJSONContent o = array.Get(i);
-            list.Add(o.ToJSON());
+            YAPI.YJSONContent o = array.get(i);
+            list.Add(o.toJSON());
         }
         return list;
     }
@@ -6803,8 +6857,8 @@ public class YFunction
     {
         string s = YAPI.DefaultEncoding.GetString(data);
         YAPI.YJSONString jstring = new YAPI.YJSONString(s, 0, s.Length);
-        jstring.Parse();
-        return jstring.GetString();
+        jstring.parse();
+        return jstring.getString();
     }
 
 
@@ -6812,20 +6866,20 @@ public class YFunction
     {
 
         string key = paths[ofs];
-        if (!jsonObject.Has(key)) {
+        if (!jsonObject.has(key)) {
             return "";
         }
 
-        YAPI.YJSONContent obj = jsonObject.Get(key);
+        YAPI.YJSONContent obj = jsonObject.get(key);
         if (obj != null) {
             if (paths.Length == ofs + 1) {
-                return obj.ToJSON();
+                return obj.toJSON();
             }
 
             if (obj is YAPI.YJSONArray) {
-                return get_json_path_array(jsonObject.GetYJSONArray(key), paths, ofs + 1);
+                return get_json_path_array(jsonObject.getYJSONArray(key), paths, ofs + 1);
             } else if (obj is YAPI.YJSONObject) {
-                return get_json_path_struct(jsonObject.GetYJSONObject(key), paths, ofs + 1);
+                return get_json_path_struct(jsonObject.getYJSONObject(key), paths, ofs + 1);
             }
         }
         return "";
@@ -6838,16 +6892,16 @@ public class YFunction
             return "";
         }
 
-        YAPI.YJSONContent obj = jsonArray.Get(key);
+        YAPI.YJSONContent obj = jsonArray.get(key);
         if (obj != null) {
             if (paths.Length == ofs + 1) {
                 return obj.ToString();
             }
 
             if (obj is YAPI.YJSONArray) {
-                return get_json_path_array(jsonArray.GetYJSONArray(key), paths, ofs + 1);
+                return get_json_path_array(jsonArray.getYJSONArray(key), paths, ofs + 1);
             } else if (obj is YAPI.YJSONObject) {
-                return get_json_path_struct(jsonArray.GetYJSONObject(key), paths, ofs + 1);
+                return get_json_path_struct(jsonArray.getYJSONObject(key), paths, ofs + 1);
             }
         }
         return "";
@@ -6857,7 +6911,7 @@ public class YFunction
 
         YAPI.YJSONObject jsonObject = null;
         jsonObject = new YAPI.YJSONObject(json);
-        jsonObject.Parse();
+        jsonObject.parse();
         string[] split = path.Split(new char[] { '\\', '|' });
         return get_json_path_struct(jsonObject, split, 0);
     }
@@ -6948,7 +7002,7 @@ public class YFunction
             _hwId = _serial + '.' + _funId;
 
             try {
-                node = apires.GetYJSONObject(funcId);
+                node = apires.getYJSONObject(funcId);
             }
             catch (Exception) {
                 _throw(YAPI.IO_ERROR, "unexpected JSON structure: missing function " + funcId);
@@ -7219,53 +7273,53 @@ public class YModule : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("productName"))
+        if (json_val.has("productName"))
         {
-            _productName = json_val.GetString("productName");
+            _productName = json_val.getString("productName");
         }
-        if (json_val.Has("serialNumber"))
+        if (json_val.has("serialNumber"))
         {
-            _serialNumber = json_val.GetString("serialNumber");
+            _serialNumber = json_val.getString("serialNumber");
         }
-        if (json_val.Has("productId"))
+        if (json_val.has("productId"))
         {
-            _productId = json_val.GetInt("productId");
+            _productId = json_val.getInt("productId");
         }
-        if (json_val.Has("productRelease"))
+        if (json_val.has("productRelease"))
         {
-            _productRelease = json_val.GetInt("productRelease");
+            _productRelease = json_val.getInt("productRelease");
         }
-        if (json_val.Has("firmwareRelease"))
+        if (json_val.has("firmwareRelease"))
         {
-            _firmwareRelease = json_val.GetString("firmwareRelease");
+            _firmwareRelease = json_val.getString("firmwareRelease");
         }
-        if (json_val.Has("persistentSettings"))
+        if (json_val.has("persistentSettings"))
         {
-            _persistentSettings = json_val.GetInt("persistentSettings");
+            _persistentSettings = json_val.getInt("persistentSettings");
         }
-        if (json_val.Has("luminosity"))
+        if (json_val.has("luminosity"))
         {
-            _luminosity = json_val.GetInt("luminosity");
+            _luminosity = json_val.getInt("luminosity");
         }
-        if (json_val.Has("beacon"))
+        if (json_val.has("beacon"))
         {
-            _beacon = json_val.GetInt("beacon") > 0 ? 1 : 0;
+            _beacon = json_val.getInt("beacon") > 0 ? 1 : 0;
         }
-        if (json_val.Has("upTime"))
+        if (json_val.has("upTime"))
         {
-            _upTime = json_val.GetLong("upTime");
+            _upTime = json_val.getLong("upTime");
         }
-        if (json_val.Has("usbCurrent"))
+        if (json_val.has("usbCurrent"))
         {
-            _usbCurrent = json_val.GetInt("usbCurrent");
+            _usbCurrent = json_val.getInt("usbCurrent");
         }
-        if (json_val.Has("rebootCountdown"))
+        if (json_val.has("rebootCountdown"))
         {
-            _rebootCountdown = json_val.GetInt("rebootCountdown");
+            _rebootCountdown = json_val.getInt("rebootCountdown");
         }
-        if (json_val.Has("userVar"))
+        if (json_val.has("userVar"))
         {
-            _userVar = json_val.GetInt("userVar");
+            _userVar = json_val.getInt("userVar");
         }
         base._parseAttr(json_val);
     }
@@ -9496,45 +9550,45 @@ public class YSensor : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("unit"))
+        if (json_val.has("unit"))
         {
-            _unit = json_val.GetString("unit");
+            _unit = json_val.getString("unit");
         }
-        if (json_val.Has("currentValue"))
+        if (json_val.has("currentValue"))
         {
-            _currentValue = Math.Round(json_val.GetDouble("currentValue") * 1000.0 / 65536.0) / 1000.0;
+            _currentValue = Math.Round(json_val.getDouble("currentValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("lowestValue"))
+        if (json_val.has("lowestValue"))
         {
-            _lowestValue = Math.Round(json_val.GetDouble("lowestValue") * 1000.0 / 65536.0) / 1000.0;
+            _lowestValue = Math.Round(json_val.getDouble("lowestValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("highestValue"))
+        if (json_val.has("highestValue"))
         {
-            _highestValue = Math.Round(json_val.GetDouble("highestValue") * 1000.0 / 65536.0) / 1000.0;
+            _highestValue = Math.Round(json_val.getDouble("highestValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("currentRawValue"))
+        if (json_val.has("currentRawValue"))
         {
-            _currentRawValue = Math.Round(json_val.GetDouble("currentRawValue") * 1000.0 / 65536.0) / 1000.0;
+            _currentRawValue = Math.Round(json_val.getDouble("currentRawValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("logFrequency"))
+        if (json_val.has("logFrequency"))
         {
-            _logFrequency = json_val.GetString("logFrequency");
+            _logFrequency = json_val.getString("logFrequency");
         }
-        if (json_val.Has("reportFrequency"))
+        if (json_val.has("reportFrequency"))
         {
-            _reportFrequency = json_val.GetString("reportFrequency");
+            _reportFrequency = json_val.getString("reportFrequency");
         }
-        if (json_val.Has("calibrationParam"))
+        if (json_val.has("calibrationParam"))
         {
-            _calibrationParam = json_val.GetString("calibrationParam");
+            _calibrationParam = json_val.getString("calibrationParam");
         }
-        if (json_val.Has("resolution"))
+        if (json_val.has("resolution"))
         {
-            _resolution = Math.Round(json_val.GetDouble("resolution") * 1000.0 / 65536.0) / 1000.0;
+            _resolution = Math.Round(json_val.getDouble("resolution") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("sensorState"))
+        if (json_val.has("sensorState"))
         {
-            _sensorState = json_val.GetInt("sensorState");
+            _sensorState = json_val.getInt("sensorState");
         }
         base._parseAttr(json_val);
     }

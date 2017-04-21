@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pwmoutput.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_pwmoutput.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -103,37 +103,37 @@ public class YPwmOutput : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("enabled"))
+        if (json_val.has("enabled"))
         {
-            _enabled = json_val.GetInt("enabled") > 0 ? 1 : 0;
+            _enabled = json_val.getInt("enabled") > 0 ? 1 : 0;
         }
-        if (json_val.Has("frequency"))
+        if (json_val.has("frequency"))
         {
-            _frequency = Math.Round(json_val.GetDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
+            _frequency = Math.Round(json_val.getDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("period"))
+        if (json_val.has("period"))
         {
-            _period = Math.Round(json_val.GetDouble("period") * 1000.0 / 65536.0) / 1000.0;
+            _period = Math.Round(json_val.getDouble("period") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("dutyCycle"))
+        if (json_val.has("dutyCycle"))
         {
-            _dutyCycle = Math.Round(json_val.GetDouble("dutyCycle") * 1000.0 / 65536.0) / 1000.0;
+            _dutyCycle = Math.Round(json_val.getDouble("dutyCycle") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("pulseDuration"))
+        if (json_val.has("pulseDuration"))
         {
-            _pulseDuration = Math.Round(json_val.GetDouble("pulseDuration") * 1000.0 / 65536.0) / 1000.0;
+            _pulseDuration = Math.Round(json_val.getDouble("pulseDuration") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("pwmTransition"))
+        if (json_val.has("pwmTransition"))
         {
-            _pwmTransition = json_val.GetString("pwmTransition");
+            _pwmTransition = json_val.getString("pwmTransition");
         }
-        if (json_val.Has("enabledAtPowerOn"))
+        if (json_val.has("enabledAtPowerOn"))
         {
-            _enabledAtPowerOn = json_val.GetInt("enabledAtPowerOn") > 0 ? 1 : 0;
+            _enabledAtPowerOn = json_val.getInt("enabledAtPowerOn") > 0 ? 1 : 0;
         }
-        if (json_val.Has("dutyCycleAtPowerOn"))
+        if (json_val.has("dutyCycleAtPowerOn"))
         {
-            _dutyCycleAtPowerOn = Math.Round(json_val.GetDouble("dutyCycleAtPowerOn") * 1000.0 / 65536.0) / 1000.0;
+            _dutyCycleAtPowerOn = Math.Round(json_val.getDouble("dutyCycleAtPowerOn") * 1000.0 / 65536.0) / 1000.0;
         }
         base._parseAttr(json_val);
     }

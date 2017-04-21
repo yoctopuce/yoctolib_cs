@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_tilt.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_tilt.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindTilt(), the high-level API for Tilt functions
  *
@@ -100,13 +100,13 @@ public class YTilt : YSensor
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("bandwidth"))
+        if (json_val.has("bandwidth"))
         {
-            _bandwidth = json_val.GetInt("bandwidth");
+            _bandwidth = json_val.getInt("bandwidth");
         }
-        if (json_val.Has("axis"))
+        if (json_val.has("axis"))
         {
-            _axis = json_val.GetInt("axis");
+            _axis = json_val.getInt("axis");
         }
         base._parseAttr(json_val);
     }

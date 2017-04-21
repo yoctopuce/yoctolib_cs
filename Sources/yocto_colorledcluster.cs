@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorledcluster.cs 27111 2017-04-06 22:19:25Z seb $
+ * $Id: yocto_colorledcluster.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -101,25 +101,25 @@ public class YColorLedCluster : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("activeLedCount"))
+        if (json_val.has("activeLedCount"))
         {
-            _activeLedCount = json_val.GetInt("activeLedCount");
+            _activeLedCount = json_val.getInt("activeLedCount");
         }
-        if (json_val.Has("maxLedCount"))
+        if (json_val.has("maxLedCount"))
         {
-            _maxLedCount = json_val.GetInt("maxLedCount");
+            _maxLedCount = json_val.getInt("maxLedCount");
         }
-        if (json_val.Has("blinkSeqMaxCount"))
+        if (json_val.has("blinkSeqMaxCount"))
         {
-            _blinkSeqMaxCount = json_val.GetInt("blinkSeqMaxCount");
+            _blinkSeqMaxCount = json_val.getInt("blinkSeqMaxCount");
         }
-        if (json_val.Has("blinkSeqMaxSize"))
+        if (json_val.has("blinkSeqMaxSize"))
         {
-            _blinkSeqMaxSize = json_val.GetInt("blinkSeqMaxSize");
+            _blinkSeqMaxSize = json_val.getInt("blinkSeqMaxSize");
         }
-        if (json_val.Has("command"))
+        if (json_val.has("command"))
         {
-            _command = json_val.GetString("command");
+            _command = json_val.getString("command");
         }
         base._parseAttr(json_val);
     }

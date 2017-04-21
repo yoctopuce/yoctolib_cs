@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_anbutton.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_anbutton.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindAnButton(), the high-level API for AnButton functions
  *
@@ -114,49 +114,49 @@ public class YAnButton : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("calibratedValue"))
+        if (json_val.has("calibratedValue"))
         {
-            _calibratedValue = json_val.GetInt("calibratedValue");
+            _calibratedValue = json_val.getInt("calibratedValue");
         }
-        if (json_val.Has("rawValue"))
+        if (json_val.has("rawValue"))
         {
-            _rawValue = json_val.GetInt("rawValue");
+            _rawValue = json_val.getInt("rawValue");
         }
-        if (json_val.Has("analogCalibration"))
+        if (json_val.has("analogCalibration"))
         {
-            _analogCalibration = json_val.GetInt("analogCalibration") > 0 ? 1 : 0;
+            _analogCalibration = json_val.getInt("analogCalibration") > 0 ? 1 : 0;
         }
-        if (json_val.Has("calibrationMax"))
+        if (json_val.has("calibrationMax"))
         {
-            _calibrationMax = json_val.GetInt("calibrationMax");
+            _calibrationMax = json_val.getInt("calibrationMax");
         }
-        if (json_val.Has("calibrationMin"))
+        if (json_val.has("calibrationMin"))
         {
-            _calibrationMin = json_val.GetInt("calibrationMin");
+            _calibrationMin = json_val.getInt("calibrationMin");
         }
-        if (json_val.Has("sensitivity"))
+        if (json_val.has("sensitivity"))
         {
-            _sensitivity = json_val.GetInt("sensitivity");
+            _sensitivity = json_val.getInt("sensitivity");
         }
-        if (json_val.Has("isPressed"))
+        if (json_val.has("isPressed"))
         {
-            _isPressed = json_val.GetInt("isPressed") > 0 ? 1 : 0;
+            _isPressed = json_val.getInt("isPressed") > 0 ? 1 : 0;
         }
-        if (json_val.Has("lastTimePressed"))
+        if (json_val.has("lastTimePressed"))
         {
-            _lastTimePressed = json_val.GetLong("lastTimePressed");
+            _lastTimePressed = json_val.getLong("lastTimePressed");
         }
-        if (json_val.Has("lastTimeReleased"))
+        if (json_val.has("lastTimeReleased"))
         {
-            _lastTimeReleased = json_val.GetLong("lastTimeReleased");
+            _lastTimeReleased = json_val.getLong("lastTimeReleased");
         }
-        if (json_val.Has("pulseCounter"))
+        if (json_val.has("pulseCounter"))
         {
-            _pulseCounter = json_val.GetLong("pulseCounter");
+            _pulseCounter = json_val.getLong("pulseCounter");
         }
-        if (json_val.Has("pulseTimer"))
+        if (json_val.has("pulseTimer"))
         {
-            _pulseTimer = json_val.GetLong("pulseTimer");
+            _pulseTimer = json_val.getLong("pulseTimer");
         }
         base._parseAttr(json_val);
     }

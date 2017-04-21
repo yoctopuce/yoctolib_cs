@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_power.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_power.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindPower(), the high-level API for Power functions
  *
@@ -94,17 +94,17 @@ public class YPower : YSensor
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("cosPhi"))
+        if (json_val.has("cosPhi"))
         {
-            _cosPhi = Math.Round(json_val.GetDouble("cosPhi") * 1000.0 / 65536.0) / 1000.0;
+            _cosPhi = Math.Round(json_val.getDouble("cosPhi") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("meter"))
+        if (json_val.has("meter"))
         {
-            _meter = Math.Round(json_val.GetDouble("meter") * 1000.0 / 65536.0) / 1000.0;
+            _meter = Math.Round(json_val.getDouble("meter") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("meterTimer"))
+        if (json_val.has("meterTimer"))
         {
-            _meterTimer = json_val.GetInt("meterTimer");
+            _meterTimer = json_val.getInt("meterTimer");
         }
         base._parseAttr(json_val);
     }

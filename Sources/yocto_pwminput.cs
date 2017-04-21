@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pwminput.cs 26947 2017-03-28 11:50:22Z seb $
+ * $Id: yocto_pwminput.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindPwmInput(), the high-level API for PwmInput functions
  *
@@ -107,33 +107,33 @@ public class YPwmInput : YSensor
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("dutyCycle"))
+        if (json_val.has("dutyCycle"))
         {
-            _dutyCycle = Math.Round(json_val.GetDouble("dutyCycle") * 1000.0 / 65536.0) / 1000.0;
+            _dutyCycle = Math.Round(json_val.getDouble("dutyCycle") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("pulseDuration"))
+        if (json_val.has("pulseDuration"))
         {
-            _pulseDuration = Math.Round(json_val.GetDouble("pulseDuration") * 1000.0 / 65536.0) / 1000.0;
+            _pulseDuration = Math.Round(json_val.getDouble("pulseDuration") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("frequency"))
+        if (json_val.has("frequency"))
         {
-            _frequency = Math.Round(json_val.GetDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
+            _frequency = Math.Round(json_val.getDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("period"))
+        if (json_val.has("period"))
         {
-            _period = Math.Round(json_val.GetDouble("period") * 1000.0 / 65536.0) / 1000.0;
+            _period = Math.Round(json_val.getDouble("period") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("pulseCounter"))
+        if (json_val.has("pulseCounter"))
         {
-            _pulseCounter = json_val.GetLong("pulseCounter");
+            _pulseCounter = json_val.getLong("pulseCounter");
         }
-        if (json_val.Has("pulseTimer"))
+        if (json_val.has("pulseTimer"))
         {
-            _pulseTimer = json_val.GetLong("pulseTimer");
+            _pulseTimer = json_val.getLong("pulseTimer");
         }
-        if (json_val.Has("pwmReportMode"))
+        if (json_val.has("pwmReportMode"))
         {
-            _pwmReportMode = json_val.GetInt("pwmReportMode");
+            _pwmReportMode = json_val.getInt("pwmReportMode");
         }
         base._parseAttr(json_val);
     }

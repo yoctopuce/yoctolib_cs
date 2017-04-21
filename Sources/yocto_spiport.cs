@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_spiport.cs 27111 2017-04-06 22:19:25Z seb $
+ * $Id: yocto_spiport.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * Implements yFindSpiPort(), the high-level API for SpiPort functions
  *
@@ -129,61 +129,61 @@ public class YSpiPort : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("rxCount"))
+        if (json_val.has("rxCount"))
         {
-            _rxCount = json_val.GetInt("rxCount");
+            _rxCount = json_val.getInt("rxCount");
         }
-        if (json_val.Has("txCount"))
+        if (json_val.has("txCount"))
         {
-            _txCount = json_val.GetInt("txCount");
+            _txCount = json_val.getInt("txCount");
         }
-        if (json_val.Has("errCount"))
+        if (json_val.has("errCount"))
         {
-            _errCount = json_val.GetInt("errCount");
+            _errCount = json_val.getInt("errCount");
         }
-        if (json_val.Has("rxMsgCount"))
+        if (json_val.has("rxMsgCount"))
         {
-            _rxMsgCount = json_val.GetInt("rxMsgCount");
+            _rxMsgCount = json_val.getInt("rxMsgCount");
         }
-        if (json_val.Has("txMsgCount"))
+        if (json_val.has("txMsgCount"))
         {
-            _txMsgCount = json_val.GetInt("txMsgCount");
+            _txMsgCount = json_val.getInt("txMsgCount");
         }
-        if (json_val.Has("lastMsg"))
+        if (json_val.has("lastMsg"))
         {
-            _lastMsg = json_val.GetString("lastMsg");
+            _lastMsg = json_val.getString("lastMsg");
         }
-        if (json_val.Has("currentJob"))
+        if (json_val.has("currentJob"))
         {
-            _currentJob = json_val.GetString("currentJob");
+            _currentJob = json_val.getString("currentJob");
         }
-        if (json_val.Has("startupJob"))
+        if (json_val.has("startupJob"))
         {
-            _startupJob = json_val.GetString("startupJob");
+            _startupJob = json_val.getString("startupJob");
         }
-        if (json_val.Has("command"))
+        if (json_val.has("command"))
         {
-            _command = json_val.GetString("command");
+            _command = json_val.getString("command");
         }
-        if (json_val.Has("voltageLevel"))
+        if (json_val.has("voltageLevel"))
         {
-            _voltageLevel = json_val.GetInt("voltageLevel");
+            _voltageLevel = json_val.getInt("voltageLevel");
         }
-        if (json_val.Has("protocol"))
+        if (json_val.has("protocol"))
         {
-            _protocol = json_val.GetString("protocol");
+            _protocol = json_val.getString("protocol");
         }
-        if (json_val.Has("spiMode"))
+        if (json_val.has("spiMode"))
         {
-            _spiMode = json_val.GetString("spiMode");
+            _spiMode = json_val.getString("spiMode");
         }
-        if (json_val.Has("ssPolarity"))
+        if (json_val.has("ssPolarity"))
         {
-            _ssPolarity = json_val.GetInt("ssPolarity") > 0 ? 1 : 0;
+            _ssPolarity = json_val.getInt("ssPolarity") > 0 ? 1 : 0;
         }
-        if (json_val.Has("shitftSampling"))
+        if (json_val.has("shitftSampling"))
         {
-            _shitftSampling = json_val.GetInt("shitftSampling") > 0 ? 1 : 0;
+            _shitftSampling = json_val.getInt("shitftSampling") > 0 ? 1 : 0;
         }
         base._parseAttr(json_val);
     }

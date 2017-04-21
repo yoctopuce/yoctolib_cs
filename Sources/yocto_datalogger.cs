@@ -1,6 +1,6 @@
 /********************************************************************
  *
- * $Id: yocto_datalogger.cs 27111 2017-04-06 22:19:25Z seb $
+ * $Id: yocto_datalogger.cs 27191 2017-04-20 17:02:22Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -173,44 +173,44 @@ public class YOldDataStream : YDataStream
         json = (YAPI.YJSONObject) raw_json;
 
 
-        if (json.Has("time")) {
-            _timeStamp = json.GetInt("time");
+        if (json.has("time")) {
+            _timeStamp = json.getInt("time");
         }
-        if (json.Has("UTC")) {
-            _utcStamp = json.GetLong("UTC");
+        if (json.has("UTC")) {
+            _utcStamp = json.getLong("UTC");
         }
-         if (json.Has("interval")) {
-            _interval = json.GetInt("interval");
+         if (json.has("interval")) {
+            _interval = json.getInt("interval");
         }
-        if (json.Has("nRows")) {
-            _nRows = json.GetInt("nRows");
+        if (json.has("nRows")) {
+            _nRows = json.getInt("nRows");
         }
-        if (json.Has("keys")) {
-            YAPI.YJSONArray jsonkeys = json.GetYJSONArray("keys");
+        if (json.has("keys")) {
+            YAPI.YJSONArray jsonkeys = json.getYJSONArray("keys");
             _nCols = jsonkeys.Length;
             for (j = 0; j < _nCols ; j++) {
-                _columnNames.Add(jsonkeys.GetString(j));
+                _columnNames.Add(jsonkeys.getString(j));
             }
         }
-         if (json.Has("div")) {
-            YAPI.YJSONArray arr = json.GetYJSONArray("div");
+         if (json.has("div")) {
+            YAPI.YJSONArray arr = json.getYJSONArray("div");
             _nCols = arr.Length;
             for (j = 0; j < _nCols ; j++) {
-                coldiv.Add(arr.GetInt(j));
+                coldiv.Add(arr.getInt(j));
             }
         }
-         if (json.Has("type")) {
-            YAPI.YJSONArray arr = json.GetYJSONArray("type");
+         if (json.has("type")) {
+            YAPI.YJSONArray arr = json.getYJSONArray("type");
             _nCols = arr.Length;
             for (j = 0; j < _nCols; j++) {
-                coltype.Add(arr.GetInt(j));
+                coltype.Add(arr.getInt(j));
             }
         }
-         if (json.Has("scal")) {
-            YAPI.YJSONArray arr = json.GetYJSONArray("type");
+         if (json.has("scal")) {
+            YAPI.YJSONArray arr = json.getYJSONArray("type");
             _nCols = arr.Length;
             for (j = 0; j < _nCols; j++) {
-                colscl.Add(arr.GetInt(j) / 65536.0);
+                colscl.Add(arr.getInt(j) / 65536.0);
                 if (coltype[j] != 0)
                     colofs.Add(-32767);
                 else
@@ -218,10 +218,10 @@ public class YOldDataStream : YDataStream
             }
 
         }
-         if (json.Has("cal")) {
+         if (json.has("cal")) {
             //fixme no calibration
         }
-        if (json.Has("data")) {
+        if (json.has("data")) {
             if (colscl.Count <= 0) {
                 for (j = 0; j <= _nCols - 1; j++) {
                     colscl.Add(1.0/coldiv[j]);
@@ -234,14 +234,14 @@ public class YOldDataStream : YDataStream
             udat.Clear();
             string data = null;
             try {
-                data = json.GetString("data");
+                data = json.getString("data");
                 udat = YAPI._decodeWords(data);
             }
             catch (Exception ) {}
             if (data==null) {
-                YAPI.YJSONArray jsonData = json.GetYJSONArray("data");
+                YAPI.YJSONArray jsonData = json.getYJSONArray("data");
                 for (j = 0; j < jsonData.Length; j++) {
-                    int tmp = (int) (jsonData.GetInt(j));
+                    int tmp = (int) (jsonData.getInt(j));
                     udat.Add(tmp);
                 }
             }
@@ -340,29 +340,29 @@ public class YDataLogger : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.Has("currentRunIndex"))
+        if (json_val.has("currentRunIndex"))
         {
-            _currentRunIndex = json_val.GetInt("currentRunIndex");
+            _currentRunIndex = json_val.getInt("currentRunIndex");
         }
-        if (json_val.Has("timeUTC"))
+        if (json_val.has("timeUTC"))
         {
-            _timeUTC = json_val.GetLong("timeUTC");
+            _timeUTC = json_val.getLong("timeUTC");
         }
-        if (json_val.Has("recording"))
+        if (json_val.has("recording"))
         {
-            _recording = json_val.GetInt("recording");
+            _recording = json_val.getInt("recording");
         }
-        if (json_val.Has("autoStart"))
+        if (json_val.has("autoStart"))
         {
-            _autoStart = json_val.GetInt("autoStart") > 0 ? 1 : 0;
+            _autoStart = json_val.getInt("autoStart") > 0 ? 1 : 0;
         }
-        if (json_val.Has("beaconDriven"))
+        if (json_val.has("beaconDriven"))
         {
-            _beaconDriven = json_val.GetInt("beaconDriven") > 0 ? 1 : 0;
+            _beaconDriven = json_val.getInt("beaconDriven") > 0 ? 1 : 0;
         }
-        if (json_val.Has("clearHistory"))
+        if (json_val.has("clearHistory"))
         {
-            _clearHistory = json_val.GetInt("clearHistory") > 0 ? 1 : 0;
+            _clearHistory = json_val.getInt("clearHistory") > 0 ? 1 : 0;
         }
         base._parseAttr(json_val);
     }
@@ -969,17 +969,17 @@ public class YDataLogger : YFunction
 
         if (root.Length == 0) 
             return YAPI.SUCCESS;
-        if (root.Get(0).GetJSONType() == YAPI.YJSONContent.YJSONType.ARRAY) {
+        if (root.get(0).getJSONType() == YAPI.YJSONContent.YJSONType.ARRAY) {
             // old datalogger format: [runIdx, timerel, utc, interval]
             for (i = 0; i < root.Length ; i++)
             {
-                YAPI.YJSONArray el = root.GetYJSONArray(i);
-                v.Add(new YOldDataStream(this,el.GetInt(0), el.GetInt(1), (uint) el.GetLong(2), el.GetInt(1)));
+                YAPI.YJSONArray el = root.getYJSONArray(i);
+                v.Add(new YOldDataStream(this,el.getInt(0), el.getInt(1), (uint) el.getLong(2), el.getInt(1)));
             }
         } else {
             // new datalogger format: {"id":"...","unit":"...","streams":["...",...]}
             
-            string json_buffer = root.ToJSON();
+            string json_buffer = root.toJSON();
             List<YDataSet> sets = this.parse_dataSets(YAPI.DefaultEncoding.GetBytes(json_buffer));
             for (int sj = 0; sj < sets.Count; sj++)
             {
