@@ -1,1 +1,1 @@
-- Add support for new JZON protocol (improve overall performance)
+- Fix crash during call of YFiles.get_list() method

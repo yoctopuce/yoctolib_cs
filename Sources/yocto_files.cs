@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs 27191 2017-04-20 17:02:22Z seb $
+ * $Id: yocto_files.cs 27241 2017-04-24 12:37:38Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -63,6 +63,7 @@ public class YFileRecord
         //--- (generated code: YFileRecord attributes initialization)
         //--- (end of generated code: YFileRecord attributes initialization)
         YAPI.YJSONObject p  = new YAPI.YJSONObject(data);
+        p.parse();
         this._name = p.getString("name");
         this._size = p.getInt("size");
         this._crc = p.getInt("crc");
