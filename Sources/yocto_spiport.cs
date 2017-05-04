@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_spiport.cs 27191 2017-04-20 17:02:22Z seb $
+ * $Id: yocto_spiport.cs 27273 2017-04-25 15:38:05Z seb $
  *
  * Implements yFindSpiPort(), the high-level API for SpiPort functions
  *
@@ -958,7 +958,7 @@ public class YSpiPort : YFunction
         this._rxptr = 0;
         this._rxbuffptr = 0;
         this._rxbuff = new byte[0];
-        
+
         return this.sendCommand("Z");
     }
 
@@ -1079,7 +1079,7 @@ public class YSpiPort : YFunction
             buff[idx] = (byte)(hexb & 0xff);
             idx = idx + 1;
         }
-        
+
         res = this._upload("txdata", buff);
         return res;
     }
@@ -1119,7 +1119,7 @@ public class YSpiPort : YFunction
             buff[idx] = (byte)(hexb & 0xff);
             idx = idx + 1;
         }
-        
+
         res = this._upload("txdata", buff);
         return res;
     }
@@ -1192,7 +1192,7 @@ public class YSpiPort : YFunction
         int mult;
         int endpos;
         int res;
-        
+
         // first check if we have the requested character in the look-ahead buffer
         bufflen = (this._rxbuff).Length;
         if ((this._rxptr >= this._rxbuffptr) && (this._rxptr < this._rxbuffptr+bufflen)) {
@@ -1200,7 +1200,7 @@ public class YSpiPort : YFunction
             this._rxptr = this._rxptr + 1;
             return res;
         }
-        
+
         // try to preload more than one byte to speed-up byte-per-byte access
         currpos = this._rxptr;
         reqlen = 1024;
@@ -1227,8 +1227,8 @@ public class YSpiPort : YFunction
         }
         // still mixed, need to process character by character
         this._rxptr = currpos;
-        
-        
+
+
         buff = this._download("rxdata.bin?pos="+Convert.ToString(this._rxptr)+"&len=1");
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1274,7 +1274,7 @@ public class YSpiPort : YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        
+
         buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nChars));
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1318,7 +1318,7 @@ public class YSpiPort : YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        
+
         buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nChars));
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1368,7 +1368,7 @@ public class YSpiPort : YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        
+
         buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nChars));
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1418,7 +1418,7 @@ public class YSpiPort : YFunction
         if (nBytes > 65535) {
             nBytes = 65535;
         }
-        
+
         buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nBytes));
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1469,7 +1469,7 @@ public class YSpiPort : YFunction
         List<string> msgarr = new List<string>();
         int msglen;
         string res;
-        
+
         url = "rxmsg.json?pos="+Convert.ToString(this._rxptr)+"&len=1&maxw=1";
         msgbin = this._download(url);
         msgarr = this._json_get_array(msgbin);
@@ -1527,7 +1527,7 @@ public class YSpiPort : YFunction
         int msglen;
         List<string> res = new List<string>();
         int idx;
-        
+
         url = "rxmsg.json?pos="+Convert.ToString( this._rxptr)+"&maxw="+Convert.ToString( maxWait)+"&pat="+pattern;
         msgbin = this._download(url);
         msgarr = this._json_get_array(msgbin);
@@ -1599,7 +1599,7 @@ public class YSpiPort : YFunction
         byte[] buff;
         int bufflen;
         int res;
-        
+
         buff = this._download("rxcnt.bin?pos="+Convert.ToString(this._rxptr));
         bufflen = (buff).Length - 1;
         while ((bufflen > 0) && (buff[bufflen] != 64)) {
@@ -1637,7 +1637,7 @@ public class YSpiPort : YFunction
         List<string> msgarr = new List<string>();
         int msglen;
         string res;
-        
+
         url = "rxmsg.json?len=1&maxw="+Convert.ToString( maxWait)+"&cmd=!"+query;
         msgbin = this._download(url);
         msgarr = this._json_get_array(msgbin);

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs 27241 2017-04-24 12:37:38Z seb $
+ * $Id: yocto_files.cs 27273 2017-04-25 15:38:05Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -307,7 +307,7 @@ public class YFiles : YFunction
     {
         string url;
         url = "files.json?a="+command;
-        
+
         return this._download(url);
     }
 

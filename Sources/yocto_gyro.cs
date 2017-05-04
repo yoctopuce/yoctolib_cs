@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_gyro.cs 27191 2017-04-20 17:02:22Z seb $
+ * $Id: yocto_gyro.cs 27273 2017-04-25 15:38:05Z seb $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -763,7 +763,7 @@ public class YGyro : YSensor
         double sqz;
         double norm;
         double delta;
-        
+
         if (this._loadQuaternion() != YAPI.SUCCESS) {
             return YAPI.DEVICE_NOT_FOUND;
         }

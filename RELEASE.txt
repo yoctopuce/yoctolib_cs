@@ -1,1 +1,1 @@
-- Fix crash during call of YFiles.get_list() method
+- Improve responsiveness of the library when used by lots of concurrent threads.

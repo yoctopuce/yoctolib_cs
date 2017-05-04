@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorledcluster.cs 27191 2017-04-20 17:02:22Z seb $
+ * $Id: yocto_colorledcluster.cs 27273 2017-04-25 15:38:05Z seb $
  *
  * Implements yFindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -1001,7 +1001,7 @@ public class YColorLedCluster : YFunction
             buff[3*idx+2] = (byte)(((rgb) & (255)) & 0xff);
             idx = idx + 1;
         }
-        
+
         res = this._upload("rgb:0:"+Convert.ToString(ledIndex), buff);
         return res;
     }
@@ -1045,7 +1045,7 @@ public class YColorLedCluster : YFunction
             buff[3*idx+2] = (byte)(((rgb) & (255)) & 0xff);
             idx = idx + 1;
         }
-        
+
         res = this._upload("rgb:"+Convert.ToString(delay), buff);
         return res;
     }
@@ -1114,7 +1114,7 @@ public class YColorLedCluster : YFunction
             buff[3*idx+2] = (byte)(((hsl) & (255)) & 0xff);
             idx = idx + 1;
         }
-        
+
         res = this._upload("hsl:0:"+Convert.ToString(ledIndex), buff);
         return res;
     }
@@ -1158,7 +1158,7 @@ public class YColorLedCluster : YFunction
             buff[3*idx+2] = (byte)(((hsl) & (255)) & 0xff);
             idx = idx + 1;
         }
-        
+
         res = this._upload("hsl:"+Convert.ToString(delay), buff);
         return res;
     }
@@ -1219,7 +1219,7 @@ public class YColorLedCluster : YFunction
         int r;
         int g;
         int b;
-        
+
         buff = this._download("rgb.bin?typ=0&pos="+Convert.ToString(3*ledIndex)+"&len="+Convert.ToString(3*count));
         res.Clear();
         idx = 0;
@@ -1262,7 +1262,7 @@ public class YColorLedCluster : YFunction
         int r;
         int g;
         int b;
-        
+
         buff = this._download("rgb.bin?typ=4&pos="+Convert.ToString(3*ledIndex)+"&len="+Convert.ToString(3*count));
         res.Clear();
         idx = 0;
@@ -1304,7 +1304,7 @@ public class YColorLedCluster : YFunction
         List<int> res = new List<int>();
         int idx;
         int seq;
-        
+
         buff = this._download("rgb.bin?typ=1&pos="+Convert.ToString(ledIndex)+"&len="+Convert.ToString(count));
         res.Clear();
         idx = 0;
@@ -1346,7 +1346,7 @@ public class YColorLedCluster : YFunction
         int hl;
         int lh;
         int ll;
-        
+
         buff = this._download("rgb.bin?typ=2&pos="+Convert.ToString(4*seqIndex)+"&len="+Convert.ToString(4*count));
         res.Clear();
         idx = 0;
@@ -1387,7 +1387,7 @@ public class YColorLedCluster : YFunction
         int idx;
         int lh;
         int ll;
-        
+
         buff = this._download("rgb.bin?typ=6&pos="+Convert.ToString(seqIndex)+"&len="+Convert.ToString(count));
         res.Clear();
         idx = 0;
@@ -1425,7 +1425,7 @@ public class YColorLedCluster : YFunction
         List<int> res = new List<int>();
         int idx;
         int started;
-        
+
         buff = this._download("rgb.bin?typ=5&pos="+Convert.ToString(seqIndex)+"&len="+Convert.ToString(count));
         res.Clear();
         idx = 0;
@@ -1462,7 +1462,7 @@ public class YColorLedCluster : YFunction
         List<int> res = new List<int>();
         int idx;
         int started;
-        
+
         buff = this._download("rgb.bin?typ=3&pos="+Convert.ToString(seqIndex)+"&len="+Convert.ToString(count));
         res.Clear();
         idx = 0;

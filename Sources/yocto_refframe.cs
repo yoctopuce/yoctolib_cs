@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_refframe.cs 27191 2017-04-20 17:02:22Z seb $
+ * $Id: yocto_refframe.cs 27273 2017-04-25 15:38:05Z seb $
  *
  * Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -507,7 +507,7 @@ public enum   MOUNTORIENTATION
         List<int> iCalib = new List<int>();
         int caltyp;
         int res;
-        
+
         calibParam = this.get_calibrationParam();
         iCalib = YAPI._decodeFloats(calibParam);
         caltyp = ((iCalib[0]) / (1000));
@@ -544,7 +544,7 @@ public enum   MOUNTORIENTATION
         List<int> iCalib = new List<int>();
         int caltyp;
         int res;
-        
+
         calibParam = this.get_calibrationParam();
         iCalib = YAPI._decodeFloats(calibParam);
         caltyp = ((iCalib[0]) / (1000));
@@ -895,7 +895,7 @@ public enum   MOUNTORIENTATION
                 return YAPI.SUCCESS;
             }
         }
-        
+
         calibParam = this._download("api/refFrame/calibrationParam.txt");
         iCalib = YAPI._decodeFloats(YAPI.DefaultEncoding.GetString(calibParam));
         cal3 = ((iCalib[1]) / (1000));
@@ -1116,7 +1116,7 @@ public enum   MOUNTORIENTATION
         if (this._calibStage == 0) {
             return YAPI.SUCCESS;
         }
-        
+
         this._calibStage = 0;
         return this.set_calibrationParam(this._calibSavedParams);
     }

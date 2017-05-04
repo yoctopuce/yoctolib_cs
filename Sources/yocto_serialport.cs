@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 27191 2017-04-20 17:02:22Z seb $
+ * $Id: yocto_serialport.cs 27273 2017-04-25 15:38:05Z seb $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
@@ -829,7 +829,7 @@ public class YSerialPort : YFunction
         this._rxptr = 0;
         this._rxbuffptr = 0;
         this._rxbuff = new byte[0];
-        
+
         return this.sendCommand("Z");
     }
 
@@ -950,7 +950,7 @@ public class YSerialPort : YFunction
             buff[idx] = (byte)(hexb & 0xff);
             idx = idx + 1;
         }
-        
+
         res = this._upload("txdata", buff);
         return res;
     }
@@ -990,7 +990,7 @@ public class YSerialPort : YFunction
             buff[idx] = (byte)(hexb & 0xff);
             idx = idx + 1;
         }
-        
+
         res = this._upload("txdata", buff);
         return res;
     }
@@ -1063,7 +1063,7 @@ public class YSerialPort : YFunction
         int mult;
         int endpos;
         int res;
-        
+
         // first check if we have the requested character in the look-ahead buffer
         bufflen = (this._rxbuff).Length;
         if ((this._rxptr >= this._rxbuffptr) && (this._rxptr < this._rxbuffptr+bufflen)) {
@@ -1071,7 +1071,7 @@ public class YSerialPort : YFunction
             this._rxptr = this._rxptr + 1;
             return res;
         }
-        
+
         // try to preload more than one byte to speed-up byte-per-byte access
         currpos = this._rxptr;
         reqlen = 1024;
@@ -1098,8 +1098,8 @@ public class YSerialPort : YFunction
         }
         // still mixed, need to process character by character
         this._rxptr = currpos;
-        
-        
+
+
         buff = this._download("rxdata.bin?pos="+Convert.ToString(this._rxptr)+"&len=1");
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1145,7 +1145,7 @@ public class YSerialPort : YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        
+
         buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nChars));
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1189,7 +1189,7 @@ public class YSerialPort : YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        
+
         buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nChars));
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1239,7 +1239,7 @@ public class YSerialPort : YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        
+
         buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nChars));
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1289,7 +1289,7 @@ public class YSerialPort : YFunction
         if (nBytes > 65535) {
             nBytes = 65535;
         }
-        
+
         buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nBytes));
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1340,7 +1340,7 @@ public class YSerialPort : YFunction
         List<string> msgarr = new List<string>();
         int msglen;
         string res;
-        
+
         url = "rxmsg.json?pos="+Convert.ToString(this._rxptr)+"&len=1&maxw=1";
         msgbin = this._download(url);
         msgarr = this._json_get_array(msgbin);
@@ -1398,7 +1398,7 @@ public class YSerialPort : YFunction
         int msglen;
         List<string> res = new List<string>();
         int idx;
-        
+
         url = "rxmsg.json?pos="+Convert.ToString( this._rxptr)+"&maxw="+Convert.ToString( maxWait)+"&pat="+pattern;
         msgbin = this._download(url);
         msgarr = this._json_get_array(msgbin);
@@ -1470,7 +1470,7 @@ public class YSerialPort : YFunction
         byte[] buff;
         int bufflen;
         int res;
-        
+
         buff = this._download("rxcnt.bin?pos="+Convert.ToString(this._rxptr));
         bufflen = (buff).Length - 1;
         while ((bufflen > 0) && (buff[bufflen] != 64)) {
@@ -1508,7 +1508,7 @@ public class YSerialPort : YFunction
         List<string> msgarr = new List<string>();
         int msglen;
         string res;
-        
+
         url = "rxmsg.json?len=1&maxw="+Convert.ToString( maxWait)+"&cmd=!"+query;
         msgbin = this._download(url);
         msgarr = this._json_get_array(msgbin);
@@ -1624,7 +1624,7 @@ public class YSerialPort : YFunction
     {
         byte[] buff;
         int res;
-        
+
         buff = this._download("cts.txt");
         if (!((buff).Length == 1)) { this._throw( YAPI.IO_ERROR, "invalid CTS reply"); return YAPI.IO_ERROR; }
         res = buff[0] - 48;
@@ -1699,7 +1699,7 @@ public class YSerialPort : YFunction
             cmd = ""+ cmd+""+String.Format("{0:X02}",((pduBytes[i]) & (0xff)));
             i = i + 1;
         }
-        
+
         url = "rxmsg.json?cmd=:"+ cmd+"&pat=:"+pat;
         msgs = this._download(url);
         reps = this._json_get_array(msgs);
@@ -1761,7 +1761,7 @@ public class YSerialPort : YFunction
         pdu.Add(((pduAddr) & (0xff)));
         pdu.Add(((nBits) >> (8)));
         pdu.Add(((nBits) & (0xff)));
-        
+
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;
@@ -1828,7 +1828,7 @@ public class YSerialPort : YFunction
         pdu.Add(((pduAddr) & (0xff)));
         pdu.Add(((nBits) >> (8)));
         pdu.Add(((nBits) & (0xff)));
-        
+
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;
@@ -1894,7 +1894,7 @@ public class YSerialPort : YFunction
         pdu.Add(((pduAddr) & (0xff)));
         pdu.Add(((nWords) >> (8)));
         pdu.Add(((nWords) & (0xff)));
-        
+
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;
@@ -1951,7 +1951,7 @@ public class YSerialPort : YFunction
         pdu.Add(((pduAddr) & (0xff)));
         pdu.Add(((nWords) >> (8)));
         pdu.Add(((nWords) & (0xff)));
-        
+
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;
@@ -2009,7 +2009,7 @@ public class YSerialPort : YFunction
         pdu.Add(((pduAddr) & (0xff)));
         pdu.Add(value);
         pdu.Add(0x00);
-        
+
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;
@@ -2082,7 +2082,7 @@ public class YSerialPort : YFunction
         if (mask != 1) {
             pdu.Add(val);
         }
-        
+
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;
@@ -2129,7 +2129,7 @@ public class YSerialPort : YFunction
         pdu.Add(((pduAddr) & (0xff)));
         pdu.Add(((value) >> (8)));
         pdu.Add(((value) & (0xff)));
-        
+
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;
@@ -2189,7 +2189,7 @@ public class YSerialPort : YFunction
             pdu.Add(((val) & (0xff)));
             regpos = regpos + 1;
         }
-        
+
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;
@@ -2261,7 +2261,7 @@ public class YSerialPort : YFunction
             pdu.Add(((val) & (0xff)));
             regpos = regpos + 1;
         }
-        
+
         reply = this.queryMODBUS(slaveNo, pdu);
         if (reply.Count == 0) {
             return res;

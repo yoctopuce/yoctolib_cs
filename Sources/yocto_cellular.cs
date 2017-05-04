@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 27191 2017-04-20 17:02:22Z seb $
+ * $Id: yocto_cellular.cs 27273 2017-04-25 15:38:05Z seb $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *
@@ -1204,7 +1204,7 @@ public class YCellular : YFunction
     public virtual int clearDataCounters()
     {
         int retcode;
-        
+
         retcode = this.set_dataReceived(0);
         if (retcode != YAPI.SUCCESS) {
             return retcode;
@@ -1312,7 +1312,7 @@ public class YCellular : YFunction
         int idx;
         int slen;
         List<string> res = new List<string>();
-        
+
         cops = this._AT("+COPS=?");
         slen = (cops).Length;
         res.Clear();
@@ -1365,7 +1365,7 @@ public class YCellular : YFunction
         int tad;
         string oper;
         List<YCellRecord> res = new List<YCellRecord>();
-        
+
         moni = this._AT("+CCED=0;#MONI=7;#MONI");
         mccs = (moni).Substring(7, 3);
         if ((mccs).Substring(0, 1) == "0") {

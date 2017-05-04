@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_messagebox.cs 27191 2017-04-20 17:02:22Z seb $
+ * $Id: yocto_messagebox.cs 27273 2017-04-25 15:38:05Z seb $
  *
  * Implements yFindMessageBox(), the high-level API for MessageBox functions
  *
@@ -167,7 +167,7 @@ public class YSms
         byte[] isolatin;
         int isosize;
         int i;
-        
+
         if (this._alphab == 0) {
             // using GSM standard 7-bit alphabet
             return this._mbox.gsm2str(this._udata);
@@ -183,7 +183,7 @@ public class YSms
             }
             return YAPI.DefaultEncoding.GetString(isolatin);
         }
-        
+
         // default: convert 8 bit to string as-is
         return YAPI.DefaultEncoding.GetString(this._udata);
     }
@@ -194,7 +194,7 @@ public class YSms
         int unisize;
         int unival;
         int i;
-        
+
         if (this._alphab == 0) {
             // using GSM standard 7-bit alphabet
             return this._mbox.gsm2unicode(this._udata);
@@ -371,7 +371,7 @@ public class YSms
         int udatalen;
         int i;
         int uni;
-        
+
         if (this._alphab == 2) {
             return YAPI.SUCCESS;
         }
@@ -390,7 +390,7 @@ public class YSms
         this._alphab = 2;
         this._udata = new byte[0];
         this.addUnicodeData(ucs2);
-        
+
         return YAPI.SUCCESS;
     }
 
@@ -401,11 +401,11 @@ public class YSms
         byte[] newdata;
         int newdatalen;
         int i;
-        
+
         if ((val).Length == 0) {
             return YAPI.SUCCESS;
         }
-        
+
         if (this._alphab == 0) {
             // Try to append using GSM 7-bit alphabet
             newdata = this._mbox.str2gsm(val);
@@ -450,7 +450,7 @@ public class YSms
                 i = i + 1;
             }
         }
-        
+
         return this.set_userData(udata);
     }
 
@@ -463,7 +463,7 @@ public class YSms
         byte[] udata;
         int udatalen;
         int surrogate;
-        
+
         if (this._alphab != 2) {
             this.convertToUnicode();
         }
@@ -502,7 +502,7 @@ public class YSms
             udatalen = udatalen + 2;
             i = i + 1;
         }
-        
+
         return this.set_userData(udata);
     }
 
@@ -528,7 +528,7 @@ public class YSms
         if (this._npdu == 0) {
             return YAPI.INVALID_ARGUMENT;
         }
-        
+
         sorted.Clear();
         partno = 0;
         while (partno < this._npdu) {
@@ -1095,7 +1095,7 @@ public class YSms
         int iei;
         int ielen;
         string sig;
-        
+
         this._aggSig = "";
         this._aggIdx = 0;
         this._aggCnt = 0;
@@ -1142,10 +1142,10 @@ public class YSms
         int carry;
         int nbits;
         int thisb;
-        
+
         this._pdu = pdu;
         this._npdu = 1;
-        
+
         // parse meta-data
         this._smsc = this.decodeAddress(pdu, 1, 2*(pdu[0]-1));
         rpos = 1+pdu[0];
@@ -1184,7 +1184,7 @@ public class YSms
         this._mclass = ((dcs) & (16+3));
         this._stamp = this.decodeTimeStamp(pdu, rpos, tslen);
         rpos = rpos + tslen;
-        
+
         // parse user data (including udh)
         nbits = 0;
         carry = 0;
@@ -1247,7 +1247,7 @@ public class YSms
             }
         }
         this.parseUserDataHeader();
-        
+
         return YAPI.SUCCESS;
     }
 
@@ -1256,7 +1256,7 @@ public class YSms
         int i;
         int retcode;
         YSms pdu;
-        
+
         if (this._npdu == 0) {
             this.generatePdu();
         }
@@ -1278,7 +1278,7 @@ public class YSms
         int i;
         int retcode;
         YSms pdu;
-        
+
         if (this._slot > 0) {
             return this._mbox.clearSIMSlot(this._slot);
         }
@@ -1713,8 +1713,8 @@ public class YMessageBox : YFunction
         List<string> arrPdu = new List<string>();
         string hexPdu;
         YSms sms;
-        
-        
+
+
         binPdu = this._download("sms.json?pos="+Convert.ToString(slot)+"&len=1");
         arrPdu = this._json_get_array(binPdu);
         hexPdu = this._decode_json_string(arrPdu[0]);
@@ -1728,7 +1728,7 @@ public class YMessageBox : YFunction
     {
         int i;
         int uni;
-        
+
         this._gsm2unicode.Clear();
         // 00-07
         this._gsm2unicode.Add(64);
@@ -1806,7 +1806,7 @@ public class YMessageBox : YFunction
         }
         // Done
         this._gsm2unicodeReady = true;
-        
+
         return YAPI.SUCCESS;
     }
 
@@ -1817,7 +1817,7 @@ public class YMessageBox : YFunction
         int reslen;
         List<int> res = new List<int>();
         int uni;
-        
+
         if (!(this._gsm2unicodeReady)) {
             this.initGsm2Unicode();
         }
@@ -1903,7 +1903,7 @@ public class YMessageBox : YFunction
         byte[] resbin;
         string resstr;
         int uni;
-        
+
         if (!(this._gsm2unicodeReady)) {
             this.initGsm2Unicode();
         }
@@ -1997,7 +1997,7 @@ public class YMessageBox : YFunction
         int extra;
         byte[] res;
         int wpos;
-        
+
         if (!(this._gsm2unicodeReady)) {
             this.initGsm2Unicode();
         }
@@ -2084,8 +2084,8 @@ public class YMessageBox : YFunction
         List<YSms> newAgg = new List<YSms>();
         List<string> signatures = new List<string>();
         YSms sms;
-        
-        
+
+
         bitmapStr = this.get_slotsBitmap();
         if (bitmapStr == this._prevBitmapStr) {
             return YAPI.SUCCESS;
@@ -2189,7 +2189,7 @@ public class YMessageBox : YFunction
             i = i + 1;
         }
         this._messages = newMsg;
-        
+
         return YAPI.SUCCESS;
     }
 
@@ -2215,7 +2215,7 @@ public class YMessageBox : YFunction
     public virtual int clearPduCounters()
     {
         int retcode;
-        
+
         retcode = this.set_pduReceived(0);
         if (retcode != YAPI.SUCCESS) {
             return retcode;
@@ -2252,7 +2252,7 @@ public class YMessageBox : YFunction
     public virtual int sendTextMessage(string recipient, string message)
     {
         YSms sms;
-        
+
         sms = new YSms(this);
         sms.set_recipient(recipient);
         sms.addText(message);
@@ -2288,7 +2288,7 @@ public class YMessageBox : YFunction
     public virtual int sendFlashMessage(string recipient, string message)
     {
         YSms sms;
-        
+
         sms = new YSms(this);
         sms.set_recipient(recipient);
         sms.set_msgClass(0);
@@ -2339,7 +2339,7 @@ public class YMessageBox : YFunction
     public virtual List<YSms> get_messages()
     {
         this.checkNewMessages();
-        
+
         return this._messages;
     }
 
