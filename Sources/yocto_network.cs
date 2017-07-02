@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_network.cs 27416 2017-05-11 09:58:11Z seb $
+ * $Id: yocto_network.cs 27726 2017-06-02 13:18:52Z mvuilleu $
  *
  * Implements yFindNetwork(), the high-level API for Network functions
  *
@@ -106,6 +106,7 @@ public class YNetwork : YFunction
     public const int CALLBACKENCODING_AZURE = 7;
     public const int CALLBACKENCODING_INFLUXDB = 8;
     public const int CALLBACKENCODING_MQTT = 9;
+    public const int CALLBACKENCODING_YOCTO_API_JZON = 10;
     public const int CALLBACKENCODING_INVALID = -1;
     public const string CALLBACKCREDENTIALS_INVALID = YAPI.INVALID_STRING;
     public const int CALLBACKINITIALDELAY_INVALID = YAPI.INVALID_UINT;
@@ -1164,8 +1165,9 @@ public class YNetwork : YFunction
      *   <c>YNetwork.CALLBACKENCODING_JSON_ARRAY</c>, <c>YNetwork.CALLBACKENCODING_CSV</c>,
      *   <c>YNetwork.CALLBACKENCODING_YOCTO_API</c>, <c>YNetwork.CALLBACKENCODING_JSON_NUM</c>,
      *   <c>YNetwork.CALLBACKENCODING_EMONCMS</c>, <c>YNetwork.CALLBACKENCODING_AZURE</c>,
-     *   <c>YNetwork.CALLBACKENCODING_INFLUXDB</c> and <c>YNetwork.CALLBACKENCODING_MQTT</c> corresponding
-     *   to the encoding standard to use for representing notification values
+     *   <c>YNetwork.CALLBACKENCODING_INFLUXDB</c>, <c>YNetwork.CALLBACKENCODING_MQTT</c> and
+     *   <c>YNetwork.CALLBACKENCODING_YOCTO_API_JZON</c> corresponding to the encoding standard to use for
+     *   representing notification values
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YNetwork.CALLBACKENCODING_INVALID</c>.
@@ -1198,8 +1200,9 @@ public class YNetwork : YFunction
      *   <c>YNetwork.CALLBACKENCODING_JSON_ARRAY</c>, <c>YNetwork.CALLBACKENCODING_CSV</c>,
      *   <c>YNetwork.CALLBACKENCODING_YOCTO_API</c>, <c>YNetwork.CALLBACKENCODING_JSON_NUM</c>,
      *   <c>YNetwork.CALLBACKENCODING_EMONCMS</c>, <c>YNetwork.CALLBACKENCODING_AZURE</c>,
-     *   <c>YNetwork.CALLBACKENCODING_INFLUXDB</c> and <c>YNetwork.CALLBACKENCODING_MQTT</c> corresponding
-     *   to the encoding standard to use for representing notification values
+     *   <c>YNetwork.CALLBACKENCODING_INFLUXDB</c>, <c>YNetwork.CALLBACKENCODING_MQTT</c> and
+     *   <c>YNetwork.CALLBACKENCODING_YOCTO_API_JZON</c> corresponding to the encoding standard to use for
+     *   representing notification values
      * </param>
      * <para>
      * </para>
@@ -1618,6 +1621,13 @@ public class YNetwork : YFunction
      *   a network interface by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

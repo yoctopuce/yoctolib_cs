@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_latitude.cs 26867 2017-03-23 08:24:48Z seb $
+ * $Id: yocto_latitude.cs 27702 2017-06-01 12:29:26Z seb $
  *
  * Implements yFindLatitude(), the high-level API for Latitude functions
  *
@@ -124,6 +124,13 @@ public class YLatitude : YSensor
      *   a latitude sensor by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

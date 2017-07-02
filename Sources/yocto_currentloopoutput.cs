@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_currentloopoutput.cs 27273 2017-04-25 15:38:05Z seb $
+ * $Id: yocto_currentloopoutput.cs 27926 2017-06-27 13:25:52Z seb $
  *
  * Implements yFindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -325,6 +325,13 @@ public class YCurrentLoopOutput : YFunction
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
      * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
+     * </para>
      * </summary>
      * <param name="func">
      *   a string that uniquely characterizes the 4-20mA output
@@ -403,7 +410,7 @@ public class YCurrentLoopOutput : YFunction
      * </summary>
      * <param name="mA_target">
      *   new current value at the end of the transition
-     *   (floating-point number, representing the transition duration in mA)
+     *   (floating-point number, representing the end current in mA)
      * </param>
      * <param name="ms_duration">
      *   total duration of the transition, in milliseconds

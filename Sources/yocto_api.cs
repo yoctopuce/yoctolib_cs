@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 27416 2017-05-11 09:58:11Z seb $
+ * $Id: yocto_api.cs 27702 2017-06-01 12:29:26Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1094,7 +1094,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "27439";
+    public const string YOCTO_API_BUILD_NO = "27961";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6279,6 +6279,13 @@ public class YFunction
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
      * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
+     * </para>
      * </summary>
      * <param name="func">
      *   a string that uniquely characterizes the function
@@ -7768,8 +7775,10 @@ public class YModule : YFunction
 
     /**
      * <summary>
-     *   Returns the value previously stored in this attribute.
+     *   Stores a 32 bit value in the device RAM.
      * <para>
+     *   This attribute is at programmer disposal,
+     *   should he need to store a state variable.
      *   On startup and after a device reboot, the value is always reset to zero.
      * </para>
      * <para>
@@ -7809,6 +7818,13 @@ public class YModule : YFunction
      *   a module by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -10093,6 +10109,13 @@ public class YSensor : YFunction
      *   a sensor by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

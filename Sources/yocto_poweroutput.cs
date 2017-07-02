@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_poweroutput.cs 27191 2017-04-20 17:02:22Z seb $
+ * $Id: yocto_poweroutput.cs 27926 2017-06-27 13:25:52Z seb $
  *
  * Implements yFindPowerOutput(), the high-level API for PowerOutput functions
  *
@@ -98,8 +98,7 @@ public class YPowerOutput : YFunction
 
     /**
      * <summary>
-     *   Returns the voltage on the power ouput featured by
-     *   the module.
+     *   Returns the voltage on the power output featured by the module.
      * <para>
      * </para>
      * <para>
@@ -107,8 +106,7 @@ public class YPowerOutput : YFunction
      * </summary>
      * <returns>
      *   a value among <c>YPowerOutput.VOLTAGE_OFF</c>, <c>YPowerOutput.VOLTAGE_OUT3V3</c> and
-     *   <c>YPowerOutput.VOLTAGE_OUT5V</c> corresponding to the voltage on the power ouput featured by
-     *   the module
+     *   <c>YPowerOutput.VOLTAGE_OUT5V</c> corresponding to the voltage on the power output featured by the module
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YPowerOutput.VOLTAGE_INVALID</c>.
@@ -195,6 +193,13 @@ public class YPowerOutput : YFunction
      *   a dual power  ouput control by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
