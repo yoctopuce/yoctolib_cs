@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 27702 2017-06-01 12:29:26Z seb $
+ * $Id: yocto_api.cs 28024 2017-07-10 08:50:02Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -1094,7 +1094,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "27961";
+    public const string YOCTO_API_BUILD_NO = "28028";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -2495,8 +2495,8 @@ public class YAPI
      * </para>
      * </summary>
      * <param name="hubDiscoveryCallback">
-     *   a procedure taking two string parameter, or null
-     *   to unregister a previously registered  callback.
+     *   a procedure taking two string parameter, the serial
+     *   number and the hub URL. Use <c>null</c> to unregister a previously registered  callback.
      * </param>
      */
     public static void RegisterHubDiscoveryCallback(YHubDiscoveryCallback hubDiscoveryCallback)
@@ -3560,7 +3560,7 @@ public class YAPI
 
     /**
      * <summary>
-     *   Force a hub discovery, if a callback as been registered with <c>yRegisterDeviceRemovalCallback</c> it
+     *   Force a hub discovery, if a callback as been registered with <c>yRegisterHubDiscoveryCallback</c> it
      *   will be called for each net work hub that will respond to the discovery.
      * <para>
      * </para>
@@ -5367,6 +5367,12 @@ public class YDataSet
         YDataStream stream;
         if (this._progress < 0) {
             url = "logger.json?id="+this._functionId;
+            if (this._startTime != 0) {
+                url = ""+url+"&from="+Convert.ToString(this._startTime);
+            }
+            if (this._endTime != 0) {
+                url = ""+url+"&to="+Convert.ToString(this._endTime);
+            }
         } else {
             if (this._progress >= this._streams.Count) {
                 return 100;

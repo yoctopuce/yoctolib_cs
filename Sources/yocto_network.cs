@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_network.cs 27726 2017-06-02 13:18:52Z mvuilleu $
+ * $Id: yocto_network.cs 28015 2017-07-07 16:27:06Z mvuilleu $
  *
  * Implements yFindNetwork(), the high-level API for Network functions
  *
@@ -1825,6 +1825,33 @@ public class YNetwork : YFunction
     public virtual int triggerCallback()
     {
         return this.set_callbackMethod(this.get_callbackMethod());
+    }
+
+    /**
+     * <summary>
+     *   Setup periodic HTTP callbacks (simplifed function).
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="interval">
+     *   a string representing the callback periodicity, expressed in
+     *   seconds, minutes or hours, eg. "60s", "5m", "1h", "48h".
+     * </param>
+     * <param name="offset">
+     *   an integer representing the time offset relative to the period
+     *   when the callback should occur. For instance, if the periodicity is
+     *   24h, an offset of 7 will make the callback occur each day at 7AM.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int set_periodicCallbackSchedule(string interval, int offset)
+    {
+        return this.set_callbackSchedule("every "+interval+"+"+Convert.ToString(offset));
     }
 
     /**
