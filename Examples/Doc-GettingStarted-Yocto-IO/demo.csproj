@@ -83,14 +83,8 @@
       <Link>yocto_api\yocto_api.cs</Link>
     </Compile>
     
-<Compile Include="..\..\Sources\yocto_altitude.cs">
-<Link>yocto_api\yocto_altitude.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_pressure.cs">
-<Link>yocto_api\yocto_pressure.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_temperature.cs">
-<Link>yocto_api\yocto_temperature.cs</Link>
+<Compile Include="..\..\Sources\yocto_digitalio.cs">
+<Link>yocto_api\yocto_digitalio.cs</Link>
 </Compile>
 
     <Compile Include="main.cs" />

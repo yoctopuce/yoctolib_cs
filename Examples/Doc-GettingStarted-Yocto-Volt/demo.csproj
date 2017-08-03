@@ -83,9 +83,6 @@
       <Link>yocto_api\yocto_api.cs</Link>
     </Compile>
     
-<Compile Include="..\..\Sources\yocto_datalogger.cs">
-<Link>yocto_api\yocto_datalogger.cs</Link>
-</Compile>
 <Compile Include="..\..\Sources\yocto_voltage.cs">
 <Link>yocto_api\yocto_voltage.cs</Link>
 </Compile>

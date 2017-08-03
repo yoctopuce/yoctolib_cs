@@ -86,9 +86,6 @@
 <Compile Include="..\..\Sources\yocto_altitude.cs">
 <Link>yocto_api\yocto_altitude.cs</Link>
 </Compile>
-<Compile Include="..\..\Sources\yocto_datalogger.cs">
-<Link>yocto_api\yocto_datalogger.cs</Link>
-</Compile>
 <Compile Include="..\..\Sources\yocto_gps.cs">
 <Link>yocto_api\yocto_gps.cs</Link>
 </Compile>

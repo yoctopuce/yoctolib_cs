@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_quadraturedecoder.cs 27702 2017-06-01 12:29:26Z seb $
+ * $Id: yocto_quadraturedecoder.cs 28159 2017-07-27 09:37:52Z seb $
  *
  * Implements yFindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -136,14 +136,14 @@ public class YQuadratureDecoder : YSensor
 
     /**
      * <summary>
-     *   Returns the PWM frequency in Hz.
+     *   Returns the increments frequency, in Hz.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   a floating point number corresponding to the PWM frequency in Hz
+     *   a floating point number corresponding to the increments frequency, in Hz
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YQuadratureDecoder.SPEED_INVALID</c>.

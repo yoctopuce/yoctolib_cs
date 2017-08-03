@@ -89,9 +89,6 @@
 <Compile Include="..\..\Sources\yocto_compass.cs">
 <Link>yocto_api\yocto_compass.cs</Link>
 </Compile>
-<Compile Include="..\..\Sources\yocto_datalogger.cs">
-<Link>yocto_api\yocto_datalogger.cs</Link>
-</Compile>
 <Compile Include="..\..\Sources\yocto_gyro.cs">
 <Link>yocto_api\yocto_gyro.cs</Link>
 </Compile>

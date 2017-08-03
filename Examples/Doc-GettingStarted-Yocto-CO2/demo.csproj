@@ -86,9 +86,6 @@
 <Compile Include="..\..\Sources\yocto_carbondioxide.cs">
 <Link>yocto_api\yocto_carbondioxide.cs</Link>
 </Compile>
-<Compile Include="..\..\Sources\yocto_datalogger.cs">
-<Link>yocto_api\yocto_datalogger.cs</Link>
-</Compile>
 
     <Compile Include="main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
