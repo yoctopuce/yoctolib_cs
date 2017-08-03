@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_currentloopoutput.cs 27926 2017-06-27 13:25:52Z seb $
+ * $Id: yocto_currentloopoutput.cs 28293 2017-08-03 09:01:57Z mvuilleu $
  *
  * Implements yFindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -428,7 +428,7 @@ public class YCurrentLoopOutput : YFunction
         if (mA_target > 21.0) {
             mA_target = 21.0;
         }
-        newval = ""+Convert.ToString( (int) Math.Round(mA_target*1000))+":"+Convert.ToString(ms_duration);
+        newval = ""+Convert.ToString( (int) Math.Round(mA_target*65536))+":"+Convert.ToString(ms_duration);
 
         return this.set_currentTransition(newval);
     }
