@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_carbondioxide.cs 27702 2017-06-01 12:29:26Z seb $
+ * $Id: yocto_carbondioxide.cs 28554 2017-09-15 14:57:55Z seb $
  *
  * Implements yFindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -136,7 +136,7 @@ public class YCarbonDioxide : YSensor
 
     /**
      * <summary>
-     *   Modifies Automatic Baseline Calibration period, in hours.
+     *   Changes Automatic Baseline Calibration period, in hours.
      * <para>
      *   If you need
      *   to disable automatic baseline calibration (for instance when using the
@@ -148,7 +148,7 @@ public class YCarbonDioxide : YSensor
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer
+     *   an integer corresponding to Automatic Baseline Calibration period, in hours
      * </param>
      * <para>
      * </para>

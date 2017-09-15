@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 28159 2017-07-27 09:37:52Z seb $
+ * $Id: yocto_api.cs 28554 2017-09-15 14:57:55Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1094,7 +1094,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "28296";
+    public const string YOCTO_API_BUILD_NO = "28564";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -2105,7 +2105,6 @@ public class YAPI
                 res = SafeNativeMethods._yapiHTTPRequestSyncDone(ref iohdl, buffer);
             }
             finally {
-
                 Monitor.Exit(_lock);
             }
             errmsg = buffer.ToString();
@@ -2221,8 +2220,8 @@ public class YAPI
                 }
 
 
-               // store result in cache
-               _cacheJson = apires;
+                // store result in cache
+                _cacheJson = apires;
                 _cacheStamp = YAPI.GetTickCount() + YAPI.DefaultCacheValidity;
             }
             return YAPI.SUCCESS;
@@ -3864,7 +3863,7 @@ public class YFirmwareUpdate
         string settings;
         string prod_prefix;
         int force;
-        if (this._progress_c < 100) {
+        if (this._progress_c < 100 && this._progress_c != YAPI.VERSION_MISMATCH) {
             serial = this._serial;
             firmwarepath = this._firmwarepath;
             settings = YAPI.DefaultEncoding.GetString(this._settings);
@@ -3874,6 +3873,11 @@ public class YFirmwareUpdate
                 force = 0;
             }
             res = SafeNativeMethods._yapiUpdateFirmwareEx(new StringBuilder(serial), new StringBuilder(firmwarepath), new StringBuilder(settings), force, newupdate, errmsg);
+            if (res == YAPI.VERSION_MISMATCH && ((this._settings).Length != 0)) {
+                this._progress_c = res;
+                this._progress_msg = errmsg.ToString();
+                return this._progress;
+            }
             if (res < 0) {
                 this._progress = res;
                 this._progress_msg = errmsg.ToString();
@@ -3903,8 +3907,13 @@ public class YFirmwareUpdate
                     m.set_allSettingsAndFiles(this._settings);
                     m.saveToFlash();
                     this._settings = new byte[0];
-                    this._progress = 100;
-                    this._progress_msg = "success";
+                    if (this._progress_c == YAPI.VERSION_MISMATCH) {
+                        this._progress = YAPI.IO_ERROR;
+                        this._progress_msg = "Unable to update firmware";
+                    } else {
+                        this._progress =  100;
+                        this._progress_msg = "success";
+                    }
                 }
             } else {
                 this._progress =  100;
@@ -9541,6 +9550,11 @@ public class YSensor : YFunction
     public const double CURRENTRAWVALUE_INVALID = YAPI.INVALID_DOUBLE;
     public const string LOGFREQUENCY_INVALID = YAPI.INVALID_STRING;
     public const string REPORTFREQUENCY_INVALID = YAPI.INVALID_STRING;
+    public const int ADVMODE_IMMEDIATE = 0;
+    public const int ADVMODE_PERIOD_AVG = 1;
+    public const int ADVMODE_PERIOD_MIN = 2;
+    public const int ADVMODE_PERIOD_MAX = 3;
+    public const int ADVMODE_INVALID = -1;
     public const string CALIBRATIONPARAM_INVALID = YAPI.INVALID_STRING;
     public const double RESOLUTION_INVALID = YAPI.INVALID_DOUBLE;
     public const int SENSORSTATE_INVALID = YAPI.INVALID_INT;
@@ -9551,6 +9565,7 @@ public class YSensor : YFunction
     protected double _currentRawValue = CURRENTRAWVALUE_INVALID;
     protected string _logFrequency = LOGFREQUENCY_INVALID;
     protected string _reportFrequency = REPORTFREQUENCY_INVALID;
+    protected int _advMode = ADVMODE_INVALID;
     protected string _calibrationParam = CALIBRATIONPARAM_INVALID;
     protected double _resolution = RESOLUTION_INVALID;
     protected int _sensorState = SENSORSTATE_INVALID;
@@ -9610,6 +9625,10 @@ public class YSensor : YFunction
         if (json_val.has("reportFrequency"))
         {
             _reportFrequency = json_val.getString("reportFrequency");
+        }
+        if (json_val.has("advMode"))
+        {
+            _advMode = json_val.getInt("advMode");
         }
         if (json_val.has("calibrationParam"))
         {
@@ -9963,6 +9982,68 @@ public class YSensor : YFunction
         lock (_thisLock) {
             rest_val = newval;
             return _setAttr("reportFrequency", rest_val);
+        }
+    }
+
+    /**
+     * <summary>
+     *   Returns the measuring mode used for the advertised value pushed to the parent hub.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among <c>YSensor.ADVMODE_IMMEDIATE</c>, <c>YSensor.ADVMODE_PERIOD_AVG</c>,
+     *   <c>YSensor.ADVMODE_PERIOD_MIN</c> and <c>YSensor.ADVMODE_PERIOD_MAX</c> corresponding to the
+     *   measuring mode used for the advertised value pushed to the parent hub
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSensor.ADVMODE_INVALID</c>.
+     * </para>
+     */
+    public int get_advMode()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ADVMODE_INVALID;
+                }
+            }
+            res = this._advMode;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Changes the measuring mode used for the advertised value pushed to the parent hub.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a value among <c>YSensor.ADVMODE_IMMEDIATE</c>, <c>YSensor.ADVMODE_PERIOD_AVG</c>,
+     *   <c>YSensor.ADVMODE_PERIOD_MIN</c> and <c>YSensor.ADVMODE_PERIOD_MAX</c> corresponding to the
+     *   measuring mode used for the advertised value pushed to the parent hub
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_advMode(int newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("advMode", rest_val);
         }
     }
 

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_lightsensor.cs 27702 2017-06-01 12:29:26Z seb $
+ * $Id: yocto_lightsensor.cs 28554 2017-09-15 14:57:55Z seb $
  *
  * Implements yFindLightSensor(), the high-level API for LightSensor functions
  *
@@ -179,7 +179,7 @@ public class YLightSensor : YSensor
 
     /**
      * <summary>
-     *   Modifies the light sensor type used in the device.
+     *   Changes the light sensor type used in the device.
      * <para>
      *   The measure can either
      *   approximate the response of the human eye, focus on a specific light
@@ -193,7 +193,7 @@ public class YLightSensor : YSensor
      * <param name="newval">
      *   a value among <c>YLightSensor.MEASURETYPE_HUMAN_EYE</c>, <c>YLightSensor.MEASURETYPE_WIDE_SPECTRUM</c>,
      *   <c>YLightSensor.MEASURETYPE_INFRARED</c>, <c>YLightSensor.MEASURETYPE_HIGH_RATE</c> and
-     *   <c>YLightSensor.MEASURETYPE_HIGH_ENERGY</c>
+     *   <c>YLightSensor.MEASURETYPE_HIGH_ENERGY</c> corresponding to the light sensor type used in the device
      * </param>
      * <para>
      * </para>

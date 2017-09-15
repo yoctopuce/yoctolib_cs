@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pwminput.cs 27702 2017-06-01 12:29:26Z seb $
+ * $Id: yocto_pwminput.cs 28554 2017-09-15 14:57:55Z seb $
  *
  * Implements yFindPwmInput(), the high-level API for PwmInput functions
  *
@@ -84,6 +84,7 @@ public class YPwmInput : YSensor
     public const int PWMREPORTMODE_PWM_PULSEDURATION = 2;
     public const int PWMREPORTMODE_PWM_EDGECOUNT = 3;
     public const int PWMREPORTMODE_INVALID = -1;
+    public const int DEBOUNCEPERIOD_INVALID = YAPI.INVALID_UINT;
     protected double _dutyCycle = DUTYCYCLE_INVALID;
     protected double _pulseDuration = PULSEDURATION_INVALID;
     protected double _frequency = FREQUENCY_INVALID;
@@ -91,6 +92,7 @@ public class YPwmInput : YSensor
     protected long _pulseCounter = PULSECOUNTER_INVALID;
     protected long _pulseTimer = PULSETIMER_INVALID;
     protected int _pwmReportMode = PWMREPORTMODE_INVALID;
+    protected int _debouncePeriod = DEBOUNCEPERIOD_INVALID;
     protected ValueCallback _valueCallbackPwmInput = null;
     protected TimedReportCallback _timedReportCallbackPwmInput = null;
     //--- (end of YPwmInput definitions)
@@ -134,6 +136,10 @@ public class YPwmInput : YSensor
         if (json_val.has("pwmReportMode"))
         {
             _pwmReportMode = json_val.getInt("pwmReportMode");
+        }
+        if (json_val.has("debouncePeriod"))
+        {
+            _debouncePeriod = json_val.getInt("debouncePeriod");
         }
         base._parseAttr(json_val);
     }
@@ -359,7 +365,7 @@ public class YPwmInput : YSensor
 
     /**
      * <summary>
-     *   Modifies the  parameter  type (frequency/duty cycle, pulse width, or edge count) returned by the get_currentValue function and callbacks.
+     *   Changes the  parameter  type (frequency/duty cycle, pulse width, or edge count) returned by the get_currentValue function and callbacks.
      * <para>
      *   The edge count value is limited to the 6 lowest digits. For values greater than one million, use
      *   get_pulseCounter().
@@ -370,6 +376,8 @@ public class YPwmInput : YSensor
      * <param name="newval">
      *   a value among <c>YPwmInput.PWMREPORTMODE_PWM_DUTYCYCLE</c>, <c>YPwmInput.PWMREPORTMODE_PWM_FREQUENCY</c>,
      *   <c>YPwmInput.PWMREPORTMODE_PWM_PULSEDURATION</c> and <c>YPwmInput.PWMREPORTMODE_PWM_EDGECOUNT</c>
+     *   corresponding to the  parameter  type (frequency/duty cycle, pulse width, or edge count) returned
+     *   by the get_currentValue function and callbacks
      * </param>
      * <para>
      * </para>
@@ -386,6 +394,66 @@ public class YPwmInput : YSensor
         lock (_thisLock) {
             rest_val = (newval).ToString();
             return _setAttr("pwmReportMode", rest_val);
+        }
+    }
+
+    /**
+     * <summary>
+     *   Returns the shortest expected pulse duration, in ms.
+     * <para>
+     *   Any shorter pulse will be automatically ignored (debounce).
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the shortest expected pulse duration, in ms
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YPwmInput.DEBOUNCEPERIOD_INVALID</c>.
+     * </para>
+     */
+    public int get_debouncePeriod()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DEBOUNCEPERIOD_INVALID;
+                }
+            }
+            res = this._debouncePeriod;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Changes the shortest expected pulse duration, in ms.
+     * <para>
+     *   Any shorter pulse will be automatically ignored (debounce).
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the shortest expected pulse duration, in ms
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_debouncePeriod(int newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("debouncePeriod", rest_val);
         }
     }
 

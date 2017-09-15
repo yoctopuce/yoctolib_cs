@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_temperature.cs 28142 2017-07-25 20:24:23Z mvuilleu $
+ * $Id: yocto_temperature.cs 28554 2017-09-15 14:57:55Z seb $
  *
  * Implements yFindTemperature(), the high-level API for Temperature functions
  *
@@ -207,7 +207,7 @@ public class YTemperature : YSensor
 
     /**
      * <summary>
-     *   Modifies the temperature sensor type.
+     *   Changes the temperature sensor type.
      * <para>
      *   This function is used
      *   to define the type of thermocouple (K,E...) used with the device.
@@ -226,7 +226,7 @@ public class YTemperature : YSensor
      *   <c>YTemperature.SENSORTYPE_PT100_4WIRES</c>, <c>YTemperature.SENSORTYPE_PT100_3WIRES</c>,
      *   <c>YTemperature.SENSORTYPE_PT100_2WIRES</c>, <c>YTemperature.SENSORTYPE_RES_OHM</c>,
      *   <c>YTemperature.SENSORTYPE_RES_NTC</c>, <c>YTemperature.SENSORTYPE_RES_LINEAR</c> and
-     *   <c>YTemperature.SENSORTYPE_RES_INTERNAL</c>
+     *   <c>YTemperature.SENSORTYPE_RES_INTERNAL</c> corresponding to the temperature sensor type
      * </param>
      * <para>
      * </para>

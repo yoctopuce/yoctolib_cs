@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_proximity.cs 27702 2017-06-01 12:29:26Z seb $
+ * $Id: yocto_proximity.cs 28554 2017-09-15 14:57:55Z seb $
  *
  * Implements yFindProximity(), the high-level API for Proximity functions
  *
@@ -435,7 +435,7 @@ public class YProximity : YSensor
 
     /**
      * <summary>
-     *   Modifies the  parameter  type (sensor value, presence or pulse count) returned by the get_currentValue function and callbacks.
+     *   Changes the  parameter  type (sensor value, presence or pulse count) returned by the get_currentValue function and callbacks.
      * <para>
      *   The edge count value is limited to the 6 lowest digits. For values greater than one million, use
      *   get_pulseCounter().
@@ -446,6 +446,8 @@ public class YProximity : YSensor
      * <param name="newval">
      *   a value among <c>YProximity.PROXIMITYREPORTMODE_NUMERIC</c>,
      *   <c>YProximity.PROXIMITYREPORTMODE_PRESENCE</c> and <c>YProximity.PROXIMITYREPORTMODE_PULSECOUNT</c>
+     *   corresponding to the  parameter  type (sensor value, presence or pulse count) returned by the
+     *   get_currentValue function and callbacks
      * </param>
      * <para>
      * </para>

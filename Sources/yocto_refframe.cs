@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_refframe.cs 27702 2017-06-01 12:29:26Z seb $
+ * $Id: yocto_refframe.cs 28457 2017-09-06 08:34:21Z mvuilleu $
  *
  * Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -92,9 +92,16 @@ public enum   MOUNTORIENTATION
     public const int MOUNTPOS_INVALID = YAPI.INVALID_UINT;
     public const double BEARING_INVALID = YAPI.INVALID_DOUBLE;
     public const string CALIBRATIONPARAM_INVALID = YAPI.INVALID_STRING;
+    public const int FUSIONMODE_NDOF = 0;
+    public const int FUSIONMODE_NDOF_FMC_OFF = 1;
+    public const int FUSIONMODE_M4G = 2;
+    public const int FUSIONMODE_COMPASS = 3;
+    public const int FUSIONMODE_IMU = 4;
+    public const int FUSIONMODE_INVALID = -1;
     protected int _mountPos = MOUNTPOS_INVALID;
     protected double _bearing = BEARING_INVALID;
     protected string _calibrationParam = CALIBRATIONPARAM_INVALID;
+    protected int _fusionMode = FUSIONMODE_INVALID;
     protected ValueCallback _valueCallbackRefFrame = null;
     protected bool _calibV2;
     protected int _calibStage = 0;
@@ -142,6 +149,10 @@ public enum   MOUNTORIENTATION
         if (json_val.has("calibrationParam"))
         {
             _calibrationParam = json_val.getString("calibrationParam");
+        }
+        if (json_val.has("fusionMode"))
+        {
+            _fusionMode = json_val.getInt("fusionMode");
         }
         base._parseAttr(json_val);
     }
@@ -267,6 +278,29 @@ public enum   MOUNTORIENTATION
         lock (_thisLock) {
             rest_val = newval;
             return _setAttr("calibrationParam", rest_val);
+        }
+    }
+
+    public int get_fusionMode()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return FUSIONMODE_INVALID;
+                }
+            }
+            res = this._fusionMode;
+        }
+        return res;
+    }
+
+    public int set_fusionMode(int newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("fusionMode", rest_val);
         }
     }
 
