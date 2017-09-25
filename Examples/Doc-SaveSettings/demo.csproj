@@ -194,6 +194,9 @@
 <Compile Include="..\..\Sources\yocto_poweroutput.cs">
 <Link>yocto_api\yocto_poweroutput.cs</Link>
 </Compile>
+<Compile Include="..\..\Sources\yocto_powersupply.cs">
+<Link>yocto_api\yocto_powersupply.cs</Link>
+</Compile>
 <Compile Include="..\..\Sources\yocto_pressure.cs">
 <Link>yocto_api\yocto_pressure.cs</Link>
 </Compile>

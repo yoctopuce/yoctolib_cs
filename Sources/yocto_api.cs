@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 28554 2017-09-15 14:57:55Z seb $
+ * $Id: yocto_api.cs 28565 2017-09-15 16:06:48Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1094,7 +1094,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "28564";
+    public const string YOCTO_API_BUILD_NO = "28628";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -3123,7 +3123,11 @@ public class YAPI
         YDevice_devCache = new List<YDevice>();
         _PlugEvents = new List<PlugEvent>(5);
         _DataEvents = new List<DataEvent>(10);
-
+        ylog = null;
+        yArrival = null;
+        yRemoval = null;
+        yChange = null;
+        _HubDiscoveryCallback = null;
         buffer.Length = 0;
         res = SafeNativeMethods._yapiInitAPI(mode, buffer);
         if (res != YAPI.DEVICE_BUSY) {
