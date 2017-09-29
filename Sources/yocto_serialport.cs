@@ -1,10 +1,10 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 27948 2017-06-30 14:46:55Z mvuilleu $
+ * $Id: yocto_serialport.cs 28657 2017-09-26 16:20:00Z seb $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
- * - - - - - - - - - License information: - - - - - - - - - 
+ * - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
@@ -23,7 +23,7 @@
  *  obligations.
  *
  *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
  *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
@@ -47,11 +47,58 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
-    //--- (YSerialPort return codes)
-    //--- (end of YSerialPort return codes)
-//--- (YSerialPort dlldef)
-//--- (end of YSerialPort dlldef)
-//--- (YSerialPort class start)
+
+//--- (generated code: YSnoopingRecord class start)
+public class YSnoopingRecord
+{
+//--- (end of generated code: YSnoopingRecord class start)
+    //--- (generated code: YSnoopingRecord definitions)
+
+    protected int _tim = 0;
+    protected int _dir = 0;
+    protected string _msg;
+    //--- (end of generated code: YSnoopingRecord definitions)
+
+    public YSnoopingRecord(string data)
+    {
+        //--- (generated code: YSnoopingRecord attributes initialization)
+        //--- (end of generated code: YSnoopingRecord attributes initialization)
+        YAPI.YJSONObject json = new YAPI.YJSONObject(data);
+        json.parse();
+        this._tim = json.getInt("t");
+        string m = json.getString("m");
+        this._dir = (m[0] == '<' ? 1 : 0);
+        this._msg = m.Substring(1);
+    }
+
+  //--- (generated code: YSnoopingRecord implementation)
+
+
+    public virtual int get_time()
+    {
+        return this._tim;
+    }
+
+    public virtual int get_direction()
+    {
+        return this._dir;
+    }
+
+    public virtual string get_message()
+    {
+        return this._msg;
+    }
+
+    //--- (end of generated code: YSnoopingRecord implementation)
+
+}
+
+
+    //--- (generated code: YSerialPort return codes)
+    //--- (end of generated code: YSerialPort return codes)
+//--- (generated code: YSerialPort dlldef)
+//--- (end of generated code: YSerialPort dlldef)
+//--- (generated code: YSerialPort class start)
 /**
  * <summary>
  *   The SerialPort function interface allows you to fully drive a Yoctopuce
@@ -67,8 +114,8 @@ using YFUN_DESCR = System.Int32;
  */
 public class YSerialPort : YFunction
 {
-//--- (end of YSerialPort class start)
-    //--- (YSerialPort definitions)
+//--- (end of generated code: YSerialPort class start)
+    //--- (generated code: YSerialPort definitions)
     public new delegate void ValueCallback(YSerialPort func, string value);
     public new delegate void TimedReportCallback(YSerialPort func, YMeasure measure);
 
@@ -107,17 +154,17 @@ public class YSerialPort : YFunction
     protected int _rxptr = 0;
     protected byte[] _rxbuff;
     protected int _rxbuffptr = 0;
-    //--- (end of YSerialPort definitions)
+    //--- (end of generated code: YSerialPort definitions)
 
     public YSerialPort(string func)
         : base(func)
     {
         _className = "SerialPort";
-        //--- (YSerialPort attributes initialization)
-        //--- (end of YSerialPort attributes initialization)
+        //--- (generated code: YSerialPort attributes initialization)
+        //--- (end of generated code: YSerialPort attributes initialization)
     }
 
-    //--- (YSerialPort implementation)
+    //--- (generated code: YSerialPort implementation)
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
@@ -1074,7 +1121,6 @@ public class YSerialPort : YFunction
         int mult;
         int endpos;
         int res;
-
         // first check if we have the requested character in the look-ahead buffer
         bufflen = (this._rxbuff).Length;
         if ((this._rxptr >= this._rxbuffptr) && (this._rxptr < this._rxbuffptr+bufflen)) {
@@ -1082,7 +1128,6 @@ public class YSerialPort : YFunction
             this._rxptr = this._rxptr + 1;
             return res;
         }
-
         // try to preload more than one byte to speed-up byte-per-byte access
         currpos = this._rxptr;
         reqlen = 1024;
@@ -1109,7 +1154,6 @@ public class YSerialPort : YFunction
         }
         // still mixed, need to process character by character
         this._rxptr = currpos;
-
 
         buff = this._download("rxdata.bin?pos="+Convert.ToString(this._rxptr)+"&len=1");
         bufflen = (buff).Length - 1;
@@ -1639,6 +1683,57 @@ public class YSerialPort : YFunction
         buff = this._download("cts.txt");
         if (!((buff).Length == 1)) { this._throw( YAPI.IO_ERROR, "invalid CTS reply"); return YAPI.IO_ERROR; }
         res = buff[0] - 48;
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Retrieves messages (both direction) in the serial port buffer, starting at current position.
+     * <para>
+     *   This function will only compare and return printable characters in the message strings.
+     *   Binary protocols are handled as hexadecimal strings.
+     * </para>
+     * <para>
+     *   If no message is found, the search waits for one up to the specified maximum timeout
+     *   (in milliseconds).
+     * </para>
+     * </summary>
+     * <param name="maxWait">
+     *   the maximum number of milliseconds to wait for a message if none is found
+     *   in the receive buffer.
+     * </param>
+     * <returns>
+     *   an array of YSnoopingRecord objects containing the messages found, if any.
+     *   Binary messages are converted to hexadecimal representation.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
+     */
+    public virtual List<YSnoopingRecord> snoopMessages(int maxWait)
+    {
+        string url;
+        byte[] msgbin;
+        List<string> msgarr = new List<string>();
+        int msglen;
+        List<YSnoopingRecord> res = new List<YSnoopingRecord>();
+        int idx;
+
+        url = "rxmsg.json?pos="+Convert.ToString( this._rxptr)+"&maxw="+Convert.ToString(maxWait)+"&t=0";
+        msgbin = this._download(url);
+        msgarr = this._json_get_array(msgbin);
+        msglen = msgarr.Count;
+        if (msglen == 0) {
+            return res;
+        }
+        // last element of array is the new position
+        msglen = msglen - 1;
+        this._rxptr = YAPI._atoi(msgarr[msglen]);
+        idx = 0;
+        while (idx < msglen) {
+            res.Add(new YSnoopingRecord(msgarr[idx]));
+            idx = idx + 1;
+        }
         return res;
     }
 
@@ -2315,9 +2410,9 @@ public class YSerialPort : YFunction
         return FindSerialPort(hwid);
     }
 
-    //--- (end of YSerialPort implementation)
+    //--- (end of generated code: YSerialPort implementation)
 
-    //--- (SerialPort functions)
+    //--- (generated code: SerialPort functions)
 
     /**
      * <summary>
@@ -2363,5 +2458,5 @@ public class YSerialPort : YFunction
 
 
 
-    //--- (end of SerialPort functions)
+    //--- (end of generated code: SerialPort functions)
 }
