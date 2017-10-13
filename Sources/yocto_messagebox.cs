@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_messagebox.cs 27702 2017-06-01 12:29:26Z seb $
+ * $Id: yocto_messagebox.cs 28736 2017-10-03 08:04:29Z seb $
  *
  * Implements yFindMessageBox(), the high-level API for MessageBox functions
  *
@@ -864,7 +864,7 @@ public class YSms
         int wpos;
         int carry;
         int nbits;
-        int thisb;
+        int thi_b;
         // nbits = number of bits in carry
         udsize = this.udataSize();
         udhsize = (this._udh).Length;
@@ -906,11 +906,11 @@ public class YSms
                     carry = this._udata[i];
                     nbits = 7;
                 } else {
-                    thisb = this._udata[i];
-                    res[wpos] = (byte)(((carry) | ((((((thisb) << (nbits)))) & (255)))) & 0xff);
+                    thi_b = this._udata[i];
+                    res[wpos] = (byte)(((carry) | ((((((thi_b) << (nbits)))) & (255)))) & 0xff);
                     wpos = wpos + 1;
                     nbits = nbits - 1;
-                    carry = ((thisb) >> ((7 - nbits)));
+                    carry = ((thi_b) >> ((7 - nbits)));
                 }
                 i = i + 1;
             }
@@ -1129,7 +1129,7 @@ public class YSms
         int i;
         int carry;
         int nbits;
-        int thisb;
+        int thi_b;
         this._pdu = pdu;
         this._npdu = 1;
         // parse meta-data
@@ -1190,9 +1190,9 @@ public class YSms
                 udhlen = (((8 + 8*udhsize + 6)) / (7));
                 nbits = 7*udhlen - 8 - 8*udhsize;
                 if (nbits > 0) {
-                    thisb = pdu[rpos];
+                    thi_b = pdu[rpos];
                     rpos = rpos + 1;
-                    carry = ((thisb) >> (nbits));
+                    carry = ((thi_b) >> (nbits));
                     nbits = 8 - nbits;
                 }
             } else {
@@ -1214,10 +1214,10 @@ public class YSms
                     carry = 0;
                     nbits = 0;
                 } else {
-                    thisb = pdu[rpos];
+                    thi_b = pdu[rpos];
                     rpos = rpos + 1;
-                    this._udata[i] = (byte)(((carry) | ((((((thisb) << (nbits)))) & (127)))) & 0xff);
-                    carry = ((thisb) >> ((7 - nbits)));
+                    this._udata[i] = (byte)(((carry) | ((((((thi_b) << (nbits)))) & (127)))) & 0xff);
+                    carry = ((thi_b) >> ((7 - nbits)));
                     nbits = nbits + 1;
                 }
                 i = i + 1;
@@ -1278,11 +1278,11 @@ public class YSms
 
     //--- (end of generated code: YSms implementation)
 
-    //--- (generated code: Sms functions)
+    //--- (generated code: YSms functions)
 
 
 
-    //--- (end of generated code: Sms functions)
+    //--- (end of generated code: YSms functions)
 }
 
 //--- (generated code: YMessageBox dlldef)
@@ -2349,7 +2349,7 @@ public class YMessageBox : YFunction
 
     //--- (end of generated code: YMessageBox implementation)
 
-    //--- (generated code: MessageBox functions)
+    //--- (generated code: YMessageBox functions)
 
     /**
      * <summary>
@@ -2395,5 +2395,5 @@ public class YMessageBox : YFunction
 
 
 
-    //--- (end of generated code: MessageBox functions)
+    //--- (end of generated code: YMessageBox functions)
 }

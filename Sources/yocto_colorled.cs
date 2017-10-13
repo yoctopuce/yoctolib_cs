@@ -1,10 +1,10 @@
 /*********************************************************************
  *
- * $Id: yocto_colorled.cs 27702 2017-06-01 12:29:26Z seb $
+ * $Id: yocto_colorled.cs 28736 2017-10-03 08:04:29Z seb $
  *
  * Implements yFindColorLed(), the high-level API for ColorLed functions
  *
- * - - - - - - - - - License information: - - - - - - - - - 
+ * - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
@@ -23,7 +23,7 @@
  *  obligations.
  *
  *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
  *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
@@ -801,7 +801,7 @@ public class YColorLed : YFunction
 
     //--- (end of YColorLed implementation)
 
-    //--- (ColorLed functions)
+    //--- (YColorLed functions)
 
     /**
      * <summary>
@@ -847,5 +847,5 @@ public class YColorLed : YFunction
 
 
 
-    //--- (end of ColorLed functions)
+    //--- (end of YColorLed functions)
 }

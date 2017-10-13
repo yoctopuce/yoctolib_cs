@@ -1,10 +1,10 @@
 /*********************************************************************
  *
- * $Id: yocto_network.cs 28015 2017-07-07 16:27:06Z mvuilleu $
+ * $Id: yocto_network.cs 28736 2017-10-03 08:04:29Z seb $
  *
  * Implements yFindNetwork(), the high-level API for Network functions
  *
- * - - - - - - - - - License information: - - - - - - - - - 
+ * - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
@@ -23,7 +23,7 @@
  *  obligations.
  *
  *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
  *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
@@ -1878,7 +1878,7 @@ public class YNetwork : YFunction
 
     //--- (end of YNetwork implementation)
 
-    //--- (Network functions)
+    //--- (YNetwork functions)
 
     /**
      * <summary>
@@ -1924,5 +1924,5 @@ public class YNetwork : YFunction
 
 
 
-    //--- (end of Network functions)
+    //--- (end of YNetwork functions)
 }

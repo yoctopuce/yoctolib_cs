@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 27702 2017-06-01 12:29:26Z seb $
+ * $Id: yocto_cellular.cs 28736 2017-10-03 08:04:29Z seb $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *
@@ -123,11 +123,11 @@ public class YCellRecord
 
     //--- (end of generated code: YCellRecord implementation)
 
-    //--- (generated code: CellRecord functions)
+    //--- (generated code: YCellRecord functions)
 
 
 
-    //--- (end of generated code: CellRecord functions)
+    //--- (end of generated code: YCellRecord functions)
 }
 
 //--- (generated code: YCellular dlldef)
@@ -1448,7 +1448,7 @@ public class YCellular : YFunction
 
     //--- (end of generated code: YCellular implementation)
 
-    //--- (generated code: Cellular functions)
+    //--- (generated code: YCellular functions)
 
     /**
      * <summary>
@@ -1494,5 +1494,5 @@ public class YCellular : YFunction
 
 
 
-    //--- (end of generated code: Cellular functions)
+    //--- (end of generated code: YCellular functions)
 }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 28657 2017-09-26 16:20:00Z seb $
+ * $Id: yocto_serialport.cs 28736 2017-10-03 08:04:29Z seb $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
@@ -2412,7 +2412,7 @@ public class YSerialPort : YFunction
 
     //--- (end of generated code: YSerialPort implementation)
 
-    //--- (generated code: SerialPort functions)
+    //--- (generated code: YSerialPort functions)
 
     /**
      * <summary>
@@ -2458,5 +2458,5 @@ public class YSerialPort : YFunction
 
 
 
-    //--- (end of generated code: SerialPort functions)
+    //--- (end of generated code: YSerialPort functions)
 }

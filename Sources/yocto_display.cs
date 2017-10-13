@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 27702 2017-06-01 12:29:26Z seb $
+ * $Id: yocto_display.cs 28736 2017-10-03 08:04:29Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -10,26 +10,26 @@
  *
  *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
  *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ *  file into your software for the sole purpose of interfacing
+ *  with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
+ *  You may reproduce and distribute copies of this file in
  *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
+ *  code is to interface with Yoctopuce products. You must retain
  *  this notice in the distributed source file.
  *
  *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
+ *  for additional information regarding your rights and
  *  obligations.
  *
  *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED "AS IS" WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
+ *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
+ *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
+ *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
  *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
  *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
  *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
@@ -896,11 +896,11 @@ public enum   ALIGN
   }
 
 
-  //--- (generated code: DisplayLayer functions)
+  //--- (generated code: YDisplayLayer functions)
 
 
 
-    //--- (end of generated code: DisplayLayer functions)
+    //--- (end of generated code: YDisplayLayer functions)
 }
 
 //--- (generated code: YDisplay class start)
@@ -1879,7 +1879,7 @@ public class YDisplay : YFunction
    * </para>
    */
   public YDisplayLayer  get_displayLayer(int layerId)
-  { 
+  {
       int i;
       int layercount = (int)get_layerCount();
 
@@ -1887,7 +1887,7 @@ public class YDisplay : YFunction
           _throw(-1, "invalid DisplayLayer index, valid values are [0.." + (layercount - 1).ToString() + "]");
           return null;
       }
-      
+
       if (_allDisplayLayers == null) {
           _allDisplayLayers = new YDisplayLayer[layercount];
           for (i = 0 ;i< layercount;i++)
@@ -1897,9 +1897,9 @@ public class YDisplay : YFunction
   }
 
   int flushLayers()
-  {  
+  {
       int i;
-      if (_allDisplayLayers != null) { 
+      if (_allDisplayLayers != null) {
           for (i=0;i<=_allDisplayLayers.GetUpperBound(0);i++)
               { _allDisplayLayers[i].flush_now(); }
       }
@@ -1908,24 +1908,24 @@ public class YDisplay : YFunction
 
   // internal method to clear all hidden flags in the API
   void resetHiddenLayerFlags()
-  {  
+  {
       int i;
-      if (_allDisplayLayers != null) { 
+      if (_allDisplayLayers != null) {
           for (i=0;i<=_allDisplayLayers.GetUpperBound(0);i++)
               { _allDisplayLayers[i].resetHiddenFlag(); }
       }
   }
 
   public int sendCommand(string cmd )
-  {  
+  {
       if (!_recording) {
-         return this.set_command(cmd); 
+         return this.set_command(cmd);
       }
       _sequence = _sequence + cmd + "\n";
       return YAPI.SUCCESS;
   }
 
-  //--- (generated code: Display functions)
+  //--- (generated code: YDisplay functions)
 
     /**
      * <summary>
@@ -1971,5 +1971,5 @@ public class YDisplay : YFunction
 
 
 
-    //--- (end of generated code: Display functions)
+    //--- (end of generated code: YDisplay functions)
 }

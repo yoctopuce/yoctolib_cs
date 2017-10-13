@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 28565 2017-09-15 16:06:48Z seb $
+ * $Id: yocto_api.cs 28799 2017-10-11 16:07:10Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1094,7 +1094,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "28707";
+    public const string YOCTO_API_BUILD_NO = "28878";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -3867,7 +3867,7 @@ public class YFirmwareUpdate
         string settings;
         string prod_prefix;
         int force;
-        if (this._progress_c < 100 && this._progress_c != YAPI.VERSION_MISMATCH) {
+        if ((this._progress_c < 100) && (this._progress_c != YAPI.VERSION_MISMATCH)) {
             serial = this._serial;
             firmwarepath = this._firmwarepath;
             settings = YAPI.DefaultEncoding.GetString(this._settings);
@@ -3877,7 +3877,7 @@ public class YFirmwareUpdate
                 force = 0;
             }
             res = SafeNativeMethods._yapiUpdateFirmwareEx(new StringBuilder(serial), new StringBuilder(firmwarepath), new StringBuilder(settings), force, newupdate, errmsg);
-            if (res == YAPI.VERSION_MISMATCH && ((this._settings).Length != 0)) {
+            if ((res == YAPI.VERSION_MISMATCH) && ((this._settings).Length != 0)) {
                 this._progress_c = res;
                 this._progress_msg = errmsg.ToString();
                 return this._progress;
@@ -6468,7 +6468,7 @@ public class YFunction
 
     //--- (end of generated code: YFunction implementation)
 
-    //--- (generated code: Function functions)
+    //--- (generated code: YFunction functions)
 
     /**
      * <summary>
@@ -6508,7 +6508,7 @@ public class YFunction
 
 
 
-    //--- (end of generated code: Function functions)
+    //--- (end of generated code: YFunction functions)
 
 
 
@@ -9470,7 +9470,7 @@ public class YModule : YFunction
         }
     }
 
-    //--- (generated code: Module functions)
+    //--- (generated code: YModule functions)
 
     /**
      * <summary>
@@ -9516,7 +9516,7 @@ public class YModule : YFunction
 
 
 
-    //--- (end of generated code: Module functions)
+    //--- (end of generated code: YModule functions)
 }
 
 
@@ -10977,7 +10977,7 @@ public class YSensor : YFunction
 
     //--- (end of generated code: YSensor implementation)
 
-    //--- (generated code: Sensor functions)
+    //--- (generated code: YSensor functions)
 
     /**
      * <summary>
@@ -11023,7 +11023,7 @@ public class YSensor : YFunction
 
 
 
-    //--- (end of generated code: Sensor functions)
+    //--- (end of generated code: YSensor functions)
 }
 
 
@@ -11972,7 +11972,7 @@ public class YDataLogger : YFunction
     }
 
 
-    //--- (generated code: DataLogger functions)
+    //--- (generated code: YDataLogger functions)
 
     /**
      * <summary>
@@ -12018,6 +12018,6 @@ public class YDataLogger : YFunction
 
 
 
-    //--- (end of generated code: DataLogger functions)
+    //--- (end of generated code: YDataLogger functions)
 }
 
