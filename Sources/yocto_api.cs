@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 28799 2017-10-11 16:07:10Z seb $
+ * $Id: yocto_api.cs 29240 2017-11-23 13:29:57Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1094,7 +1094,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "28878";
+    public const string YOCTO_API_BUILD_NO = "29281";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -1115,6 +1115,7 @@ public class YAPI
     public const int YOCTO_PASS_LEN = 20;
     public const int YOCTO_REALM_LEN = 20;
     public const int INVALID_YHANDLE = 0;
+    public const int HASH_BUF_SIZE = 28;
 
     // Calibration types
     public const int YOCTO_CALIB_TYPE_OFS = 30;
@@ -2065,6 +2066,7 @@ public class YAPI
             IntPtr preply = default(IntPtr);
             int replysize = 0;
             byte[] fullrequest = null;
+            ulong start_tm = YAPI.GetTickCount();
             YRETCODE res;
             bool enter;
             do {
@@ -2108,6 +2110,9 @@ public class YAPI
                 Monitor.Exit(_lock);
             }
             errmsg = buffer.ToString();
+            ulong stop_tm = YAPI.GetTickCount();
+            ulong delta = stop_tm - start_tm;
+            Console.WriteLine("Req took "+delta+"ms");
             return res;
         }
 
@@ -3036,7 +3041,7 @@ public class YAPI
 
     public static _yapiDeviceLogCallback native_yDeviceLogDelegate = native_yDeviceLogCallback;
     static GCHandle native_yDeviceLogAnchor = GCHandle.Alloc(native_yDeviceLogDelegate);
-
+    
 
     /**
      * <summary>
@@ -8906,6 +8911,7 @@ public class YModule : YFunction
         for (int ii = 0; ii < restoreLast.Count; ii++) {
             this._download(restoreLast[ii]);
         }
+        this.clearCache();
         return YAPI.SUCCESS;
     }
 

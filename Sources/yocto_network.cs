@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_network.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_network.cs 29067 2017-11-03 08:10:55Z seb $
  *
  * Implements yFindNetwork(), the high-level API for Network functions
  *
@@ -706,6 +706,11 @@ public class YNetwork : YFunction
     public int set_userPassword(string newval)
     {
         string rest_val;
+        if (newval.Length > YAPI.HASH_BUF_SIZE)
+        {
+            _throw(YAPI.INVALID_ARGUMENT, "Password too long :" + newval);
+            return YAPI.INVALID_ARGUMENT;
+        }
         lock (_thisLock) {
             rest_val = newval;
             return _setAttr("userPassword", rest_val);
@@ -771,6 +776,11 @@ public class YNetwork : YFunction
     public int set_adminPassword(string newval)
     {
         string rest_val;
+        if (newval.Length > YAPI.HASH_BUF_SIZE)
+        {
+            _throw(YAPI.INVALID_ARGUMENT, "Password too long :" + newval);
+            return YAPI.INVALID_ARGUMENT;
+        }
         lock (_thisLock) {
             rest_val = newval;
             return _setAttr("adminPassword", rest_val);
