@@ -182,6 +182,9 @@
 <Compile Include="..\..\Sources\yocto_multiaxiscontroller.cs">
 <Link>yocto_api\yocto_multiaxiscontroller.cs</Link>
 </Compile>
+<Compile Include="..\..\Sources\yocto_multicellweighscale.cs">
+<Link>yocto_api\yocto_multicellweighscale.cs</Link>
+</Compile>
 <Compile Include="..\..\Sources\yocto_network.cs">
 <Link>yocto_api\yocto_network.cs</Link>
 </Compile>

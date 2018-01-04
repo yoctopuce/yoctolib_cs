@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 29240 2017-11-23 13:29:57Z seb $
+ * $Id: yocto_api.cs 29543 2018-01-04 09:26:56Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -42,8 +42,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Security;
-
-
 using System.Diagnostics;
 using System.Linq;
 using YHANDLE = System.Int32;
@@ -57,7 +55,6 @@ using u16 = System.UInt16;
 using u32 = System.UInt32;
 using u64 = System.UInt64;
 
-
 // yStrRef of serial number
 using YDEV_DESCR = System.Int32;
 // yStrRef of serial + (ystrRef of funcId << 16)
@@ -69,7 +66,6 @@ using yHash = System.Int16;
 using yBlkHdl = System.Char;
 using yStrRef = System.Int16;
 using yUrlRef = System.Int16;
-
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -78,8 +74,8 @@ using System.Threading;
 public class YAPI_Exception : Exception
 {
     public YRETCODE errorType;
-    public YAPI_Exception(YRETCODE errType, string errMsg)
-        : base(errMsg)
+
+    public YAPI_Exception(YRETCODE errType, string errMsg) : base(errMsg)
     {
         errorType = errType;
     }
@@ -91,6 +87,7 @@ public class YAPI_Exception : Exception
 
         errorType = info.GetInt32("errorType");
     }
+
     public override void GetObjectData(SerializationInfo info, StreamingContext context)
     {
         base.GetObjectData(info, context);
@@ -98,14 +95,12 @@ public class YAPI_Exception : Exception
             info.AddValue("errorType", this.errorType);
         }
     }
-
 }
 
 
 [SuppressUnmanagedCodeSecurityAttribute]
 internal static class SafeNativeMethods
 {
-
     [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     internal struct yDeviceSt
     {
@@ -113,16 +108,22 @@ internal static class SafeNativeMethods
         public u16 deviceid;
         public u16 devrelease;
         public u16 nbinbterfaces;
+
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = YAPI.YOCTO_MANUFACTURER_LEN)]
         public string manufacturer;
+
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = YAPI.YOCTO_PRODUCTNAME_LEN)]
         public string productname;
+
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = YAPI.YOCTO_SERIAL_LEN)]
         public string serial;
+
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = YAPI.YOCTO_LOGICAL_LEN)]
         public string logicalname;
+
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = YAPI.YOCTO_FIRMWARE_LEN)]
         public string firmware;
+
         public u8 beacon;
     }
 
@@ -144,11 +145,13 @@ internal static class SafeNativeMethods
 
 
     internal const int YIOHDL_SIZE = 8;
+
     [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     internal struct YIOHDL
     {
         [MarshalAs(UnmanagedType.U1, SizeConst = YIOHDL_SIZE)]
         public u8 raw0;
+
         public u8 raw1;
         public u8 raw2;
         public u8 raw3;
@@ -172,7 +175,6 @@ internal static class SafeNativeMethods
     }
 
 
-
     internal enum yFACE_STATUS
     {
         YFACE_EMPTY,
@@ -184,160 +186,236 @@ internal static class SafeNativeMethods
     // 32 bits dll entry points
     [DllImport("yapi", EntryPoint = "yapiInitAPI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiInitAPI32(int mode, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiFreeAPI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiFreeAPI32();
+
     [DllImport("yapi", EntryPoint = "yapiRegisterLogFunction", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterLogFunction32(IntPtr fct);
+
     [DllImport("yapi", EntryPoint = "yapiRegisterDeviceArrivalCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceArrivalCallback32(IntPtr fct);
+
     [DllImport("yapi", EntryPoint = "yapiRegisterDeviceRemovalCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceRemovalCallback32(IntPtr fct);
+
     [DllImport("yapi", EntryPoint = "yapiRegisterDeviceChangeCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceChangeCallback32(IntPtr fct);
+
     [DllImport("yapi", EntryPoint = "yapiRegisterFunctionUpdateCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterFunctionUpdateCallback32(IntPtr fct);
+
     [DllImport("yapi", EntryPoint = "yapiRegisterTimedReportCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterTimedReportCallback32(IntPtr fct);
+
     [DllImport("yapi", EntryPoint = "yapiLockDeviceCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiLockDeviceCallBack32(StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiUnlockDeviceCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiUnlockDeviceCallBack32(StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiLockFunctionCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiLockFunctionCallBack32(StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiUnlockFunctionCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiUnlockFunctionCallBack32(StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiRegisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiRegisterHub32(StringBuilder rootUrl, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiPreregisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiPreregisterHub32(StringBuilder rootUrl, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiUnregisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static void _yapiUnregisterHub32(StringBuilder rootUrl);
+
     [DllImport("yapi", EntryPoint = "yapiUpdateDeviceList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiUpdateDeviceList32(uint force, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiHandleEvents", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHandleEvents32(StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiGetTickCount", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static u64 _yapiGetTickCount32();
+
     [DllImport("yapi", EntryPoint = "yapiCheckLogicalName", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiCheckLogicalName32(StringBuilder name);
+
     [DllImport("yapi", EntryPoint = "yapiGetAPIVersion", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static u16 _yapiGetAPIVersion32(ref IntPtr version, ref IntPtr date);
+
     [DllImport("yapi", EntryPoint = "yapiGetDevice", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YDEV_DESCR _yapiGetDevice32(StringBuilder device_str, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiGetAllDevices", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetAllDevices32(IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiGetDeviceInfo", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetDeviceInfo32(YDEV_DESCR d, ref yDeviceSt infos, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiGetFunction", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YFUN_DESCR _yapiGetFunction32(StringBuilder class_str, StringBuilder function_str, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiGetFunctionsByClass", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetFunctionsByClass32(StringBuilder class_str, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiGetFunctionsByDevice", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetFunctionsByDevice32(YDEV_DESCR device, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiGetFunctionInfoEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetFunctionInfoEx32(YFUN_DESCR fundesc, ref YDEV_DESCR devdesc, StringBuilder serial, StringBuilder funcId, StringBuilder baseType, StringBuilder funcName, StringBuilder funcVal, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiHTTPRequestSyncStart", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestSyncStart32(ref YIOHDL iohdl, StringBuilder device, IntPtr request, ref IntPtr reply, ref int replysize, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiHTTPRequestSyncStartEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestSyncStartEx32(ref YIOHDL iohdl, StringBuilder device, IntPtr request, int requestlen, ref IntPtr reply, ref int replysize, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiHTTPRequestSyncDone", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestSyncDone32(ref YIOHDL iohdl, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiHTTPRequestAsync", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestAsync32(StringBuilder device, IntPtr request, IntPtr callback, IntPtr context, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiHTTPRequestAsyncEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestAsyncEx32(StringBuilder device, IntPtr request, int requestlen, IntPtr callback, IntPtr context, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiHTTPRequest", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequest32(StringBuilder device, StringBuilder url, StringBuilder buffer, int buffsize, ref int fullsize, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiGetDevicePath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetDevicePath32(int devdesc, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiSleep", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiSleep32(int duration_ms, StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiRegisterHubDiscoveryCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterHubDiscoveryCallback32(IntPtr fct);
+
     [DllImport("yapi", EntryPoint = "yapiTriggerHubDiscovery", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiTriggerHubDiscovery32(StringBuilder errmsg);
+
     [DllImport("yapi", EntryPoint = "yapiRegisterDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceLogCallback32(IntPtr fct);
+
     [DllImport("yapi", EntryPoint = "yapiStartStopDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiStartStopDeviceLogCallback32(StringBuilder errmsg, int start_stop);
 
     // 64 bits dll entry points
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiInitAPI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiInitAPI64(int mode, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiFreeAPI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiFreeAPI64();
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterLogFunction", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterLogFunction64(IntPtr fct);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterDeviceArrivalCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceArrivalCallback64(IntPtr fct);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterDeviceRemovalCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceRemovalCallback64(IntPtr fct);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterDeviceChangeCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceChangeCallback64(IntPtr fct);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterFunctionUpdateCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterFunctionUpdateCallback64(IntPtr fct);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterTimedReportCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterTimedReportCallback64(IntPtr fct);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiLockDeviceCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiLockDeviceCallBack64(StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiUnlockDeviceCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiUnlockDeviceCallBack64(StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiLockFunctionCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiLockFunctionCallBack64(StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiUnlockFunctionCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiUnlockFunctionCallBack64(StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiRegisterHub64(StringBuilder rootUrl, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiPreregisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiPreregisterHub64(StringBuilder rootUrl, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiUnregisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static void _yapiUnregisterHub64(StringBuilder rootUrl);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiUpdateDeviceList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiUpdateDeviceList64(uint force, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHandleEvents", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHandleEvents64(StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetTickCount", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static u64 _yapiGetTickCount64();
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiCheckLogicalName", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiCheckLogicalName64(StringBuilder name);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetAPIVersion", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static u16 _yapiGetAPIVersion64(ref IntPtr version, ref IntPtr date);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetDevice", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YDEV_DESCR _yapiGetDevice64(StringBuilder device_str, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetAllDevices", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetAllDevices64(IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetDeviceInfo", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetDeviceInfo64(YDEV_DESCR d, ref yDeviceSt infos, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetFunction", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YFUN_DESCR _yapiGetFunction64(StringBuilder class_str, StringBuilder function_str, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetFunctionsByClass", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetFunctionsByClass64(StringBuilder class_str, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetFunctionsByDevice", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetFunctionsByDevice64(YDEV_DESCR device, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetFunctionInfoEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetFunctionInfoEx64(YFUN_DESCR fundesc, ref YDEV_DESCR devdesc, StringBuilder serial, StringBuilder funcId, StringBuilder baseType, StringBuilder funcName, StringBuilder funcVal, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequestSyncStart", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestSyncStart64(ref YIOHDL iohdl, StringBuilder device, IntPtr request, ref IntPtr reply, ref int replysize, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequestSyncStartEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestSyncStartEx64(ref YIOHDL iohdl, StringBuilder device, IntPtr request, int requestlen, ref IntPtr reply, ref int replysize, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequestSyncDone", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestSyncDone64(ref YIOHDL iohdl, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequestAsync", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestAsync64(StringBuilder device, IntPtr request, IntPtr callback, IntPtr context, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequestAsyncEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestAsyncEx64(StringBuilder device, IntPtr request, int requestlen, IntPtr callback, IntPtr context, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequest", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequest64(StringBuilder device, StringBuilder url, StringBuilder buffer, int buffsize, ref int fullsize, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi", EntryPoint = "yapiGetDevicePath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetDevicePath64(int devdesc, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiSleep", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiSleep64(int duration_ms, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterHubDiscoveryCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterHubDiscoveryCallback64(IntPtr fct);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiTriggerHubDiscovery", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiTriggerHubDiscovery64(StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceLogCallback64(IntPtr fct);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiStartStopDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiStartStopDeviceLogCallback64(StringBuilder errmsg, int start_stop);
 
@@ -680,7 +758,6 @@ internal static class SafeNativeMethods
     }
 
 
-
     internal static int _yapiGetFunctionInfoEx(YFUN_DESCR fundesc, ref YDEV_DESCR devdesc, StringBuilder serial, StringBuilder funcId, StringBuilder baseType, StringBuilder funcName, StringBuilder funcVal, StringBuilder errmsg)
     {
         if (IntPtr.Size == 4) {
@@ -855,205 +932,238 @@ internal static class SafeNativeMethods
     //--- (generated code: YFunction dlldef)
     [DllImport("yapi", EntryPoint = "yapiGetAllJsonKeys", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiGetAllJsonKeys32(StringBuilder jsonbuffer, StringBuilder out_buffer, int out_buffersize, ref int fullsize, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetAllJsonKeys", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiGetAllJsonKeys64(StringBuilder jsonbuffer, StringBuilder out_buffer, int out_buffersize, ref int fullsize, StringBuilder errmsg);
+
     internal static YRETCODE _yapiGetAllJsonKeys(StringBuilder jsonbuffer, StringBuilder out_buffer, int out_buffersize, ref int fullsize, StringBuilder errmsg)
     {
         if (IntPtr.Size == 4) {
-             return _yapiGetAllJsonKeys32(jsonbuffer, out_buffer, out_buffersize, ref fullsize, errmsg);
+            return _yapiGetAllJsonKeys32(jsonbuffer, out_buffer, out_buffersize, ref fullsize, errmsg);
         } else {
-             try {
-                 return _yapiGetAllJsonKeys64(jsonbuffer, out_buffer, out_buffersize, ref fullsize, errmsg);
-             } catch (System.DllNotFoundException) {
-                 return _yapiGetAllJsonKeys32(jsonbuffer, out_buffer, out_buffersize, ref fullsize, errmsg);
-             }
+            try {
+                return _yapiGetAllJsonKeys64(jsonbuffer, out_buffer, out_buffersize, ref fullsize, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiGetAllJsonKeys32(jsonbuffer, out_buffer, out_buffersize, ref fullsize, errmsg);
+            }
         }
     }
+
     [DllImport("yapi", EntryPoint = "yapiCheckFirmware", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiCheckFirmware32(StringBuilder serial, StringBuilder rev, StringBuilder path, StringBuilder buffer, int buffersize, ref int fullsize, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiCheckFirmware", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiCheckFirmware64(StringBuilder serial, StringBuilder rev, StringBuilder path, StringBuilder buffer, int buffersize, ref int fullsize, StringBuilder errmsg);
+
     internal static YRETCODE _yapiCheckFirmware(StringBuilder serial, StringBuilder rev, StringBuilder path, StringBuilder buffer, int buffersize, ref int fullsize, StringBuilder errmsg)
     {
         if (IntPtr.Size == 4) {
-             return _yapiCheckFirmware32(serial, rev, path, buffer, buffersize, ref fullsize, errmsg);
+            return _yapiCheckFirmware32(serial, rev, path, buffer, buffersize, ref fullsize, errmsg);
         } else {
-             try {
-                 return _yapiCheckFirmware64(serial, rev, path, buffer, buffersize, ref fullsize, errmsg);
-             } catch (System.DllNotFoundException) {
-                 return _yapiCheckFirmware32(serial, rev, path, buffer, buffersize, ref fullsize, errmsg);
-             }
+            try {
+                return _yapiCheckFirmware64(serial, rev, path, buffer, buffersize, ref fullsize, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiCheckFirmware32(serial, rev, path, buffer, buffersize, ref fullsize, errmsg);
+            }
         }
     }
+
     [DllImport("yapi", EntryPoint = "yapiGetBootloaders", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiGetBootloaders32(StringBuilder buffer, int buffersize, ref int totalSize, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetBootloaders", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiGetBootloaders64(StringBuilder buffer, int buffersize, ref int totalSize, StringBuilder errmsg);
+
     internal static YRETCODE _yapiGetBootloaders(StringBuilder buffer, int buffersize, ref int totalSize, StringBuilder errmsg)
     {
         if (IntPtr.Size == 4) {
-             return _yapiGetBootloaders32(buffer, buffersize, ref totalSize, errmsg);
+            return _yapiGetBootloaders32(buffer, buffersize, ref totalSize, errmsg);
         } else {
-             try {
-                 return _yapiGetBootloaders64(buffer, buffersize, ref totalSize, errmsg);
-             } catch (System.DllNotFoundException) {
-                 return _yapiGetBootloaders32(buffer, buffersize, ref totalSize, errmsg);
-             }
+            try {
+                return _yapiGetBootloaders64(buffer, buffersize, ref totalSize, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiGetBootloaders32(buffer, buffersize, ref totalSize, errmsg);
+            }
         }
     }
+
     [DllImport("yapi", EntryPoint = "yapiUpdateFirmwareEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiUpdateFirmwareEx32(StringBuilder serial, StringBuilder firmwarePath, StringBuilder settings, int force, int startUpdate, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiUpdateFirmwareEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiUpdateFirmwareEx64(StringBuilder serial, StringBuilder firmwarePath, StringBuilder settings, int force, int startUpdate, StringBuilder errmsg);
+
     internal static YRETCODE _yapiUpdateFirmwareEx(StringBuilder serial, StringBuilder firmwarePath, StringBuilder settings, int force, int startUpdate, StringBuilder errmsg)
     {
         if (IntPtr.Size == 4) {
-             return _yapiUpdateFirmwareEx32(serial, firmwarePath, settings, force, startUpdate, errmsg);
+            return _yapiUpdateFirmwareEx32(serial, firmwarePath, settings, force, startUpdate, errmsg);
         } else {
-             try {
-                 return _yapiUpdateFirmwareEx64(serial, firmwarePath, settings, force, startUpdate, errmsg);
-             } catch (System.DllNotFoundException) {
-                 return _yapiUpdateFirmwareEx32(serial, firmwarePath, settings, force, startUpdate, errmsg);
-             }
+            try {
+                return _yapiUpdateFirmwareEx64(serial, firmwarePath, settings, force, startUpdate, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiUpdateFirmwareEx32(serial, firmwarePath, settings, force, startUpdate, errmsg);
+            }
         }
     }
+
     [DllImport("yapi", EntryPoint = "yapiHTTPRequestSyncStartOutOfBand", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiHTTPRequestSyncStartOutOfBand32(ref YIOHDL iohdl, int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr reply, ref int replysize, ref IntPtr progress_cb, IntPtr progress_ctx, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequestSyncStartOutOfBand", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiHTTPRequestSyncStartOutOfBand64(ref YIOHDL iohdl, int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr reply, ref int replysize, ref IntPtr progress_cb, IntPtr progress_ctx, StringBuilder errmsg);
+
     internal static YRETCODE _yapiHTTPRequestSyncStartOutOfBand(ref YIOHDL iohdl, int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr reply, ref int replysize, ref IntPtr progress_cb, IntPtr progress_ctx, StringBuilder errmsg)
     {
         if (IntPtr.Size == 4) {
-             return _yapiHTTPRequestSyncStartOutOfBand32(ref iohdl, channel, device, request, requestsize, ref reply, ref replysize, ref progress_cb, progress_ctx, errmsg);
+            return _yapiHTTPRequestSyncStartOutOfBand32(ref iohdl, channel, device, request, requestsize, ref reply, ref replysize, ref progress_cb, progress_ctx, errmsg);
         } else {
-             try {
-                 return _yapiHTTPRequestSyncStartOutOfBand64(ref iohdl, channel, device, request, requestsize, ref reply, ref replysize, ref progress_cb, progress_ctx, errmsg);
-             } catch (System.DllNotFoundException) {
-                 return _yapiHTTPRequestSyncStartOutOfBand32(ref iohdl, channel, device, request, requestsize, ref reply, ref replysize, ref progress_cb, progress_ctx, errmsg);
-             }
+            try {
+                return _yapiHTTPRequestSyncStartOutOfBand64(ref iohdl, channel, device, request, requestsize, ref reply, ref replysize, ref progress_cb, progress_ctx, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiHTTPRequestSyncStartOutOfBand32(ref iohdl, channel, device, request, requestsize, ref reply, ref replysize, ref progress_cb, progress_ctx, errmsg);
+            }
         }
     }
+
     [DllImport("yapi", EntryPoint = "yapiHTTPRequestAsyncOutOfBand", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiHTTPRequestAsyncOutOfBand32(int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr callback, IntPtr context, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequestAsyncOutOfBand", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiHTTPRequestAsyncOutOfBand64(int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr callback, IntPtr context, StringBuilder errmsg);
+
     internal static YRETCODE _yapiHTTPRequestAsyncOutOfBand(int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr callback, IntPtr context, StringBuilder errmsg)
     {
         if (IntPtr.Size == 4) {
-             return _yapiHTTPRequestAsyncOutOfBand32(channel, device, request, requestsize, ref callback, context, errmsg);
+            return _yapiHTTPRequestAsyncOutOfBand32(channel, device, request, requestsize, ref callback, context, errmsg);
         } else {
-             try {
-                 return _yapiHTTPRequestAsyncOutOfBand64(channel, device, request, requestsize, ref callback, context, errmsg);
-             } catch (System.DllNotFoundException) {
-                 return _yapiHTTPRequestAsyncOutOfBand32(channel, device, request, requestsize, ref callback, context, errmsg);
-             }
+            try {
+                return _yapiHTTPRequestAsyncOutOfBand64(channel, device, request, requestsize, ref callback, context, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiHTTPRequestAsyncOutOfBand32(channel, device, request, requestsize, ref callback, context, errmsg);
+            }
         }
     }
+
     [DllImport("yapi", EntryPoint = "yapiTestHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiTestHub32(StringBuilder url, int mstimeout, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiTestHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiTestHub64(StringBuilder url, int mstimeout, StringBuilder errmsg);
+
     internal static YRETCODE _yapiTestHub(StringBuilder url, int mstimeout, StringBuilder errmsg)
     {
         if (IntPtr.Size == 4) {
-             return _yapiTestHub32(url, mstimeout, errmsg);
+            return _yapiTestHub32(url, mstimeout, errmsg);
         } else {
-             try {
-                 return _yapiTestHub64(url, mstimeout, errmsg);
-             } catch (System.DllNotFoundException) {
-                 return _yapiTestHub32(url, mstimeout, errmsg);
-             }
+            try {
+                return _yapiTestHub64(url, mstimeout, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiTestHub32(url, mstimeout, errmsg);
+            }
         }
     }
+
     [DllImport("yapi", EntryPoint = "yapiJsonGetPath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiJsonGetPath32(StringBuilder path, StringBuilder json_data, int json_len, ref IntPtr result, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiJsonGetPath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiJsonGetPath64(StringBuilder path, StringBuilder json_data, int json_len, ref IntPtr result, StringBuilder errmsg);
+
     internal static int _yapiJsonGetPath(StringBuilder path, StringBuilder json_data, int json_len, ref IntPtr result, StringBuilder errmsg)
     {
         if (IntPtr.Size == 4) {
-             return _yapiJsonGetPath32(path, json_data, json_len, ref result, errmsg);
+            return _yapiJsonGetPath32(path, json_data, json_len, ref result, errmsg);
         } else {
-             try {
-                 return _yapiJsonGetPath64(path, json_data, json_len, ref result, errmsg);
-             } catch (System.DllNotFoundException) {
-                 return _yapiJsonGetPath32(path, json_data, json_len, ref result, errmsg);
-             }
+            try {
+                return _yapiJsonGetPath64(path, json_data, json_len, ref result, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiJsonGetPath32(path, json_data, json_len, ref result, errmsg);
+            }
         }
     }
+
     [DllImport("yapi", EntryPoint = "yapiJsonDecodeString", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiJsonDecodeString32(StringBuilder json_data, StringBuilder output);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiJsonDecodeString", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiJsonDecodeString64(StringBuilder json_data, StringBuilder output);
+
     internal static int _yapiJsonDecodeString(StringBuilder json_data, StringBuilder output)
     {
         if (IntPtr.Size == 4) {
-             return _yapiJsonDecodeString32(json_data, output);
+            return _yapiJsonDecodeString32(json_data, output);
         } else {
-             try {
-                 return _yapiJsonDecodeString64(json_data, output);
-             } catch (System.DllNotFoundException) {
-                 return _yapiJsonDecodeString32(json_data, output);
-             }
+            try {
+                return _yapiJsonDecodeString64(json_data, output);
+            } catch (System.DllNotFoundException) {
+                return _yapiJsonDecodeString32(json_data, output);
+            }
         }
     }
+
     [DllImport("yapi", EntryPoint = "yapiGetSubdevices", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiGetSubdevices32(StringBuilder serial, StringBuilder buffer, int buffersize, ref int totalSize, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetSubdevices", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiGetSubdevices64(StringBuilder serial, StringBuilder buffer, int buffersize, ref int totalSize, StringBuilder errmsg);
+
     internal static YRETCODE _yapiGetSubdevices(StringBuilder serial, StringBuilder buffer, int buffersize, ref int totalSize, StringBuilder errmsg)
     {
         if (IntPtr.Size == 4) {
-             return _yapiGetSubdevices32(serial, buffer, buffersize, ref totalSize, errmsg);
+            return _yapiGetSubdevices32(serial, buffer, buffersize, ref totalSize, errmsg);
         } else {
-             try {
-                 return _yapiGetSubdevices64(serial, buffer, buffersize, ref totalSize, errmsg);
-             } catch (System.DllNotFoundException) {
-                 return _yapiGetSubdevices32(serial, buffer, buffersize, ref totalSize, errmsg);
-             }
+            try {
+                return _yapiGetSubdevices64(serial, buffer, buffersize, ref totalSize, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiGetSubdevices32(serial, buffer, buffersize, ref totalSize, errmsg);
+            }
         }
     }
+
     [DllImport("yapi", EntryPoint = "yapiFreeMem", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static void _yapiFreeMem32(IntPtr buffer);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiFreeMem", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static void _yapiFreeMem64(IntPtr buffer);
+
     internal static void _yapiFreeMem(IntPtr buffer)
     {
         if (IntPtr.Size == 4) {
-             _yapiFreeMem32(buffer);
+            _yapiFreeMem32(buffer);
         } else {
-             try {
-                 _yapiFreeMem64(buffer);
-             } catch (System.DllNotFoundException) {
-                 _yapiFreeMem32(buffer);
-             }
+            try {
+                _yapiFreeMem64(buffer);
+            } catch (System.DllNotFoundException) {
+                _yapiFreeMem32(buffer);
+            }
         }
     }
+
     [DllImport("yapi", EntryPoint = "yapiGetDevicePathEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiGetDevicePathEx32(StringBuilder serial, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg);
+
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetDevicePathEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiGetDevicePathEx64(StringBuilder serial, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg);
+
     internal static YRETCODE _yapiGetDevicePathEx(StringBuilder serial, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg)
     {
         if (IntPtr.Size == 4) {
-             return _yapiGetDevicePathEx32(serial, rootdevice, path, pathsize, ref neededsize, errmsg);
+            return _yapiGetDevicePathEx32(serial, rootdevice, path, pathsize, ref neededsize, errmsg);
         } else {
-             try {
-                 return _yapiGetDevicePathEx64(serial, rootdevice, path, pathsize, ref neededsize, errmsg);
-             } catch (System.DllNotFoundException) {
-                 return _yapiGetDevicePathEx32(serial, rootdevice, path, pathsize, ref neededsize, errmsg);
-             }
+            try {
+                return _yapiGetDevicePathEx64(serial, rootdevice, path, pathsize, ref neededsize, errmsg);
+            } catch (System.DllNotFoundException) {
+                return _yapiGetDevicePathEx32(serial, rootdevice, path, pathsize, ref neededsize, errmsg);
+            }
         }
     }
+
 //--- (end of generated code: YFunction dlldef)
 }
 
 
-
-
 public class YAPI
 {
-
     public static Encoding DefaultEncoding = System.Text.Encoding.GetEncoding("iso-8859-1");
 
     // Switch to turn off exceptions and use return codes instead, for source-code compatibility
@@ -1061,6 +1171,7 @@ public class YAPI
     public static bool ExceptionsDisabled = false;
 
     internal static Object globalLock = new Object();
+
     static bool _apiInitialized = false;
     // Default cache validity (in [ms]) before reloading data from device. This saves a lots of trafic.
     // Note that a value undger 2 ms makes little sense since a USB bus itself has a 2ms roundtrip period
@@ -1076,6 +1187,7 @@ public class YAPI
     public const string FRIENDLYNAME_INVALID = INVALID_STRING;
 
     public const int INVALID_UNSIGNED = -1;
+
     // yInitAPI argument
     public const int Y_DETECT_NONE = 0;
     public const int Y_DETECT_USB = 1;
@@ -1094,7 +1206,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "29281";
+    public const string YOCTO_API_BUILD_NO = "29543";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -1107,9 +1219,12 @@ public class YAPI
     public const int YOCTO_PRODUCTNAME_LEN = 28;
     public const int YOCTO_FIRMWARE_LEN = 22;
     public const int YOCTO_LOGICAL_LEN = 20;
+
     public const int YOCTO_FUNCTION_LEN = 20;
+
     // Size of the data (can be non null terminated)
     public const int YOCTO_PUBVAL_SIZE = 6;
+
     // Temporary storage, > YOCTO_PUBVAL_SIZE
     public const int YOCTO_PUBVAL_LEN = 16;
     public const int YOCTO_PASS_LEN = 20;
@@ -1123,28 +1238,25 @@ public class YAPI
     public const int yUnknowSize = 1024;
 
 
-
     // --- (generated code: YFunction return codes)
 // Yoctopuce error codes, used by default as function return value
-    public const int SUCCESS = 0;                   // everything worked all right
-    public const int NOT_INITIALIZED = -1;          // call yInitAPI() first !
-    public const int INVALID_ARGUMENT = -2;         // one of the arguments passed to the function is invalid
-    public const int NOT_SUPPORTED = -3;            // the operation attempted is (currently) not supported
-    public const int DEVICE_NOT_FOUND = -4;         // the requested device is not reachable
-    public const int VERSION_MISMATCH = -5;         // the device firmware is incompatible with this API version
-    public const int DEVICE_BUSY = -6;              // the device is busy with another task and cannot answer
-    public const int TIMEOUT = -7;                  // the device took too long to provide an answer
-    public const int IO_ERROR = -8;                 // there was an I/O problem while talking to the device
-    public const int NO_MORE_DATA = -9;             // there is no more data to read from
-    public const int EXHAUSTED = -10;               // you have run out of a limited resource, check the documentation
-    public const int DOUBLE_ACCES = -11;            // you have two process that try to access to the same device
-    public const int UNAUTHORIZED = -12;            // unauthorized access to password-protected device
-    public const int RTC_NOT_READY = -13;           // real-time clock has not been initialized (or time was lost)
-    public const int FILE_NOT_FOUND = -14;          // the file is not found
+    public const int SUCCESS = 0; // everything worked all right
+    public const int NOT_INITIALIZED = -1; // call yInitAPI() first !
+    public const int INVALID_ARGUMENT = -2; // one of the arguments passed to the function is invalid
+    public const int NOT_SUPPORTED = -3; // the operation attempted is (currently) not supported
+    public const int DEVICE_NOT_FOUND = -4; // the requested device is not reachable
+    public const int VERSION_MISMATCH = -5; // the device firmware is incompatible with this API version
+    public const int DEVICE_BUSY = -6; // the device is busy with another task and cannot answer
+    public const int TIMEOUT = -7; // the device took too long to provide an answer
+    public const int IO_ERROR = -8; // there was an I/O problem while talking to the device
+    public const int NO_MORE_DATA = -9; // there is no more data to read from
+    public const int EXHAUSTED = -10; // you have run out of a limited resource, check the documentation
+    public const int DOUBLE_ACCES = -11; // you have two process that try to access to the same device
+    public const int UNAUTHORIZED = -12; // unauthorized access to password-protected device
+    public const int RTC_NOT_READY = -13; // real-time clock has not been initialized (or time was lost)
+
+    public const int FILE_NOT_FOUND = -14; // the file is not found
     //--- (end of generated code: YFunction return codes)
-
-
-
 
 
     static List<YDevice> YDevice_devCache;
@@ -1155,8 +1267,11 @@ public class YAPI
 
     // - Types used for public yocto_api callbacks
     public delegate void yLogFunc(string log);
+
     public delegate void yDeviceUpdateFunc(YModule modul);
+
     public delegate double yCalibrationHandler(double rawValue, int calibType, List<int> parameters, List<double> rawValues, List<double> refValues);
+
     public delegate void YHubDiscoveryCallback(String serial, String url);
 
     // - Types used for internal yapi callbacks
@@ -1207,8 +1322,6 @@ public class YAPI
     }
 
 
-
-
     internal static int ParseHTTP(string data, int start, int stop, out int headerlen, out string errmsg)
     {
         const string httpheader = "HTTP/1.1 ";
@@ -1218,12 +1331,11 @@ public class YAPI
         const string CR = "\r\n";
         int httpcode;
 
-        if ((stop-start) > okHeader.Length  && data.Substring(start, okHeader.Length) == okHeader) {
+        if ((stop - start) > okHeader.Length && data.Substring(start, okHeader.Length) == okHeader) {
             httpcode = 200;
             errmsg = "";
-        }
-        else {
-            if ((stop - start) < httpheader.Length ||data.Substring(start, httpheader.Length) != httpheader) {
+        } else {
+            if ((stop - start) < httpheader.Length || data.Substring(start, httpheader.Length) != httpheader) {
                 errmsg = "data should start with " + httpheader;
                 headerlen = 0;
                 return -1;
@@ -1240,16 +1352,18 @@ public class YAPI
             httpcode = Convert.ToInt32(data.Substring(p1, p2 - p1 + 1));
             if (httpcode != 200) {
                 errmsg = string.Format("Unexpected HTTP return code:{0}", httpcode);
-            }else {
+            } else {
                 errmsg = "";
             }
         }
+
         p1 = data.IndexOf(CR + CR, start); //json data is a structure
         if (p1 < 0) {
             errmsg = "Invalid HTTP header (missing header end)";
             headerlen = 0;
             return -1;
         }
+
         headerlen = p1 + 4;
         return httpcode;
     }
@@ -1261,6 +1375,7 @@ public class YAPI
         internal int _data_start;
         protected int _data_len;
         internal int _data_boundary;
+
         protected YJSONType _type;
         //protected string debug;
 
@@ -1300,6 +1415,7 @@ public class YAPI
             } else {
                 res = new YJSONNumber(data, start, stop);
             }
+
             res.parse();
             return res;
         }
@@ -1321,6 +1437,7 @@ public class YAPI
         {
             return _type;
         }
+
         public abstract int parse();
 
         protected static int SkipGarbage(string data, int start, int stop)
@@ -1328,10 +1445,12 @@ public class YAPI
             if (data.Length <= start) {
                 return start;
             }
+
             char sti = data[start];
             while (start < stop && (sti == '\n' || sti == '\r' || sti == ' ')) {
                 start++;
             }
+
             return start;
         }
 
@@ -1346,6 +1465,7 @@ public class YAPI
             if (_data == null) {
                 return errmsg;
             }
+
             return errmsg + " near " + _data.Substring(ststart, cur_pos - ststart) + _data.Substring(cur_pos, stend - cur_pos);
         }
 
@@ -1366,9 +1486,7 @@ public class YAPI
         { }
 
         public int Length {
-            get {
-                return _arrayValue.Count;
-            }
+            get { return _arrayValue.Count; }
         }
 
         public override int parse()
@@ -1378,6 +1496,7 @@ public class YAPI
             if (_data[cur_pos] != '[') {
                 throw new System.Exception(FormatError("Opening braces was expected", cur_pos));
             }
+
             cur_pos++;
             Tjstate state = Tjstate.JWAITFORDATA;
 
@@ -1423,6 +1542,7 @@ public class YAPI
                         } else if (sti != ' ' && sti != '\n' && sti != '\r') {
                             throw new System.Exception(FormatError("invalid char: was expecting  \",0..9,t or f", cur_pos));
                         }
+
                         break;
                     case Tjstate.JWAITFORNEXTARRAYITEM:
                         if (sti == ',') {
@@ -1435,23 +1555,26 @@ public class YAPI
                                 throw new System.Exception(FormatError("invalid char: was expecting ,", cur_pos));
                             }
                         }
+
                         break;
                     default:
                         throw new System.Exception(FormatError("invalid state for YJSONObject", cur_pos));
                 }
+
                 cur_pos++;
             }
+
             throw new System.Exception(FormatError("unexpected end of data", cur_pos));
         }
 
         public YJSONObject getYJSONObject(int i)
         {
-            return (YJSONObject)_arrayValue[i];
+            return (YJSONObject) _arrayValue[i];
         }
 
         public string getString(int i)
         {
-            YJSONString ystr = (YJSONString)_arrayValue[i];
+            YJSONString ystr = (YJSONString) _arrayValue[i];
             return ystr.getString();
         }
 
@@ -1462,18 +1585,18 @@ public class YAPI
 
         public YJSONArray getYJSONArray(int i)
         {
-            return (YJSONArray)_arrayValue[i];
+            return (YJSONArray) _arrayValue[i];
         }
 
         public int getInt(int i)
         {
-            YJSONNumber ystr = (YJSONNumber)_arrayValue[i];
+            YJSONNumber ystr = (YJSONNumber) _arrayValue[i];
             return ystr.getInt();
         }
 
         public long getLong(int i)
         {
-            YJSONNumber ystr = (YJSONNumber)_arrayValue[i];
+            YJSONNumber ystr = (YJSONNumber) _arrayValue[i];
             return ystr.getLong();
         }
 
@@ -1495,6 +1618,7 @@ public class YAPI
                 res.Append(subres);
                 sep = ",";
             }
+
             res.Append(']');
             return res.ToString();
         }
@@ -1510,6 +1634,7 @@ public class YAPI
                 res.Append(subres);
                 sep = ",";
             }
+
             res.Append(']');
             return res.ToString();
         }
@@ -1536,6 +1661,7 @@ public class YAPI
             if (_data[cur_pos] != '"') {
                 throw new System.Exception(FormatError("double quote was expected", cur_pos));
             }
+
             cur_pos++;
             int str_start = cur_pos;
             Tjstate state = Tjstate.JWAITFORSTRINGVALUE;
@@ -1556,6 +1682,7 @@ public class YAPI
                         } else if (sti < 32) {
                             throw new System.Exception(FormatError("invalid char: was expecting string value", cur_pos));
                         }
+
                         break;
                     case Tjstate.JWAITFORSTRINGVALUE_ESC:
                         value += sti;
@@ -1565,8 +1692,10 @@ public class YAPI
                     default:
                         throw new System.Exception(FormatError("invalid state for YJSONObject", cur_pos));
                 }
+
                 cur_pos++;
             }
+
             throw new System.Exception(FormatError("unexpected end of data", cur_pos));
         }
 
@@ -1605,6 +1734,7 @@ public class YAPI
                         break;
                 }
             }
+
             res.Append('"');
             return res.ToString();
         }
@@ -1637,7 +1767,6 @@ public class YAPI
 
         public override int parse()
         {
-
             bool neg = false;
             int start, dotPos;
             char sti;
@@ -1647,6 +1776,7 @@ public class YAPI
                 neg = true;
                 cur_pos++;
             }
+
             start = cur_pos;
             dotPos = start;
             while (cur_pos < _data_boundary) {
@@ -1662,14 +1792,18 @@ public class YAPI
                     } else {
                         _intValue = Convert.ToInt64(numberpart);
                     }
+
                     if (neg) {
                         _doubleValue = 0 - _doubleValue;
                         _intValue = 0 - _intValue;
                     }
+
                     return cur_pos - _data_start;
                 }
+
                 cur_pos++;
             }
+
             throw new System.Exception(FormatError("unexpected end of data", cur_pos));
         }
 
@@ -1684,7 +1818,7 @@ public class YAPI
         public long getLong()
         {
             if (_isFloat)
-                return (long)_doubleValue;
+                return (long) _doubleValue;
             else
                 return _intValue;
         }
@@ -1692,9 +1826,9 @@ public class YAPI
         public int getInt()
         {
             if (_isFloat)
-                return (int)_doubleValue;
+                return (int) _doubleValue;
             else
-                return (int)_intValue;
+                return (int) _intValue;
         }
 
         public double getDouble()
@@ -1735,6 +1869,7 @@ public class YAPI
             if (_data.Length <= cur_pos || _data[cur_pos] != '{') {
                 throw new System.Exception(FormatError("Opening braces was expected", cur_pos));
             }
+
             cur_pos++;
             Tjstate state = Tjstate.JWAITFORNAME;
 
@@ -1753,28 +1888,28 @@ public class YAPI
                                 throw new System.Exception(FormatError("invalid char: was expecting \"", cur_pos));
                             }
                         }
+
                         break;
                     case Tjstate.JWAITFORENDOFNAME:
                         if (sti == '"') {
                             current_name = _data.Substring(name_start, cur_pos - name_start);
                             state = Tjstate.JWAITFORCOLON;
-
                         } else {
                             if (sti < 32) {
-                                throw new System.Exception(
-                                    FormatError("invalid char: was expecting an identifier compliant char", cur_pos));
+                                throw new System.Exception(FormatError("invalid char: was expecting an identifier compliant char", cur_pos));
                             }
                         }
+
                         break;
                     case Tjstate.JWAITFORCOLON:
                         if (sti == ':') {
                             state = Tjstate.JWAITFORDATA;
                         } else {
                             if (sti != ' ' && sti != '\n' && sti != '\r') {
-                                throw new System.Exception(
-                                    FormatError("invalid char: was expecting \"", cur_pos));
+                                throw new System.Exception(FormatError("invalid char: was expecting \"", cur_pos));
                             }
                         }
+
                         break;
                     case Tjstate.JWAITFORDATA:
                         if (sti == '{') {
@@ -1816,6 +1951,7 @@ public class YAPI
                         } else if (sti != ' ' && sti != '\n' && sti != '\r') {
                             throw new System.Exception(FormatError("invalid char: was expecting  \",0..9,t or f", cur_pos));
                         }
+
                         break;
                     case Tjstate.JWAITFORNEXTSTRUCTMEMBER:
                         if (sti == ',') {
@@ -1829,6 +1965,7 @@ public class YAPI
                                 throw new System.Exception(FormatError("invalid char: was expecting ,", cur_pos));
                             }
                         }
+
                         break;
                     case Tjstate.JWAITFORNEXTARRAYITEM:
                     case Tjstate.JWAITFORSTRINGVALUE:
@@ -1836,8 +1973,10 @@ public class YAPI
                     case Tjstate.JWAITFORBOOLVALUE:
                         throw new System.Exception(FormatError("invalid state for YJSONObject", cur_pos));
                 }
+
                 cur_pos++;
             }
+
             throw new System.Exception(FormatError("unexpected end of data", cur_pos));
         }
 
@@ -1848,17 +1987,17 @@ public class YAPI
 
         public YJSONObject getYJSONObject(string key)
         {
-            return (YJSONObject)parsed[key];
+            return (YJSONObject) parsed[key];
         }
 
         internal YJSONString getYJSONString(string key)
         {
-            return (YJSONString)parsed[key];
+            return (YJSONString) parsed[key];
         }
 
         internal YJSONArray getYJSONArray(string key)
         {
-            return (YJSONArray)parsed[key];
+            return (YJSONArray) parsed[key];
         }
 
         public List<string> keys()
@@ -1868,7 +2007,7 @@ public class YAPI
 
         internal YJSONNumber getYJSONNumber(string key)
         {
-            return (YJSONNumber)parsed[key];
+            return (YJSONNumber) parsed[key];
         }
 
         public void remove(string key)
@@ -1878,13 +2017,13 @@ public class YAPI
 
         public string getString(string key)
         {
-            YJSONString ystr = (YJSONString)parsed[key];
+            YJSONString ystr = (YJSONString) parsed[key];
             return ystr.getString();
         }
 
         public int getInt(string key)
         {
-            YJSONNumber yint = (YJSONNumber)parsed[key];
+            YJSONNumber yint = (YJSONNumber) parsed[key];
             return yint.getInt();
         }
 
@@ -1895,13 +2034,13 @@ public class YAPI
 
         public long getLong(string key)
         {
-            YJSONNumber yint = (YJSONNumber)parsed[key];
+            YJSONNumber yint = (YJSONNumber) parsed[key];
             return yint.getLong();
         }
 
         public double getDouble(string key)
         {
-            YJSONNumber yint = (YJSONNumber)parsed[key];
+            YJSONNumber yint = (YJSONNumber) parsed[key];
             return yint.getDouble();
         }
 
@@ -1920,6 +2059,7 @@ public class YAPI
                 res.Append(subres);
                 sep = ",";
             }
+
             res.Append('}');
             return res.ToString();
         }
@@ -1938,10 +2078,10 @@ public class YAPI
                 res.Append(subres);
                 sep = ",";
             }
+
             res.Append('}');
             return res.ToString();
         }
-
 
 
         public void parseWithRef(YJSONObject reference)
@@ -1952,10 +2092,9 @@ public class YAPI
                     yzon.parse();
                     convert(reference, yzon);
                     return;
-                } catch (Exception) {
-
-                }
+                } catch (Exception) { }
             }
+
             this.parse();
         }
 
@@ -1976,8 +2115,7 @@ public class YAPI
                     parsed.Add(key, jobj);
                     _keys.Add(key);
                 } else {
-                    throw new System.Exception("Unable to convert "+ new_item.getJSONType().ToString() + " to "+ reference.getJSONType().ToString());
-
+                    throw new System.Exception("Unable to convert " + new_item.getJSONType().ToString() + " to " + reference.getJSONType().ToString());
                 }
             }
         }
@@ -1986,7 +2124,6 @@ public class YAPI
         {
             return _keys[i];
         }
-
     }
 
 
@@ -2052,9 +2189,11 @@ public class YAPI
                         return YAPI.YDevice_devCache[idx];
                     }
                 }
+
                 dev = new YDevice(devdescr);
                 YAPI.YDevice_devCache.Add(dev);
             }
+
             return dev;
         }
 
@@ -2075,6 +2214,7 @@ public class YAPI
                     Thread.Sleep(50);
                 }
             } while (!enter);
+
             try {
                 res = HTTPRequestPrepare(request_org, ref fullrequest, ref errmsg);
                 if (YAPI.YISERR(res))
@@ -2092,27 +2232,27 @@ public class YAPI
                 requestbuf = Marshal.AllocHGlobal(fullrequest.Length);
                 Marshal.Copy(fullrequest, 0, requestbuf, fullrequest.Length);
 
-                res = SafeNativeMethods._yapiHTTPRequestSyncStartEx(ref iohdl, new StringBuilder(_rootdevice),
-                    requestbuf,
-                    fullrequest.Length, ref preply, ref replysize, buffer);
+                res = SafeNativeMethods._yapiHTTPRequestSyncStartEx(ref iohdl, new StringBuilder(_rootdevice), requestbuf, fullrequest.Length, ref preply, ref replysize, buffer);
                 Marshal.FreeHGlobal(requestbuf);
                 if (res < 0) {
                     errmsg = buffer.ToString();
                     return res;
                 }
+
                 reply = new byte[replysize];
                 if (reply.Length > 0 && preply != null) {
                     Marshal.Copy(preply, reply, 0, replysize);
                 }
+
                 res = SafeNativeMethods._yapiHTTPRequestSyncDone(ref iohdl, buffer);
-            }
-            finally {
+            } finally {
                 Monitor.Exit(_lock);
             }
+
             errmsg = buffer.ToString();
             ulong stop_tm = YAPI.GetTickCount();
             ulong delta = stop_tm - start_tm;
-            Console.WriteLine("Req took "+delta+"ms");
+            Console.WriteLine("Req took " + delta + "ms");
             return res;
         }
 
@@ -2129,9 +2269,9 @@ public class YAPI
 
                 requestbuf = Marshal.AllocHGlobal(fullrequest.Length);
                 Marshal.Copy(fullrequest, 0, requestbuf, fullrequest.Length);
-                res = SafeNativeMethods._yapiHTTPRequestAsyncEx(new StringBuilder(_rootdevice), requestbuf,
-                    fullrequest.Length, default(IntPtr), default(IntPtr), buffer);
+                res = SafeNativeMethods._yapiHTTPRequestAsyncEx(new StringBuilder(_rootdevice), requestbuf, fullrequest.Length, default(IntPtr), default(IntPtr), buffer);
             }
+
             Marshal.FreeHGlobal(requestbuf);
             errmsg = buffer.ToString();
             return res;
@@ -2167,6 +2307,7 @@ public class YAPI
                 _subpath = b.ToString();
                 _subpathinit = true;
             }
+
             // search for the first '/'
             p = 0;
             while (p < request.Length && request[p] != 47)
@@ -2193,12 +2334,14 @@ public class YAPI
                     apires = _cacheJson;
                     return YAPI.SUCCESS;
                 }
+
                 string request;
                 if (_cacheJson == null) {
                     request = "GET /api.json \r\n\r\n";
                 } else {
-                    request = "GET /api.json?fw="+_cacheJson.getYJSONObject("module").getString("firmwareRelease")+" \r\n\r\n";
+                    request = "GET /api.json?fw=" + _cacheJson.getYJSONObject("module").getString("firmwareRelease") + " \r\n\r\n";
                 }
+
                 res = HTTPRequest(request, out buffer, ref errmsg);
                 if (YAPI.YISERR(res)) {
                     // make sure a device scan does not solve the issue
@@ -2206,20 +2349,22 @@ public class YAPI
                     if (YAPI.YISERR(res)) {
                         return res;
                     }
+
                     res = HTTPRequest(request, out buffer, ref errmsg);
                     if (YAPI.YISERR(res)) {
                         return res;
                     }
                 }
+
                 int httpcode = YAPI.ParseHTTP(buffer, 0, buffer.Length, out http_headerlen, out errmsg);
                 if (httpcode != 200) {
                     return YAPI.IO_ERROR;
                 }
+
                 try {
                     apires = new YJSONObject(buffer, http_headerlen, buffer.Length);
                     apires.parseWithRef(_cacheJson);
-                }
-                catch (Exception E) {
+                } catch (Exception E) {
                     errmsg = "unexpected JSON structure: " + E.Message;
                     return YAPI.IO_ERROR;
                 }
@@ -2229,6 +2374,7 @@ public class YAPI
                 _cacheJson = apires;
                 _cacheStamp = YAPI.GetTickCount() + YAPI.DefaultCacheValidity;
             }
+
             return YAPI.SUCCESS;
         }
 
@@ -2256,7 +2402,7 @@ public class YAPI
                         return res;
                     }
 
-                    count = Convert.ToInt32(neededsize/Marshal.SizeOf(i));
+                    count = Convert.ToInt32(neededsize / Marshal.SizeOf(i));
                     //  i is an 32 bits integer
                     Array.Resize(ref ids, count + 1);
                     Marshal.Copy(p, ids, 0, count);
@@ -2266,8 +2412,10 @@ public class YAPI
 
                     Marshal.FreeHGlobal(p);
                 }
+
                 functions = _functions;
             }
+
             return YAPI.SUCCESS;
         }
 
@@ -2299,10 +2447,7 @@ public class YAPI
         {
             return this.HTTPRequestAsync(YAPI.DefaultEncoding.GetBytes(request), ref errmsg);
         }
-
-
     }
-
 
 
     /**
@@ -2319,6 +2464,7 @@ public class YAPI
     {
         ExceptionsDisabled = true;
     }
+
     /**
      * <summary>
      *   Re-enables the use of exceptions for runtime error handling.
@@ -2353,10 +2499,10 @@ public class YAPI
         if (yapiGetDeviceInfo(devdescr, ref infos, ref errmsg) != YAPI.SUCCESS) {
             return;
         }
+
         modul = YModule.FindModule(infos.serial + ".module");
         callback = modul.get_logCallback();
-        if (callback != null)
-        {
+        if (callback != null) {
             callback(modul, Marshal.PtrToStringAnsi(data));
         }
     }
@@ -2378,13 +2524,11 @@ public class YAPI
     public static void RegisterLogFunction(yLogFunc logfun)
     {
         ylog = logfun;
-
     }
 
 
-
-    private class DataEvent {
-
+    private class DataEvent
+    {
         private YFunction _fun;
         private YSensor _sensor;
         private String _value;
@@ -2409,20 +2553,20 @@ public class YAPI
             _report = report;
         }
 
-        public void invoke(){
-            if (_fun==null) {
-                YMeasure mesure =  _sensor._decodeTimedReport(_timestamp,_report);
+        public void invoke()
+        {
+            if (_fun == null) {
+                YMeasure mesure = _sensor._decodeTimedReport(_timestamp, _report);
                 _sensor._invokeTimedReportCallback(mesure);
-            }else {
+            } else {
                 // new value
                 _fun._invokeValueCallback(_value);
             }
         }
-
     }
 
-    private class PlugEvent {
-
+    private class PlugEvent
+    {
         public enum EVTYPE
         {
             ARRIVAL,
@@ -2442,16 +2586,16 @@ public class YAPI
             _module = mod;
         }
 
-        public PlugEvent(String serial, String  url)
+        public PlugEvent(String serial, String url)
         {
             _eventtype = EVTYPE.HUB_DISCOVERY;
             _serial = serial;
             _url = url;
         }
 
-        public void invoke() {
-            switch (_eventtype)
-            {
+        public void invoke()
+        {
+            switch (_eventtype) {
                 case EVTYPE.ARRIVAL:
                     if (yArrival != null)
                         yArrival(_module);
@@ -2516,10 +2660,10 @@ public class YAPI
         PlugEvent ev;
         string errmsg = "";
 
-        if (yapiGetDeviceInfo(d, ref infos, ref errmsg) != SUCCESS)
-        {
+        if (yapiGetDeviceInfo(d, ref infos, ref errmsg) != SUCCESS) {
             return;
         }
+
         YDevice.PlugDevice(d);
         YModule modul = YModule.FindModule(infos.serial + ".module");
         modul.setImmutableAttributes(infos);
@@ -2545,18 +2689,16 @@ public class YAPI
     public static void RegisterDeviceArrivalCallback(yDeviceUpdateFunc arrivalCallback)
     {
         yArrival = arrivalCallback;
-        if (arrivalCallback != null)
-        {
+        if (arrivalCallback != null) {
             string error = "";
             YModule mod = YModule.FirstModule();
-            while (mod != null)
-            {
-                if (mod.isOnline())
-                {
+            while (mod != null) {
+                if (mod.isOnline()) {
                     yapiLockDeviceCallBack(ref error);
                     native_yDeviceArrivalCallback(mod.functionDescriptor());
                     yapiUnlockDeviceCallBack(ref error);
                 }
+
                 mod = mod.nextModule();
             }
         }
@@ -2626,13 +2768,9 @@ public class YAPI
 
     private static void native_yFunctionUpdateCallback(YFUN_DESCR fundesc, IntPtr data)
     {
-
-        if (!IntPtr.Zero.Equals(data))
-        {
-            for (int i = 0; i < YFunction._ValueCallbackList.Count; i++)
-            {
-                if (YFunction._ValueCallbackList[i].get_functionDescriptor() == fundesc)
-                {
+        if (!IntPtr.Zero.Equals(data)) {
+            for (int i = 0; i < YFunction._ValueCallbackList.Count; i++) {
+                if (YFunction._ValueCallbackList[i].get_functionDescriptor() == fundesc) {
                     DataEvent ev = new DataEvent(YFunction._ValueCallbackList[i], Marshal.PtrToStringAnsi(data));
                     _DataEvents.Add(ev);
                 }
@@ -2642,26 +2780,22 @@ public class YAPI
 
     private static void native_yTimedReportCallback(YFUN_DESCR fundesc, double timestamp, IntPtr rawdata, u32 len)
     {
-        for (int i = 0; i < YFunction._TimedReportCallbackList.Count; i++)
-        {
-            if (YFunction._TimedReportCallbackList[i].get_functionDescriptor() == fundesc)
-            {
+        for (int i = 0; i < YFunction._TimedReportCallbackList.Count; i++) {
+            if (YFunction._TimedReportCallbackList[i].get_functionDescriptor() == fundesc) {
                 byte[] data = new byte[len];
-                Marshal.Copy(rawdata, data, 0, (int)len);
-                if ((data[0]&0xff) <= 2)
-                {
-                    List<int> report = new List<int>((int)len);
+                Marshal.Copy(rawdata, data, 0, (int) len);
+                if ((data[0] & 0xff) <= 2) {
+                    List<int> report = new List<int>((int) len);
                     int p = 0;
-                    while (p < len)
-                    {
+                    while (p < len) {
                         report.Add(data[p++] & 0xff);
                     }
+
                     DataEvent ev = new DataEvent(YFunction._TimedReportCallbackList[i], timestamp, report);
                     _DataEvents.Add(ev);
                 }
             }
         }
-
     }
 
 
@@ -2682,32 +2816,27 @@ public class YAPI
         x = rawValues[0];
         adj = refValues[0] - x;
         i = 0;
-        if (calibType < YAPI.YOCTO_CALIB_TYPE_OFS)
-        {
+        if (calibType < YAPI.YOCTO_CALIB_TYPE_OFS) {
             npt = calibType % 10;
             if (npt > rawValues.Count) npt = rawValues.Count;
             if (npt > refValues.Count) npt = refValues.Count;
-        }
-        else
-        {
+        } else {
             npt = refValues.Count;
         }
 
-        while ((rawValue > rawValues[i]) && (i + 1 < npt))
-        {
+        while ((rawValue > rawValues[i]) && (i + 1 < npt)) {
             i++;
             x2 = x;
             adj2 = adj;
             x = rawValues[i];
             adj = refValues[i] - x;
-            if ((rawValue < x) && (x > x2))
-            {
+            if ((rawValue < x) && (x > x2)) {
                 adj = adj2 + (adj - adj2) * (rawValue - x2) / (x - x2);
             }
         }
+
         return rawValue + adj;
     }
-
 
 
     private static int yapiLockDeviceCallBack(ref string errmsg)
@@ -2760,9 +2889,7 @@ public class YAPI
         return null;
     }
 
-    private static double[] decExp = new double[] {
-    1.0e-6, 1.0e-5, 1.0e-4, 1.0e-3, 1.0e-2, 1.0e-1, 1.0,
-    1.0e1, 1.0e2, 1.0e3, 1.0e4, 1.0e5, 1.0e6, 1.0e7, 1.0e8, 1.0e9 };
+    private static double[] decExp = new double[] {1.0e-6, 1.0e-5, 1.0e-4, 1.0e-3, 1.0e-2, 1.0e-1, 1.0, 1.0e1, 1.0e2, 1.0e3, 1.0e4, 1.0e5, 1.0e6, 1.0e7, 1.0e8, 1.0e9};
 
     // Convert Yoctopuce 16-bit decimal floats to standard double-precision floats
     //
@@ -2773,18 +2900,16 @@ public class YAPI
         int mantis = val & 2047;
         if (mantis == 0)
             return 0.0;
-        if (val > 32767)
-        {
+        if (val > 32767) {
             negate = true;
             val = 65536 - val;
-        }
-        else if (val < 0)
-        {
+        } else if (val < 0) {
             negate = true;
             val = -val;
         }
+
         int exp = val >> 11;
-        res = (double)(mantis) * decExp[exp];
+        res = (double) (mantis) * decExp[exp];
         return (negate ? -res : res);
     }
 
@@ -2797,66 +2922,57 @@ public class YAPI
         int decpow;
         long res;
 
-        if (val == 0.0)
-        {
+        if (val == 0.0) {
             return 0;
         }
-        if (val < 0)
-        {
+
+        if (val < 0) {
             negate = 1;
             val = -val;
         }
+
         comp = val / 1999.0;
         decpow = 0;
-        while (comp > decExp[decpow] && decpow < 15)
-        {
+        while (comp > decExp[decpow] && decpow < 15) {
             decpow++;
         }
+
         mant = val / decExp[decpow];
-        if (decpow == 15 && mant > 2047.0)
-        {
+        if (decpow == 15 && mant > 2047.0) {
             res = (15 << 11) + 2047; // overflow
-        }
-        else
-        {
+        } else {
             res = (decpow << 11) + Convert.ToInt32(mant);
         }
+
         return (negate != 0 ? -res : res);
     }
-
 
 
     public static List<int> _decodeWords(string sdat)
     {
         List<int> udat = new List<int>();
 
-        for (int p = 0; p < sdat.Length; )
-        {
+        for (int p = 0; p < sdat.Length;) {
             uint val;
             uint c = sdat[p++];
             if (c == '*') {
                 val = 0;
-            }else if (c == 'X') {
+            } else if (c == 'X') {
                 val = 0xffff;
             } else if (c == 'Y') {
                 val = 0x7fff;
             } else if (c >= 'a') {
-                int srcpos = (int)(udat.Count - 1 - (c - 'a'));
-                if (srcpos < 0)
-                {
+                int srcpos = (int) (udat.Count - 1 - (c - 'a'));
+                if (srcpos < 0) {
                     val = 0;
+                } else {
+                    val = (uint) udat[srcpos];
                 }
-                else
-                {
-                    val = (uint)udat[srcpos];
-                }
-            }
-            else
-            {
-                if (p + 2 > sdat.Length)
-                {
+            } else {
+                if (p + 2 > sdat.Length) {
                     return udat;
                 }
+
                 val = (c - '0');
                 c = sdat[p++];
                 val += (c - '0') << 5;
@@ -2864,8 +2980,10 @@ public class YAPI
                 if (c == 'z') c = '\\';
                 val += (c - '0') << 10;
             }
-            udat.Add((int)val);
+
+            udat.Add((int) val);
         }
+
         return udat;
     }
 
@@ -2873,74 +2991,70 @@ public class YAPI
     {
         List<int> idat = new List<int>();
 
-        for (int p = 0; p < sdat.Length; )
-        {
+        for (int p = 0; p < sdat.Length;) {
             int val = 0;
             int sign = 1;
             int dec = 0;
             int decInc = 0;
             int c = sdat[p++];
-            while (c != (int)'-' && (c < (int)'0' || c > (int)'9'))
-            {
-                if (p >= sdat.Length)
-                {
+            while (c != (int) '-' && (c < (int) '0' || c > (int) '9')) {
+                if (p >= sdat.Length) {
                     return idat;
                 }
+
                 c = sdat[p++];
             }
-            if (c == '-')
-            {
-                if (p >= sdat.Length)
-                {
+
+            if (c == '-') {
+                if (p >= sdat.Length) {
                     return idat;
                 }
+
                 sign = -sign;
                 c = sdat[p++];
             }
-            while ((c >= '0' && c <= '9') || c == '.')
-            {
-                if (c == '.')
-                {
+
+            while ((c >= '0' && c <= '9') || c == '.') {
+                if (c == '.') {
                     decInc = 1;
-                }
-                else if (dec < 3)
-                {
+                } else if (dec < 3) {
                     val = val * 10 + (c - '0');
                     dec += decInc;
                 }
-                if (p < sdat.Length)
-                {
+
+                if (p < sdat.Length) {
                     c = sdat[p++];
-                }
-                else
-                {
+                } else {
                     c = 0;
                 }
             }
-            if (dec < 3)
-            {
+
+            if (dec < 3) {
                 if (dec == 0) val *= 1000;
-                else if (dec == 1) val *= 100;
-                else val *= 10;
+                else if (dec == 1)
+                    val *= 100;
+                else
+                    val *= 10;
             }
-            idat.Add(sign*val);
+
+            idat.Add(sign * val);
         }
+
         return idat;
     }
 
     public static string _floatToStr(double value)
     {
-        int rounded = (int)Math.Round(value * 1000);
+        int rounded = (int) Math.Round(value * 1000);
         string res = "";
-        if (rounded < 0)
-        {
+        if (rounded < 0) {
             res += "-";
             rounded = -rounded;
         }
-        res += Convert.ToString((int)(rounded / 1000));
+
+        res += Convert.ToString((int) (rounded / 1000));
         int decim = rounded % 1000;
-        if (decim > 0)
-        {
+        if (decim > 0) {
             res += ".";
             if (decim < 100) res += "0";
             if (decim < 10) res += "0";
@@ -2948,24 +3062,28 @@ public class YAPI
             if ((decim % 10) == 0) decim /= 10;
             res += Convert.ToString(decim);
         }
+
         return res;
     }
 
     public static int _atoi(string val)
     {
         int p = 0;
-        while(p < val.Length && Char.IsWhiteSpace(val[p])) {
+        while (p < val.Length && Char.IsWhiteSpace(val[p])) {
             p++;
         }
+
         int start = p;
         if (p < val.Length && (val[p] == '-' || val[p] == '+'))
             p++;
         while (p < val.Length && Char.IsDigit(val[p])) {
             p++;
         }
+
         if (start < p) {
-            return int.Parse(val.Substring(start, p-start));
+            return int.Parse(val.Substring(start, p - start));
         }
+
         return 0;
     }
 
@@ -2979,6 +3097,7 @@ public class YAPI
             hexChars[j * 2] = _hexArray[v >> 4];
             hexChars[j * 2 + 1] = _hexArray[v & 0x0F];
         }
+
         return new string(hexChars);
     }
 
@@ -2988,7 +3107,7 @@ public class YAPI
         byte[] res = new byte[len];
         for (int i = 0; i < len; i++) {
             int val = 0;
-            for(int n = 0; n < 2; n++){
+            for (int n = 0; n < 2; n++) {
                 char c = hex_str[i * 2 + n];
                 val <<= 4;
                 if (c <= '9') {
@@ -2996,13 +3115,13 @@ public class YAPI
                 } else if (c <= 'F') {
                     val += c - 'A' + 10;
                 } else {
-                    val += c - 'a'+ 10;
-
+                    val += c - 'a' + 10;
                 }
-
             }
-            res[i] = (byte)val;
+
+            res[i] = (byte) val;
         }
+
         return res;
     }
 
@@ -3013,8 +3132,6 @@ public class YAPI
         System.Buffer.BlockCopy(array_b, 0, res, array_a.Length, array_b.Length);
         return res;
     }
-
-
 
 
     // - Delegate object for our internal callback, protected from GC
@@ -3041,7 +3158,7 @@ public class YAPI
 
     public static _yapiDeviceLogCallback native_yDeviceLogDelegate = native_yDeviceLogCallback;
     static GCHandle native_yDeviceLogAnchor = GCHandle.Alloc(native_yDeviceLogDelegate);
-    
+
 
     /**
      * <summary>
@@ -3071,7 +3188,7 @@ public class YAPI
     {
         string version = default(string);
         string date = default(string);
-        apiGetAPIVersion(ref  version, ref date);
+        apiGetAPIVersion(ref version, ref date);
         return YOCTO_API_VERSION_STR + "." + YOCTO_API_BUILD_NO + " (" + version + ")";
     }
 
@@ -3116,9 +3233,26 @@ public class YAPI
             functionReturnValue = SUCCESS;
             return functionReturnValue;
         }
+
         string version = default(string);
         string date = default(string);
-        if (apiGetAPIVersion(ref version, ref date) != YOCTO_API_VERSION_BCD) {
+        u16 api_ver;
+        try {
+            api_ver = apiGetAPIVersion(ref version, ref date);
+        } catch (System.DllNotFoundException ex) {
+            errmsg = "Unable to load yapi.dll (" + ex.Message + ")";
+            return FILE_NOT_FOUND;
+        } catch (System.BadImageFormatException) {
+            if (IntPtr.Size == 4) {
+                errmsg = "Invalid yapi.dll (Using 64 bits yapi.dll with 32 bit application)";
+            } else {
+                errmsg = "Invalid yapi.dll (Using 32 bits yapi.dll with 64 bit application)";
+            }
+
+            return VERSION_MISMATCH;
+        }
+
+        if (api_ver != YOCTO_API_VERSION_BCD) {
             errmsg = "yapi.dll does does not match the version of the Libary (Libary=" + YOCTO_API_VERSION_STR + "." + YOCTO_API_BUILD_NO;
             errmsg += " yapi.dll=" + version + ")";
             return VERSION_MISMATCH;
@@ -3141,6 +3275,7 @@ public class YAPI
                 return res;
             }
         }
+
         SafeNativeMethods._yapiRegisterDeviceArrivalCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceArrivalDelegate));
         SafeNativeMethods._yapiRegisterDeviceRemovalCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceRemovalDelegate));
         SafeNativeMethods._yapiRegisterDeviceChangeCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceChangeDelegate));
@@ -3156,6 +3291,7 @@ public class YAPI
         _apiInitialized = true;
         return YAPI.SUCCESS;
     }
+
     /**
      * <summary>
      *   Frees dynamically allocated memory blocks used by the Yoctopuce library.
@@ -3183,6 +3319,7 @@ public class YAPI
             _apiInitialized = false;
         }
     }
+
     /**
      * <summary>
      *   Setup the Yoctopuce library to use modules connected on a given machine.
@@ -3251,8 +3388,7 @@ public class YAPI
         StringBuilder buffer = new StringBuilder(YOCTO_ERRMSG_LEN);
         YRETCODE res;
 
-        if (!_apiInitialized)
-        {
+        if (!_apiInitialized) {
             res = InitAPI(0, ref errmsg);
             if (YISERR(res))
                 return res;
@@ -3263,12 +3399,13 @@ public class YAPI
         if (YISERR(res)) {
             errmsg = buffer.ToString();
         }
+
         return res;
     }
 
     /**
      * <summary>
-     *   Fault-tolerant alternative to RegisterHub().
+     *   Fault-tolerant alternative to <c>RegisterHub()</c>.
      * <para>
      *   This function has the same
      *   purpose and same arguments as <c>RegisterHub()</c>, but does not trigger
@@ -3298,8 +3435,7 @@ public class YAPI
         StringBuilder buffer = new StringBuilder(YOCTO_ERRMSG_LEN);
         YRETCODE res;
 
-        if (!_apiInitialized)
-        {
+        if (!_apiInitialized) {
             res = InitAPI(0, ref errmsg);
             if (YISERR(res))
                 return res;
@@ -3307,10 +3443,10 @@ public class YAPI
 
         buffer.Length = 0;
         res = SafeNativeMethods._yapiPreregisterHub(new StringBuilder(url), buffer);
-        if (YISERR(res))
-        {
+        if (YISERR(res)) {
             errmsg = buffer.ToString();
         }
+
         return res;
     }
 
@@ -3350,10 +3486,10 @@ public class YAPI
 
         buffer.Length = 0;
         res = SafeNativeMethods._yapiTestHub(new StringBuilder(url), mstimeout, buffer);
-        if (YISERR(res))
-        {
+        if (YISERR(res)) {
             errmsg = buffer.ToString();
         }
+
         return res;
     }
 
@@ -3372,8 +3508,7 @@ public class YAPI
      */
     public static void UnregisterHub(string url)
     {
-        if (!_apiInitialized)
-        {
+        if (!_apiInitialized) {
             return;
         }
 
@@ -3409,32 +3544,32 @@ public class YAPI
         YRETCODE res = default(YRETCODE);
         PlugEvent p;
 
-        if (!_apiInitialized)
-        {
+        if (!_apiInitialized) {
             res = InitAPI(0, ref errmsg);
             if (YISERR(res))
                 return res;
         }
+
         res = yapiUpdateDeviceList(0, ref errmsg);
-        if (YISERR(res)) { return res; }
+        if (YISERR(res)) {
+            return res;
+        }
 
         errbuffer.Length = 0;
         res = SafeNativeMethods._yapiHandleEvents(errbuffer);
-        if (YISERR(res))
-        {
+        if (YISERR(res)) {
             errmsg = errbuffer.ToString();
             return res;
         }
 
-        while (_PlugEvents.Count > 0)
-        {
+        while (_PlugEvents.Count > 0) {
             yapiLockDeviceCallBack(ref errmsg);
             p = _PlugEvents[0];
             _PlugEvents.RemoveAt(0);
             yapiUnlockDeviceCallBack(ref errmsg);
             p.invoke();
-
         }
+
         return SUCCESS;
     }
 
@@ -3475,29 +3610,29 @@ public class YAPI
         errBuffer.Length = 0;
         res = SafeNativeMethods._yapiHandleEvents(errBuffer);
 
-        if ((YISERR(res)))
-        {
+        if ((YISERR(res))) {
             errmsg = errBuffer.ToString();
             functionReturnValue = res;
             return functionReturnValue;
         }
 
-        while ((_DataEvents.Count > 0))
-        {
+        while ((_DataEvents.Count > 0)) {
             yapiLockFunctionCallBack(ref errmsg);
-            if (_DataEvents.Count == 0)
-            {
+            if (_DataEvents.Count == 0) {
                 yapiUnlockFunctionCallBack(ref errmsg);
                 break;
             }
+
             DataEvent ev = _DataEvents[0];
             _DataEvents.RemoveAt(0);
             yapiUnlockFunctionCallBack(ref errmsg);
             ev.invoke();
         }
+
         functionReturnValue = SUCCESS;
         return functionReturnValue;
     }
+
     /**
      * <summary>
      *   Pauses the execution flow for a specified duration.
@@ -3536,30 +3671,27 @@ public class YAPI
         int res = 0;
 
 
-        timeout = GetTickCount() + (ulong)ms_duration;
+        timeout = GetTickCount() + (ulong) ms_duration;
         res = SUCCESS;
         errBuffer.Length = 0;
 
-        do
-        {
+        do {
             res = HandleEvents(ref errmsg);
-            if ((YISERR(res)))
-            {
+            if ((YISERR(res))) {
                 functionReturnValue = res;
                 return functionReturnValue;
             }
-            if ((GetTickCount() < timeout))
-            {
+
+            if ((GetTickCount() < timeout)) {
                 res = SafeNativeMethods._yapiSleep(2, errBuffer);
-                if ((YISERR(res)))
-                {
+                if ((YISERR(res))) {
                     functionReturnValue = res;
                     errmsg = errBuffer.ToString();
                     return functionReturnValue;
                 }
             }
-
         } while (!(GetTickCount() >= timeout));
+
         errmsg = errBuffer.ToString();
         functionReturnValue = res;
         return functionReturnValue;
@@ -3586,8 +3718,7 @@ public class YAPI
         StringBuilder buffer = new StringBuilder(YOCTO_ERRMSG_LEN);
         YRETCODE res;
 
-        if (!_apiInitialized)
-        {
+        if (!_apiInitialized) {
             res = InitAPI(0, ref errmsg);
             if (YISERR(res))
                 return res;
@@ -3595,10 +3726,10 @@ public class YAPI
 
         buffer.Length = 0;
         res = SafeNativeMethods._yapiTriggerHubDiscovery(buffer);
-        if (YISERR(res))
-        {
+        if (YISERR(res)) {
             errmsg = buffer.ToString();
         }
+
         return res;
     }
 
@@ -3616,7 +3747,7 @@ public class YAPI
      */
     public static ulong GetTickCount()
     {
-        return Convert.ToUInt64((ulong)SafeNativeMethods._yapiGetTickCount());
+        return Convert.ToUInt64((ulong) SafeNativeMethods._yapiGetTickCount());
     }
 
     /**
@@ -3639,14 +3770,12 @@ public class YAPI
     public static bool CheckLogicalName(string name)
     {
         bool functionReturnValue = false;
-        if ((SafeNativeMethods._yapiCheckLogicalName(new StringBuilder(name)) == 0))
-        {
+        if ((SafeNativeMethods._yapiCheckLogicalName(new StringBuilder(name)) == 0)) {
             functionReturnValue = false;
-        }
-        else
-        {
+        } else {
             functionReturnValue = true;
         }
+
         return functionReturnValue;
     }
 
@@ -3711,14 +3840,12 @@ public class YAPI
         errBuffer.Length = 0;
         res = SafeNativeMethods._yapiGetFunctionInfoEx(fundesc, ref devdesc, null, null, null, null, null, errBuffer);
         errmsg = errBuffer.ToString();
-        if ((res < 0))
-        {
+        if ((res < 0)) {
             functionReturnValue = res;
-        }
-        else
-        {
+        } else {
             functionReturnValue = devdesc;
         }
+
         return functionReturnValue;
     }
 
@@ -3739,10 +3866,10 @@ public class YAPI
         StringBuilder buffer = new StringBuilder(YOCTO_ERRMSG_LEN);
         buffer.Length = 0;
         YRETCODE res = SafeNativeMethods._yapiUpdateDeviceList(force, buffer);
-        if (YAPI.YISERR(res))
-        {
+        if (YAPI.YISERR(res)) {
             errmsg = buffer.ToString();
         }
+
         return res;
     }
 
@@ -3795,13 +3922,11 @@ public class YAPI
         errmsg = buffer.ToString();
         return functionReturnValue;
     }
-
 }
 
 // Backward-compatibility with previous versions of the library
 public class yAPI : YAPI
-{
-}
+{ }
 
 //--- (generated code: YFirmwareUpdate class start)
 /**
@@ -3832,6 +3957,7 @@ public class YFirmwareUpdate
     protected int _progress_c = 0;
     protected int _progress = 0;
     protected int _restore_step = 0;
+
     protected bool _force;
     //--- (end of generated code: YFirmwareUpdate definitions)
 
@@ -3845,7 +3971,6 @@ public class YFirmwareUpdate
         //--- (generated code: YFirmwareUpdate attributes initialization)
         //--- (end of generated code: YFirmwareUpdate attributes initialization)
     }
-
 
 
     public YFirmwareUpdate(string serial, string path, byte[] settings)
@@ -3881,17 +4006,20 @@ public class YFirmwareUpdate
             } else {
                 force = 0;
             }
+
             res = SafeNativeMethods._yapiUpdateFirmwareEx(new StringBuilder(serial), new StringBuilder(firmwarepath), new StringBuilder(settings), force, newupdate, errmsg);
             if ((res == YAPI.VERSION_MISMATCH) && ((this._settings).Length != 0)) {
                 this._progress_c = res;
                 this._progress_msg = errmsg.ToString();
                 return this._progress;
             }
+
             if (res < 0) {
                 this._progress = res;
                 this._progress_msg = errmsg.ToString();
                 return res;
             }
+
             this._progress_c = res;
             this._progress = ((this._progress_c * 9) / (10));
             this._progress_msg = errmsg.ToString();
@@ -3902,16 +4030,22 @@ public class YFirmwareUpdate
                 if (!(m.isOnline())) {
                     return this._progress;
                 }
+
                 if (this._progress < 95) {
-                    prod_prefix = (m.get_productName()).Substring( 0, 8);
+                    prod_prefix = (m.get_productName()).Substring(0, 8);
                     if (prod_prefix == "YoctoHub") {
-                        {string ignore=""; YAPI.Sleep(1000, ref ignore);};
+                        {
+                            string ignore = "";
+                            YAPI.Sleep(1000, ref ignore);
+                        }
+                        ;
                         this._progress = this._progress + 1;
                         return this._progress;
                     } else {
                         this._progress = 95;
                     }
                 }
+
                 if (this._progress < 100) {
                     m.set_allSettingsAndFiles(this._settings);
                     m.saveToFlash();
@@ -3920,15 +4054,16 @@ public class YFirmwareUpdate
                         this._progress = YAPI.IO_ERROR;
                         this._progress_msg = "Unable to update firmware";
                     } else {
-                        this._progress =  100;
+                        this._progress = 100;
                         this._progress_msg = "success";
                     }
                 }
             } else {
-                this._progress =  100;
+                this._progress = 100;
                 this._progress_msg = "success";
             }
         }
+
         return this._progress;
     }
 
@@ -3962,6 +4097,7 @@ public class YFirmwareUpdate
         if (yapi_res < 0) {
             return bootladers;
         }
+
         if (fullsize <= 1024) {
             bootloader_list = smallbuff.ToString();
         } else {
@@ -3974,11 +4110,14 @@ public class YFirmwareUpdate
             } else {
                 bootloader_list = bigbuff.ToString();
             }
+
             bigbuff = null;
         }
+
         if (!(bootloader_list == "")) {
             bootladers = new List<string>(bootloader_list.Split(new Char[] {','}));
         }
+
         return bootladers;
     }
 
@@ -4026,6 +4165,7 @@ public class YFirmwareUpdate
             firmware_path = "error:" + errmsg.ToString();
             return "error:" + errmsg.ToString();
         }
+
         if (fullsize <= 1024) {
             firmware_path = smallbuff.ToString();
         } else {
@@ -4037,8 +4177,10 @@ public class YFirmwareUpdate
             } else {
                 firmware_path = bigbuff.ToString();
             }
+
             bigbuff = null;
         }
+
         return firmware_path;
     }
 
@@ -4065,6 +4207,7 @@ public class YFirmwareUpdate
         if (this._progress >= 0) {
             this._processMore(0);
         }
+
         return this._progress;
     }
 
@@ -4112,34 +4255,20 @@ public class YFirmwareUpdate
         int leng;
         err = YAPI.DefaultEncoding.GetString(this._settings);
         leng = (err).Length;
-        if (( leng >= 6) && ("error:" == (err).Substring(0, 6))) {
+        if ((leng >= 6) && ("error:" == (err).Substring(0, 6))) {
             this._progress = -1;
-            this._progress_msg = (err).Substring( 6, leng - 6);
+            this._progress_msg = (err).Substring(6, leng - 6);
         } else {
             this._progress = 0;
             this._progress_c = 0;
             this._processMore(1);
         }
+
         return this._progress;
     }
 
     //--- (end of generated code: YFirmwareUpdate implementation)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //--- (generated code: YDataStream class start)
@@ -4194,6 +4323,7 @@ public class YDataStream
     protected List<int> _calpar = new List<int>();
     protected List<double> _calraw = new List<double>();
     protected List<double> _calref = new List<double>();
+
     protected List<List<double>> _values = new List<List<double>>();
     //--- (end of generated code: YDataStream definitions)
 
@@ -4208,11 +4338,10 @@ public class YDataStream
 
     public YDataStream(YFunction parent, YDataSet dataset, List<int> encoded)
     {
-        this._parent   = parent;
+        this._parent = parent;
         //--- (generated code: YDataStream attributes initialization)
         //--- (end of generated code: YDataStream attributes initialization)
         this._initFromDataSet(dataset, encoded);
-
     }
 
 
@@ -4243,10 +4372,12 @@ public class YDataStream
                 this._samplesPerHour = this._samplesPerHour * 60;
             }
         }
+
         val = encoded[5];
         if (val > 32767) {
             val = val - 65536;
         }
+
         this._decimals = val;
         this._offset = val;
         this._scale = encoded[6];
@@ -4257,6 +4388,7 @@ public class YDataStream
         if (val == 0xffff) {
             val = 0;
         }
+
         this._nRows = val;
         duration_float = this._nRows * 3600 / this._samplesPerHour;
         this._duration = (int) Math.Round(duration_float);
@@ -4269,6 +4401,7 @@ public class YDataStream
                 i = i + 1;
             }
         }
+
         iCalib = dataset._get_calibration();
         this._caltyp = iCalib[0];
         if (this._caltyp != 0) {
@@ -4283,6 +4416,7 @@ public class YDataStream
                     this._calpar.Add(iCalib[i]);
                     i = i + 1;
                 }
+
                 i = 1;
                 while (i + 1 < maxpos) {
                     fRaw = iCalib[i];
@@ -4311,23 +4445,26 @@ public class YDataStream
                         this._calraw.Add(YAPI._decimalToDouble(iRaw));
                         this._calref.Add(YAPI._decimalToDouble(iRef));
                     }
+
                     i = i + 2;
                 }
             }
         }
+
         // preload column names for backward-compatibility
         this._functionId = dataset.get_functionId();
         if (this._isAvg) {
             this._columnNames.Clear();
-            this._columnNames.Add(""+this._functionId+"_min");
-            this._columnNames.Add(""+this._functionId+"_avg");
-            this._columnNames.Add(""+this._functionId+"_max");
+            this._columnNames.Add("" + this._functionId + "_min");
+            this._columnNames.Add("" + this._functionId + "_avg");
+            this._columnNames.Add("" + this._functionId + "_max");
             this._nCols = 3;
         } else {
             this._columnNames.Clear();
             this._columnNames.Add(this._functionId);
             this._nCols = 1;
         }
+
         // decode min/avg/max values for the sequence
         if (this._nRows > 0) {
             if (this._isScal32) {
@@ -4340,6 +4477,7 @@ public class YDataStream
                 this._avgVal = this._decodeAvg(encoded[10] + (((encoded[11]) << (16))), this._nRows);
             }
         }
+
         return 0;
     }
 
@@ -4370,6 +4508,7 @@ public class YDataStream
                     dat.Add(this._decodeVal(udat[idx + 1]));
                     idx = idx + 4;
                 }
+
                 this._values.Add(new List<double>(dat));
             }
         } else {
@@ -4397,8 +4536,7 @@ public class YDataStream
     public virtual string _get_url()
     {
         string url;
-        url = "logger.json?id="+
-        this._functionId+"&run="+Convert.ToString(this._runNo)+"&utc="+Convert.ToString(this._utcStamp);
+        url = "logger.json?id=" + this._functionId + "&run=" + Convert.ToString(this._runNo) + "&utc=" + Convert.ToString(this._utcStamp);
         return url;
     }
 
@@ -4420,11 +4558,13 @@ public class YDataStream
                 val = YAPI._decimalToDouble(w);
             }
         }
+
         if (this._caltyp != 0) {
             if (this._calhdl != null) {
                 val = this._calhdl(val, this._caltyp, this._calpar, this._calraw, this._calref);
             }
         }
+
         return val;
     }
 
@@ -4441,11 +4581,13 @@ public class YDataStream
                 val = val / (count * this._decexp);
             }
         }
+
         if (this._caltyp != 0) {
             if (this._calhdl != null) {
                 val = this._calhdl(val, this._caltyp, this._calpar, this._calraw, this._calref);
             }
         }
+
         return val;
     }
 
@@ -4495,7 +4637,7 @@ public class YDataStream
      */
     public virtual int get_startTime()
     {
-        return (int)(this._utcStamp - Convert.ToUInt32((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds));
+        return (int) (this._utcStamp - Convert.ToUInt32((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds));
     }
 
     /**
@@ -4570,6 +4712,7 @@ public class YDataStream
         if ((this._nRows != 0) && this._isClosed) {
             return this._nRows;
         }
+
         this.loadStream();
         return this._nRows;
     }
@@ -4601,6 +4744,7 @@ public class YDataStream
         if (this._nCols != 0) {
             return this._nCols;
         }
+
         this.loadStream();
         return this._nCols;
     }
@@ -4636,6 +4780,7 @@ public class YDataStream
         if (this._columnNames.Count != 0) {
             return this._columnNames;
         }
+
         this.loadStream();
         return this._columnNames;
     }
@@ -4729,7 +4874,8 @@ public class YDataStream
         if (this._isClosed) {
             return this._duration;
         }
-        return (int)(Convert.ToUInt32((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds) - this._utcStamp);
+
+        return (int) (Convert.ToUInt32((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds) - this._utcStamp);
     }
 
     /**
@@ -4761,6 +4907,7 @@ public class YDataStream
         if ((this._values.Count == 0) || !(this._isClosed)) {
             this.loadStream();
         }
+
         return this._values;
     }
 
@@ -4797,12 +4944,15 @@ public class YDataStream
         if ((this._values.Count == 0) || !(this._isClosed)) {
             this.loadStream();
         }
+
         if (row >= this._values.Count) {
             return DATA_INVALID;
         }
+
         if (col >= this._values[row].Count) {
             return DATA_INVALID;
         }
+
         return this._values[row][col];
     }
 
@@ -4832,10 +4982,12 @@ public class YMeasure
     protected double _end = 0;
     protected double _minVal = 0;
     protected double _avgVal = 0;
+
     protected double _maxVal = 0;
+
     //--- (end of generated code: YMeasure definitions)
-    protected DateTime            _start_datetime;
-    protected DateTime            _end_datetime;
+    protected DateTime _start_datetime;
+    protected DateTime _end_datetime;
     private static DateTime _epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     public YMeasure(double start, double end, double minVal, double avgVal, double maxVal)
@@ -4852,8 +5004,7 @@ public class YMeasure
     }
 
     public YMeasure()
-    {
-    }
+    { }
 
     public DateTime get_startTimeUTC_asDateTime()
     {
@@ -4966,8 +5117,6 @@ public class YMeasure
     }
 
     //--- (end of generated code: YMeasure implementation)
-
-
 }
 
 //--- (generated code: YDataSet class start)
@@ -5013,6 +5162,7 @@ public class YDataSet
     protected List<YDataStream> _streams = new List<YDataStream>();
     protected YMeasure _summary;
     protected List<YMeasure> _preview = new List<YMeasure>();
+
     protected List<YMeasure> _measures = new List<YMeasure>();
     //--- (end of generated code: YDataSet definitions)
 
@@ -5021,12 +5171,12 @@ public class YDataSet
     {
         //--- (generated code: YDataSet attributes initialization)
         //--- (end of generated code: YDataSet attributes initialization)
-        this._parent     = parent;
+        this._parent = parent;
         this._functionId = functionId;
-        this._unit       = unit;
-        this._startTime  = startTime;
-        this._endTime    = endTime;
-        this._progress   = -1;
+        this._unit = unit;
+        this._startTime = startTime;
+        this._endTime = endTime;
+        this._progress = -1;
         this._summary = new YMeasure();
     }
 
@@ -5037,7 +5187,7 @@ public class YDataSet
         //--- (end of generated code: YDataSet attributes initialization)
         this._parent = parent;
         this._startTime = 0;
-        this._endTime   = 0;
+        this._endTime = 0;
         this._summary = new YMeasure();
     }
 
@@ -5070,78 +5220,64 @@ public class YDataSet
         this._unit = p.getString("unit");
         if (p.has("calib")) {
             this._calib = YAPI._decodeFloats(p.getString("calib"));
-            this._calib[0] = this._calib[0]/1000;
+            this._calib[0] = this._calib[0] / 1000;
         } else {
             this._calib = YAPI._decodeWords(p.getString("cal"));
         }
+
         arr = p.getYJSONArray("streams");
         this._streams = new List<YDataStream>();
         this._preview = new List<YMeasure>();
         this._measures = new List<YMeasure>();
-        for (int i = 0; i < arr.Length; i++)
-        {
+        for (int i = 0; i < arr.Length; i++) {
             stream = _parent._findDataStream(this, arr.getString(i));
             streamStartTime = stream.get_startTimeUTC() - stream.get_dataSamplesIntervalMs() / 1000;
             streamEndTime = stream.get_startTimeUTC() + stream.get_duration();
-            if (_startTime > 0 && streamEndTime <= _startTime)
-            {
+            if (_startTime > 0 && streamEndTime <= _startTime) {
                 // this stream is too early, drop it
-            }
-            else if (_endTime > 0 && stream.get_startTimeUTC() > this._endTime)
-            {
+            } else if (_endTime > 0 && stream.get_startTimeUTC() > this._endTime) {
                 // this stream is too late, drop it
-            }
-            else
-            {
+            } else {
                 _streams.Add(stream);
-                if (startTime > streamStartTime)
-                {
+                if (startTime > streamStartTime) {
                     startTime = streamStartTime;
                 }
-                if (endTime < streamEndTime)
-                {
+
+                if (endTime < streamEndTime) {
                     endTime = streamEndTime;
                 }
-                if (stream.isClosed() && stream.get_startTimeUTC() >= this._startTime &&
-                   (this._endTime == 0 || streamEndTime <= this._endTime))
-                {
+
+                if (stream.isClosed() && stream.get_startTimeUTC() >= this._startTime && (this._endTime == 0 || streamEndTime <= this._endTime)) {
                     if (summaryMinVal > stream.get_minValue()) {
                         summaryMinVal = stream.get_minValue();
                     }
+
                     if (summaryMaxVal < stream.get_maxValue()) {
                         summaryMaxVal = stream.get_maxValue();
                     }
+
                     summaryTotalAvg += stream.get_averageValue() * stream.get_duration();
                     summaryTotalTime += stream.get_duration();
 
-                    YMeasure rec = new YMeasure(
-                                        stream.get_startTimeUTC(),
-                                        streamEndTime,
-                                        stream.get_minValue(),
-                                        stream.get_averageValue(),
-                                        stream.get_maxValue());
+                    YMeasure rec = new YMeasure(stream.get_startTimeUTC(), streamEndTime, stream.get_minValue(), stream.get_averageValue(), stream.get_maxValue());
                     this._preview.Add(rec);
                 }
             }
         }
-        if ((this._streams.Count > 0) && (summaryTotalTime>0))
-        {
+
+        if ((this._streams.Count > 0) && (summaryTotalTime > 0)) {
             // update time boundaries with actual data
-            if (this._startTime < startTime)
-            {
+            if (this._startTime < startTime) {
                 this._startTime = startTime;
             }
-            if (this._endTime == 0 || this._endTime > endTime)
-            {
+
+            if (this._endTime == 0 || this._endTime > endTime) {
                 this._endTime = endTime;
             }
-            this._summary = new YMeasure(
-                                        _startTime,
-                                        _endTime,
-                                        summaryMinVal,
-                                        summaryTotalAvg / summaryTotalTime,
-                                        summaryMaxVal);
+
+            this._summary = new YMeasure(_startTime, _endTime, summaryMinVal, summaryTotalAvg / summaryTotalTime, summaryMaxVal);
         }
+
         this._progress = 0;
         return this.get_progress();
     }
@@ -5169,14 +5305,17 @@ public class YDataSet
         if (progress != this._progress) {
             return this._progress;
         }
+
         if (this._progress < 0) {
             strdata = YAPI.DefaultEncoding.GetString(data);
             if (strdata == "{}") {
                 this._parent._throw(YAPI.VERSION_MISMATCH, "device firmware is too old");
                 return YAPI.VERSION_MISMATCH;
             }
+
             return this._parse(strdata);
         }
+
         stream = this._streams[this._progress];
         stream._parseStream(data);
         dataRows = stream.get_dataRows();
@@ -5184,11 +5323,13 @@ public class YDataSet
         if (dataRows.Count == 0) {
             return this.get_progress();
         }
+
         tim = (double) stream.get_startTimeUTC();
         itv = stream.get_dataSamplesInterval();
         if (tim < itv) {
             tim = itv;
         }
+
         nCols = dataRows[0].Count;
         minCol = 0;
         if (nCols > 2) {
@@ -5196,6 +5337,7 @@ public class YDataSet
         } else {
             avgCol = 0;
         }
+
         if (nCols > 2) {
             maxCol = 2;
         } else {
@@ -5206,9 +5348,11 @@ public class YDataSet
             if ((tim >= this._startTime) && ((this._endTime == 0) || (tim <= this._endTime))) {
                 this._measures.Add(new YMeasure(tim - itv, tim, dataRows[ii][minCol], dataRows[ii][avgCol], dataRows[ii][maxCol]));
             }
+
             tim = tim + itv;
             tim = Math.Round(tim * 1000) / 1000.0;
         }
+
         return this.get_progress();
     }
 
@@ -5242,8 +5386,9 @@ public class YDataSet
         if (!(this._hardwareId == "")) {
             return this._hardwareId;
         }
+
         mo = this._parent.get_module();
-        this._hardwareId = ""+ mo.get_serialNumber()+"."+this.get_functionId();
+        this._hardwareId = "" + mo.get_serialNumber() + "." + this.get_functionId();
         return this._hardwareId;
     }
 
@@ -5355,10 +5500,12 @@ public class YDataSet
         if (this._progress < 0) {
             return 0;
         }
+
         // index not yet loaded
         if (this._progress >= this._streams.Count) {
             return 100;
         }
+
         return ((1 + (1 + this._progress) * 98) / ((1 + this._streams.Count)));
     }
 
@@ -5384,12 +5531,13 @@ public class YDataSet
         string url;
         YDataStream stream;
         if (this._progress < 0) {
-            url = "logger.json?id="+this._functionId;
+            url = "logger.json?id=" + this._functionId;
             if (this._startTime != 0) {
-                url = ""+url+"&from="+Convert.ToString(this._startTime);
+                url = "" + url + "&from=" + Convert.ToString(this._startTime);
             }
+
             if (this._endTime != 0) {
-                url = ""+url+"&to="+Convert.ToString(this._endTime);
+                url = "" + url + "&to=" + Convert.ToString(this._endTime);
             }
         } else {
             if (this._progress >= this._streams.Count) {
@@ -5399,6 +5547,7 @@ public class YDataSet
                 url = stream._get_url();
             }
         }
+
         return this.processMore(this._progress, this._parent._download(url));
     }
 
@@ -5505,18 +5654,22 @@ public class YDataSet
                 stream = this._streams[ii];
             }
         }
+
         if (stream == null) {
             return measures;
         }
+
         dataRows = stream.get_dataRows();
         if (dataRows.Count == 0) {
             return measures;
         }
+
         tim = (double) stream.get_startTimeUTC();
         itv = stream.get_dataSamplesInterval();
         if (tim < itv) {
             tim = itv;
         }
+
         nCols = dataRows[0].Count;
         minCol = 0;
         if (nCols > 2) {
@@ -5524,6 +5677,7 @@ public class YDataSet
         } else {
             avgCol = 0;
         }
+
         if (nCols > 2) {
             maxCol = 2;
         } else {
@@ -5534,8 +5688,10 @@ public class YDataSet
             if ((tim >= this._startTime) && ((this._endTime == 0) || (tim <= this._endTime))) {
                 measures.Add(new YMeasure(tim - itv, tim, dataRows[ii][minCol], dataRows[ii][avgCol], dataRows[ii][maxCol]));
             }
+
             tim = tim + itv;
         }
+
         return measures;
     }
 
@@ -5630,6 +5786,7 @@ public class YFunction
 //--- (end of generated code: YFunction class start)
     //--- (generated code: YFunction definitions)
     public delegate void ValueCallback(YFunction func, string value);
+
     public delegate void TimedReportCallback(YFunction func, YMeasure measure);
 
     public const string LOGICALNAME_INVALID = YAPI.INVALID_STRING;
@@ -5640,7 +5797,9 @@ public class YFunction
     protected ulong _cacheExpiration = 0;
     protected string _serial;
     protected string _funId;
+
     protected string _hwId;
+
     //--- (end of generated code: YFunction definitions)
     public static Dictionary<string, YFunction> _cache = new Dictionary<string, YFunction>();
     public static List<YFunction> _ValueCallbackList = new List<YFunction>();
@@ -5675,19 +5834,18 @@ public class YFunction
     {
         _lastErrorType = errType;
         _lastErrorMsg = errMsg;
-        if (!(YAPI.ExceptionsDisabled))
-        {
+        if (!(YAPI.ExceptionsDisabled)) {
             throw new YAPI_Exception(errType, "YoctoApi error : " + errMsg);
         }
     }
 
 
     // function cache methods
-    static protected YFunction  _FindFromCache(string classname, string func)
+    static protected YFunction _FindFromCache(string classname, string func)
     {
-         if(_cache.ContainsKey(classname + "_" + func))
+        if (_cache.ContainsKey(classname + "_" + func))
             return _cache[classname + "_" + func];
-         return null;
+        return null;
     }
 
     static protected void _AddToCache(string classname, string func, YFunction obj)
@@ -5703,32 +5861,24 @@ public class YFunction
 
     static protected void _UpdateValueCallbackList(YFunction func, Boolean add)
     {
-        if (add)
-        {
+        if (add) {
             func.isOnline();
-            if (!_ValueCallbackList.Contains(func))
-            {
+            if (!_ValueCallbackList.Contains(func)) {
                 _ValueCallbackList.Add(func);
             }
-        }
-        else
-        {
+        } else {
             _ValueCallbackList.Remove(func);
         }
     }
 
     static protected void _UpdateTimedReportCallbackList(YSensor func, Boolean add)
     {
-        if (add)
-        {
+        if (add) {
             func.isOnline();
-            if (!_TimedReportCallbackList.Contains(func))
-            {
+            if (!_TimedReportCallbackList.Contains(func)) {
                 _TimedReportCallbackList.Add(func);
             }
-        }
-        else
-        {
+        } else {
             _TimedReportCallbackList.Remove(func);
         }
     }
@@ -5741,24 +5891,21 @@ public class YFunction
         YFUN_DESCR tmp_fundescr;
 
         tmp_fundescr = YAPI.yapiGetFunction(_className, _func, ref errMsg);
-        if (YAPI.YISERR(tmp_fundescr))
-        {
+        if (YAPI.YISERR(tmp_fundescr)) {
             res = YAPI.yapiUpdateDeviceList(1, ref errMsg);
-            if (YAPI.YISERR(res))
-            {
+            if (YAPI.YISERR(res)) {
                 return res;
             }
 
             tmp_fundescr = YAPI.yapiGetFunction(_className, _func, ref errMsg);
-            if (YAPI.YISERR(tmp_fundescr))
-            {
+            if (YAPI.YISERR(tmp_fundescr)) {
                 return tmp_fundescr;
             }
         }
+
         _fundescr = fundescr = tmp_fundescr;
         return YAPI.SUCCESS;
     }
-
 
 
     // Return a pointer to our device caching object (may trigger a hub scan)
@@ -5771,16 +5918,14 @@ public class YFunction
 
         // Resolve function name
         res = _getDescriptor(ref fundescr, ref errMsg);
-        if ((YAPI.YISERR(res)))
-        {
+        if ((YAPI.YISERR(res))) {
             functionReturnValue = res;
             return functionReturnValue;
         }
 
         // Get device descriptor
         devdescr = YAPI.yapiGetDeviceByFunction(fundescr, ref errMsg);
-        if ((YAPI.YISERR(devdescr)))
-        {
+        if ((YAPI.YISERR(devdescr))) {
             return devdescr;
         }
 
@@ -5813,8 +5958,7 @@ public class YFunction
         int[] pdata = new int[1];
 
         res = _getDescriptor(ref fundescr, ref errmsg);
-        if ((YAPI.YISERR(res)))
-        {
+        if ((YAPI.YISERR(res))) {
             _throw(res, errmsg);
             functionReturnValue = res;
             return functionReturnValue;
@@ -5825,16 +5969,14 @@ public class YFunction
         res = YAPI.apiGetFunctionsByClass(_className, fundescr, p, maxsize, ref neededsize, ref errmsg);
         Marshal.Copy(p, pdata, 0, n_element);
         Marshal.FreeHGlobal(p);
-        if ((YAPI.YISERR(res)))
-        {
+        if ((YAPI.YISERR(res))) {
             _throw(res, errmsg);
             functionReturnValue = res;
             return functionReturnValue;
         }
 
         count = Convert.ToInt32(neededsize / Marshal.SizeOf(pdata[0]));
-        if (count == 0)
-        {
+        if (count == 0) {
             hwid = "";
             functionReturnValue = YAPI.SUCCESS;
             return functionReturnValue;
@@ -5842,8 +5984,7 @@ public class YFunction
 
         res = YAPI.yapiGetFunctionInfo(pdata[0], ref devdescr, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg);
 
-        if ((YAPI.YISERR(res)))
-        {
+        if ((YAPI.YISERR(res))) {
             _throw(res, errmsg);
             functionReturnValue = YAPI.SUCCESS;
             return functionReturnValue;
@@ -5860,30 +6001,28 @@ public class YFunction
         int i = 0;
         char c = '\0';
         string h = null;
-        for (i = 0; i < changeval.Length; i++)
-        {
+        for (i = 0; i < changeval.Length; i++) {
             c = changeval[i];
-            if (c <= ' ' || (c > 'z' && c != '~') || c == '"' || c == '%' || c == '&' ||
-                       c == '+' || c == '<' || c == '=' || c == '>' || c == '\\' || c == '^' || c == '`') {
+            if (c <= ' ' || (c > 'z' && c != '~') || c == '"' || c == '%' || c == '&' || c == '+' || c == '<' || c == '=' || c == '>' || c == '\\' || c == '^' || c == '`') {
                 int hh;
                 if ((c == 0xc2 || c == 0xc3) && (i + 1 < changeval.Length) && (changeval[i + 1] & 0xc0) == 0x80) {
                     // UTF8-encoded ISO-8859-1 character: translate to plain ISO-8859-1
                     hh = (c & 1) * 0x40;
                     i++;
-                    hh +=changeval[i];
+                    hh += changeval[i];
                 } else {
                     hh = c;
                 }
+
                 h = hh.ToString("X");
                 if ((h.Length < 2))
                     h = "0" + h;
                 espcaped += "%" + h;
-            }
-            else
-            {
-                espcaped +=c;
+            } else {
+                espcaped += c;
             }
         }
+
         return espcaped;
     }
 
@@ -5903,25 +6042,25 @@ public class YFunction
         // Resolve the function name
         res = _getDescriptor(ref fundesc, ref errmsg);
 
-        if ((YAPI.YISERR(res)))
-        {
+        if ((YAPI.YISERR(res))) {
             functionReturnValue = res;
             return functionReturnValue;
         }
+
         res = SafeNativeMethods._yapiGetFunctionInfoEx(fundesc, ref devdesc, null, funcid, null, null, null, errbuff);
-        if (YAPI.YISERR(res))
-        {
+        if (YAPI.YISERR(res)) {
             errmsg = errbuff.ToString();
             _throw(res, errmsg);
             functionReturnValue = res;
             return functionReturnValue;
         }
+
         request = "GET /api/" + funcid.ToString() + "/";
         uchangeval = "";
-        if (changeattr != "")
-        {
+        if (changeattr != "") {
             request = request + changeattr + "?" + changeattr + "=" + _escapeAttr(changeval);
         }
+
         request = request + uchangeval + "&. \r\n\r\n";
         functionReturnValue = YAPI.SUCCESS;
         return functionReturnValue;
@@ -5938,41 +6077,39 @@ public class YFunction
 
         //  Execute http request
         res = _buildSetRequest(attrname, newvalue, ref request, ref errmsg);
-        if (YAPI.YISERR(res))
-        {
+        if (YAPI.YISERR(res)) {
             _throw(res, errmsg);
             return res;
         }
 
         // Get device Object
         res = _getDevice(ref dev, ref errmsg);
-        if (YAPI.YISERR(res))
-        {
+        if (YAPI.YISERR(res)) {
             _throw(res, errmsg);
             return res;
         }
 
         res = dev.HTTPRequestAsync(request, ref errmsg);
-        if (YAPI.YISERR(res))
-        {
+        if (YAPI.YISERR(res)) {
             // make sure a device scan does not solve the issue
             res = YAPI.yapiUpdateDeviceList(1, ref errmsg);
-            if (YAPI.YISERR(res))
-            {
+            if (YAPI.YISERR(res)) {
                 _throw(res, errmsg);
                 return res;
             }
+
             res = dev.HTTPRequestAsync(request, ref errmsg);
-            if (YAPI.YISERR(res))
-            {
+            if (YAPI.YISERR(res)) {
                 _throw(res, errmsg);
                 return res;
             }
         }
+
         dev.clearCache(false);
         if (_cacheExpiration != 0) {
-           _cacheExpiration = YAPI.GetTickCount();
+            _cacheExpiration = YAPI.GetTickCount();
         }
+
         return YAPI.SUCCESS;
     }
 
@@ -5993,45 +6130,43 @@ public class YFunction
 
         // Resolve our reference to our device, load REST API
         res = _getDevice(ref dev, ref errmsg);
-        if (YAPI.YISERR(res))
-        {
+        if (YAPI.YISERR(res)) {
             _throw(res, errmsg);
             return new byte[0];
         }
+
         res = dev.HTTPRequest(request, ref buffer, ref errmsg);
-        if (YAPI.YISERR(res))
-        { // Check if an update of the device list does notb solve the issue
+        if (YAPI.YISERR(res)) {
+            // Check if an update of the device list does notb solve the issue
             res = YAPI.yapiUpdateDeviceList(1, ref errmsg);
-            if (YAPI.YISERR(res))
-            {
+            if (YAPI.YISERR(res)) {
                 _throw(res, errmsg);
                 return new byte[0];
             }
+
             res = dev.HTTPRequest(request, ref buffer, ref errmsg);
-            if (YAPI.YISERR(res))
-            {
+            if (YAPI.YISERR(res)) {
                 _throw(res, errmsg);
                 return new byte[0];
             }
         }
-        if (buffer.Length >= 4)
-        {
+
+        if (buffer.Length >= 4) {
             check = new byte[4];
             Buffer.BlockCopy(buffer, 0, check, 0, 4);
-            if (YAPI.DefaultEncoding.GetString(check) == "OK\r\n")
-            {
+            if (YAPI.DefaultEncoding.GetString(check) == "OK\r\n") {
                 return buffer;
             }
-            if (buffer.Length >= 17)
-            {
+
+            if (buffer.Length >= 17) {
                 check = new byte[17];
                 Buffer.BlockCopy(buffer, 0, check, 0, 17);
-                if (YAPI.DefaultEncoding.GetString(check) == "HTTP/1.1 200 OK\r\n")
-                {
+                if (YAPI.DefaultEncoding.GetString(check) == "HTTP/1.1 200 OK\r\n") {
                     return buffer;
                 }
             }
         }
+
         _throw(YAPI.IO_ERROR, "http request failed");
         return new byte[0];
     }
@@ -6044,16 +6179,16 @@ public class YFunction
         int found, body;
         request = "GET /" + path + " HTTP/1.1\r\n\r\n";
         buffer = _request(request);
-        for (found = 0; found < buffer.Length - 4; found++)
-        {
+        for (found = 0; found < buffer.Length - 4; found++) {
             if (buffer[found] == 13 && buffer[found + 1] == 10 && buffer[found + 2] == 13 && buffer[found + 3] == 10)
                 break;
         }
-        if(found >= buffer.Length - 4)
-        {
+
+        if (found >= buffer.Length - 4) {
             _throw(YAPI.IO_ERROR, "http request failed");
             return new byte[0];
         }
+
         body = found + 4;
         res = new byte[buffer.Length - body];
         Buffer.BlockCopy(buffer, body, res, 0, buffer.Length - body);
@@ -6078,49 +6213,41 @@ public class YFunction
         string bodystr, boundary;
         byte[] body, bb, header, footer, fullrequest, buffer;
 
-        bodystr = "Content-Disposition: form-data; name=\"" + path + "\"; filename=\"api\"\r\n" +
-                  "Content-Type: application/octet-stream\r\n" +
-                  "Content-Transfer-Encoding: binary\r\n\r\n";
+        bodystr = "Content-Disposition: form-data; name=\"" + path + "\"; filename=\"api\"\r\n" + "Content-Type: application/octet-stream\r\n" + "Content-Transfer-Encoding: binary\r\n\r\n";
         body = new byte[bodystr.Length + content.Length];
         Buffer.BlockCopy(YAPI.DefaultEncoding.GetBytes(bodystr), 0, body, 0, bodystr.Length);
         Buffer.BlockCopy(content, 0, body, bodystr.Length, content.Length);
 
         Random random = new Random();
         int pos, i;
-        do
-        {
-            boundary = "Zz" + ((int)random.Next(100000, 999999)).ToString() + "zZ";
+        do {
+            boundary = "Zz" + ((int) random.Next(100000, 999999)).ToString() + "zZ";
             bb = YAPI.DefaultEncoding.GetBytes(boundary);
             pos = 0;
-            while (pos <= body.Length - bb.Length)
-            {
+            while (pos <= body.Length - bb.Length) {
                 if (body[pos] == 90) // 'Z'
                 {
                     i = 1;
                     while (i < bb.Length && body[pos + i] == bb[i]) i++;
                     if (i >= bb.Length) break;
                     pos += i;
-                }
-                else pos++;
+                } else pos++;
             }
-        }
-        while (pos <= body.Length - bb.Length);
+        } while (pos <= body.Length - bb.Length);
 
-        header = YAPI.DefaultEncoding.GetBytes("POST /upload.html HTTP/1.1\r\n" +
-                                                "Content-Type: multipart/form-data, boundary=" + boundary + "\r\n" +
-                                                "\r\n--" + boundary + "\r\n");
+        header = YAPI.DefaultEncoding.GetBytes("POST /upload.html HTTP/1.1\r\n" + "Content-Type: multipart/form-data, boundary=" + boundary + "\r\n" + "\r\n--" + boundary + "\r\n");
         footer = YAPI.DefaultEncoding.GetBytes("\r\n--" + boundary + "--\r\n");
         fullrequest = new byte[header.Length + body.Length + footer.Length];
         Buffer.BlockCopy(header, 0, fullrequest, 0, header.Length);
         Buffer.BlockCopy(body, 0, fullrequest, header.Length, body.Length);
-        Buffer.BlockCopy(footer, 0, fullrequest, header.Length+body.Length, footer.Length);
+        Buffer.BlockCopy(footer, 0, fullrequest, header.Length + body.Length, footer.Length);
 
         buffer = _request(fullrequest);
-        if (buffer.Length == 0)
-        {
+        if (buffer.Length == 0) {
             _throw(YAPI.IO_ERROR, "http request failed");
             return YAPI.IO_ERROR;
         }
+
         return YAPI.SUCCESS;
     }
 
@@ -6128,8 +6255,8 @@ public class YFunction
     public YDataStream _findDataStream(YDataSet dataset, string def)
     {
         string key = dataset.get_functionId() + ":" + def;
-        if(_dataStreams.ContainsKey(key))
-            return (YDataStream)_dataStreams[key];
+        if (_dataStreams.ContainsKey(key))
+            return (YDataStream) _dataStreams[key];
 
         YDataStream newDataStream = new YDataStream(this, dataset, YAPI._decodeWords(def));
         _dataStreams.Add(key, newDataStream);
@@ -6154,12 +6281,11 @@ public class YFunction
 
     protected virtual void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.has("logicalName"))
-        {
+        if (json_val.has("logicalName")) {
             _logicalName = json_val.getString("logicalName");
         }
-        if (json_val.has("advertisedValue"))
-        {
+
+        if (json_val.has("advertisedValue")) {
             _advertisedValue = json_val.getString("advertisedValue");
         }
     }
@@ -6188,8 +6314,10 @@ public class YFunction
                     return LOGICALNAME_INVALID;
                 }
             }
+
             res = this._logicalName;
         }
+
         return res;
     }
 
@@ -6220,11 +6348,11 @@ public class YFunction
     public int set_logicalName(string newval)
     {
         string rest_val;
-        if (!YAPI.CheckLogicalName(newval))
-        {
+        if (!YAPI.CheckLogicalName(newval)) {
             _throw(YAPI.INVALID_ARGUMENT, "Invalid name :" + newval);
             return YAPI.INVALID_ARGUMENT;
         }
+
         lock (_thisLock) {
             rest_val = newval;
             return _setAttr("logicalName", rest_val);
@@ -6255,8 +6383,10 @@ public class YFunction
                     return ADVERTISEDVALUE_INVALID;
                 }
             }
+
             res = this._advertisedValue;
         }
+
         return res;
     }
 
@@ -6328,6 +6458,7 @@ public class YFunction
                 YFunction._AddToCache("Function", func, obj);
             }
         }
+
         return obj;
     }
 
@@ -6357,6 +6488,7 @@ public class YFunction
         } else {
             YFunction._UpdateValueCallbackList(this, false);
         }
+
         this._valueCallbackFunction = callback;
         // Immediately invoke value callback with current value
         if (callback != null && this.isOnline()) {
@@ -6365,6 +6497,7 @@ public class YFunction
                 this._invokeValueCallback(val);
             }
         }
+
         return 0;
     }
 
@@ -6372,8 +6505,8 @@ public class YFunction
     {
         if (this._valueCallbackFunction != null) {
             this._valueCallbackFunction(this, value);
-        } else {
-        }
+        } else { }
+
         return 0;
     }
 
@@ -6443,7 +6576,7 @@ public class YFunction
     {
         string url;
         byte[] attrVal;
-        url = "api/"+ this.get_functionId()+"/"+attrName;
+        url = "api/" + this.get_functionId() + "/" + attrName;
         attrVal = this._download(url);
         return YAPI.DefaultEncoding.GetString(attrVal);
     }
@@ -6512,9 +6645,7 @@ public class YFunction
     }
 
 
-
     //--- (end of generated code: YFunction functions)
-
 
 
     /**
@@ -6550,13 +6681,12 @@ public class YFunction
         string funcValue = "";
         lock (_thisLock) {
             fundescr = YAPI.yapiGetFunction(_className, _func, ref errmsg);
-            if ((!(YAPI.YISERR(fundescr))))
-            {
-                if ((!(YAPI.YISERR(YAPI.yapiGetFunctionInfo(fundescr, ref devdescr, ref serial, ref funcId, ref funcName, ref funcValue, ref errmsg)))))
-                {
+            if ((!(YAPI.YISERR(fundescr)))) {
+                if ((!(YAPI.YISERR(YAPI.yapiGetFunctionInfo(fundescr, ref devdescr, ref serial, ref funcId, ref funcName, ref funcValue, ref errmsg))))) {
                     return _className + "(" + _func + ")=" + serial + "." + funcId;
                 }
             }
+
             return _className + "(" + _func + ")=unresolved";
         }
     }
@@ -6582,7 +6712,6 @@ public class YFunction
 
     public string get_hardwareId()
     {
-
         YRETCODE retcode;
         YFUN_DESCR fundesc = 0;
         YDEV_DESCR devdesc = 0;
@@ -6595,15 +6724,13 @@ public class YFunction
         lock (_thisLock) {
             // Resolve the function name
             retcode = _getDescriptor(ref fundesc, ref errmsg);
-            if (YAPI.YISERR(retcode))
-            {
+            if (YAPI.YISERR(retcode)) {
                 _throw(retcode, errmsg);
                 return YAPI.HARDWAREID_INVALID;
             }
 
             retcode = YAPI.yapiGetFunctionInfo(fundesc, ref devdesc, ref snum, ref funcid, ref funcName, ref funcVal, ref errmsg);
-            if (YAPI.YISERR(retcode))
-            {
+            if (YAPI.YISERR(retcode)) {
                 _throw(retcode, errmsg);
                 return YAPI.HARDWAREID_INVALID;
             }
@@ -6633,7 +6760,6 @@ public class YFunction
 
     public string get_functionId()
     {
-
         YRETCODE retcode;
         YFUN_DESCR fundesc = 0;
         YDEV_DESCR devdesc = 0;
@@ -6646,15 +6772,13 @@ public class YFunction
         lock (_thisLock) {
             // Resolve the function name
             retcode = _getDescriptor(ref fundesc, ref errmsg);
-            if (YAPI.YISERR(retcode))
-            {
+            if (YAPI.YISERR(retcode)) {
                 _throw(retcode, errmsg);
                 return YAPI.FUNCTIONID_INVALID;
             }
 
             retcode = YAPI.yapiGetFunctionInfo(fundesc, ref devdesc, ref snum, ref funcid, ref funcName, ref funcVal, ref errmsg);
-            if (YAPI.YISERR(retcode))
-            {
+            if (YAPI.YISERR(retcode)) {
                 _throw(retcode, errmsg);
                 return YAPI.FUNCTIONID_INVALID;
             }
@@ -6664,8 +6788,7 @@ public class YFunction
     }
 
 
-    public string FriendlyName
-    {
+    public string FriendlyName {
         get { return this.get_friendlyName(); }
     }
 
@@ -6691,7 +6814,6 @@ public class YFunction
 
     public virtual string get_friendlyName()
     {
-
         YRETCODE retcode;
         YFUN_DESCR fundesc = 0;
         YDEV_DESCR devdesc = 0;
@@ -6707,49 +6829,41 @@ public class YFunction
         lock (_thisLock) {
             // Resolve the function name
             retcode = _getDescriptor(ref fundesc, ref errmsg);
-            if (YAPI.YISERR(retcode))
-            {
+            if (YAPI.YISERR(retcode)) {
                 _throw(retcode, errmsg);
                 return YAPI.FRIENDLYNAME_INVALID;
             }
 
             retcode = YAPI.yapiGetFunctionInfo(fundesc, ref devdesc, ref snum, ref funcid, ref funcName, ref dummy, ref errmsg);
-            if (YAPI.YISERR(retcode))
-            {
+            if (YAPI.YISERR(retcode)) {
                 _throw(retcode, errmsg);
                 return YAPI.FRIENDLYNAME_INVALID;
             }
 
             moddescr = YAPI.yapiGetFunction("Module", snum, ref errmsg);
-            if (YAPI.YISERR(moddescr))
-            {
+            if (YAPI.YISERR(moddescr)) {
                 _throw(retcode, errmsg);
                 return YAPI.FRIENDLYNAME_INVALID;
             }
 
             retcode = YAPI.yapiGetFunctionInfo(moddescr, ref devdesc, ref snum, ref dummy, ref mod_name, ref dummy, ref errmsg);
-            if (YAPI.YISERR(retcode))
-            {
+            if (YAPI.YISERR(retcode)) {
                 _throw(retcode, errmsg);
                 return YAPI.FRIENDLYNAME_INVALID;
             }
 
-            if (mod_name != "")
-            {
+            if (mod_name != "") {
                 friendly = mod_name + '.';
-            }
-            else
-            {
+            } else {
                 friendly = snum + '.';
             }
-            if (funcName != "")
-            {
+
+            if (funcName != "") {
                 friendly += funcName;
-            }
-            else
-            {
+            } else {
                 friendly += funcid;
             }
+
             return friendly;
         }
     }
@@ -6757,7 +6871,6 @@ public class YFunction
 
     public override string ToString()
     {
-
         return describe();
     }
 
@@ -6780,10 +6893,12 @@ public class YFunction
     {
         return _lastErrorType;
     }
+
     public YRETCODE errorType()
     {
         return _lastErrorType;
     }
+
     public YRETCODE errType()
     {
         return _lastErrorType;
@@ -6808,10 +6923,12 @@ public class YFunction
     {
         return _lastErrorMsg;
     }
+
     public string errorMessage()
     {
         return _lastErrorMsg;
     }
+
     public string errMessage()
     {
         return _lastErrorMsg;
@@ -6839,22 +6956,18 @@ public class YFunction
         string errmsg = "";
         YAPI.YJSONObject apires;
         lock (_thisLock) {
-
             //  A valid value in cache means that the device is online
-            if (_cacheExpiration > YAPI.GetTickCount())
-            {
+            if (_cacheExpiration > YAPI.GetTickCount()) {
                 return true;
             }
 
             // Check that the function is available, without throwing exceptions
-            if (YAPI.YISERR(_getDevice(ref dev, ref errmsg)))
-            {
+            if (YAPI.YISERR(_getDevice(ref dev, ref errmsg))) {
                 return false;
             }
 
             // Try to execute a function request to be positively sure that the device is ready
-            if (YAPI.YISERR(dev.requestAPI(out apires, ref errmsg)))
-            {
+            if (YAPI.YISERR(dev.requestAPI(out apires, ref errmsg))) {
                 return false;
             }
 
@@ -6865,9 +6978,7 @@ public class YFunction
     }
 
 
-
-
-    protected string  _json_get_key(byte[] data, string key)
+    protected string _json_get_key(byte[] data, string key)
     {
         YAPI.YJSONObject obj = new YAPI.YJSONObject(YAPI.DefaultEncoding.GetString(data));
         obj.parse();
@@ -6876,8 +6987,10 @@ public class YFunction
             if (val == null) {
                 val = obj.ToString();
             }
+
             return val;
         }
+
         throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "No key " + key + "in JSON struct");
     }
 
@@ -6891,6 +7004,7 @@ public class YFunction
             YAPI.YJSONContent o = array.get(i);
             list.Add(o.toJSON());
         }
+
         return list;
     }
 
@@ -6903,9 +7017,8 @@ public class YFunction
     }
 
 
-    private  string get_json_path_struct(YAPI.YJSONObject jsonObject, string[] paths, int ofs)
+    private string get_json_path_struct(YAPI.YJSONObject jsonObject, string[] paths, int ofs)
     {
-
         string key = paths[ofs];
         if (!jsonObject.has(key)) {
             return "";
@@ -6923,6 +7036,7 @@ public class YFunction
                 return get_json_path_struct(jsonObject.getYJSONObject(key), paths, ofs + 1);
             }
         }
+
         return "";
     }
 
@@ -6945,15 +7059,16 @@ public class YFunction
                 return get_json_path_struct(jsonArray.getYJSONObject(key), paths, ofs + 1);
             }
         }
+
         return "";
     }
+
     public string _get_json_path(string json, string path)
     {
-
         YAPI.YJSONObject jsonObject = null;
         jsonObject = new YAPI.YJSONObject(json);
         jsonObject.parse();
-        string[] split = path.Split(new char[] { '\\', '|' });
+        string[] split = path.Split(new char[] {'\\', '|'});
         return get_json_path_struct(jsonObject, split, 0);
     }
 
@@ -7030,13 +7145,13 @@ public class YFunction
             }
 
             devdesc = 0;
-            res = YAPI.yapiGetFunctionInfo(fundescr, ref devdesc, ref serial, ref funcId, ref funcName, ref funcVal,
-                ref errbuf);
+            res = YAPI.yapiGetFunctionInfo(fundescr, ref devdesc, ref serial, ref funcId, ref funcName, ref funcVal, ref errbuf);
             if (YAPI.YISERR(res)) {
                 _throw(res, errmsg);
                 functionReturnValue = res;
                 return functionReturnValue;
             }
+
             _cacheExpiration = YAPI.GetTickCount() + (ulong) msValidity;
             _serial = serial;
             _funId = funcId;
@@ -7044,8 +7159,7 @@ public class YFunction
 
             try {
                 node = apires.getYJSONObject(funcId);
-            }
-            catch (Exception) {
+            } catch (Exception) {
                 _throw(YAPI.IO_ERROR, "unexpected JSON structure: missing function " + funcId);
                 functionReturnValue = YAPI.IO_ERROR;
                 return functionReturnValue;
@@ -7078,13 +7192,12 @@ public class YFunction
         lock (_thisLock) {
             // Resolve our reference to our device, load REST API
             res = _getDevice(ref dev, ref errmsg);
-            if ((YAPI.YISERR(res)))
-            {
+            if ((YAPI.YISERR(res))) {
                 return;
             }
+
             dev.clearCache(false);
-            if (_cacheExpiration != 0)
-            {
+            if (_cacheExpiration != 0) {
                 _cacheExpiration = YAPI.GetTickCount();
             }
         }
@@ -7117,10 +7230,8 @@ public class YFunction
 
         lock (_thisLock) {
             fundescr = YAPI.yapiGetFunction(_className, _func, ref errmsg);
-            if (!YAPI.YISERR(fundescr))
-            {
-                if (!YAPI.YISERR(YAPI.yapiGetFunctionInfo(fundescr, ref devdescr, ref serial, ref funcId, ref funcName, ref funcValue, ref errmsg)))
-                {
+            if (!YAPI.YISERR(fundescr)) {
+                if (!YAPI.YISERR(YAPI.yapiGetFunctionInfo(fundescr, ref devdescr, ref serial, ref funcId, ref funcName, ref funcValue, ref errmsg))) {
                     return YModule.FindModule(serial + ".module");
                 }
             }
@@ -7134,6 +7245,7 @@ public class YFunction
     {
         return get_module();
     }
+
     /**
      * <summary>
      *   Returns a unique identifier of type <c>YFUN_DESCR</c> corresponding to the function.
@@ -7157,7 +7269,9 @@ public class YFunction
     }
 
     public YFUN_DESCR functionDescriptor()
-    { return get_functionDescriptor(); }
+    {
+        return get_functionDescriptor();
+    }
 
 
     /**
@@ -7181,8 +7295,11 @@ public class YFunction
             return _userData;
         }
     }
+
     public object userData()
-    { return get_userData(); }
+    {
+        return get_userData();
+    }
 
     /**
      * <summary>
@@ -7204,12 +7321,11 @@ public class YFunction
             _userData = data;
         }
     }
+
     public void setUserData(object data)
-    { set_userData(data); }
-
-
-
-
+    {
+        set_userData(data);
+    }
 }
 
 
@@ -7230,7 +7346,9 @@ public class YModule : YFunction
 //--- (end of generated code: YModule class start)
     //--- (generated code: YModule definitions)
     public delegate void LogCallback(YModule module, string logline);
+
     public new delegate void ValueCallback(YModule func, string value);
+
     public new delegate void TimedReportCallback(YModule func, YMeasure measure);
 
     public const string PRODUCTNAME_INVALID = YAPI.INVALID_STRING;
@@ -7263,11 +7381,11 @@ public class YModule : YFunction
     protected int _rebootCountdown = REBOOTCOUNTDOWN_INVALID;
     protected int _userVar = USERVAR_INVALID;
     protected ValueCallback _valueCallbackModule = null;
+
     protected LogCallback _logCallback = null;
     //--- (end of generated code: YModule definitions)
 
-    public YModule(string func)
-        : base(func)
+    public YModule(string func) : base(func)
     {
         _className = "Module";
         //--- (generated code: YModule attributes initialization)
@@ -7294,11 +7412,12 @@ public class YModule : YFunction
     {
         lock (_thisLock) {
             _logCallback = callback;
-            if (_logCallback ==null){
+            if (_logCallback == null) {
                 SafeNativeMethods._yapiStartStopDeviceLogCallback(new StringBuilder(_serialNumber), 0);
             } else {
                 SafeNativeMethods._yapiStartStopDeviceLogCallback(new StringBuilder(_serialNumber), 1);
             }
+
             return YAPI.SUCCESS;
         }
     }
@@ -7314,54 +7433,54 @@ public class YModule : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.has("productName"))
-        {
+        if (json_val.has("productName")) {
             _productName = json_val.getString("productName");
         }
-        if (json_val.has("serialNumber"))
-        {
+
+        if (json_val.has("serialNumber")) {
             _serialNumber = json_val.getString("serialNumber");
         }
-        if (json_val.has("productId"))
-        {
+
+        if (json_val.has("productId")) {
             _productId = json_val.getInt("productId");
         }
-        if (json_val.has("productRelease"))
-        {
+
+        if (json_val.has("productRelease")) {
             _productRelease = json_val.getInt("productRelease");
         }
-        if (json_val.has("firmwareRelease"))
-        {
+
+        if (json_val.has("firmwareRelease")) {
             _firmwareRelease = json_val.getString("firmwareRelease");
         }
-        if (json_val.has("persistentSettings"))
-        {
+
+        if (json_val.has("persistentSettings")) {
             _persistentSettings = json_val.getInt("persistentSettings");
         }
-        if (json_val.has("luminosity"))
-        {
+
+        if (json_val.has("luminosity")) {
             _luminosity = json_val.getInt("luminosity");
         }
-        if (json_val.has("beacon"))
-        {
+
+        if (json_val.has("beacon")) {
             _beacon = json_val.getInt("beacon") > 0 ? 1 : 0;
         }
-        if (json_val.has("upTime"))
-        {
+
+        if (json_val.has("upTime")) {
             _upTime = json_val.getLong("upTime");
         }
-        if (json_val.has("usbCurrent"))
-        {
+
+        if (json_val.has("usbCurrent")) {
             _usbCurrent = json_val.getInt("usbCurrent");
         }
-        if (json_val.has("rebootCountdown"))
-        {
+
+        if (json_val.has("rebootCountdown")) {
             _rebootCountdown = json_val.getInt("rebootCountdown");
         }
-        if (json_val.has("userVar"))
-        {
+
+        if (json_val.has("userVar")) {
             _userVar = json_val.getInt("userVar");
         }
+
         base._parseAttr(json_val);
     }
 
@@ -7389,8 +7508,10 @@ public class YModule : YFunction
                     return PRODUCTNAME_INVALID;
                 }
             }
+
             res = this._productName;
         }
+
         return res;
     }
 
@@ -7418,8 +7539,10 @@ public class YModule : YFunction
                     return SERIALNUMBER_INVALID;
                 }
             }
+
             res = this._serialNumber;
         }
+
         return res;
     }
 
@@ -7447,8 +7570,10 @@ public class YModule : YFunction
                     return PRODUCTID_INVALID;
                 }
             }
+
             res = this._productId;
         }
+
         return res;
     }
 
@@ -7476,8 +7601,10 @@ public class YModule : YFunction
                     return PRODUCTRELEASE_INVALID;
                 }
             }
+
             res = this._productRelease;
         }
+
         return res;
     }
 
@@ -7505,8 +7632,10 @@ public class YModule : YFunction
                     return FIRMWARERELEASE_INVALID;
                 }
             }
+
             res = this._firmwareRelease;
         }
+
         return res;
     }
 
@@ -7535,8 +7664,10 @@ public class YModule : YFunction
                     return PERSISTENTSETTINGS_INVALID;
                 }
             }
+
             res = this._persistentSettings;
         }
+
         return res;
     }
 
@@ -7573,8 +7704,10 @@ public class YModule : YFunction
                     return LUMINOSITY_INVALID;
                 }
             }
+
             res = this._luminosity;
         }
+
         return res;
     }
 
@@ -7635,8 +7768,10 @@ public class YModule : YFunction
                     return BEACON_INVALID;
                 }
             }
+
             res = this._beacon;
         }
+
         return res;
     }
 
@@ -7693,8 +7828,10 @@ public class YModule : YFunction
                     return UPTIME_INVALID;
                 }
             }
+
             res = this._upTime;
         }
+
         return res;
     }
 
@@ -7722,8 +7859,10 @@ public class YModule : YFunction
                     return USBCURRENT_INVALID;
                 }
             }
+
             res = this._usbCurrent;
         }
+
         return res;
     }
 
@@ -7753,8 +7892,10 @@ public class YModule : YFunction
                     return REBOOTCOUNTDOWN_INVALID;
                 }
             }
+
             res = this._rebootCountdown;
         }
+
         return res;
     }
 
@@ -7792,8 +7933,10 @@ public class YModule : YFunction
                     return USERVAR_INVALID;
                 }
             }
+
             res = this._userVar;
         }
+
         return res;
     }
 
@@ -7870,6 +8013,7 @@ public class YModule : YFunction
                 YFunction._AddToCache("Module", func, obj);
             }
         }
+
         return obj;
     }
 
@@ -7899,6 +8043,7 @@ public class YModule : YFunction
         } else {
             YFunction._UpdateValueCallbackList(this, false);
         }
+
         this._valueCallbackModule = callback;
         // Immediately invoke value callback with current value
         if (callback != null && this.isOnline()) {
@@ -7907,6 +8052,7 @@ public class YModule : YFunction
                 this._invokeValueCallback(val);
             }
         }
+
         return 0;
     }
 
@@ -7917,6 +8063,7 @@ public class YModule : YFunction
         } else {
             base._invokeValueCallback(value);
         }
+
         return 0;
     }
 
@@ -8040,12 +8187,14 @@ public class YModule : YFunction
         } else {
             release = 0;
         }
+
         //may throw an exception
         serial = this.get_serialNumber();
-        tmp_res = YFirmwareUpdate.CheckFirmware(serial,path, release);
+        tmp_res = YFirmwareUpdate.CheckFirmware(serial, path, release);
         if ((tmp_res).IndexOf("error:") == 0) {
             this._throw(YAPI.INVALID_ARGUMENT, tmp_res);
         }
+
         return tmp_res;
     }
 
@@ -8080,6 +8229,7 @@ public class YModule : YFunction
             this._throw(YAPI.IO_ERROR, "Unable to get device settings");
             settings = YAPI.DefaultEncoding.GetBytes("error:Unable to get device settings");
         }
+
         return new YFirmwareUpdate(serial, path, settings, force);
     }
 
@@ -8144,44 +8294,49 @@ public class YModule : YFunction
         if ((settings).Length == 0) {
             return settings;
         }
+
         ext_settings = ", \"extras\":[";
         templist = this.get_functionIds("Temperature");
         sep = "";
-        for (int ii = 0; ii <  templist.Count; ii++) {
+        for (int ii = 0; ii < templist.Count; ii++) {
             if (YAPI._atoi(this.get_firmwareRelease()) > 9000) {
-                url = "api/"+ templist[ii]+"/sensorType";
+                url = "api/" + templist[ii] + "/sensorType";
                 t_type = YAPI.DefaultEncoding.GetString(this._download(url));
                 if (t_type == "RES_NTC") {
-                    id = ( templist[ii]).Substring( 11, ( templist[ii]).Length - 11);
-                    temp_data_bin = this._download("extra.json?page="+id);
+                    id = (templist[ii]).Substring(11, (templist[ii]).Length - 11);
+                    temp_data_bin = this._download("extra.json?page=" + id);
                     if ((temp_data_bin).Length == 0) {
                         return temp_data_bin;
                     }
-                    item = ""+ sep+"{\"fid\":\""+  templist[ii]+"\", \"json\":"+YAPI.DefaultEncoding.GetString(temp_data_bin)+"}\n";
+
+                    item = "" + sep + "{\"fid\":\"" + templist[ii] + "\", \"json\":" + YAPI.DefaultEncoding.GetString(temp_data_bin) + "}\n";
                     ext_settings = ext_settings + item;
                     sep = ",";
                 }
             }
         }
+
         ext_settings = ext_settings + "],\n\"files\":[";
         if (this.hasFunction("files")) {
             json = this._download("files.json?a=dir&f=");
             if ((json).Length == 0) {
                 return json;
             }
+
             filelist = this._json_get_array(json);
             sep = "";
-            for (int ii = 0; ii <  filelist.Count; ii++) {
-                name = this._json_get_key(YAPI.DefaultEncoding.GetBytes( filelist[ii]), "name");
+            for (int ii = 0; ii < filelist.Count; ii++) {
+                name = this._json_get_key(YAPI.DefaultEncoding.GetBytes(filelist[ii]), "name");
                 if (((name).Length > 0) && !(name == "startupConf.json")) {
                     file_data_bin = this._download(this._escapeAttr(name));
                     file_data = YAPI._bytesToHexStr(file_data_bin, 0, file_data_bin.Length);
-                    item = ""+ sep+"{\"name\":\""+ name+"\", \"data\":\""+file_data+"\"}\n";
+                    item = "" + sep + "{\"name\":\"" + name + "\", \"data\":\"" + file_data + "\"}\n";
                     ext_settings = ext_settings + item;
                     sep = ",";
                 }
             }
         }
+
         res = YAPI.DefaultEncoding.GetBytes("{ \"api\":" + YAPI.DefaultEncoding.GetString(settings) + ext_settings + "]}");
         return res;
     }
@@ -8204,10 +8359,11 @@ public class YModule : YFunction
         while (ofs + 1 < size) {
             curr = values[ofs];
             currTemp = values[ofs + 1];
-            url = "api/"+  funcId+"/.json?command=m"+ curr+":"+currTemp;
+            url = "api/" + funcId + "/.json?command=m" + curr + ":" + currTemp;
             this._download(url);
             ofs = ofs + 2;
         }
+
         return YAPI.SUCCESS;
     }
 
@@ -8217,14 +8373,15 @@ public class YModule : YFunction
         string functionId;
         string data;
         extras = this._json_get_array(YAPI.DefaultEncoding.GetBytes(jsonExtra));
-        for (int ii = 0; ii <  extras.Count; ii++) {
-            functionId = this._get_json_path( extras[ii], "fid");
+        for (int ii = 0; ii < extras.Count; ii++) {
+            functionId = this._get_json_path(extras[ii], "fid");
             functionId = this._decode_json_string(functionId);
-            data = this._get_json_path( extras[ii], "json");
+            data = this._get_json_path(extras[ii], "json");
             if (this.hasFunction(functionId)) {
                 this.loadThermistorExtra(functionId, data);
             }
         }
+
         return YAPI.SUCCESS;
     }
 
@@ -8262,10 +8419,12 @@ public class YModule : YFunction
         if (json_api == "") {
             return this.set_allSettings(settings);
         }
+
         json_extra = this._get_json_path(json, "extras");
         if (!(json_extra == "")) {
             this.set_extraSettings(json_extra);
         }
+
         this.set_allSettings(YAPI.DefaultEncoding.GetBytes(json_api));
         if (this.hasFunction("files")) {
             List<string> files = new List<string>();
@@ -8275,17 +8434,22 @@ public class YModule : YFunction
             down = this._download("files.json?a=format");
             res = this._get_json_path(YAPI.DefaultEncoding.GetString(down), "res");
             res = this._decode_json_string(res);
-            if (!(res == "ok")) { this._throw( YAPI.IO_ERROR, "format failed"); return YAPI.IO_ERROR; }
+            if (!(res == "ok")) {
+                this._throw(YAPI.IO_ERROR, "format failed");
+                return YAPI.IO_ERROR;
+            }
+
             json_files = this._get_json_path(json, "files");
             files = this._json_get_array(YAPI.DefaultEncoding.GetBytes(json_files));
-            for (int ii = 0; ii <  files.Count; ii++) {
-                name = this._get_json_path( files[ii], "name");
+            for (int ii = 0; ii < files.Count; ii++) {
+                name = this._get_json_path(files[ii], "name");
                 name = this._decode_json_string(name);
-                data = this._get_json_path( files[ii], "data");
+                data = this._get_json_path(files[ii], "data");
                 data = this._decode_json_string(data);
                 this._upload(name, YAPI._hexStrToBin(data));
             }
         }
+
         return YAPI.SUCCESS;
     }
 
@@ -8312,15 +8476,17 @@ public class YModule : YFunction
         int i;
         string fid;
 
-        count  = this.functionCount();
+        count = this.functionCount();
         i = 0;
         while (i < count) {
-            fid  = this.functionId(i);
+            fid = this.functionId(i);
             if (fid == funcId) {
                 return true;
             }
+
             i = i + 1;
         }
+
         return false;
     }
 
@@ -8358,8 +8524,10 @@ public class YModule : YFunction
                     res.Add(this.functionId(i));
                 }
             }
+
             i = i + 1;
         }
+
         return res;
     }
 
@@ -8381,6 +8549,7 @@ public class YModule : YFunction
             jsonflat = "error:" + errmsg.ToString();
             return YAPI.DefaultEncoding.GetBytes(jsonflat);
         }
+
         if (fullsize <= 1024) {
             jsonflat = smallbuff.ToString();
         } else {
@@ -8394,8 +8563,10 @@ public class YModule : YFunction
             } else {
                 jsonflat = bigbuff.ToString();
             }
+
             bigbuff = null;
         }
+
         return YAPI.DefaultEncoding.GetBytes(jsonflat);
     }
 
@@ -8404,6 +8575,7 @@ public class YModule : YFunction
         if (cparams == "0,") {
             return 3;
         }
+
         if ((cparams).IndexOf(",") >= 0) {
             if ((cparams).IndexOf(" ") > 0) {
                 return 3;
@@ -8411,9 +8583,11 @@ public class YModule : YFunction
                 return 1;
             }
         }
+
         if (cparams == "" || cparams == "0") {
             return 1;
         }
+
         if (((cparams).Length < 2) || ((cparams).IndexOf(".") >= 0)) {
             return 0;
         } else {
@@ -8426,19 +8600,23 @@ public class YModule : YFunction
         if (unit_name == "g" || unit_name == "gauss" || unit_name == "W") {
             return 1000;
         }
+
         if (unit_name == "C") {
             if (sensorType == "") {
                 return 16;
             }
+
             if (YAPI._atoi(sensorType) < 8) {
                 return 16;
             } else {
                 return 100;
             }
         }
+
         if (unit_name == "m" || unit_name == "deg") {
             return 10;
         }
+
         return 1;
     }
 
@@ -8447,6 +8625,7 @@ public class YModule : YFunction
         if (unit_name == "% RH" || unit_name == "mbar" || unit_name == "lx") {
             return 0;
         }
+
         return 32767;
     }
 
@@ -8495,6 +8674,7 @@ public class YModule : YFunction
                 }
             }
         }
+
         calibData.Clear();
         calibType = 0;
         if (paramVer < 3) {
@@ -8509,11 +8689,13 @@ public class YModule : YFunction
                     paramScale = words[1];
                     paramOffset = words[0];
                 }
+
                 if ((words.Count >= 3) && (words[2] > 0)) {
                     maxSize = 3 + 2 * ((words[2]) % (10));
                     if (maxSize > words.Count) {
                         maxSize = words.Count;
                     }
+
                     i = 3;
                     while (i < maxSize) {
                         calibData.Add((double) words[i]);
@@ -8526,14 +8708,17 @@ public class YModule : YFunction
                     for (int ii = 0; ii < words_str.Count; ii++) {
                         words.Add(YAPI._atoi(words_str[ii]));
                     }
+
                     if (param == "" || (words[0] > 10)) {
                         paramScale = 0;
                     }
+
                     if ((words.Count > 0) && (words[0] > 0)) {
                         maxSize = 1 + 2 * ((words[0]) % (10));
                         if (maxSize > words.Count) {
                             maxSize = words.Count;
                         }
+
                         i = 1;
                         while (i < maxSize) {
                             calibData.Add((double) words[i]);
@@ -8552,6 +8737,7 @@ public class YModule : YFunction
                     }
                 }
             }
+
             i = 0;
             while (i < calibData.Count) {
                 if (paramScale > 0) {
@@ -8561,6 +8747,7 @@ public class YModule : YFunction
                     // floating-point decoding
                     calibData[i] = YAPI._decimalToDouble((int) Math.Round(calibData[i]));
                 }
+
                 i = i + 1;
             }
         } else {
@@ -8570,12 +8757,14 @@ public class YModule : YFunction
             if (calibType >= 30) {
                 calibType = calibType - 30;
             }
+
             i = 1;
             while (i < iCalib.Count) {
                 calibData.Add(iCalib[i] / 1000.0);
                 i = i + 1;
             }
         }
+
         if (funVer >= 3) {
             // Encode parameters in new format
             if (calibData.Count == 0) {
@@ -8589,9 +8778,11 @@ public class YModule : YFunction
                     } else {
                         param = param + " ";
                     }
+
                     param = param + ((int) Math.Round(calibData[i] * 1000.0 / 1000.0)).ToString();
                     i = i + 1;
                 }
+
                 param = param + ",";
             }
         } else {
@@ -8606,6 +8797,7 @@ public class YModule : YFunction
                     } else {
                         wordVal = calibData[i] * funScale + funOffset;
                     }
+
                     param = param + "," + (Math.Round(wordVal)).ToString();
                     i = i + 1;
                 }
@@ -8616,6 +8808,7 @@ public class YModule : YFunction
                 }
             }
         }
+
         return param;
     }
 
@@ -8679,6 +8872,7 @@ public class YModule : YFunction
         if (!(tmp == "")) {
             settings = YAPI.DefaultEncoding.GetBytes(tmp);
         }
+
         oldval = "";
         newval = "";
         old_json_flat = this._flattenJsonStruct(settings);
@@ -8692,9 +8886,10 @@ public class YModule : YFunction
                 this._throw(YAPI.INVALID_ARGUMENT, "Invalid settings");
                 return YAPI.INVALID_ARGUMENT;
             }
-            jpath = (each_str).Substring( 0, eqpos);
+
+            jpath = (each_str).Substring(0, eqpos);
             eqpos = eqpos + 1;
-            value = (each_str).Substring( eqpos, leng - eqpos);
+            value = (each_str).Substring(eqpos, leng - eqpos);
             old_jpath.Add(jpath);
             old_jpath_len.Add((jpath).Length);
             old_val_arr.Add(value);
@@ -8713,13 +8908,15 @@ public class YModule : YFunction
                 this._throw(YAPI.INVALID_ARGUMENT, "Invalid settings");
                 return YAPI.INVALID_ARGUMENT;
             }
-            jpath = (each_str).Substring( 0, eqpos);
+
+            jpath = (each_str).Substring(0, eqpos);
             eqpos = eqpos + 1;
-            value = (each_str).Substring( eqpos, leng - eqpos);
+            value = (each_str).Substring(eqpos, leng - eqpos);
             new_jpath.Add(jpath);
             new_jpath_len.Add((jpath).Length);
             new_val_arr.Add(value);
         }
+
         i = 0;
         while (i < new_jpath.Count) {
             njpath = new_jpath[i];
@@ -8728,121 +8925,159 @@ public class YModule : YFunction
             if ((cpos < 0) || (leng == 0)) {
                 continue;
             }
-            fun = (njpath).Substring( 0, cpos);
+
+            fun = (njpath).Substring(0, cpos);
             cpos = cpos + 1;
-            attr = (njpath).Substring( cpos, leng - cpos);
+            attr = (njpath).Substring(cpos, leng - cpos);
             do_update = true;
             if (fun == "services") {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "firmwareRelease")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "usbCurrent")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "upTime")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "persistentSettings")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "adminPassword")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "userPassword")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "rebootCountdown")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "advertisedValue")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "poeCurrent")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "readiness")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "ipAddress")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "subnetMask")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "router")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "linkQuality")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "ssid")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "channel")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "security")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "message")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "currentValue")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "currentRawValue")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "currentRunIndex")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "pulseTimer")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "lastTimePressed")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "lastTimeReleased")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "filesCount")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "freeSpace")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "timeUTC")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "rtcTime")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "unixTime")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "dateTime")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "rawValue")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "lastMsg")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "delayedPulseTimer")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "rxCount")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "txCount")) {
                 do_update = false;
             }
+
             if ((do_update) && (attr == "msgCount")) {
                 do_update = false;
             }
+
             if (do_update) {
                 do_update = false;
                 newval = new_val_arr[i];
@@ -8856,9 +9091,11 @@ public class YModule : YFunction
                             do_update = true;
                         }
                     }
+
                     j = j + 1;
                 }
             }
+
             if (do_update) {
                 if (attr == "calibrationParam") {
                     old_calib = "";
@@ -8872,8 +9109,10 @@ public class YModule : YFunction
                             found = true;
                             old_calib = old_val_arr[j];
                         }
+
                         j = j + 1;
                     }
+
                     tmp = fun + "/unit";
                     j = 0;
                     found = false;
@@ -8882,8 +9121,10 @@ public class YModule : YFunction
                             found = true;
                             unit_name = new_val_arr[j];
                         }
+
                         j = j + 1;
                     }
+
                     tmp = fun + "/sensorType";
                     j = 0;
                     found = false;
@@ -8892,8 +9133,10 @@ public class YModule : YFunction
                             found = true;
                             sensorType = new_val_arr[j];
                         }
+
                         j = j + 1;
                     }
+
                     newval = this.calibConvert(old_calib, new_val_arr[i], unit_name, sensorType);
                     url = "api/" + fun + ".json?" + attr + "=" + this._escapeAttr(newval);
                     this._download(url);
@@ -8906,11 +9149,14 @@ public class YModule : YFunction
                     }
                 }
             }
+
             i = i + 1;
         }
+
         for (int ii = 0; ii < restoreLast.Count; ii++) {
             this._download(restoreLast[ii]);
         }
+
         this.clearCache();
         return YAPI.SUCCESS;
     }
@@ -9033,6 +9279,7 @@ public class YModule : YFunction
         if (yapi_res < 0) {
             return subdevices;
         }
+
         if (fullsize <= 1024) {
             subdevice_list = smallbuff.ToString();
         } else {
@@ -9045,11 +9292,14 @@ public class YModule : YFunction
             } else {
                 subdevice_list = bigbuff.ToString();
             }
+
             bigbuff = null;
         }
+
         if (!(subdevice_list == "")) {
             subdevices = new List<string>(subdevice_list.Split(new Char[] {','}));
         }
+
         return subdevices;
     }
 
@@ -9080,6 +9330,7 @@ public class YModule : YFunction
         if (yapi_res < 0) {
             return "";
         }
+
         return hubserial.ToString();
     }
 
@@ -9110,6 +9361,7 @@ public class YModule : YFunction
         if (yapi_res < 0) {
             return "";
         }
+
         return path.ToString();
     }
 
@@ -9158,7 +9410,6 @@ public class YModule : YFunction
 
     public override string get_friendlyName()
     {
-
         YRETCODE retcode;
         YFUN_DESCR fundesc = 0;
         YDEV_DESCR devdesc = 0;
@@ -9171,23 +9422,21 @@ public class YModule : YFunction
         lock (_thisLock) {
             // Resolve the function name
             retcode = _getDescriptor(ref fundesc, ref errmsg);
-            if (YAPI.YISERR(retcode))
-            {
+            if (YAPI.YISERR(retcode)) {
                 _throw(retcode, errmsg);
                 return YAPI.FRIENDLYNAME_INVALID;
             }
 
             retcode = YAPI.yapiGetFunctionInfo(fundesc, ref devdesc, ref snum, ref funcid, ref funcName, ref dummy, ref errmsg);
-            if (YAPI.YISERR(retcode))
-            {
+            if (YAPI.YISERR(retcode)) {
                 _throw(retcode, errmsg);
                 return YAPI.FRIENDLYNAME_INVALID;
             }
 
-            if (funcName != "")
-            {
+            if (funcName != "") {
                 return funcName;
             }
+
             return snum;
         }
     }
@@ -9213,19 +9462,16 @@ public class YModule : YFunction
 
         // retrieve device object
         res = _getDevice(ref dev, ref errmsg);
-        if ((YAPI.YISERR(res)))
-        {
+        if ((YAPI.YISERR(res))) {
             _throw(res, errmsg);
             functionReturnValue = res;
             return functionReturnValue;
         }
 
 
-
         // get reference to all functions from the device
         res = dev.getFunctions(ref functions, ref errmsg);
-        if ((YAPI.YISERR(res)))
-        {
+        if ((YAPI.YISERR(res))) {
             functionReturnValue = res;
             return functionReturnValue;
         }
@@ -9234,8 +9480,7 @@ public class YModule : YFunction
         fundescr = Convert.ToInt32(functions[idx]);
 
         res = YAPI.yapiGetFunctionInfoEx(fundescr, ref devdescr, ref serial, ref funcId, ref baseType, ref funcName, ref funcVal, ref errmsg);
-        if ((YAPI.YISERR(res)))
-        {
+        if ((YAPI.YISERR(res))) {
             functionReturnValue = res;
             return functionReturnValue;
         }
@@ -9265,15 +9510,13 @@ public class YModule : YFunction
         int res;
         lock (_thisLock) {
             res = _getDevice(ref dev, ref errmsg);
-            if ((YAPI.YISERR(res)))
-            {
+            if ((YAPI.YISERR(res))) {
                 _throw(res, errmsg);
                 return res;
             }
 
             res = dev.getFunctions(ref functions, ref errmsg);
-            if ((YAPI.YISERR(res)))
-            {
+            if ((YAPI.YISERR(res))) {
                 functions = null;
                 _throw(res, errmsg);
                 return res;
@@ -9310,11 +9553,11 @@ public class YModule : YFunction
         int res = 0;
         lock (_thisLock) {
             res = _getFunction(functionIndex, ref serial, ref funcId, ref baseType, ref funcName, ref funcVal, ref errmsg);
-            if ((YAPI.YISERR(res)))
-            {
+            if ((YAPI.YISERR(res))) {
                 _throw(res, errmsg);
                 return YAPI.INVALID_STRING;
             }
+
             return funcId;
         }
     }
@@ -9346,21 +9589,20 @@ public class YModule : YFunction
         int res = 0;
         lock (_thisLock) {
             res = _getFunction(functionIndex, ref serial, ref funcId, ref baseType, ref funcName, ref funcVal, ref errmsg);
-            if ((YAPI.YISERR(res)))
-            {
+            if ((YAPI.YISERR(res))) {
                 _throw(res, errmsg);
                 return YAPI.INVALID_STRING;
             }
+
             char first = funcId[0];
             int i;
-            for (i = 1; i < funcId.Length; i++)
-            {
-                if (!Char.IsLetter(funcId[i]))
-                {
+            for (i = 1; i < funcId.Length; i++) {
+                if (!Char.IsLetter(funcId[i])) {
                     break;
                 }
             }
-            return Char.ToUpper(first)+ funcId.Substring(1, i - 1);
+
+            return Char.ToUpper(first) + funcId.Substring(1, i - 1);
         }
     }
 
@@ -9393,11 +9635,11 @@ public class YModule : YFunction
         int res = 0;
         lock (_thisLock) {
             res = _getFunction(functionIndex, ref serial, ref funcId, ref baseType, ref funcName, ref funcVal, ref errmsg);
-            if ((YAPI.YISERR(res)))
-            {
+            if ((YAPI.YISERR(res))) {
                 _throw(res, errmsg);
                 return YAPI.INVALID_STRING;
             }
+
             return baseType;
         }
     }
@@ -9430,8 +9672,7 @@ public class YModule : YFunction
         int res = 0;
         lock (_thisLock) {
             res = _getFunction(functionIndex, ref serial, ref funcId, ref baseType, ref funcName, ref funcVal, ref errmsg);
-            if ((YAPI.YISERR(res)))
-            {
+            if ((YAPI.YISERR(res))) {
                 _throw(res, errmsg);
                 return YAPI.INVALID_STRING;
             }
@@ -9467,11 +9708,11 @@ public class YModule : YFunction
         int res = 0;
         lock (_thisLock) {
             res = _getFunction(functionIndex, ref serial, ref funcId, ref baseType, ref funcName, ref funcVal, ref errmsg);
-            if ((YAPI.YISERR(res)))
-            {
+            if ((YAPI.YISERR(res))) {
                 _throw(res, errmsg);
                 return YAPI.INVALID_STRING;
             }
+
             return funcVal;
         }
     }
@@ -9521,10 +9762,8 @@ public class YModule : YFunction
     }
 
 
-
     //--- (end of generated code: YModule functions)
 }
-
 
 
 //--- (generated code: YSensor class start)
@@ -9551,6 +9790,7 @@ public class YSensor : YFunction
 //--- (end of generated code: YSensor class start)
     //--- (generated code: YSensor definitions)
     public new delegate void ValueCallback(YSensor func, string value);
+
     public new delegate void TimedReportCallback(YSensor func, YMeasure measure);
 
     public const string UNIT_INVALID = YAPI.INVALID_STRING;
@@ -9592,11 +9832,11 @@ public class YSensor : YFunction
     protected List<int> _calpar = new List<int>();
     protected List<double> _calraw = new List<double>();
     protected List<double> _calref = new List<double>();
+
     protected YAPI.yCalibrationHandler _calhdl = null;
     //--- (end of generated code: YSensor definitions)
 
-    public YSensor(string func)
-        : base(func)
+    public YSensor(string func) : base(func)
     {
         _className = "Sensor";
         //--- (generated code: YSensor attributes initialization)
@@ -9608,50 +9848,50 @@ public class YSensor : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.has("unit"))
-        {
+        if (json_val.has("unit")) {
             _unit = json_val.getString("unit");
         }
-        if (json_val.has("currentValue"))
-        {
+
+        if (json_val.has("currentValue")) {
             _currentValue = Math.Round(json_val.getDouble("currentValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.has("lowestValue"))
-        {
+
+        if (json_val.has("lowestValue")) {
             _lowestValue = Math.Round(json_val.getDouble("lowestValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.has("highestValue"))
-        {
+
+        if (json_val.has("highestValue")) {
             _highestValue = Math.Round(json_val.getDouble("highestValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.has("currentRawValue"))
-        {
+
+        if (json_val.has("currentRawValue")) {
             _currentRawValue = Math.Round(json_val.getDouble("currentRawValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.has("logFrequency"))
-        {
+
+        if (json_val.has("logFrequency")) {
             _logFrequency = json_val.getString("logFrequency");
         }
-        if (json_val.has("reportFrequency"))
-        {
+
+        if (json_val.has("reportFrequency")) {
             _reportFrequency = json_val.getString("reportFrequency");
         }
-        if (json_val.has("advMode"))
-        {
+
+        if (json_val.has("advMode")) {
             _advMode = json_val.getInt("advMode");
         }
-        if (json_val.has("calibrationParam"))
-        {
+
+        if (json_val.has("calibrationParam")) {
             _calibrationParam = json_val.getString("calibrationParam");
         }
-        if (json_val.has("resolution"))
-        {
+
+        if (json_val.has("resolution")) {
             _resolution = Math.Round(json_val.getDouble("resolution") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.has("sensorState"))
-        {
+
+        if (json_val.has("sensorState")) {
             _sensorState = json_val.getInt("sensorState");
         }
+
         base._parseAttr(json_val);
     }
 
@@ -9679,8 +9919,10 @@ public class YSensor : YFunction
                     return UNIT_INVALID;
                 }
             }
+
             res = this._unit;
         }
+
         return res;
     }
 
@@ -9709,13 +9951,16 @@ public class YSensor : YFunction
                     return CURRENTVALUE_INVALID;
                 }
             }
+
             res = this._applyCalibration(this._currentRawValue);
             if (res == CURRENTVALUE_INVALID) {
                 res = this._currentValue;
             }
+
             res = res * this._iresol;
             res = Math.Round(res) / this._iresol;
         }
+
         return res;
     }
 
@@ -9723,6 +9968,8 @@ public class YSensor : YFunction
      * <summary>
      *   Changes the recorded minimal value observed.
      * <para>
+     *   Can be used to reset the value returned
+     *   by get_lowestValue().
      * </para>
      * <para>
      * </para>
@@ -9752,6 +9999,7 @@ public class YSensor : YFunction
      * <summary>
      *   Returns the minimal value observed for the measure since the device was started.
      * <para>
+     *   Can be reset to an arbitrary value thanks to set_lowestValue().
      * </para>
      * <para>
      * </para>
@@ -9772,9 +10020,11 @@ public class YSensor : YFunction
                     return LOWESTVALUE_INVALID;
                 }
             }
+
             res = this._lowestValue * this._iresol;
             res = Math.Round(res) / this._iresol;
         }
+
         return res;
     }
 
@@ -9782,6 +10032,8 @@ public class YSensor : YFunction
      * <summary>
      *   Changes the recorded maximal value observed.
      * <para>
+     *   Can be used to reset the value returned
+     *   by get_lowestValue().
      * </para>
      * <para>
      * </para>
@@ -9811,6 +10063,7 @@ public class YSensor : YFunction
      * <summary>
      *   Returns the maximal value observed for the measure since the device was started.
      * <para>
+     *   Can be reset to an arbitrary value thanks to set_highestValue().
      * </para>
      * <para>
      * </para>
@@ -9831,9 +10084,11 @@ public class YSensor : YFunction
                     return HIGHESTVALUE_INVALID;
                 }
             }
+
             res = this._highestValue * this._iresol;
             res = Math.Round(res) / this._iresol;
         }
+
         return res;
     }
 
@@ -9862,8 +10117,10 @@ public class YSensor : YFunction
                     return CURRENTRAWVALUE_INVALID;
                 }
             }
+
             res = this._currentRawValue;
         }
+
         return res;
     }
 
@@ -9893,8 +10150,10 @@ public class YSensor : YFunction
                     return LOGFREQUENCY_INVALID;
                 }
             }
+
             res = this._logFrequency;
         }
+
         return res;
     }
 
@@ -9957,8 +10216,10 @@ public class YSensor : YFunction
                     return REPORTFREQUENCY_INVALID;
                 }
             }
+
             res = this._reportFrequency;
         }
+
         return res;
     }
 
@@ -10021,8 +10282,10 @@ public class YSensor : YFunction
                     return ADVMODE_INVALID;
                 }
             }
+
             res = this._advMode;
         }
+
         return res;
     }
 
@@ -10066,8 +10329,10 @@ public class YSensor : YFunction
                     return CALIBRATIONPARAM_INVALID;
                 }
             }
+
             res = this._calibrationParam;
         }
+
         return res;
     }
 
@@ -10137,8 +10402,10 @@ public class YSensor : YFunction
                     return RESOLUTION_INVALID;
                 }
             }
+
             res = this._resolution;
         }
+
         return res;
     }
 
@@ -10168,8 +10435,10 @@ public class YSensor : YFunction
                     return SENSORSTATE_INVALID;
                 }
             }
+
             res = this._sensorState;
         }
+
         return res;
     }
 
@@ -10232,6 +10501,7 @@ public class YSensor : YFunction
                 YFunction._AddToCache("Sensor", func, obj);
             }
         }
+
         return obj;
     }
 
@@ -10261,6 +10531,7 @@ public class YSensor : YFunction
         } else {
             YFunction._UpdateValueCallbackList(this, false);
         }
+
         this._valueCallbackSensor = callback;
         // Immediately invoke value callback with current value
         if (callback != null && this.isOnline()) {
@@ -10269,6 +10540,7 @@ public class YSensor : YFunction
                 this._invokeValueCallback(val);
             }
         }
+
         return 0;
     }
 
@@ -10279,6 +10551,7 @@ public class YSensor : YFunction
         } else {
             base._invokeValueCallback(value);
         }
+
         return 0;
     }
 
@@ -10304,11 +10577,13 @@ public class YSensor : YFunction
             this._iresol = 10000;
             this._resolution = 0.0001;
         }
+
         // Old format: supported when there is no calibration
         if (this._calibrationParam == "" || this._calibrationParam == "0") {
             this._caltyp = 0;
             return 0;
         }
+
         if ((this._calibrationParam).IndexOf(",") >= 0) {
             // Plain text format
             iCalib = YAPI._decodeFloats(this._calibrationParam);
@@ -10319,6 +10594,7 @@ public class YSensor : YFunction
                     this._caltyp = -1;
                     return 0;
                 }
+
                 this._calhdl = YAPI._getCalibrationHandler(this._caltyp);
                 if (!(this._calhdl != null)) {
                     // Unknown calibration type: calibrated value will be provided by the device
@@ -10326,6 +10602,7 @@ public class YSensor : YFunction
                     return 0;
                 }
             }
+
             // New 32bit text format
             this._isScal = true;
             this._isScal32 = true;
@@ -10338,6 +10615,7 @@ public class YSensor : YFunction
                 this._calpar.Add(iCalib[position]);
                 position = position + 1;
             }
+
             this._calraw.Clear();
             this._calref.Clear();
             position = 1;
@@ -10358,6 +10636,7 @@ public class YSensor : YFunction
                 this._caltyp = -1;
                 return 0;
             }
+
             // Save variable format (scale for scalar, or decimal exponent)
             this._isScal = (iCalib[1] > 0);
             if (this._isScal) {
@@ -10365,6 +10644,7 @@ public class YSensor : YFunction
                 if (this._offset > 32767) {
                     this._offset = this._offset - 65536;
                 }
+
                 this._scale = iCalib[1];
                 this._decexp = 0;
             } else {
@@ -10377,11 +10657,13 @@ public class YSensor : YFunction
                     position = position - 1;
                 }
             }
+
             // Shortcut when there is no calibration parameter
             if (iCalib.Count == 2) {
                 this._caltyp = 0;
                 return 0;
             }
+
             this._caltyp = iCalib[2];
             this._calhdl = YAPI._getCalibrationHandler(this._caltyp);
             // parse calibration points
@@ -10394,10 +10676,12 @@ public class YSensor : YFunction
                     maxpos = 5;
                 }
             }
+
             maxpos = 3 + 2 * maxpos;
             if (maxpos > iCalib.Count) {
                 maxpos = iCalib.Count;
             }
+
             this._calpar.Clear();
             this._calraw.Clear();
             this._calref.Clear();
@@ -10418,9 +10702,11 @@ public class YSensor : YFunction
                     this._calraw.Add(YAPI._decimalToDouble(iRaw));
                     this._calref.Add(YAPI._decimalToDouble(iRef));
                 }
+
                 position = position + 2;
             }
         }
+
         return 0;
     }
 
@@ -10444,9 +10730,11 @@ public class YSensor : YFunction
         if (!(this.isOnline())) {
             return false;
         }
+
         if (!(this._sensorState == 0)) {
             return false;
         }
+
         return true;
     }
 
@@ -10477,8 +10765,9 @@ public class YSensor : YFunction
         if (serial == YAPI.INVALID_STRING) {
             return null;
         }
+
         hwid = serial + ".dataLogger";
-        logger  = YDataLogger.FindDataLogger(hwid);
+        logger = YDataLogger.FindDataLogger(hwid);
         return logger;
     }
 
@@ -10500,7 +10789,11 @@ public class YSensor : YFunction
         byte[] res;
 
         res = this._download("api/dataLogger/recording?recording=1");
-        if (!((res).Length>0)) { this._throw( YAPI.IO_ERROR, "unable to start datalogger"); return YAPI.IO_ERROR; }
+        if (!((res).Length > 0)) {
+            this._throw(YAPI.IO_ERROR, "unable to start datalogger");
+            return YAPI.IO_ERROR;
+        }
+
         return YAPI.SUCCESS;
     }
 
@@ -10519,7 +10812,11 @@ public class YSensor : YFunction
         byte[] res;
 
         res = this._download("api/dataLogger/recording?recording=0");
-        if (!((res).Length>0)) { this._throw( YAPI.IO_ERROR, "unable to stop datalogger"); return YAPI.IO_ERROR; }
+        if (!((res).Length > 0)) {
+            this._throw(YAPI.IO_ERROR, "unable to stop datalogger");
+            return YAPI.IO_ERROR;
+        }
+
         return YAPI.SUCCESS;
     }
 
@@ -10598,6 +10895,7 @@ public class YSensor : YFunction
         } else {
             YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
+
         this._timedReportCallbackSensor = callback;
         return 0;
     }
@@ -10606,8 +10904,8 @@ public class YSensor : YFunction
     {
         if (this._timedReportCallbackSensor != null) {
             this._timedReportCallbackSensor(this, value);
-        } else {
-        }
+        } else { }
+
         return 0;
     }
 
@@ -10654,6 +10952,7 @@ public class YSensor : YFunction
             rest_val = this._encodeCalibrationPoints(rawValues, refValues);
             res = this._setAttr("calibrationParam", rest_val);
         }
+
         return res;
     }
 
@@ -10692,19 +10991,23 @@ public class YSensor : YFunction
                     return YAPI.DEVICE_NOT_FOUND;
                 }
             }
+
             if (this._caltyp < 0) {
                 this._throw(YAPI.NOT_SUPPORTED, "Calibration parameters format mismatch. Please upgrade your library or firmware.");
                 return YAPI.NOT_SUPPORTED;
             }
+
             rawValues.Clear();
             refValues.Clear();
             for (int ii = 0; ii < this._calraw.Count; ii++) {
                 rawValues.Add(this._calraw[ii]);
             }
+
             for (int ii = 0; ii < this._calref.Count; ii++) {
                 refValues.Add(this._calref[ii]);
             }
         }
+
         return YAPI.SUCCESS;
     }
 
@@ -10720,52 +11023,57 @@ public class YSensor : YFunction
             this._throw(YAPI.INVALID_ARGUMENT, "Invalid calibration parameters (size mismatch)");
             return YAPI.INVALID_STRING;
         }
+
         // Shortcut when building empty calibration parameters
         if (npt == 0) {
             return "0";
         }
+
         // Load function parameters if not yet loaded
         if (this._scale == 0) {
             if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return YAPI.INVALID_STRING;
             }
         }
+
         // Detect old firmware
         if ((this._caltyp < 0) || (this._scale < 0)) {
             this._throw(YAPI.NOT_SUPPORTED, "Calibration parameters format mismatch. Please upgrade your library or firmware.");
             return "0";
         }
+
         if (this._isScal32) {
             // 32-bit fixed-point encoding
-            res = ""+Convert.ToString(YAPI.YOCTO_CALIB_TYPE_OFS);
+            res = "" + Convert.ToString(YAPI.YOCTO_CALIB_TYPE_OFS);
             idx = 0;
             while (idx < npt) {
-                res = ""+ res+","+YAPI._floatToStr( rawValues[idx])+","+YAPI._floatToStr(refValues[idx]);
+                res = "" + res + "," + YAPI._floatToStr(rawValues[idx]) + "," + YAPI._floatToStr(refValues[idx]);
                 idx = idx + 1;
             }
         } else {
             if (this._isScal) {
                 // 16-bit fixed-point encoding
-                res = ""+Convert.ToString(npt);
+                res = "" + Convert.ToString(npt);
                 idx = 0;
                 while (idx < npt) {
                     iRaw = (int) Math.Round(rawValues[idx] * this._scale + this._offset);
                     iRef = (int) Math.Round(refValues[idx] * this._scale + this._offset);
-                    res = ""+ res+","+Convert.ToString( iRaw)+","+Convert.ToString(iRef);
+                    res = "" + res + "," + Convert.ToString(iRaw) + "," + Convert.ToString(iRef);
                     idx = idx + 1;
                 }
             } else {
                 // 16-bit floating-point decimal encoding
-                res = ""+Convert.ToString(10 + npt);
+                res = "" + Convert.ToString(10 + npt);
                 idx = 0;
                 while (idx < npt) {
                     iRaw = (int) YAPI._doubleToDecimal(rawValues[idx]);
                     iRef = (int) YAPI._doubleToDecimal(refValues[idx]);
-                    res = ""+ res+","+Convert.ToString( iRaw)+","+Convert.ToString(iRef);
+                    res = "" + res + "," + Convert.ToString(iRaw) + "," + Convert.ToString(iRef);
                     idx = idx + 1;
                 }
             }
         }
+
         return res;
     }
 
@@ -10774,15 +11082,19 @@ public class YSensor : YFunction
         if (rawValue == CURRENTVALUE_INVALID) {
             return CURRENTVALUE_INVALID;
         }
+
         if (this._caltyp == 0) {
             return rawValue;
         }
+
         if (this._caltyp < 0) {
             return CURRENTVALUE_INVALID;
         }
+
         if (!(this._calhdl != null)) {
             return CURRENTVALUE_INVALID;
         }
+
         return this._calhdl(rawValue, this._caltyp, this._calpar, this._calraw, this._calref);
     }
 
@@ -10807,6 +11119,7 @@ public class YSensor : YFunction
         if (startTime == 0) {
             startTime = endTime;
         }
+
         if (report[0] == 2) {
             // 32bit timed report format
             if (report.Count <= 5) {
@@ -10821,15 +11134,18 @@ public class YSensor : YFunction
                     poww = poww * 0x100;
                     i = i + 1;
                 }
+
                 if (((byteVal) & (0x80)) != 0) {
                     avgRaw = avgRaw - poww;
                 }
+
                 avgVal = avgRaw / 1000.0;
                 if (this._caltyp != 0) {
                     if (this._calhdl != null) {
                         avgVal = this._calhdl(avgVal, this._caltyp, this._calpar, this._calraw, this._calref);
                     }
                 }
+
                 minVal = avgVal;
                 maxVal = avgVal;
             } else {
@@ -10846,9 +11162,11 @@ public class YSensor : YFunction
                     i = i + 1;
                     sublen = sublen - 1;
                 }
+
                 if (((byteVal) & (0x80)) != 0) {
                     avgRaw = avgRaw - poww;
                 }
+
                 sublen = 1 + ((((report[1]) >> (2))) & (3));
                 poww = 1;
                 difRaw = 0;
@@ -10859,6 +11177,7 @@ public class YSensor : YFunction
                     i = i + 1;
                     sublen = sublen - 1;
                 }
+
                 minRaw = avgRaw - difRaw;
                 sublen = 1 + ((((report[1]) >> (4))) & (3));
                 poww = 1;
@@ -10870,6 +11189,7 @@ public class YSensor : YFunction
                     i = i + 1;
                     sublen = sublen - 1;
                 }
+
                 maxRaw = avgRaw + difRaw;
                 avgVal = avgRaw / 1000.0;
                 minVal = minRaw / 1000.0;
@@ -10896,14 +11216,17 @@ public class YSensor : YFunction
                     poww = poww * 0x100;
                     i = i + 1;
                 }
+
                 if (this._isScal) {
                     avgVal = this._decodeVal(avgRaw);
                 } else {
                     if (((byteVal) & (0x80)) != 0) {
                         avgRaw = avgRaw - poww;
                     }
+
                     avgVal = this._decodeAvg(avgRaw);
                 }
+
                 minVal = avgVal;
                 maxVal = avgVal;
             } else {
@@ -10917,11 +11240,13 @@ public class YSensor : YFunction
                 } else {
                     avgRaw = avgRaw - 0x1000000 * (0x100 - byteVal);
                 }
+
                 minVal = this._decodeVal(minRaw);
                 avgVal = this._decodeAvg(avgRaw);
                 maxVal = this._decodeVal(maxRaw);
             }
         }
+
         return new YMeasure(startTime, endTime, minVal, avgVal, maxVal);
     }
 
@@ -10934,11 +11259,13 @@ public class YSensor : YFunction
         } else {
             val = YAPI._decimalToDouble(w);
         }
+
         if (this._caltyp != 0) {
             if (this._calhdl != null) {
                 val = this._calhdl(val, this._caltyp, this._calpar, this._calraw, this._calref);
             }
         }
+
         return val;
     }
 
@@ -10951,11 +11278,13 @@ public class YSensor : YFunction
         } else {
             val = val / this._decexp;
         }
+
         if (this._caltyp != 0) {
             if (this._calhdl != null) {
                 val = this._calhdl(val, this._caltyp, this._calpar, this._calraw, this._calref);
             }
         }
+
         return val;
     }
 
@@ -11028,11 +11357,8 @@ public class YSensor : YFunction
     }
 
 
-
     //--- (end of generated code: YSensor functions)
 }
-
-
 
 
 /**
@@ -11052,15 +11378,14 @@ public class YOldDataStream : YDataStream
     protected int _timeStamp;
     protected int _interval;
 
-    public YOldDataStream(YDataLogger parent, int run, int stamp, UInt32 utc, int itv)
-    : base(parent)
+    public YOldDataStream(YDataLogger parent, int run, int stamp, UInt32 utc, int itv) : base(parent)
     {
         this._dataLogger = parent;
         this._runNo = run;
         this._timeStamp = stamp;
         this._utcStamp = utc;
         this._interval = itv;
-        this._samplesPerHour = (int)(3600 / _interval);
+        this._samplesPerHour = (int) (3600 / _interval);
         this._isClosed = true;
         this._minVal = DATA_INVALID;
         this._avgVal = DATA_INVALID;
@@ -11089,7 +11414,7 @@ public class YOldDataStream : YDataStream
      */
     public new int get_startTime()
     {
-        return (int)this._timeStamp;
+        return (int) this._timeStamp;
     }
 
     /**
@@ -11114,13 +11439,13 @@ public class YOldDataStream : YDataStream
      */
     public new int get_dataSamplesInterval()
     {
-        return (int)this._interval;
+        return (int) this._interval;
     }
 
     public new int loadStream()
     {
         YAPI.YJSONContent raw_json;
-        YAPI.YJSONObject  json;
+        YAPI.YJSONObject json;
         int res = 0;
         List<int> coldiv = new List<int>();
         List<int> coltype = new List<int>();
@@ -11138,52 +11463,58 @@ public class YOldDataStream : YDataStream
         int j = 0;
 
         res = _dataLogger.getData(_runNo, _timeStamp, out raw_json);
-        if ((res != YAPI.SUCCESS))
-        {
+        if ((res != YAPI.SUCCESS)) {
             return res;
         }
 
         _nRows = 0;
         _nCols = 0;
         _columnNames.Clear();
-        _values = new List< List<double> >();
+        _values = new List<List<double>>();
         json = (YAPI.YJSONObject) raw_json;
 
 
         if (json.has("time")) {
             _timeStamp = json.getInt("time");
         }
+
         if (json.has("UTC")) {
             _utcStamp = json.getLong("UTC");
         }
-         if (json.has("interval")) {
+
+        if (json.has("interval")) {
             _interval = json.getInt("interval");
         }
+
         if (json.has("nRows")) {
             _nRows = json.getInt("nRows");
         }
+
         if (json.has("keys")) {
             YAPI.YJSONArray jsonkeys = json.getYJSONArray("keys");
             _nCols = jsonkeys.Length;
-            for (j = 0; j < _nCols ; j++) {
+            for (j = 0; j < _nCols; j++) {
                 _columnNames.Add(jsonkeys.getString(j));
             }
         }
-         if (json.has("div")) {
+
+        if (json.has("div")) {
             YAPI.YJSONArray arr = json.getYJSONArray("div");
             _nCols = arr.Length;
-            for (j = 0; j < _nCols ; j++) {
+            for (j = 0; j < _nCols; j++) {
                 coldiv.Add(arr.getInt(j));
             }
         }
-         if (json.has("type")) {
+
+        if (json.has("type")) {
             YAPI.YJSONArray arr = json.getYJSONArray("type");
             _nCols = arr.Length;
             for (j = 0; j < _nCols; j++) {
                 coltype.Add(arr.getInt(j));
             }
         }
-         if (json.has("scal")) {
+
+        if (json.has("scal")) {
             YAPI.YJSONArray arr = json.getYJSONArray("type");
             _nCols = arr.Length;
             for (j = 0; j < _nCols; j++) {
@@ -11193,54 +11524,57 @@ public class YOldDataStream : YDataStream
                 else
                     colofs.Add(0);
             }
-
         }
-         if (json.has("cal")) {
+
+        if (json.has("cal")) {
             //fixme no calibration
         }
+
         if (json.has("data")) {
             if (colscl.Count <= 0) {
                 for (j = 0; j <= _nCols - 1; j++) {
-                    colscl.Add(1.0/coldiv[j]);
+                    colscl.Add(1.0 / coldiv[j]);
                     if (coltype[j] != 0)
                         colofs.Add(-32767);
                     else
                         colofs.Add(0);
                 }
             }
+
             udat.Clear();
             string data = null;
             try {
                 data = json.getString("data");
                 udat = YAPI._decodeWords(data);
-            }
-            catch (Exception ) {}
-            if (data==null) {
+            } catch (Exception) { }
+
+            if (data == null) {
                 YAPI.YJSONArray jsonData = json.getYJSONArray("data");
                 for (j = 0; j < jsonData.Length; j++) {
                     int tmp = (int) (jsonData.getInt(j));
                     udat.Add(tmp);
                 }
             }
+
             _values = new List<List<double>>();
             List<double> dat = new List<double>();
             foreach (int uval in udat) {
                 double value;
                 if (coltype[x] < 2) {
-                    value = (uval + colofs[x])*colscl[x];
-                }
-                else {
+                    value = (uval + colofs[x]) * colscl[x];
+                } else {
                     value = YAPI._decimalToDouble(uval - 32767);
                 }
+
                 if (caltyp[x] > 0 && calhdl[x] != null) {
                     YAPI.yCalibrationHandler handler = calhdl[x];
                     if (caltyp[x] <= 10) {
-                        value = handler((uval + colofs[x])/coldiv[x], caltyp[x], calpar[x], calraw[x], calref[x]);
-                    }
-                    else if (caltyp[x] > 20) {
+                        value = handler((uval + colofs[x]) / coldiv[x], caltyp[x], calpar[x], calraw[x], calref[x]);
+                    } else if (caltyp[x] > 20) {
                         value = handler(value, caltyp[x], calpar[x], calraw[x], calref[x]);
                     }
                 }
+
                 dat.Add(value);
                 x++;
                 if (x == _nCols) {
@@ -11250,12 +11584,10 @@ public class YOldDataStream : YDataStream
                 }
             }
         }
+
         return YAPI.SUCCESS;
     }
-
-
 }
-
 
 
 //--- (generated code: YDataLogger class start)
@@ -11276,8 +11608,10 @@ public class YDataLogger : YFunction
 //--- (end of generated code: YDataLogger class start)
 
     public const double Y_DATA_INVALID = YAPI.INVALID_DOUBLE;
+
     //--- (generated code: YDataLogger definitions)
     public new delegate void ValueCallback(YDataLogger func, string value);
+
     public new delegate void TimedReportCallback(YDataLogger func, YMeasure measure);
 
     public const int CURRENTRUNINDEX_INVALID = YAPI.INVALID_UINT;
@@ -11301,12 +11635,13 @@ public class YDataLogger : YFunction
     protected int _autoStart = AUTOSTART_INVALID;
     protected int _beaconDriven = BEACONDRIVEN_INVALID;
     protected int _clearHistory = CLEARHISTORY_INVALID;
+
     protected ValueCallback _valueCallbackDataLogger = null;
+
     //--- (end of generated code: YDataLogger definitions)
     protected string _dataLoggerURL = "";
 
-    public YDataLogger(string func)
-        : base(func)
+    public YDataLogger(string func) : base(func)
     {
         _className = "DataLogger";
         //--- (generated code: YDataLogger attributes initialization)
@@ -11317,30 +11652,30 @@ public class YDataLogger : YFunction
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.has("currentRunIndex"))
-        {
+        if (json_val.has("currentRunIndex")) {
             _currentRunIndex = json_val.getInt("currentRunIndex");
         }
-        if (json_val.has("timeUTC"))
-        {
+
+        if (json_val.has("timeUTC")) {
             _timeUTC = json_val.getLong("timeUTC");
         }
-        if (json_val.has("recording"))
-        {
+
+        if (json_val.has("recording")) {
             _recording = json_val.getInt("recording");
         }
-        if (json_val.has("autoStart"))
-        {
+
+        if (json_val.has("autoStart")) {
             _autoStart = json_val.getInt("autoStart") > 0 ? 1 : 0;
         }
-        if (json_val.has("beaconDriven"))
-        {
+
+        if (json_val.has("beaconDriven")) {
             _beaconDriven = json_val.getInt("beaconDriven") > 0 ? 1 : 0;
         }
-        if (json_val.has("clearHistory"))
-        {
+
+        if (json_val.has("clearHistory")) {
             _clearHistory = json_val.getInt("clearHistory") > 0 ? 1 : 0;
         }
+
         base._parseAttr(json_val);
     }
 
@@ -11370,8 +11705,10 @@ public class YDataLogger : YFunction
                     return CURRENTRUNINDEX_INVALID;
                 }
             }
+
             res = this._currentRunIndex;
         }
+
         return res;
     }
 
@@ -11399,8 +11736,10 @@ public class YDataLogger : YFunction
                     return TIMEUTC_INVALID;
                 }
             }
+
             res = this._timeUTC;
         }
+
         return res;
     }
 
@@ -11458,8 +11797,10 @@ public class YDataLogger : YFunction
                     return RECORDING_INVALID;
                 }
             }
+
             res = this._recording;
         }
+
         return res;
     }
 
@@ -11519,8 +11860,10 @@ public class YDataLogger : YFunction
                     return AUTOSTART_INVALID;
                 }
             }
+
             res = this._autoStart;
         }
+
         return res;
     }
 
@@ -11581,8 +11924,10 @@ public class YDataLogger : YFunction
                     return BEACONDRIVEN_INVALID;
                 }
             }
+
             res = this._beaconDriven;
         }
+
         return res;
     }
 
@@ -11627,8 +11972,10 @@ public class YDataLogger : YFunction
                     return CLEARHISTORY_INVALID;
                 }
             }
+
             res = this._clearHistory;
         }
+
         return res;
     }
 
@@ -11700,6 +12047,7 @@ public class YDataLogger : YFunction
                 YFunction._AddToCache("DataLogger", func, obj);
             }
         }
+
         return obj;
     }
 
@@ -11729,6 +12077,7 @@ public class YDataLogger : YFunction
         } else {
             YFunction._UpdateValueCallbackList(this, false);
         }
+
         this._valueCallbackDataLogger = callback;
         // Immediately invoke value callback with current value
         if (callback != null && this.isOnline()) {
@@ -11737,6 +12086,7 @@ public class YDataLogger : YFunction
                 this._invokeValueCallback(val);
             }
         }
+
         return 0;
     }
 
@@ -11747,6 +12097,7 @@ public class YDataLogger : YFunction
         } else {
             base._invokeValueCallback(value);
         }
+
         return 0;
     }
 
@@ -11808,6 +12159,7 @@ public class YDataLogger : YFunction
             dataset._parse(dslist[ii]);
             res.Add(dataset);
         }
+
         return res;
     }
 
@@ -11836,7 +12188,6 @@ public class YDataLogger : YFunction
     //--- (end of generated code: YDataLogger implementation)
 
 
-
     public int getData(long runIdx, long timeIdx, out YAPI.YJSONContent jsondata)
     {
         YAPI.YDevice dev = null;
@@ -11850,36 +12201,29 @@ public class YDataLogger : YFunction
 
         // Resolve our reference to our device, load REST API
         res = _getDevice(ref dev, ref errmsg);
-        if (YAPI.YISERR(res))
-        {
+        if (YAPI.YISERR(res)) {
             _throw(res, errmsg);
             jsondata = null;
             return res;
         }
 
-        if (timeIdx > 0)
-        {
+        if (timeIdx > 0) {
             query = "GET " + _dataLoggerURL + "?run=" + runIdx.ToString() + "&time=" + timeIdx.ToString() + " HTTP/1.1\r\n\r\n";
-        }
-        else
-        {
+        } else {
             query = "GET " + _dataLoggerURL + " HTTP/1.1\r\n\r\n";
         }
 
         res = dev.HTTPRequest(query, out buffer, ref errmsg);
-        if (YAPI.YISERR(res))
-        {
+        if (YAPI.YISERR(res)) {
             res = YAPI.UpdateDeviceList(ref errmsg);
-            if (YAPI.YISERR(res))
-            {
+            if (YAPI.YISERR(res)) {
                 _throw(res, errmsg);
                 jsondata = null;
                 return res;
             }
 
             res = dev.HTTPRequest("GET " + _dataLoggerURL + " HTTP/1.1\r\n\r\n", out buffer, ref errmsg);
-            if (YAPI.YISERR(res))
-            {
+            if (YAPI.YISERR(res)) {
                 _throw(res, errmsg);
                 jsondata = null;
                 return res;
@@ -11897,6 +12241,7 @@ public class YDataLogger : YFunction
             jsondata = null;
             return YAPI.IO_ERROR;
         }
+
         try {
             jsondata = YAPI.YJSONContent.ParseJson(buffer, http_headerlen, buffer.Length);
         } catch (Exception E) {
@@ -11905,36 +12250,37 @@ public class YDataLogger : YFunction
             jsondata = null;
             return YAPI.IO_ERROR;
         }
+
         return YAPI.SUCCESS;
     }
 
-   /**
-    * <summary>
-    *   Builds a list of all data streams hold by the data logger (legacy method).
-    * <para>
-    *   The caller must pass by reference an empty array to hold YDataStream
-    *   objects, and the function fills it with objects describing available
-    *   data sequences.
-    * </para>
-    * <para>
-    *   This is the old way to retrieve data from the DataLogger.
-    *   For new applications, you should rather use <c>get_dataSets()</c>
-    *   method, or call directly <c>get_recordedData()</c> on the
-    *   sensor object.
-    * </para>
-    * <para>
-    * </para>
-    * </summary>
-    * <param name="v">
-    *   an array of YDataStream objects to be filled in
-    * </param>
-    * <returns>
-    *   <c>YAPI.SUCCESS</c> if the call succeeds.
-    * </returns>
-    * <para>
-    *   On failure, throws an exception or returns a negative error code.
-    * </para>
-    */
+    /**
+     * <summary>
+     *   Builds a list of all data streams hold by the data logger (legacy method).
+     * <para>
+     *   The caller must pass by reference an empty array to hold YDataStream
+     *   objects, and the function fills it with objects describing available
+     *   data sequences.
+     * </para>
+     * <para>
+     *   This is the old way to retrieve data from the DataLogger.
+     *   For new applications, you should rather use <c>get_dataSets()</c>
+     *   method, or call directly <c>get_recordedData()</c> on the
+     *   sensor object.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="v">
+     *   an array of YDataStream objects to be filled in
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
     public int get_dataStreams(List<YDataStream> v)
     {
         YAPI.YJSONContent raw_json;
@@ -11944,10 +12290,10 @@ public class YDataLogger : YFunction
 
         v.Clear();
         res = getData(0, 0, out raw_json);
-        if (res != YAPI.SUCCESS)
-        {
+        if (res != YAPI.SUCCESS) {
             return res;
         }
+
         root = (YAPI.YJSONArray) raw_json;
 
 
@@ -11955,25 +12301,23 @@ public class YDataLogger : YFunction
             return YAPI.SUCCESS;
         if (root.get(0).getJSONType() == YAPI.YJSONContent.YJSONType.ARRAY) {
             // old datalogger format: [runIdx, timerel, utc, interval]
-            for (i = 0; i < root.Length ; i++)
-            {
+            for (i = 0; i < root.Length; i++) {
                 YAPI.YJSONArray el = root.getYJSONArray(i);
-                v.Add(new YOldDataStream(this,el.getInt(0), el.getInt(1), (uint) el.getLong(2), el.getInt(1)));
+                v.Add(new YOldDataStream(this, el.getInt(0), el.getInt(1), (uint) el.getLong(2), el.getInt(1)));
             }
         } else {
             // new datalogger format: {"id":"...","unit":"...","streams":["...",...]}
 
             string json_buffer = root.toJSON();
             List<YDataSet> sets = this.parse_dataSets(YAPI.DefaultEncoding.GetBytes(json_buffer));
-            for (int sj = 0; sj < sets.Count; sj++)
-            {
+            for (int sj = 0; sj < sets.Count; sj++) {
                 List<YDataStream> ds = sets[sj].get_privateDataStreams();
-                for (int si = 0; si < ds.Count; si++)
-                {
+                for (int si = 0; si < ds.Count; si++) {
                     v.Add(ds[si]);
                 }
             }
         }
+
         return YAPI.SUCCESS;
     }
 
@@ -12023,7 +12367,5 @@ public class YDataLogger : YFunction
     }
 
 
-
     //--- (end of generated code: YDataLogger functions)
 }
-
