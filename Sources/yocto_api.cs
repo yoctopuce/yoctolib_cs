@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 29543 2018-01-04 09:26:56Z seb $
+ * $Id: yocto_api.cs 29587 2018-01-10 14:50:18Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1206,7 +1206,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "29543";
+    public const string YOCTO_API_BUILD_NO = "29598";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -2205,7 +2205,6 @@ public class YAPI
             IntPtr preply = default(IntPtr);
             int replysize = 0;
             byte[] fullrequest = null;
-            ulong start_tm = YAPI.GetTickCount();
             YRETCODE res;
             bool enter;
             do {
@@ -2250,9 +2249,6 @@ public class YAPI
             }
 
             errmsg = buffer.ToString();
-            ulong stop_tm = YAPI.GetTickCount();
-            ulong delta = stop_tm - start_tm;
-            Console.WriteLine("Req took " + delta + "ms");
             return res;
         }
 

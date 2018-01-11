@@ -1,2 +1,1 @@
-- Improve error reporting if yapi.dll is not present or invalid
-- Add YMultiCellWeighScale class
+- Remove debug logs "Req took..."
