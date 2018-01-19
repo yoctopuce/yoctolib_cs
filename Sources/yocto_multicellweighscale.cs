@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_multicellweighscale.cs 29478 2017-12-21 08:10:05Z seb $
+ * $Id: yocto_multicellweighscale.cs 29661 2018-01-18 13:32:13Z mvuilleu $
  *
  * Implements yFindMultiCellWeighScale(), the high-level API for MultiCellWeighScale functions
  *
@@ -141,6 +141,37 @@ public class YMultiCellWeighScale : YSensor
             _command = json_val.getString("command");
         }
         base._parseAttr(json_val);
+    }
+
+    /**
+     * <summary>
+     *   Changes the measuring unit for the weight.
+     * <para>
+     *   Remember to call the <c>saveToFlash()</c> method of the module if the
+     *   modification must be kept.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a string corresponding to the measuring unit for the weight
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_unit(string newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("unit", rest_val);
+        }
     }
 
     /**

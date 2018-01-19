@@ -1,1 +1,2 @@
-- Remove debug logs "Req took..."
+- Improve error reporting if yapi.dll is not present or invalid
+- Fix handling of functionIds of length 19 (Yocto-MaxiBridge & Yocto-Stepper)
