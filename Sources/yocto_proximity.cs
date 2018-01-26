@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_proximity.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_proximity.cs 29768 2018-01-26 08:54:17Z seb $
  *
  * Implements yFindProximity(), the high-level API for Proximity functions
  *
@@ -75,6 +75,9 @@ public class YProximity : YSensor
 
     public const double SIGNALVALUE_INVALID = YAPI.INVALID_DOUBLE;
     public const int DETECTIONTHRESHOLD_INVALID = YAPI.INVALID_UINT;
+    public const int DETECTIONHYSTERESIS_INVALID = YAPI.INVALID_UINT;
+    public const int PRESENCEMINTIME_INVALID = YAPI.INVALID_UINT;
+    public const int REMOVALMINTIME_INVALID = YAPI.INVALID_UINT;
     public const int ISPRESENT_FALSE = 0;
     public const int ISPRESENT_TRUE = 1;
     public const int ISPRESENT_INVALID = -1;
@@ -88,6 +91,9 @@ public class YProximity : YSensor
     public const int PROXIMITYREPORTMODE_INVALID = -1;
     protected double _signalValue = SIGNALVALUE_INVALID;
     protected int _detectionThreshold = DETECTIONTHRESHOLD_INVALID;
+    protected int _detectionHysteresis = DETECTIONHYSTERESIS_INVALID;
+    protected int _presenceMinTime = PRESENCEMINTIME_INVALID;
+    protected int _removalMinTime = REMOVALMINTIME_INVALID;
     protected int _isPresent = ISPRESENT_INVALID;
     protected long _lastTimeApproached = LASTTIMEAPPROACHED_INVALID;
     protected long _lastTimeRemoved = LASTTIMEREMOVED_INVALID;
@@ -117,6 +123,18 @@ public class YProximity : YSensor
         if (json_val.has("detectionThreshold"))
         {
             _detectionThreshold = json_val.getInt("detectionThreshold");
+        }
+        if (json_val.has("detectionHysteresis"))
+        {
+            _detectionHysteresis = json_val.getInt("detectionHysteresis");
+        }
+        if (json_val.has("presenceMinTime"))
+        {
+            _presenceMinTime = json_val.getInt("presenceMinTime");
+        }
+        if (json_val.has("removalMinTime"))
+        {
+            _removalMinTime = json_val.getInt("removalMinTime");
         }
         if (json_val.has("isPresent"))
         {
@@ -235,6 +253,194 @@ public class YProximity : YSensor
         lock (_thisLock) {
             rest_val = (newval).ToString();
             return _setAttr("detectionThreshold", rest_val);
+        }
+    }
+
+    /**
+     * <summary>
+     *   Returns the hysteresis used to determine the logical state of the proximity sensor, when considered
+     *   as a binary input (on/off).
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the hysteresis used to determine the logical state of the proximity
+     *   sensor, when considered
+     *   as a binary input (on/off)
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YProximity.DETECTIONHYSTERESIS_INVALID</c>.
+     * </para>
+     */
+    public int get_detectionHysteresis()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DETECTIONHYSTERESIS_INVALID;
+                }
+            }
+            res = this._detectionHysteresis;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Changes the hysteresis used to determine the logical state of the proximity sensor, when considered
+     *   as a binary input (on/off).
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the hysteresis used to determine the logical state of the proximity
+     *   sensor, when considered
+     *   as a binary input (on/off)
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_detectionHysteresis(int newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("detectionHysteresis", rest_val);
+        }
+    }
+
+    /**
+     * <summary>
+     *   Returns the minimal detection duration before signaling a presence event.
+     * <para>
+     *   Any shorter detection is
+     *   considered as noise or bounce (false positive) and filtered out.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the minimal detection duration before signaling a presence event
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YProximity.PRESENCEMINTIME_INVALID</c>.
+     * </para>
+     */
+    public int get_presenceMinTime()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PRESENCEMINTIME_INVALID;
+                }
+            }
+            res = this._presenceMinTime;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Changes the minimal detection duration before signaling a presence event.
+     * <para>
+     *   Any shorter detection is
+     *   considered as noise or bounce (false positive) and filtered out.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the minimal detection duration before signaling a presence event
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_presenceMinTime(int newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("presenceMinTime", rest_val);
+        }
+    }
+
+    /**
+     * <summary>
+     *   Returns the minimal detection duration before signaling a removal event.
+     * <para>
+     *   Any shorter detection is
+     *   considered as noise or bounce (false positive) and filtered out.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the minimal detection duration before signaling a removal event
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YProximity.REMOVALMINTIME_INVALID</c>.
+     * </para>
+     */
+    public int get_removalMinTime()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return REMOVALMINTIME_INVALID;
+                }
+            }
+            res = this._removalMinTime;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Changes the minimal detection duration before signaling a removal event.
+     * <para>
+     *   Any shorter detection is
+     *   considered as noise or bounce (false positive) and filtered out.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the minimal detection duration before signaling a removal event
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_removalMinTime(int newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("removalMinTime", rest_val);
         }
     }
 
