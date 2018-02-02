@@ -42,7 +42,7 @@ namespace ConsoleApplication1
 
                 Console.WriteLine("Using: " + sensor.get_module().get_serialNumber());
             } else {
-                sensor = YWeighScale.FindWeighScale(target + ".WeighScale");
+                sensor = YWeighScale.FindWeighScale(target + ".weighScale1");
             }
 
 
