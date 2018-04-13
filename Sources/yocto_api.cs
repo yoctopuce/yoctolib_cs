@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 29663 2018-01-18 13:48:41Z seb $
+ * $Id: yocto_api.cs 29999 2018-02-20 23:51:34Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1170,7 +1170,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "29837";
+    public const string YOCTO_API_BUILD_NO = "30598";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -2298,7 +2298,9 @@ public class YAPI
                 if (_cacheJson == null) {
                     request = "GET /api.json \r\n\r\n";
                 } else {
-                    request = "GET /api.json?fw=" + _cacheJson.getYJSONObject("module").getString("firmwareRelease") + " \r\n\r\n";
+                    string fwrelease = _cacheJson.getYJSONObject("module").getString("firmwareRelease");
+                    fwrelease = YAPI.__escapeAttr(fwrelease);
+                    request = "GET /api.json?fw=" + fwrelease + " \r\n\r\n";
                 }
 
                 res = HTTPRequest(request, out buffer, ref errmsg);
@@ -3092,6 +3094,37 @@ public class YAPI
         return res;
     }
 
+
+    public static string __escapeAttr(string changeval)
+    {
+        string espcaped = "";
+        int i = 0;
+        char c = '\0';
+        string h = null;
+        for (i = 0; i < changeval.Length; i++) {
+            c = changeval[i];
+            if (c <= ' ' || (c > 'z' && c != '~') || c == '"' || c == '%' || c == '&' || c == '+' || c == '<' || c == '=' || c == '>' || c == '\\' || c == '^' || c == '`') {
+                int hh;
+                if ((c == 0xc2 || c == 0xc3) && (i + 1 < changeval.Length) && (changeval[i + 1] & 0xc0) == 0x80) {
+                    // UTF8-encoded ISO-8859-1 character: translate to plain ISO-8859-1
+                    hh = (c & 1) * 0x40;
+                    i++;
+                    hh += changeval[i];
+                } else {
+                    hh = c;
+                }
+
+                h = hh.ToString("X");
+                if ((h.Length < 2))
+                    h = "0" + h;
+                espcaped += "%" + h;
+            } else {
+                espcaped += c;
+            }
+        }
+
+        return espcaped;
+    }
 
     // - Delegate object for our internal callback, protected from GC
     public static _yapiLogFunc native_yLogFunctionDelegate = native_yLogFunction;
@@ -5888,33 +5921,7 @@ public class YFunction
 
     protected string _escapeAttr(string changeval)
     {
-        string espcaped = "";
-        int i = 0;
-        char c = '\0';
-        string h = null;
-        for (i = 0; i < changeval.Length; i++) {
-            c = changeval[i];
-            if (c <= ' ' || (c > 'z' && c != '~') || c == '"' || c == '%' || c == '&' || c == '+' || c == '<' || c == '=' || c == '>' || c == '\\' || c == '^' || c == '`') {
-                int hh;
-                if ((c == 0xc2 || c == 0xc3) && (i + 1 < changeval.Length) && (changeval[i + 1] & 0xc0) == 0x80) {
-                    // UTF8-encoded ISO-8859-1 character: translate to plain ISO-8859-1
-                    hh = (c & 1) * 0x40;
-                    i++;
-                    hh += changeval[i];
-                } else {
-                    hh = c;
-                }
-
-                h = hh.ToString("X");
-                if ((h.Length < 2))
-                    h = "0" + h;
-                espcaped += "%" + h;
-            } else {
-                espcaped += c;
-            }
-        }
-
-        return espcaped;
+        return YAPI.__escapeAttr(changeval);
     }
 
 

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_multiaxiscontroller.cs 29507 2017-12-28 14:14:56Z mvuilleu $
+ * $Id: yocto_multiaxiscontroller.cs 30483 2018-03-29 07:43:07Z mvuilleu $
  *
  * Implements yFindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -362,7 +362,7 @@ public class YMultiAxisController : YFunction
      */
     public virtual int reset()
     {
-        return this.sendCommand("Z");
+        return this.set_command("Z");
     }
 
     /**
@@ -490,7 +490,7 @@ public class YMultiAxisController : YFunction
      */
     public virtual int emergencyStop()
     {
-        return this.sendCommand("!");
+        return this.set_command("!");
     }
 
     /**
@@ -506,7 +506,7 @@ public class YMultiAxisController : YFunction
      */
     public virtual int abortAndBrake()
     {
-        return this.sendCommand("B");
+        return this.set_command("B");
     }
 
     /**
@@ -522,7 +522,7 @@ public class YMultiAxisController : YFunction
      */
     public virtual int abortAndHiZ()
     {
-        return this.sendCommand("z");
+        return this.set_command("z");
     }
 
     /**

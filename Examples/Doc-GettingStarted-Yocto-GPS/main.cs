@@ -42,7 +42,7 @@ namespace ConsoleApplication1
           Environment.Exit(0);
         }
       } else {
-        gps = YGps.FindGps(target + ".temperature");
+        gps = YGps.FindGps(target + ".gps");
       }
 
       if (!gps.isOnline()) {

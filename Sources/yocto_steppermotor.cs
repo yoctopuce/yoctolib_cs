@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_steppermotor.cs 29507 2017-12-28 14:14:56Z mvuilleu $
+ * $Id: yocto_steppermotor.cs 30483 2018-03-29 07:43:07Z mvuilleu $
  *
  * Implements yFindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -1024,7 +1024,7 @@ public class YStepperMotor : YFunction
      */
     public virtual int reset()
     {
-        return this.sendCommand("Z");
+        return this.set_command("Z");
     }
 
     /**
@@ -1169,7 +1169,7 @@ public class YStepperMotor : YFunction
      */
     public virtual int emergencyStop()
     {
-        return this.sendCommand("!");
+        return this.set_command("!");
     }
 
     /**
@@ -1187,7 +1187,7 @@ public class YStepperMotor : YFunction
      */
     public virtual int alertStepOut()
     {
-        return this.sendCommand(".");
+        return this.set_command(".");
     }
 
     /**
@@ -1210,9 +1210,9 @@ public class YStepperMotor : YFunction
     {
         if (!(dir != 0)) { this._throw( YAPI.INVALID_ARGUMENT, "direction must be +1 or -1"); return YAPI.INVALID_ARGUMENT; }
         if (dir > 0) {
-            return this.sendCommand(".+");
+            return this.set_command(".+");
         }
-        return this.sendCommand(".-");
+        return this.set_command(".-");
     }
 
     /**
@@ -1228,7 +1228,7 @@ public class YStepperMotor : YFunction
      */
     public virtual int abortAndBrake()
     {
-        return this.sendCommand("B");
+        return this.set_command("B");
     }
 
     /**
@@ -1244,7 +1244,7 @@ public class YStepperMotor : YFunction
      */
     public virtual int abortAndHiZ()
     {
-        return this.sendCommand("z");
+        return this.set_command("z");
     }
 
     /**

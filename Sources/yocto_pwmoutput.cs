@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pwmoutput.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_pwmoutput.cs 30595 2018-04-12 21:36:11Z mvuilleu $
  *
  * Implements yFindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -690,8 +690,7 @@ public class YPwmOutput : YFunction
      * <summary>
      *   Performs a smooth transistion of the pulse duration toward a given value.
      * <para>
-     *   Any period,
-     *   frequency, duty cycle or pulse width change will cancel any ongoing transition process.
+     *   Any period, frequency, duty cycle or pulse width change will cancel any ongoing transition process.
      * </para>
      * </summary>
      * <param name="ms_target">
@@ -720,13 +719,14 @@ public class YPwmOutput : YFunction
 
     /**
      * <summary>
-     *   Performs a smooth change of the pulse duration toward a given value.
+     *   Performs a smooth change of the duty cycle toward a given value.
      * <para>
+     *   Any period, frequency, duty cycle or pulse width change will cancel any ongoing transition process.
      * </para>
      * </summary>
      * <param name="target">
      *   new duty cycle at the end of the transition
-     *   (floating-point number, between 0 and 1)
+     *   (percentage, floating-point number between 0 and 100)
      * </param>
      * <param name="ms_duration">
      *   total duration of the transition, in milliseconds
@@ -748,6 +748,132 @@ public class YPwmOutput : YFunction
             target = 100.0;
         }
         newval = ""+Convert.ToString( (int) Math.Round(target*65536))+":"+Convert.ToString(ms_duration);
+        return this.set_pwmTransition(newval);
+    }
+
+    /**
+     * <summary>
+     *   Performs a smooth frequency change toward a given value.
+     * <para>
+     *   Any period, frequency, duty cycle or pulse width change will cancel any ongoing transition process.
+     * </para>
+     * </summary>
+     * <param name="target">
+     *   new freuency at the end of the transition (floating-point number)
+     * </param>
+     * <param name="ms_duration">
+     *   total duration of the transition, in milliseconds
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int frequencyMove(double target, int ms_duration)
+    {
+        string newval;
+        if (target < 0.001) {
+            target = 0.001;
+        }
+        newval = ""+YAPI._floatToStr( target)+"Hz:"+Convert.ToString(ms_duration);
+        return this.set_pwmTransition(newval);
+    }
+
+    /**
+     * <summary>
+     *   Trigger a given number of pulses of specified duration, at current frequency.
+     * <para>
+     *   At the end of the pulse train, revert to the original state of the PWM generator.
+     * </para>
+     * </summary>
+     * <param name="ms_target">
+     *   desired pulse duration
+     *   (floating-point number, representing the pulse duration in milliseconds)
+     * </param>
+     * <param name="n_pulses">
+     *   desired pulse count
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int triggerPulsesByDuration(double ms_target, int n_pulses)
+    {
+        string newval;
+        if (ms_target < 0.0) {
+            ms_target = 0.0;
+        }
+        newval = ""+Convert.ToString( (int) Math.Round(ms_target*65536))+"ms*"+Convert.ToString(n_pulses);
+        return this.set_pwmTransition(newval);
+    }
+
+    /**
+     * <summary>
+     *   Trigger a given number of pulses of specified duration, at current frequency.
+     * <para>
+     *   At the end of the pulse train, revert to the original state of the PWM generator.
+     * </para>
+     * </summary>
+     * <param name="target">
+     *   desired duty cycle for the generated pulses
+     *   (percentage, floating-point number between 0 and 100)
+     * </param>
+     * <param name="n_pulses">
+     *   desired pulse count
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int triggerPulsesByDutyCycle(double target, int n_pulses)
+    {
+        string newval;
+        if (target < 0.0) {
+            target = 0.0;
+        }
+        if (target > 100.0) {
+            target = 100.0;
+        }
+        newval = ""+Convert.ToString( (int) Math.Round(target*65536))+"*"+Convert.ToString(n_pulses);
+        return this.set_pwmTransition(newval);
+    }
+
+    /**
+     * <summary>
+     *   Trigger a given number of pulses at the specified frequency, using current duty cycle.
+     * <para>
+     *   At the end of the pulse train, revert to the original state of the PWM generator.
+     * </para>
+     * </summary>
+     * <param name="target">
+     *   desired frequency for the generated pulses (floating-point number)
+     *   (percentage, floating-point number between 0 and 100)
+     * </param>
+     * <param name="n_pulses">
+     *   desired pulse count
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int triggerPulsesByFrequency(double target, int n_pulses)
+    {
+        string newval;
+        if (target < 0.001) {
+            target = 0.001;
+        }
+        newval = ""+YAPI._floatToStr( target)+"Hz*"+Convert.ToString(n_pulses);
         return this.set_pwmTransition(newval);
     }
 

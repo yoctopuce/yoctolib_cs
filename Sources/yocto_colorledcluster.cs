@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorledcluster.cs 29186 2017-11-16 10:04:13Z seb $
+ * $Id: yocto_colorledcluster.cs 30500 2018-04-04 07:53:46Z mvuilleu $
  *
  * Implements yFindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -77,11 +77,15 @@ public class YColorLedCluster : YFunction
     public new delegate void TimedReportCallback(YColorLedCluster func, YMeasure measure);
 
     public const int ACTIVELEDCOUNT_INVALID = YAPI.INVALID_UINT;
+    public const int LEDTYPE_RGB = 0;
+    public const int LEDTYPE_RGBW = 1;
+    public const int LEDTYPE_INVALID = -1;
     public const int MAXLEDCOUNT_INVALID = YAPI.INVALID_UINT;
     public const int BLINKSEQMAXCOUNT_INVALID = YAPI.INVALID_UINT;
     public const int BLINKSEQMAXSIZE_INVALID = YAPI.INVALID_UINT;
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _activeLedCount = ACTIVELEDCOUNT_INVALID;
+    protected int _ledType = LEDTYPE_INVALID;
     protected int _maxLedCount = MAXLEDCOUNT_INVALID;
     protected int _blinkSeqMaxCount = BLINKSEQMAXCOUNT_INVALID;
     protected int _blinkSeqMaxSize = BLINKSEQMAXSIZE_INVALID;
@@ -104,6 +108,10 @@ public class YColorLedCluster : YFunction
         if (json_val.has("activeLedCount"))
         {
             _activeLedCount = json_val.getInt("activeLedCount");
+        }
+        if (json_val.has("ledType"))
+        {
+            _ledType = json_val.getInt("ledType");
         }
         if (json_val.has("maxLedCount"))
         {
@@ -179,6 +187,66 @@ public class YColorLedCluster : YFunction
         lock (_thisLock) {
             rest_val = (newval).ToString();
             return _setAttr("activeLedCount", rest_val);
+        }
+    }
+
+    /**
+     * <summary>
+     *   Returns the RGB LED type currently handled by the device.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   either <c>YColorLedCluster.LEDTYPE_RGB</c> or <c>YColorLedCluster.LEDTYPE_RGBW</c>, according to
+     *   the RGB LED type currently handled by the device
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YColorLedCluster.LEDTYPE_INVALID</c>.
+     * </para>
+     */
+    public int get_ledType()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LEDTYPE_INVALID;
+                }
+            }
+            res = this._ledType;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Changes the RGB LED type currently handled by the device.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   either <c>YColorLedCluster.LEDTYPE_RGB</c> or <c>YColorLedCluster.LEDTYPE_RGBW</c>, according to
+     *   the RGB LED type currently handled by the device
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_ledType(int newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("ledType", rest_val);
         }
     }
 
