@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorledcluster.cs 30500 2018-04-04 07:53:46Z mvuilleu $
+ * $Id: yocto_colorledcluster.cs 30652 2018-04-19 10:09:15Z seb $
  *
  * Implements yFindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -499,7 +499,7 @@ public class YColorLedCluster : YFunction
      */
     public virtual int set_rgbColor(int ledIndex, int count, int rgbValue)
     {
-        return this.sendCommand("SR"+Convert.ToString(ledIndex)+","+Convert.ToString(count)+","+String.Format("{0:X}",rgbValue));
+        return this.sendCommand("SR"+Convert.ToString(ledIndex)+","+Convert.ToString(count)+","+String.Format("{0:x}",rgbValue));
     }
 
     /**
@@ -529,7 +529,7 @@ public class YColorLedCluster : YFunction
      */
     public virtual int set_rgbColorAtPowerOn(int ledIndex, int count, int rgbValue)
     {
-        return this.sendCommand("SC"+Convert.ToString(ledIndex)+","+Convert.ToString(count)+","+String.Format("{0:X}",rgbValue));
+        return this.sendCommand("SC"+Convert.ToString(ledIndex)+","+Convert.ToString(count)+","+String.Format("{0:x}",rgbValue));
     }
 
     /**
@@ -557,7 +557,7 @@ public class YColorLedCluster : YFunction
      */
     public virtual int set_hslColor(int ledIndex, int count, int hslValue)
     {
-        return this.sendCommand("SH"+Convert.ToString(ledIndex)+","+Convert.ToString(count)+","+String.Format("{0:X}",hslValue));
+        return this.sendCommand("SH"+Convert.ToString(ledIndex)+","+Convert.ToString(count)+","+String.Format("{0:x}",hslValue));
     }
 
     /**
@@ -589,7 +589,7 @@ public class YColorLedCluster : YFunction
      */
     public virtual int rgb_move(int ledIndex, int count, int rgbValue, int delay)
     {
-        return this.sendCommand("MR"+Convert.ToString(ledIndex)+","+Convert.ToString(count)+","+String.Format("{0:X}",rgbValue)+","+Convert.ToString(delay));
+        return this.sendCommand("MR"+Convert.ToString(ledIndex)+","+Convert.ToString(count)+","+String.Format("{0:x}",rgbValue)+","+Convert.ToString(delay));
     }
 
     /**
@@ -625,7 +625,7 @@ public class YColorLedCluster : YFunction
      */
     public virtual int hsl_move(int ledIndex, int count, int hslValue, int delay)
     {
-        return this.sendCommand("MH"+Convert.ToString(ledIndex)+","+Convert.ToString(count)+","+String.Format("{0:X}",hslValue)+","+Convert.ToString(delay));
+        return this.sendCommand("MH"+Convert.ToString(ledIndex)+","+Convert.ToString(count)+","+String.Format("{0:x}",hslValue)+","+Convert.ToString(delay));
     }
 
     /**
@@ -655,7 +655,7 @@ public class YColorLedCluster : YFunction
      */
     public virtual int addRgbMoveToBlinkSeq(int seqIndex, int rgbValue, int delay)
     {
-        return this.sendCommand("AR"+Convert.ToString(seqIndex)+","+String.Format("{0:X}",rgbValue)+","+Convert.ToString(delay));
+        return this.sendCommand("AR"+Convert.ToString(seqIndex)+","+String.Format("{0:x}",rgbValue)+","+Convert.ToString(delay));
     }
 
     /**
@@ -685,7 +685,7 @@ public class YColorLedCluster : YFunction
      */
     public virtual int addHslMoveToBlinkSeq(int seqIndex, int hslValue, int delay)
     {
-        return this.sendCommand("AH"+Convert.ToString(seqIndex)+","+String.Format("{0:X}",hslValue)+","+Convert.ToString(delay));
+        return this.sendCommand("AH"+Convert.ToString(seqIndex)+","+String.Format("{0:x}",hslValue)+","+Convert.ToString(delay));
     }
 
     /**

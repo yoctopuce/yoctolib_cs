@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_display.cs 30652 2018-04-19 10:09:15Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -163,7 +163,7 @@ public enum   ALIGN
      */
     public virtual int selectColorPen(int color)
     {
-        return this.command_push("c"+String.Format("{0:X06}",color));
+        return this.command_push("c"+String.Format("{0:x06}",color));
     }
 
     /**

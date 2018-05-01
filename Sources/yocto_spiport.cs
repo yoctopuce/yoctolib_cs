@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_spiport.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_spiport.cs 30685 2018-04-24 13:46:18Z seb $
  *
  * Implements yFindSpiPort(), the high-level API for SpiPort functions
  *

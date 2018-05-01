@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pwmoutput.cs 30595 2018-04-12 21:36:11Z mvuilleu $
+ * $Id: yocto_pwmoutput.cs 30679 2018-04-24 09:34:17Z mvuilleu $
  *
  * Implements yFindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -875,6 +875,16 @@ public class YPwmOutput : YFunction
         }
         newval = ""+YAPI._floatToStr( target)+"Hz*"+Convert.ToString(n_pulses);
         return this.set_pwmTransition(newval);
+    }
+
+    public virtual int markForRepeat()
+    {
+        return this.set_pwmTransition(":");
+    }
+
+    public virtual int repeatFromMark()
+    {
+        return this.set_pwmTransition("R");
     }
 
     /**

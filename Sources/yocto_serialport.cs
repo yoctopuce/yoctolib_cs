@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_serialport.cs 30685 2018-04-24 13:46:18Z seb $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *

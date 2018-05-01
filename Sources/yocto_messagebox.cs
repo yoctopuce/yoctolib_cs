@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_messagebox.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_messagebox.cs 30652 2018-04-19 10:09:15Z seb $
  *
  * Implements yFindMessageBox(), the high-level API for MessageBox functions
  *
@@ -671,7 +671,7 @@ public class YSms
             i = 0;
             while (i < siz) {
                 byt = addr[ofs+i+1];
-                res = ""+ res+""+String.Format("{0:X}", ((byt) & (15)))+""+String.Format("{0:X}",((byt) >> (4)));
+                res = ""+ res+""+String.Format("{0:x}", ((byt) & (15)))+""+String.Format("{0:x}",((byt) >> (4)));
                 i = i + 1;
             }
             // remove padding digit if needed
@@ -799,7 +799,7 @@ public class YSms
         i = 0;
         while ((i < siz) && (i < 6)) {
             byt = exp[ofs+i];
-            res = ""+ res+""+String.Format("{0:X}", ((byt) & (15)))+""+String.Format("{0:X}",((byt) >> (4)));
+            res = ""+ res+""+String.Format("{0:x}", ((byt) & (15)))+""+String.Format("{0:x}",((byt) >> (4)));
             if (i < 3) {
                 if (i < 2) {
                     res = ""+res+"-";
@@ -1096,16 +1096,16 @@ public class YSms
             if (i + ielen <= udhlen) {
                 if ((iei == 0) && (ielen == 3)) {
                     // concatenated SMS, 8-bit ref
-                    sig = ""+ this._orig+"-"+ this._dest+"-"+String.Format("{0:X02}",
-                    this._mref)+"-"+String.Format("{0:X02}",this._udh[i]);
+                    sig = ""+ this._orig+"-"+ this._dest+"-"+String.Format("{0:x02}",
+                    this._mref)+"-"+String.Format("{0:x02}",this._udh[i]);
                     this._aggSig = sig;
                     this._aggCnt = this._udh[i+1];
                     this._aggIdx = this._udh[i+2];
                 }
                 if ((iei == 8) && (ielen == 4)) {
                     // concatenated SMS, 16-bit ref
-                    sig = ""+ this._orig+"-"+ this._dest+"-"+String.Format("{0:X02}",
-                    this._mref)+"-"+String.Format("{0:X02}", this._udh[i])+""+String.Format("{0:X02}",this._udh[i+1]);
+                    sig = ""+ this._orig+"-"+ this._dest+"-"+String.Format("{0:x02}",
+                    this._mref)+"-"+String.Format("{0:x02}", this._udh[i])+""+String.Format("{0:x02}",this._udh[i+1]);
                     this._aggSig = sig;
                     this._aggCnt = this._udh[i+2];
                     this._aggIdx = this._udh[i+3];
