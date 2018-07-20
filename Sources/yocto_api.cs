@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 29999 2018-02-20 23:51:34Z seb $
+ * $Id: yocto_api.cs 31240 2018-07-17 14:43:00Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -184,121 +184,124 @@ internal static class SafeNativeMethods
 
 
     // 32 bits dll entry points
-    [DllImport("yapi", EntryPoint = "yapiInitAPI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiInitAPI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiInitAPI32(int mode, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiFreeAPI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi.dll", EntryPoint = "yapiFreeAPI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiFreeAPI32();
 
-    [DllImport("yapi", EntryPoint = "yapiRegisterLogFunction", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi.dll", EntryPoint = "yapiRegisterLogFunction", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterLogFunction32(IntPtr fct);
 
-    [DllImport("yapi", EntryPoint = "yapiRegisterDeviceArrivalCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi.dll", EntryPoint = "yapiRegisterDeviceArrivalCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceArrivalCallback32(IntPtr fct);
 
-    [DllImport("yapi", EntryPoint = "yapiRegisterDeviceRemovalCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi.dll", EntryPoint = "yapiRegisterDeviceRemovalCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceRemovalCallback32(IntPtr fct);
 
-    [DllImport("yapi", EntryPoint = "yapiRegisterDeviceChangeCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi.dll", EntryPoint = "yapiRegisterDeviceChangeCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceChangeCallback32(IntPtr fct);
 
-    [DllImport("yapi", EntryPoint = "yapiRegisterFunctionUpdateCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi.dll", EntryPoint = "yapiRegisterDeviceConfigChangeCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static void _yapiRegisterDeviceConfigChangeCallback32(IntPtr fct);
+
+    [DllImport("yapi.dll", EntryPoint = "yapiRegisterFunctionUpdateCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterFunctionUpdateCallback32(IntPtr fct);
 
-    [DllImport("yapi", EntryPoint = "yapiRegisterTimedReportCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi.dll", EntryPoint = "yapiRegisterTimedReportCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterTimedReportCallback32(IntPtr fct);
 
-    [DllImport("yapi", EntryPoint = "yapiLockDeviceCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiLockDeviceCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiLockDeviceCallBack32(StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiUnlockDeviceCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiUnlockDeviceCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiUnlockDeviceCallBack32(StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiLockFunctionCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiLockFunctionCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiLockFunctionCallBack32(StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiUnlockFunctionCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiUnlockFunctionCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiUnlockFunctionCallBack32(StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiRegisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiRegisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiRegisterHub32(StringBuilder rootUrl, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiPreregisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiPreregisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiPreregisterHub32(StringBuilder rootUrl, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiUnregisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiUnregisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static void _yapiUnregisterHub32(StringBuilder rootUrl);
 
-    [DllImport("yapi", EntryPoint = "yapiUpdateDeviceList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiUpdateDeviceList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiUpdateDeviceList32(uint force, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiHandleEvents", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiHandleEvents", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHandleEvents32(StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiGetTickCount", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi.dll", EntryPoint = "yapiGetTickCount", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static u64 _yapiGetTickCount32();
 
-    [DllImport("yapi", EntryPoint = "yapiCheckLogicalName", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiCheckLogicalName", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiCheckLogicalName32(StringBuilder name);
 
-    [DllImport("yapi", EntryPoint = "yapiGetAPIVersion", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi.dll", EntryPoint = "yapiGetAPIVersion", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static u16 _yapiGetAPIVersion32(ref IntPtr version, ref IntPtr date);
 
-    [DllImport("yapi", EntryPoint = "yapiGetDevice", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiGetDevice", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YDEV_DESCR _yapiGetDevice32(StringBuilder device_str, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiGetAllDevices", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiGetAllDevices", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetAllDevices32(IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiGetDeviceInfo", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiGetDeviceInfo", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetDeviceInfo32(YDEV_DESCR d, ref yDeviceSt infos, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiGetFunction", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiGetFunction", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YFUN_DESCR _yapiGetFunction32(StringBuilder class_str, StringBuilder function_str, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiGetFunctionsByClass", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiGetFunctionsByClass", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetFunctionsByClass32(StringBuilder class_str, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiGetFunctionsByDevice", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiGetFunctionsByDevice", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetFunctionsByDevice32(YDEV_DESCR device, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiGetFunctionInfoEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiGetFunctionInfoEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetFunctionInfoEx32(YFUN_DESCR fundesc, ref YDEV_DESCR devdesc, StringBuilder serial, StringBuilder funcId, StringBuilder baseType, StringBuilder funcName, StringBuilder funcVal, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiHTTPRequestSyncStart", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequestSyncStart", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestSyncStart32(ref YIOHDL iohdl, StringBuilder device, IntPtr request, ref IntPtr reply, ref int replysize, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiHTTPRequestSyncStartEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequestSyncStartEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestSyncStartEx32(ref YIOHDL iohdl, StringBuilder device, IntPtr request, int requestlen, ref IntPtr reply, ref int replysize, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiHTTPRequestSyncDone", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequestSyncDone", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestSyncDone32(ref YIOHDL iohdl, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiHTTPRequestAsync", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequestAsync", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestAsync32(StringBuilder device, IntPtr request, IntPtr callback, IntPtr context, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiHTTPRequestAsyncEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequestAsyncEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestAsyncEx32(StringBuilder device, IntPtr request, int requestlen, IntPtr callback, IntPtr context, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiHTTPRequest", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequest", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequest32(StringBuilder device, StringBuilder url, StringBuilder buffer, int buffsize, ref int fullsize, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiGetDevicePath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiGetDevicePath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetDevicePath32(int devdesc, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiSleep", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiSleep", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiSleep32(int duration_ms, StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiRegisterHubDiscoveryCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi.dll", EntryPoint = "yapiRegisterHubDiscoveryCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterHubDiscoveryCallback32(IntPtr fct);
 
-    [DllImport("yapi", EntryPoint = "yapiTriggerHubDiscovery", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiTriggerHubDiscovery", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiTriggerHubDiscovery32(StringBuilder errmsg);
 
-    [DllImport("yapi", EntryPoint = "yapiRegisterDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi.dll", EntryPoint = "yapiRegisterDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceLogCallback32(IntPtr fct);
 
-    [DllImport("yapi", EntryPoint = "yapiStartStopDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi.dll", EntryPoint = "yapiStartStopDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiStartStopDeviceLogCallback32(StringBuilder errmsg, int start_stop);
 
     // 64 bits dll entry points
@@ -319,6 +322,9 @@ internal static class SafeNativeMethods
 
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterDeviceChangeCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceChangeCallback64(IntPtr fct);
+
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterDeviceConfigChangeCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    private extern static void _yapiRegisterDeviceConfigChangeCallback64(IntPtr fct);
 
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterFunctionUpdateCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterFunctionUpdateCallback64(IntPtr fct);
@@ -401,7 +407,7 @@ internal static class SafeNativeMethods
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequest", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequest64(StringBuilder device, StringBuilder url, StringBuilder buffer, int buffsize, ref int fullsize, StringBuilder errmsg);
 
-    [DllImport("amd64\\yapi", EntryPoint = "yapiGetDevicePath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetDevicePath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetDevicePath64(int devdesc, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg);
 
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiSleep", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
@@ -493,6 +499,19 @@ internal static class SafeNativeMethods
                 _yapiRegisterDeviceChangeCallback64(fct);
             } catch (System.DllNotFoundException) {
                 _yapiRegisterDeviceChangeCallback32(fct);
+            }
+        }
+    }
+
+    internal static void _yapiRegisterDeviceConfigChangeCallback(IntPtr fct)
+    {
+        if (IntPtr.Size == 4) {
+            _yapiRegisterDeviceConfigChangeCallback32(fct);
+        } else {
+            try {
+                _yapiRegisterDeviceConfigChangeCallback64(fct);
+            } catch (System.DllNotFoundException) {
+                _yapiRegisterDeviceConfigChangeCallback32(fct);
             }
         }
     }
@@ -1170,7 +1189,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "30760";
+    public const string YOCTO_API_BUILD_NO = "31315";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -2492,6 +2511,7 @@ public class YAPI
     {
         private YFunction _fun;
         private YSensor _sensor;
+        private YModule _module;
         private String _value;
         private List<int> _report;
         private double _timestamp;
@@ -2500,6 +2520,7 @@ public class YAPI
         {
             _fun = fun;
             _sensor = null;
+            _module = null;
             _value = value;
             _report = null;
             _timestamp = 0;
@@ -2509,19 +2530,32 @@ public class YAPI
         {
             _fun = null;
             _sensor = sensor;
+            _module = null;
             _value = null;
             _timestamp = timestamp;
             _report = report;
         }
 
+        public DataEvent(YModule module)
+        {
+            _fun = null;
+            _sensor = null;
+            _module = module;
+            _value = null;
+            _report = null;
+            _timestamp = 0;
+        }
+
         public void invoke()
         {
-            if (_fun == null) {
+            if (_sensor != null) {
                 YMeasure mesure = _sensor._decodeTimedReport(_timestamp, _report);
                 _sensor._invokeTimedReportCallback(mesure);
-            } else {
+            } else if (_fun != null) {
                 // new value
                 _fun._invokeValueCallback(_value);
+            } else {
+                _module._invokeConfigChangeCallback();
             }
         }
     }
@@ -2717,6 +2751,19 @@ public class YAPI
     public static void RegisterDeviceChangeCallback(yDeviceUpdateFunc callback)
     {
         yChange = callback;
+    }
+
+    public static void native_yDeviceConfigChangeCallback(YDEV_DESCR d)
+    {
+        DataEvent ev;
+        SafeNativeMethods.yDeviceSt infos = SafeNativeMethods.emptyDeviceSt();
+        string errmsg = "";
+
+        if (yapiGetDeviceInfo(d, ref infos, ref errmsg) != SUCCESS)
+            return;
+        YModule modul = YModule.FindModule(infos.serial + ".module");
+        ev = new DataEvent(modul);
+        _DataEvents.Add(ev);
     }
 
     private static void queuesCleanUp()
@@ -3148,6 +3195,9 @@ public class YAPI
     public static _yapiDeviceUpdateFunc native_yDeviceChangeDelegate = native_yDeviceChangeCallback;
     static GCHandle native_yDeviceChangeAnchor = GCHandle.Alloc(native_yDeviceChangeDelegate);
 
+    public static _yapiDeviceUpdateFunc native_yDeviceConfigChangeDelegate = native_yDeviceConfigChangeCallback;
+    static GCHandle native_yDeviceConfigChangeAnchor = GCHandle.Alloc(native_yDeviceConfigChangeDelegate);
+
     public static _yapiDeviceLogCallback native_yDeviceLogDelegate = native_yDeviceLogCallback;
     static GCHandle native_yDeviceLogAnchor = GCHandle.Alloc(native_yDeviceLogDelegate);
 
@@ -3271,6 +3321,7 @@ public class YAPI
         SafeNativeMethods._yapiRegisterDeviceArrivalCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceArrivalDelegate));
         SafeNativeMethods._yapiRegisterDeviceRemovalCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceRemovalDelegate));
         SafeNativeMethods._yapiRegisterDeviceChangeCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceChangeDelegate));
+        SafeNativeMethods._yapiRegisterDeviceConfigChangeCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceConfigChangeDelegate));
         SafeNativeMethods._yapiRegisterFunctionUpdateCallback(Marshal.GetFunctionPointerForDelegate(native_yFunctionUpdateDelegate));
         SafeNativeMethods._yapiRegisterTimedReportCallback(Marshal.GetFunctionPointerForDelegate(native_yTimedReportDelegate));
         SafeNativeMethods._yapiRegisterHubDiscoveryCallback(Marshal.GetFunctionPointerForDelegate(native_yapiHubDiscoveryDelegate));
@@ -7239,6 +7290,7 @@ public class YModule : YFunction
 //--- (end of generated code: YModule class start)
     //--- (generated code: YModule definitions)
     public delegate void LogCallback(YModule module, string logline);
+    public delegate void ConfigChangeCallback(YModule module);
     public new delegate void ValueCallback(YModule func, string value);
     public new delegate void TimedReportCallback(YModule func, YMeasure measure);
 
@@ -7273,6 +7325,7 @@ public class YModule : YFunction
     protected int _userVar = USERVAR_INVALID;
     protected ValueCallback _valueCallbackModule = null;
     protected LogCallback _logCallback = null;
+    protected ConfigChangeCallback _confChangeCallback = null;
     //--- (end of generated code: YModule definitions)
 
     public YModule(string func) : base(func)
@@ -8008,6 +8061,46 @@ public class YModule : YFunction
     public virtual int triggerFirmwareUpdate(int secBeforeReboot)
     {
         return this.set_rebootCountdown(-secBeforeReboot);
+    }
+
+    /**
+     * <summary>
+     *   Register a callback function, to be called when a persistent settings in
+     *   a device configuration has been changed (e.g.
+     * <para>
+     *   change of unit, etc).
+     * </para>
+     * </summary>
+     * <param name="callback">
+     *   a procedure taking a YModule parameter, or <c>null</c>
+     *   to unregister a previously registered  callback.
+     * </param>
+     */
+    public virtual int registerConfigChangeCallback(ConfigChangeCallback callback)
+    {
+        this._confChangeCallback = callback;
+        return 0;
+    }
+
+    public virtual int _invokeConfigChangeCallback()
+    {
+        if (this._confChangeCallback != null) {
+            this._confChangeCallback(this);
+        }
+        return 0;
+    }
+
+    /**
+     * <summary>
+     *   Triggers a configuration change callback, to check if they are supported or not.
+     * <para>
+     * </para>
+     * </summary>
+     */
+    public virtual int triggerConfigChangeCallback()
+    {
+        this._setAttr("persistentSettings","2");
+        return 0;
     }
 
     /**

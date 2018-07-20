@@ -26,7 +26,12 @@ namespace ConsoleApplication1
 
     static void deviceLog(YModule module, string logline)
     {
-      Console.WriteLine("log:" + module.get_hardwareId() + ":" + logline);
+      Console.WriteLine("log: " + module.get_hardwareId() + ":" + logline);
+    }
+
+    static void configChange(YModule m)
+    {
+        Console.WriteLine("config change: " + m.get_serialNumber());
     }
 
     static void deviceArrival(YModule m)
@@ -34,6 +39,7 @@ namespace ConsoleApplication1
       string serial = m.get_serialNumber();
       Console.WriteLine("Device arrival : " + serial);
       m.registerLogCallback(deviceLog);
+      m.registerConfigChangeCallback(configChange);
 
       // First solution: look for a specific type of function (eg. anButton)
       int fctcount = m.functionCount();
