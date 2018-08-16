@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_hubport.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_hubport.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindHubPort(), the high-level API for HubPort functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YHubPort return codes)
 //--- (YHubPort dlldef)
 //--- (end of YHubPort dlldef)
+//--- (YHubPort yapiwrapper)
+//--- (end of YHubPort yapiwrapper)
 //--- (YHubPort class start)
 /**
  * <summary>
@@ -135,7 +137,7 @@ public class YHubPort : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return ENABLED_INVALID;
                 }
             }
@@ -198,7 +200,7 @@ public class YHubPort : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return PORTSTATE_INVALID;
                 }
             }
@@ -229,7 +231,7 @@ public class YHubPort : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return BAUDRATE_INVALID;
                 }
             }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_quadraturedecoder.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_quadraturedecoder.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YQuadratureDecoder return codes)
 //--- (YQuadratureDecoder dlldef)
 //--- (end of YQuadratureDecoder dlldef)
+//--- (YQuadratureDecoder yapiwrapper)
+//--- (end of YQuadratureDecoder yapiwrapper)
 //--- (YQuadratureDecoder class start)
 /**
  * <summary>
@@ -154,7 +156,7 @@ public class YQuadratureDecoder : YSensor
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return SPEED_INVALID;
                 }
             }
@@ -184,7 +186,7 @@ public class YQuadratureDecoder : YSensor
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return DECODING_INVALID;
                 }
             }

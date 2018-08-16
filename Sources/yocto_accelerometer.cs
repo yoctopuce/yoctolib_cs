@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_accelerometer.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_accelerometer.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YAccelerometer return codes)
 //--- (YAccelerometer dlldef)
 //--- (end of YAccelerometer dlldef)
+//--- (YAccelerometer yapiwrapper)
+//--- (end of YAccelerometer yapiwrapper)
 //--- (YAccelerometer class start)
 /**
  * <summary>
@@ -148,7 +150,7 @@ public class YAccelerometer : YSensor
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return BANDWIDTH_INVALID;
                 }
             }
@@ -208,7 +210,7 @@ public class YAccelerometer : YSensor
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return XVALUE_INVALID;
                 }
             }
@@ -237,7 +239,7 @@ public class YAccelerometer : YSensor
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return YVALUE_INVALID;
                 }
             }
@@ -266,7 +268,7 @@ public class YAccelerometer : YSensor
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return ZVALUE_INVALID;
                 }
             }
@@ -280,7 +282,7 @@ public class YAccelerometer : YSensor
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return GRAVITYCANCELLATION_INVALID;
                 }
             }

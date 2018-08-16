@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_altitude.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_altitude.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindAltitude(), the high-level API for Altitude functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YAltitude return codes)
 //--- (YAltitude dlldef)
 //--- (end of YAltitude dlldef)
+//--- (YAltitude yapiwrapper)
+//--- (end of YAltitude yapiwrapper)
 //--- (YAltitude class start)
 /**
  * <summary>
@@ -190,7 +192,7 @@ public class YAltitude : YSensor
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return QNH_INVALID;
                 }
             }
@@ -222,7 +224,7 @@ public class YAltitude : YSensor
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return TECHNOLOGY_INVALID;
                 }
             }

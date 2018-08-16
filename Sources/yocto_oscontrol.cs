@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_oscontrol.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_oscontrol.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindOsControl(), the high-level API for OsControl functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YOsControl return codes)
 //--- (YOsControl dlldef)
 //--- (end of YOsControl dlldef)
+//--- (YOsControl yapiwrapper)
+//--- (end of YOsControl yapiwrapper)
 //--- (YOsControl class start)
 /**
  * <summary>
@@ -116,7 +118,7 @@ public class YOsControl : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return SHUTDOWNCOUNTDOWN_INVALID;
                 }
             }

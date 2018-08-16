@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_anbutton.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_anbutton.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindAnButton(), the high-level API for AnButton functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YAnButton return codes)
 //--- (YAnButton dlldef)
 //--- (end of YAnButton dlldef)
+//--- (YAnButton yapiwrapper)
+//--- (end of YAnButton yapiwrapper)
 //--- (YAnButton class start)
 /**
  * <summary>
@@ -181,7 +183,7 @@ public class YAnButton : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return CALIBRATEDVALUE_INVALID;
                 }
             }
@@ -210,7 +212,7 @@ public class YAnButton : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return RAWVALUE_INVALID;
                 }
             }
@@ -239,7 +241,7 @@ public class YAnButton : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return ANALOGCALIBRATION_INVALID;
                 }
             }
@@ -299,7 +301,7 @@ public class YAnButton : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return CALIBRATIONMAX_INVALID;
                 }
             }
@@ -362,7 +364,7 @@ public class YAnButton : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return CALIBRATIONMIN_INVALID;
                 }
             }
@@ -425,7 +427,7 @@ public class YAnButton : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return SENSITIVITY_INVALID;
                 }
             }
@@ -489,7 +491,7 @@ public class YAnButton : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return ISPRESSED_INVALID;
                 }
             }
@@ -520,7 +522,7 @@ public class YAnButton : YFunction
         long res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return LASTTIMEPRESSED_INVALID;
                 }
             }
@@ -551,7 +553,7 @@ public class YAnButton : YFunction
         long res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return LASTTIMERELEASED_INVALID;
                 }
             }
@@ -583,7 +585,7 @@ public class YAnButton : YFunction
         long res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return PULSECOUNTER_INVALID;
                 }
             }
@@ -621,7 +623,7 @@ public class YAnButton : YFunction
         long res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return PULSETIMER_INVALID;
                 }
             }

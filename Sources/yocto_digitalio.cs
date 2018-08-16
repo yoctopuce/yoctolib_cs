@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_digitalio.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_digitalio.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YDigitalIO return codes)
 //--- (YDigitalIO dlldef)
 //--- (end of YDigitalIO dlldef)
+//--- (YDigitalIO yapiwrapper)
+//--- (end of YDigitalIO yapiwrapper)
 //--- (YDigitalIO class start)
 /**
  * <summary>
@@ -161,7 +163,7 @@ public class YDigitalIO : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return PORTSTATE_INVALID;
                 }
             }
@@ -222,7 +224,7 @@ public class YDigitalIO : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return PORTDIRECTION_INVALID;
                 }
             }
@@ -284,7 +286,7 @@ public class YDigitalIO : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return PORTOPENDRAIN_INVALID;
                 }
             }
@@ -347,7 +349,7 @@ public class YDigitalIO : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return PORTPOLARITY_INVALID;
                 }
             }
@@ -412,7 +414,7 @@ public class YDigitalIO : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return PORTDIAGS_INVALID;
                 }
             }
@@ -441,7 +443,7 @@ public class YDigitalIO : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return PORTSIZE_INVALID;
                 }
             }
@@ -471,7 +473,7 @@ public class YDigitalIO : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return OUTPUTVOLTAGE_INVALID;
                 }
             }
@@ -516,7 +518,7 @@ public class YDigitalIO : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

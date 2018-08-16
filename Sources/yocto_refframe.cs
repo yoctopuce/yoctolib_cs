@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_refframe.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_refframe.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YRefFrame return codes)
 //--- (YRefFrame dlldef)
 //--- (end of YRefFrame dlldef)
+//--- (YRefFrame yapiwrapper)
+//--- (end of YRefFrame yapiwrapper)
 //--- (YRefFrame class start)
 /**
  * <summary>
@@ -162,7 +164,7 @@ public enum   MOUNTORIENTATION
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return MOUNTPOS_INVALID;
                 }
             }
@@ -249,7 +251,7 @@ public enum   MOUNTORIENTATION
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return BEARING_INVALID;
                 }
             }
@@ -263,7 +265,7 @@ public enum   MOUNTORIENTATION
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return CALIBRATIONPARAM_INVALID;
                 }
             }
@@ -286,7 +288,7 @@ public enum   MOUNTORIENTATION
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return FUSIONMODE_INVALID;
                 }
             }

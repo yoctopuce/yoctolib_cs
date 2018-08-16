@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_files.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -163,7 +163,7 @@ public class YFiles : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return FILESCOUNT_INVALID;
                 }
             }
@@ -192,7 +192,7 @@ public class YFiles : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return FREESPACE_INVALID;
                 }
             }

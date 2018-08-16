@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_gps.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_gps.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindGps(), the high-level API for Gps functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YGps return codes)
 //--- (YGps dlldef)
 //--- (end of YGps dlldef)
+//--- (YGps yapiwrapper)
+//--- (end of YGps yapiwrapper)
 //--- (YGps class start)
 /**
  * <summary>
@@ -195,7 +197,7 @@ public class YGps : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return ISFIXED_INVALID;
                 }
             }
@@ -224,7 +226,7 @@ public class YGps : YFunction
         long res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return SATCOUNT_INVALID;
                 }
             }
@@ -254,7 +256,7 @@ public class YGps : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return COORDSYSTEM_INVALID;
                 }
             }
@@ -313,7 +315,7 @@ public class YGps : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return LATITUDE_INVALID;
                 }
             }
@@ -342,7 +344,7 @@ public class YGps : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return LONGITUDE_INVALID;
                 }
             }
@@ -373,7 +375,7 @@ public class YGps : YFunction
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return DILUTION_INVALID;
                 }
             }
@@ -404,7 +406,7 @@ public class YGps : YFunction
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return ALTITUDE_INVALID;
                 }
             }
@@ -433,7 +435,7 @@ public class YGps : YFunction
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return GROUNDSPEED_INVALID;
                 }
             }
@@ -464,7 +466,7 @@ public class YGps : YFunction
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return DIRECTION_INVALID;
                 }
             }
@@ -495,7 +497,7 @@ public class YGps : YFunction
         long res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return UNIXTIME_INVALID;
                 }
             }
@@ -524,7 +526,7 @@ public class YGps : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return DATETIME_INVALID;
                 }
             }
@@ -553,7 +555,7 @@ public class YGps : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return UTCOFFSET_INVALID;
                 }
             }
@@ -598,7 +600,7 @@ public class YGps : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

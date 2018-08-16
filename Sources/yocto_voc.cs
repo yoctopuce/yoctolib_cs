@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_voc.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_voc.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindVoc(), the high-level API for Voc functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YVoc return codes)
 //--- (YVoc dlldef)
 //--- (end of YVoc dlldef)
+//--- (YVoc yapiwrapper)
+//--- (end of YVoc yapiwrapper)
 //--- (YVoc class start)
 /**
  * <summary>

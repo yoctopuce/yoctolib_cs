@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_magnetometer.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_magnetometer.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindMagnetometer(), the high-level API for Magnetometer functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YMagnetometer return codes)
 //--- (YMagnetometer dlldef)
 //--- (end of YMagnetometer dlldef)
+//--- (YMagnetometer yapiwrapper)
+//--- (end of YMagnetometer yapiwrapper)
 //--- (YMagnetometer class start)
 /**
  * <summary>
@@ -140,7 +142,7 @@ public class YMagnetometer : YSensor
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return BANDWIDTH_INVALID;
                 }
             }
@@ -200,7 +202,7 @@ public class YMagnetometer : YSensor
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return XVALUE_INVALID;
                 }
             }
@@ -229,7 +231,7 @@ public class YMagnetometer : YSensor
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return YVALUE_INVALID;
                 }
             }
@@ -258,7 +260,7 @@ public class YMagnetometer : YSensor
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return ZVALUE_INVALID;
                 }
             }

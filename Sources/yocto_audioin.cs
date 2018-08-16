@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_audioin.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_audioin.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindAudioIn(), the high-level API for AudioIn functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YAudioIn return codes)
 //--- (YAudioIn dlldef)
 //--- (end of YAudioIn dlldef)
+//--- (YAudioIn yapiwrapper)
+//--- (end of YAudioIn yapiwrapper)
 //--- (YAudioIn class start)
 /**
  * <summary>
@@ -138,7 +140,7 @@ public class YAudioIn : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return VOLUME_INVALID;
                 }
             }
@@ -196,7 +198,7 @@ public class YAudioIn : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return MUTE_INVALID;
                 }
             }
@@ -260,7 +262,7 @@ public class YAudioIn : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return VOLUMERANGE_INVALID;
                 }
             }
@@ -289,7 +291,7 @@ public class YAudioIn : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return SIGNAL_INVALID;
                 }
             }
@@ -318,7 +320,7 @@ public class YAudioIn : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return NOSIGNALFOR_INVALID;
                 }
             }

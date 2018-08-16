@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_multiaxiscontroller.cs 30483 2018-03-29 07:43:07Z mvuilleu $
+ * $Id: yocto_multiaxiscontroller.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YMultiAxisController return codes)
 //--- (YMultiAxisController dlldef)
 //--- (end of YMultiAxisController dlldef)
+//--- (YMultiAxisController yapiwrapper)
+//--- (end of YMultiAxisController yapiwrapper)
 //--- (YMultiAxisController class start)
 /**
  * <summary>
@@ -130,7 +132,7 @@ public class YMultiAxisController : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return NAXIS_INVALID;
                 }
             }
@@ -191,7 +193,7 @@ public class YMultiAxisController : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return GLOBALSTATE_INVALID;
                 }
             }
@@ -205,7 +207,7 @@ public class YMultiAxisController : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

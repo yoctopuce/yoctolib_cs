@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 31240 2018-07-17 14:43:00Z mvuilleu $
+ * $Id: yocto_api.cs 31625 2018-08-14 11:48:05Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -184,124 +184,124 @@ internal static class SafeNativeMethods
 
 
     // 32 bits dll entry points
-    [DllImport("yapi.dll", EntryPoint = "yapiInitAPI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiInitAPI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiInitAPI32(int mode, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiFreeAPI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi", EntryPoint = "yapiFreeAPI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiFreeAPI32();
 
-    [DllImport("yapi.dll", EntryPoint = "yapiRegisterLogFunction", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi", EntryPoint = "yapiRegisterLogFunction", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterLogFunction32(IntPtr fct);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiRegisterDeviceArrivalCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi", EntryPoint = "yapiRegisterDeviceArrivalCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceArrivalCallback32(IntPtr fct);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiRegisterDeviceRemovalCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi", EntryPoint = "yapiRegisterDeviceRemovalCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceRemovalCallback32(IntPtr fct);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiRegisterDeviceChangeCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi", EntryPoint = "yapiRegisterDeviceChangeCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceChangeCallback32(IntPtr fct);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiRegisterDeviceConfigChangeCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi", EntryPoint = "yapiRegisterDeviceConfigChangeCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceConfigChangeCallback32(IntPtr fct);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiRegisterFunctionUpdateCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi", EntryPoint = "yapiRegisterFunctionUpdateCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterFunctionUpdateCallback32(IntPtr fct);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiRegisterTimedReportCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi", EntryPoint = "yapiRegisterTimedReportCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterTimedReportCallback32(IntPtr fct);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiLockDeviceCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiLockDeviceCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiLockDeviceCallBack32(StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiUnlockDeviceCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiUnlockDeviceCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiUnlockDeviceCallBack32(StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiLockFunctionCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiLockFunctionCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiLockFunctionCallBack32(StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiUnlockFunctionCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiUnlockFunctionCallBack", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiUnlockFunctionCallBack32(StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiRegisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiRegisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiRegisterHub32(StringBuilder rootUrl, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiPreregisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiPreregisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiPreregisterHub32(StringBuilder rootUrl, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiUnregisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiUnregisterHub", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static void _yapiUnregisterHub32(StringBuilder rootUrl);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiUpdateDeviceList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiUpdateDeviceList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiUpdateDeviceList32(uint force, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiHandleEvents", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiHandleEvents", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHandleEvents32(StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiGetTickCount", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi", EntryPoint = "yapiGetTickCount", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static u64 _yapiGetTickCount32();
 
-    [DllImport("yapi.dll", EntryPoint = "yapiCheckLogicalName", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiCheckLogicalName", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiCheckLogicalName32(StringBuilder name);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiGetAPIVersion", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi", EntryPoint = "yapiGetAPIVersion", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static u16 _yapiGetAPIVersion32(ref IntPtr version, ref IntPtr date);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiGetDevice", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiGetDevice", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YDEV_DESCR _yapiGetDevice32(StringBuilder device_str, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiGetAllDevices", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiGetAllDevices", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetAllDevices32(IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiGetDeviceInfo", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiGetDeviceInfo", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetDeviceInfo32(YDEV_DESCR d, ref yDeviceSt infos, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiGetFunction", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiGetFunction", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YFUN_DESCR _yapiGetFunction32(StringBuilder class_str, StringBuilder function_str, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiGetFunctionsByClass", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiGetFunctionsByClass", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetFunctionsByClass32(StringBuilder class_str, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiGetFunctionsByDevice", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiGetFunctionsByDevice", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetFunctionsByDevice32(YDEV_DESCR device, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiGetFunctionInfoEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiGetFunctionInfoEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetFunctionInfoEx32(YFUN_DESCR fundesc, ref YDEV_DESCR devdesc, StringBuilder serial, StringBuilder funcId, StringBuilder baseType, StringBuilder funcName, StringBuilder funcVal, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequestSyncStart", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiHTTPRequestSyncStart", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestSyncStart32(ref YIOHDL iohdl, StringBuilder device, IntPtr request, ref IntPtr reply, ref int replysize, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequestSyncStartEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiHTTPRequestSyncStartEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestSyncStartEx32(ref YIOHDL iohdl, StringBuilder device, IntPtr request, int requestlen, ref IntPtr reply, ref int replysize, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequestSyncDone", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiHTTPRequestSyncDone", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestSyncDone32(ref YIOHDL iohdl, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequestAsync", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiHTTPRequestAsync", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestAsync32(StringBuilder device, IntPtr request, IntPtr callback, IntPtr context, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequestAsyncEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiHTTPRequestAsyncEx", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequestAsyncEx32(StringBuilder device, IntPtr request, int requestlen, IntPtr callback, IntPtr context, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiHTTPRequest", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiHTTPRequest", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiHTTPRequest32(StringBuilder device, StringBuilder url, StringBuilder buffer, int buffsize, ref int fullsize, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiGetDevicePath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiGetDevicePath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetDevicePath32(int devdesc, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiSleep", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiSleep", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiSleep32(int duration_ms, StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiRegisterHubDiscoveryCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi", EntryPoint = "yapiRegisterHubDiscoveryCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterHubDiscoveryCallback32(IntPtr fct);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiTriggerHubDiscovery", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiTriggerHubDiscovery", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiTriggerHubDiscovery32(StringBuilder errmsg);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiRegisterDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("yapi", EntryPoint = "yapiRegisterDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     private extern static void _yapiRegisterDeviceLogCallback32(IntPtr fct);
 
-    [DllImport("yapi.dll", EntryPoint = "yapiStartStopDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    [DllImport("yapi", EntryPoint = "yapiStartStopDeviceLogCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiStartStopDeviceLogCallback32(StringBuilder errmsg, int start_stop);
 
     // 64 bits dll entry points
@@ -1141,6 +1141,38 @@ internal static class SafeNativeMethods
              }
         }
     }
+    [DllImport("yapi", EntryPoint = "yapiSetNetDevListValidity", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static void _yapiSetNetDevListValidity32(int sValidity);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiSetNetDevListValidity", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static void _yapiSetNetDevListValidity64(int sValidity);
+    internal static void _yapiSetNetDevListValidity(int sValidity)
+    {
+        if (IntPtr.Size == 4) {
+             _yapiSetNetDevListValidity32(sValidity);
+        } else {
+             try {
+                 _yapiSetNetDevListValidity64(sValidity);
+             } catch (System.DllNotFoundException) {
+                 _yapiSetNetDevListValidity32(sValidity);
+             }
+        }
+    }
+    [DllImport("yapi", EntryPoint = "yapiGetNetDevListValidity", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static int _yapiGetNetDevListValidity32();
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetNetDevListValidity", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static int _yapiGetNetDevListValidity64();
+    internal static int _yapiGetNetDevListValidity()
+    {
+        if (IntPtr.Size == 4) {
+             return _yapiGetNetDevListValidity32();
+        } else {
+             try {
+                 return _yapiGetNetDevListValidity64();
+             } catch (System.DllNotFoundException) {
+                 return _yapiGetNetDevListValidity32();
+             }
+        }
+    }
 //--- (end of generated code: YFunction dlldef)
 }
 
@@ -1156,10 +1188,7 @@ public class YAPI
     internal static Object globalLock = new Object();
 
     static bool _apiInitialized = false;
-    // Default cache validity (in [ms]) before reloading data from device. This saves a lots of trafic.
-    // Note that a value undger 2 ms makes little sense since a USB bus itself has a 2ms roundtrip period
-
-    public static ulong DefaultCacheValidity = 5;
+    internal static YAPIContext _yapiContext = new YAPIContext();
     public const string INVALID_STRING = "!INVALID!";
     public const double INVALID_DOUBLE = -1.79769313486231E+308;
     public const int INVALID_INT = -2147483648;
@@ -1189,7 +1218,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "31315";
+    public const string YOCTO_API_BUILD_NO = "31701";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -2352,7 +2381,7 @@ public class YAPI
 
                 // store result in cache
                 _cacheJson = apires;
-                _cacheStamp = YAPI.GetTickCount() + YAPI.DefaultCacheValidity;
+                _cacheStamp = YAPI.GetTickCount() + YAPI._yapiContext.GetCacheValidity();
             }
 
             return YAPI.SUCCESS;
@@ -3202,6 +3231,9 @@ public class YAPI
     static GCHandle native_yDeviceLogAnchor = GCHandle.Alloc(native_yDeviceLogDelegate);
 
 
+
+
+
     /**
      * <summary>
      *   Returns the version identifier for the Yoctopuce library in use.
@@ -3304,7 +3336,7 @@ public class YAPI
         YDevice_devCache = new List<YDevice>();
         _PlugEvents = new List<PlugEvent>(5);
         _DataEvents = new List<DataEvent>(10);
-        ylog = null;
+        
         yArrival = null;
         yRemoval = null;
         yChange = null;
@@ -3358,7 +3390,7 @@ public class YAPI
             _DataEvents.Clear();
             _DataEvents = null;
             YFunction._CalibHandlers.Clear();
-
+            ylog = null;
             _apiInitialized = false;
         }
     }
@@ -3906,9 +3938,10 @@ public class YAPI
 
     internal static YRETCODE yapiUpdateDeviceList(uint force, ref string errmsg)
     {
+        YRETCODE res = YAPI.SUCCESS;
         StringBuilder buffer = new StringBuilder(YOCTO_ERRMSG_LEN);
         buffer.Length = 0;
-        YRETCODE res = SafeNativeMethods._yapiUpdateDeviceList(force, buffer);
+        res = SafeNativeMethods._yapiUpdateDeviceList(force, buffer);
         if (YAPI.YISERR(res)) {
             errmsg = buffer.ToString();
         }
@@ -3965,11 +3998,210 @@ public class YAPI
         errmsg = buffer.ToString();
         return functionReturnValue;
     }
+    //--- (generated code: YAPIContext yapiwrapper)
+    /**
+     * <summary>
+     *   Change the time between each forced enumeration of the YoctoHub used.
+     * <para>
+     *   By default, the library performs a complete enumeration every 10 seconds.
+     *   To reduce network traffic it is possible to increase this delay.
+     *   This is particularly useful when a YoctoHub is connected to a GSM network
+     *   where the traffic is charged. This setting does not affect modules connected by USB,
+     *   nor the operation of arrival/removal callbacks.
+     *   Note: This function must be called after <c>yInitAPI</c>.
+     * </para>
+     * </summary>
+     * <param name="deviceListValidity">
+     *   number of seconds between each enumeration.
+     * </param>
+     */
+    public static void SetDeviceListValidity(int deviceListValidity)
+    {
+        _yapiContext.SetDeviceListValidity(deviceListValidity);
+    }
+    /**
+     * <summary>
+     *   Returns the time between each forced enumeration of the YoctoHub used.
+     * <para>
+     *   Note: This function must be called after <c>yInitAPI</c>.
+     * </para>
+     * </summary>
+     * <returns>
+     *   the number of seconds between each enumeration.
+     * </returns>
+     */
+    public static int GetDeviceListValidity()
+    {
+        return _yapiContext.GetDeviceListValidity();
+    }
+    /**
+     * <summary>
+     *   Change the validity period of the data loaded by the library.
+     * <para>
+     *   By default, when accessing a module, all the attributes of the
+     *   module functions are automatically kept in cache for the standard
+     *   duration (5 ms). This method can be used to change this standard duration,
+     *   for example in order to reduce network or USB traffic. This parameter
+     *   does not affect value change callbacks
+     *   Note: This function must be called after <c>yInitAPI</c>.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="cacheValidityMs">
+     *   an integer corresponding to the validity attributed to the
+     *   loaded function parameters, in milliseconds
+     * </param>
+     */
+    public static void SetCacheValidity(ulong cacheValidityMs)
+    {
+        _yapiContext.SetCacheValidity(cacheValidityMs);
+    }
+    /**
+     * <summary>
+     *   Returns the validity period of the data loaded by the library.
+     * <para>
+     *   This method returns the cache validity of all attributes
+     *   module functions.
+     *   Note: This function must be called after <c>yInitAPI </c>.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the validity attributed to the
+     *   loaded function parameters, in milliseconds
+     * </returns>
+     */
+    public static ulong GetCacheValidity()
+    {
+        return _yapiContext.GetCacheValidity();
+    }
+//--- (end of generated code: YAPIContext yapiwrapper)
 }
 
 // Backward-compatibility with previous versions of the library
 public class yAPI : YAPI
 { }
+
+
+
+//--- (generated code: YAPIContext return codes)
+    //--- (end of generated code: YAPIContext return codes)
+//--- (generated code: YAPIContext dlldef)
+//--- (end of generated code: YAPIContext dlldef)
+//--- (generated code: YAPIContext class start)
+public class YAPIContext
+{
+//--- (end of generated code: YAPIContext class start)
+
+    //--- (generated code: YAPIContext definitions)
+
+    protected ulong _cacheValidity = 5;
+    //--- (end of generated code: YAPIContext definitions)
+
+    public YAPIContext()    {
+        //--- (generated code: YAPIContext attributes initialization)
+        //--- (end of generated code: YAPIContext attributes initialization)
+    }
+
+    //--- (generated code: YAPIContext implementation)
+
+
+    /**
+     * <summary>
+     *   Change the time between each forced enumeration of the YoctoHub used.
+     * <para>
+     *   By default, the library performs a complete enumeration every 10 seconds.
+     *   To reduce network traffic it is possible to increase this delay.
+     *   This is particularly useful when a YoctoHub is connected to a GSM network
+     *   where the traffic is charged. This setting does not affect modules connected by USB,
+     *   nor the operation of arrival/removal callbacks.
+     *   Note: This function must be called after <c>yInitAPI</c>.
+     * </para>
+     * </summary>
+     * <param name="deviceListValidity">
+     *   number of seconds between each enumeration.
+     * </param>
+     */
+    public virtual void SetDeviceListValidity(int deviceListValidity)
+    {
+        SafeNativeMethods._yapiSetNetDevListValidity(deviceListValidity);
+    }
+
+    /**
+     * <summary>
+     *   Returns the time between each forced enumeration of the YoctoHub used.
+     * <para>
+     *   Note: This function must be called after <c>yInitAPI</c>.
+     * </para>
+     * </summary>
+     * <returns>
+     *   the number of seconds between each enumeration.
+     * </returns>
+     */
+    public virtual int GetDeviceListValidity()
+    {
+        int res;
+        res = SafeNativeMethods._yapiGetNetDevListValidity();
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Change the validity period of the data loaded by the library.
+     * <para>
+     *   By default, when accessing a module, all the attributes of the
+     *   module functions are automatically kept in cache for the standard
+     *   duration (5 ms). This method can be used to change this standard duration,
+     *   for example in order to reduce network or USB traffic. This parameter
+     *   does not affect value change callbacks
+     *   Note: This function must be called after <c>yInitAPI</c>.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="cacheValidityMs">
+     *   an integer corresponding to the validity attributed to the
+     *   loaded function parameters, in milliseconds
+     * </param>
+     */
+    public virtual void SetCacheValidity(ulong cacheValidityMs)
+    {
+        this._cacheValidity = cacheValidityMs;
+    }
+
+    /**
+     * <summary>
+     *   Returns the validity period of the data loaded by the library.
+     * <para>
+     *   This method returns the cache validity of all attributes
+     *   module functions.
+     *   Note: This function must be called after <c>yInitAPI </c>.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the validity attributed to the
+     *   loaded function parameters, in milliseconds
+     * </returns>
+     */
+    public virtual ulong GetCacheValidity()
+    {
+        return this._cacheValidity;
+    }
+
+    //--- (end of generated code: YAPIContext implementation)
+
+    //--- (generated code: YAPIContext functions)
+
+
+
+    //--- (end of generated code: YAPIContext functions)
+}
+
+
 
 //--- (generated code: YFirmwareUpdate class start)
 /**
@@ -5533,7 +5765,11 @@ public class YDataSet
                 url = stream._get_url();
             }
         }
-        return this.processMore(this._progress, this._parent._download(url));
+        try {
+            return this.processMore(this._progress, this._parent._download(url));
+        } catch {
+            return this.processMore(this._progress, this._parent._download(url));
+        }
     }
 
     /**
@@ -6260,7 +6496,7 @@ public class YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return LOGICALNAME_INVALID;
                 }
             }
@@ -6327,7 +6563,7 @@ public class YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return ADVERTISEDVALUE_INVALID;
                 }
             }
@@ -6916,7 +7152,7 @@ public class YFunction
             }
 
             // Preload the function data, since we have it in device cache
-            load(YAPI.DefaultCacheValidity);
+            load(YAPI._yapiContext.GetCacheValidity());
             return true;
         }
     }
@@ -7447,7 +7683,7 @@ public class YModule : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration == 0) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return PRODUCTNAME_INVALID;
                 }
             }
@@ -7476,7 +7712,7 @@ public class YModule : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration == 0) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return SERIALNUMBER_INVALID;
                 }
             }
@@ -7505,7 +7741,7 @@ public class YModule : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration == 0) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return PRODUCTID_INVALID;
                 }
             }
@@ -7534,7 +7770,7 @@ public class YModule : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return PRODUCTRELEASE_INVALID;
                 }
             }
@@ -7563,7 +7799,7 @@ public class YModule : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return FIRMWARERELEASE_INVALID;
                 }
             }
@@ -7593,7 +7829,7 @@ public class YModule : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return PERSISTENTSETTINGS_INVALID;
                 }
             }
@@ -7631,7 +7867,7 @@ public class YModule : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return LUMINOSITY_INVALID;
                 }
             }
@@ -7693,7 +7929,7 @@ public class YModule : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return BEACON_INVALID;
                 }
             }
@@ -7751,7 +7987,7 @@ public class YModule : YFunction
         long res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return UPTIME_INVALID;
                 }
             }
@@ -7780,7 +8016,7 @@ public class YModule : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return USBCURRENT_INVALID;
                 }
             }
@@ -7811,7 +8047,7 @@ public class YModule : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return REBOOTCOUNTDOWN_INVALID;
                 }
             }
@@ -7850,7 +8086,7 @@ public class YModule : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return USERVAR_INVALID;
                 }
             }
@@ -9764,7 +10000,7 @@ public class YSensor : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return UNIT_INVALID;
                 }
             }
@@ -9794,7 +10030,7 @@ public class YSensor : YFunction
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return CURRENTVALUE_INVALID;
                 }
             }
@@ -9860,7 +10096,7 @@ public class YSensor : YFunction
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return LOWESTVALUE_INVALID;
                 }
             }
@@ -9922,7 +10158,7 @@ public class YSensor : YFunction
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return HIGHESTVALUE_INVALID;
                 }
             }
@@ -9953,7 +10189,7 @@ public class YSensor : YFunction
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return CURRENTRAWVALUE_INVALID;
                 }
             }
@@ -9984,7 +10220,7 @@ public class YSensor : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return LOGFREQUENCY_INVALID;
                 }
             }
@@ -10048,7 +10284,7 @@ public class YSensor : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return REPORTFREQUENCY_INVALID;
                 }
             }
@@ -10112,7 +10348,7 @@ public class YSensor : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return ADVMODE_INVALID;
                 }
             }
@@ -10157,7 +10393,7 @@ public class YSensor : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return CALIBRATIONPARAM_INVALID;
                 }
             }
@@ -10228,7 +10464,7 @@ public class YSensor : YFunction
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return RESOLUTION_INVALID;
                 }
             }
@@ -10259,7 +10495,7 @@ public class YSensor : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return SENSORSTATE_INVALID;
                 }
             }
@@ -10783,7 +11019,7 @@ public class YSensor : YFunction
         // Load function parameters if not yet loaded
         lock (_thisLock) {
             if (this._scale == 0) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return YAPI.DEVICE_NOT_FOUND;
                 }
             }
@@ -10821,7 +11057,7 @@ public class YSensor : YFunction
         }
         // Load function parameters if not yet loaded
         if (this._scale == 0) {
-            if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                 return YAPI.INVALID_STRING;
             }
         }
@@ -11465,7 +11701,7 @@ public class YDataLogger : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return CURRENTRUNINDEX_INVALID;
                 }
             }
@@ -11494,7 +11730,7 @@ public class YDataLogger : YFunction
         long res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return TIMEUTC_INVALID;
                 }
             }
@@ -11553,7 +11789,7 @@ public class YDataLogger : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return RECORDING_INVALID;
                 }
             }
@@ -11614,7 +11850,7 @@ public class YDataLogger : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return AUTOSTART_INVALID;
                 }
             }
@@ -11676,7 +11912,7 @@ public class YDataLogger : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return BEACONDRIVEN_INVALID;
                 }
             }
@@ -11722,7 +11958,7 @@ public class YDataLogger : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return CLEARHISTORY_INVALID;
                 }
             }
@@ -11962,7 +12198,7 @@ public class YDataLogger : YFunction
 
         res = dev.HTTPRequest(query, out buffer, ref errmsg);
         if (YAPI.YISERR(res)) {
-            res = YAPI.UpdateDeviceList(ref errmsg);
+            res = YAPI.yapiUpdateDeviceList(1, ref errmsg);
             if (YAPI.YISERR(res)) {
                 _throw(res, errmsg);
                 jsondata = null;

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_genericsensor.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_genericsensor.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YGenericSensor return codes)
 //--- (YGenericSensor dlldef)
 //--- (end of YGenericSensor dlldef)
+//--- (YGenericSensor yapiwrapper)
+//--- (end of YGenericSensor yapiwrapper)
 //--- (YGenericSensor class start)
 /**
  * <summary>
@@ -183,7 +185,7 @@ public class YGenericSensor : YSensor
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return SIGNALVALUE_INVALID;
                 }
             }
@@ -212,7 +214,7 @@ public class YGenericSensor : YSensor
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration == 0) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return SIGNALUNIT_INVALID;
                 }
             }
@@ -241,7 +243,7 @@ public class YGenericSensor : YSensor
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return SIGNALRANGE_INVALID;
                 }
             }
@@ -300,7 +302,7 @@ public class YGenericSensor : YSensor
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return VALUERANGE_INVALID;
                 }
             }
@@ -393,7 +395,7 @@ public class YGenericSensor : YSensor
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return SIGNALBIAS_INVALID;
                 }
             }
@@ -430,7 +432,7 @@ public class YGenericSensor : YSensor
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return SIGNALSAMPLING_INVALID;
                 }
             }

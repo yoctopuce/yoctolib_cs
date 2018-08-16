@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_motor.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_motor.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindMotor(), the high-level API for Motor functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YMotor return codes)
 //--- (YMotor dlldef)
 //--- (end of YMotor dlldef)
+//--- (YMotor yapiwrapper)
+//--- (end of YMotor yapiwrapper)
 //--- (YMotor class start)
 /**
  * <summary>
@@ -189,7 +191,7 @@ public class YMotor : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return MOTORSTATUS_INVALID;
                 }
             }
@@ -261,7 +263,7 @@ public class YMotor : YFunction
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return DRIVINGFORCE_INVALID;
                 }
             }
@@ -322,7 +324,7 @@ public class YMotor : YFunction
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return BRAKINGFORCE_INVALID;
                 }
             }
@@ -392,7 +394,7 @@ public class YMotor : YFunction
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return CUTOFFVOLTAGE_INVALID;
                 }
             }
@@ -424,7 +426,7 @@ public class YMotor : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return OVERCURRENTLIMIT_INVALID;
                 }
             }
@@ -520,7 +522,7 @@ public class YMotor : YFunction
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return FREQUENCY_INVALID;
                 }
             }
@@ -551,7 +553,7 @@ public class YMotor : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return STARTERTIME_INVALID;
                 }
             }
@@ -616,7 +618,7 @@ public class YMotor : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return FAILSAFETIMEOUT_INVALID;
                 }
             }
@@ -664,7 +666,7 @@ public class YMotor : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

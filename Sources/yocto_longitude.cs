@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_longitude.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_longitude.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindLongitude(), the high-level API for Longitude functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YLongitude return codes)
 //--- (YLongitude dlldef)
 //--- (end of YLongitude dlldef)
+//--- (YLongitude yapiwrapper)
+//--- (end of YLongitude yapiwrapper)
 //--- (YLongitude class start)
 /**
  * <summary>

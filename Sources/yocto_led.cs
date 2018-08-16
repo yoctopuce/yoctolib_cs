@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_led.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_led.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindLed(), the high-level API for Led functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YLed return codes)
 //--- (YLed dlldef)
 //--- (end of YLed dlldef)
+//--- (YLed yapiwrapper)
+//--- (end of YLed yapiwrapper)
 //--- (YLed class start)
 /**
  * <summary>
@@ -134,7 +136,7 @@ public class YLed : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return POWER_INVALID;
                 }
             }
@@ -192,7 +194,7 @@ public class YLed : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return LUMINOSITY_INVALID;
                 }
             }
@@ -252,7 +254,7 @@ public class YLed : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return BLINKING_INVALID;
                 }
             }

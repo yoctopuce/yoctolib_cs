@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_voltageoutput.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_voltageoutput.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindVoltageOutput(), the high-level API for VoltageOutput functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YVoltageOutput return codes)
 //--- (YVoltageOutput dlldef)
 //--- (end of YVoltageOutput dlldef)
+//--- (YVoltageOutput yapiwrapper)
+//--- (end of YVoltageOutput yapiwrapper)
 //--- (YVoltageOutput class start)
 /**
  * <summary>
@@ -154,7 +156,7 @@ public class YVoltageOutput : YFunction
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return CURRENTVOLTAGE_INVALID;
                 }
             }
@@ -168,7 +170,7 @@ public class YVoltageOutput : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return VOLTAGETRANSITION_INVALID;
                 }
             }
@@ -237,7 +239,7 @@ public class YVoltageOutput : YFunction
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return VOLTAGEATSTARTUP_INVALID;
                 }
             }

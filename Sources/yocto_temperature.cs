@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_temperature.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_temperature.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindTemperature(), the high-level API for Temperature functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YTemperature return codes)
 //--- (YTemperature dlldef)
 //--- (end of YTemperature dlldef)
+//--- (YTemperature yapiwrapper)
+//--- (end of YTemperature yapiwrapper)
 //--- (YTemperature class start)
 /**
  * <summary>
@@ -196,7 +198,7 @@ public class YTemperature : YSensor
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return SENSORTYPE_INVALID;
                 }
             }
@@ -266,7 +268,7 @@ public class YTemperature : YSensor
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return SIGNALVALUE_INVALID;
                 }
             }
@@ -295,7 +297,7 @@ public class YTemperature : YSensor
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration == 0) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return SIGNALUNIT_INVALID;
                 }
             }
@@ -309,7 +311,7 @@ public class YTemperature : YSensor
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

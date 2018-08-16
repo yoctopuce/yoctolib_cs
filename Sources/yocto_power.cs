@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_power.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_power.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindPower(), the high-level API for Power functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YPower return codes)
 //--- (YPower dlldef)
 //--- (end of YPower dlldef)
+//--- (YPower yapiwrapper)
+//--- (end of YPower yapiwrapper)
 //--- (YPower class start)
 /**
  * <summary>
@@ -131,7 +133,7 @@ public class YPower : YSensor
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return COSPHI_INVALID;
                 }
             }
@@ -171,7 +173,7 @@ public class YPower : YSensor
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return METER_INVALID;
                 }
             }
@@ -200,7 +202,7 @@ public class YPower : YSensor
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return METERTIMER_INVALID;
                 }
             }

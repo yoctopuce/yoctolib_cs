@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_poweroutput.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_poweroutput.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindPowerOutput(), the high-level API for PowerOutput functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YPowerOutput return codes)
 //--- (YPowerOutput dlldef)
 //--- (end of YPowerOutput dlldef)
+//--- (YPowerOutput yapiwrapper)
+//--- (end of YPowerOutput yapiwrapper)
 //--- (YPowerOutput class start)
 /**
  * <summary>
@@ -117,7 +119,7 @@ public class YPowerOutput : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return VOLTAGE_INVALID;
                 }
             }

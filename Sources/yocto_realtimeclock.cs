@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_realtimeclock.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_realtimeclock.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YRealTimeClock return codes)
 //--- (YRealTimeClock dlldef)
 //--- (end of YRealTimeClock dlldef)
+//--- (YRealTimeClock yapiwrapper)
+//--- (end of YRealTimeClock yapiwrapper)
 //--- (YRealTimeClock class start)
 /**
  * <summary>
@@ -136,7 +138,7 @@ public class YRealTimeClock : YFunction
         long res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return UNIXTIME_INVALID;
                 }
             }
@@ -195,7 +197,7 @@ public class YRealTimeClock : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return DATETIME_INVALID;
                 }
             }
@@ -224,7 +226,7 @@ public class YRealTimeClock : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return UTCOFFSET_INVALID;
                 }
             }
@@ -284,7 +286,7 @@ public class YRealTimeClock : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return TIMESET_INVALID;
                 }
             }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_carbondioxide.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_carbondioxide.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YCarbonDioxide return codes)
 //--- (YCarbonDioxide dlldef)
 //--- (end of YCarbonDioxide dlldef)
+//--- (YCarbonDioxide yapiwrapper)
+//--- (end of YCarbonDioxide yapiwrapper)
 //--- (YCarbonDioxide class start)
 /**
  * <summary>
@@ -125,7 +127,7 @@ public class YCarbonDioxide : YSensor
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return ABCPERIOD_INVALID;
                 }
             }
@@ -173,7 +175,7 @@ public class YCarbonDioxide : YSensor
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

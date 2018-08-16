@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_voltage.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_voltage.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindVoltage(), the high-level API for Voltage functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YVoltage return codes)
 //--- (YVoltage dlldef)
 //--- (end of YVoltage dlldef)
+//--- (YVoltage yapiwrapper)
+//--- (end of YVoltage yapiwrapper)
 //--- (YVoltage class start)
 /**
  * <summary>
@@ -103,7 +105,7 @@ public class YVoltage : YSensor
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return ENABLED_INVALID;
                 }
             }

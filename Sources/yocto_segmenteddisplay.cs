@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_segmenteddisplay.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_segmenteddisplay.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YSegmentedDisplay return codes)
 //--- (YSegmentedDisplay dlldef)
 //--- (end of YSegmentedDisplay dlldef)
+//--- (YSegmentedDisplay yapiwrapper)
+//--- (end of YSegmentedDisplay yapiwrapper)
 //--- (YSegmentedDisplay class start)
 /**
  * <summary>
@@ -122,7 +124,7 @@ public class YSegmentedDisplay : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return DISPLAYEDTEXT_INVALID;
                 }
             }
@@ -165,7 +167,7 @@ public class YSegmentedDisplay : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return DISPLAYMODE_INVALID;
                 }
             }

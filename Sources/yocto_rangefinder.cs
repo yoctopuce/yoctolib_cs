@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_rangefinder.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_rangefinder.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindRangeFinder(), the high-level API for RangeFinder functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YRangeFinder return codes)
 //--- (YRangeFinder dlldef)
 //--- (end of YRangeFinder dlldef)
+//--- (YRangeFinder yapiwrapper)
+//--- (end of YRangeFinder yapiwrapper)
 //--- (YRangeFinder class start)
 /**
  * <summary>
@@ -178,7 +180,7 @@ public class YRangeFinder : YSensor
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return RANGEFINDERMODE_INVALID;
                 }
             }
@@ -225,7 +227,7 @@ public class YRangeFinder : YSensor
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return HARDWARECALIBRATION_INVALID;
                 }
             }
@@ -263,7 +265,7 @@ public class YRangeFinder : YSensor
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return CURRENTTEMPERATURE_INVALID;
                 }
             }
@@ -277,7 +279,7 @@ public class YRangeFinder : YSensor
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

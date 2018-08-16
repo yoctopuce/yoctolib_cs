@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_currentloopoutput.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_currentloopoutput.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YCurrentLoopOutput return codes)
 //--- (YCurrentLoopOutput dlldef)
 //--- (end of YCurrentLoopOutput dlldef)
+//--- (YCurrentLoopOutput yapiwrapper)
+//--- (end of YCurrentLoopOutput yapiwrapper)
 //--- (YCurrentLoopOutput class start)
 /**
  * <summary>
@@ -166,7 +168,7 @@ public class YCurrentLoopOutput : YFunction
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return CURRENT_INVALID;
                 }
             }
@@ -180,7 +182,7 @@ public class YCurrentLoopOutput : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return CURRENTTRANSITION_INVALID;
                 }
             }
@@ -249,7 +251,7 @@ public class YCurrentLoopOutput : YFunction
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return CURRENTATSTARTUP_INVALID;
                 }
             }
@@ -282,7 +284,7 @@ public class YCurrentLoopOutput : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return LOOPPOWER_INVALID;
                 }
             }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_pwmpowersource.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_pwmpowersource.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YPwmPowerSource return codes)
 //--- (YPwmPowerSource dlldef)
 //--- (end of YPwmPowerSource dlldef)
+//--- (YPwmPowerSource yapiwrapper)
+//--- (end of YPwmPowerSource yapiwrapper)
 //--- (YPwmPowerSource class start)
 /**
  * <summary>
@@ -119,7 +121,7 @@ public class YPwmPowerSource : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return POWERMODE_INVALID;
                 }
             }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_latitude.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_latitude.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindLatitude(), the high-level API for Latitude functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YLatitude return codes)
 //--- (YLatitude dlldef)
 //--- (end of YLatitude dlldef)
+//--- (YLatitude yapiwrapper)
+//--- (end of YLatitude yapiwrapper)
 //--- (YLatitude class start)
 /**
  * <summary>

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_daisychain.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_daisychain.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindDaisyChain(), the high-level API for DaisyChain functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YDaisyChain return codes)
 //--- (YDaisyChain dlldef)
 //--- (end of YDaisyChain dlldef)
+//--- (YDaisyChain yapiwrapper)
+//--- (end of YDaisyChain yapiwrapper)
 //--- (YDaisyChain class start)
 /**
  * <summary>
@@ -133,7 +135,7 @@ public class YDaisyChain : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return DAISYSTATE_INVALID;
                 }
             }
@@ -162,7 +164,7 @@ public class YDaisyChain : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return CHILDCOUNT_INVALID;
                 }
             }
@@ -191,7 +193,7 @@ public class YDaisyChain : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return REQUIREDCHILDCOUNT_INVALID;
                 }
             }

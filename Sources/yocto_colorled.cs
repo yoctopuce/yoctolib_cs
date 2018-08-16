@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorled.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_colorled.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindColorLed(), the high-level API for ColorLed functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YColorLed return codes)
 //--- (YColorLed dlldef)
 //--- (end of YColorLed dlldef)
+//--- (YColorLed yapiwrapper)
+//--- (end of YColorLed yapiwrapper)
 //--- (YColorLed class start)
 /**
  * <summary>
@@ -190,7 +192,7 @@ public class YColorLed : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return RGBCOLOR_INVALID;
                 }
             }
@@ -249,7 +251,7 @@ public class YColorLed : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return HSLCOLOR_INVALID;
                 }
             }
@@ -293,7 +295,7 @@ public class YColorLed : YFunction
         YColorLedMove res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return RGBMOVE_INVALID;
                 }
             }
@@ -346,7 +348,7 @@ public class YColorLed : YFunction
         YColorLedMove res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return HSLMOVE_INVALID;
                 }
             }
@@ -414,7 +416,7 @@ public class YColorLed : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return RGBCOLORATPOWERON_INVALID;
                 }
             }
@@ -472,7 +474,7 @@ public class YColorLed : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return BLINKSEQSIZE_INVALID;
                 }
             }
@@ -501,7 +503,7 @@ public class YColorLed : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration == 0) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return BLINKSEQMAXSIZE_INVALID;
                 }
             }
@@ -534,7 +536,7 @@ public class YColorLed : YFunction
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return BLINKSEQSIGNATURE_INVALID;
                 }
             }
@@ -548,7 +550,7 @@ public class YColorLed : YFunction
         string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

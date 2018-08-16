@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_compass.cs 28736 2017-10-03 08:04:29Z seb $
+ * $Id: yocto_compass.cs 31373 2018-07-26 12:44:19Z seb $
  *
  * Implements yFindCompass(), the high-level API for Compass functions
  *
@@ -51,6 +51,8 @@ using YFUN_DESCR = System.Int32;
     //--- (end of YCompass return codes)
 //--- (YCompass dlldef)
 //--- (end of YCompass dlldef)
+//--- (YCompass yapiwrapper)
+//--- (end of YCompass yapiwrapper)
 //--- (YCompass class start)
 /**
  * <summary>
@@ -137,7 +139,7 @@ public class YCompass : YSensor
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return BANDWIDTH_INVALID;
                 }
             }
@@ -182,7 +184,7 @@ public class YCompass : YSensor
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return AXIS_INVALID;
                 }
             }
@@ -211,7 +213,7 @@ public class YCompass : YSensor
         double res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return MAGNETICHEADING_INVALID;
                 }
             }
