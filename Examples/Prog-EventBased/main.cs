@@ -31,7 +31,7 @@ namespace ConsoleApplication1
 
     static void configChange(YModule m)
     {
-        Console.WriteLine("config change: " + m.get_serialNumber());
+      Console.WriteLine("config change: " + m.get_serialNumber());
     }
 
     static void deviceArrival(YModule m)
