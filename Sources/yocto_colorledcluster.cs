@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_colorledcluster.cs 31373 2018-07-26 12:44:19Z seb $
+ * $Id: yocto_colorledcluster.cs 31894 2018-08-24 21:29:05Z seb $
  *
  * Implements yFindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -531,6 +531,38 @@ public class YColorLedCluster : YFunction
      */
     public virtual int set_rgbColorAtPowerOn(int ledIndex, int count, int rgbValue)
     {
+        return this.sendCommand("SC"+Convert.ToString(ledIndex)+","+Convert.ToString(count)+","+String.Format("{0:x}",rgbValue));
+    }
+
+    /**
+     * <summary>
+     *   Changes the  color at device startup of consecutve LEDs in the cluster, using a HSL color.
+     * <para>
+     *   Encoding is done as follows: 0xHHSSLL.
+     *   Don't forget to call <c>saveLedsConfigAtPowerOn()</c> to make sure the modification is saved in the
+     *   device flash memory.
+     * </para>
+     * </summary>
+     * <param name="ledIndex">
+     *   index of the first affected LED.
+     * </param>
+     * <param name="count">
+     *   affected LED count.
+     * </param>
+     * <param name="hslValue">
+     *   new color.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int set_hslColorAtPowerOn(int ledIndex, int count, int hslValue)
+    {
+        int rgbValue;
+        rgbValue = this.hsl2rgb(hslValue);
         return this.sendCommand("SC"+Convert.ToString(ledIndex)+","+Convert.ToString(count)+","+String.Format("{0:x}",rgbValue));
     }
 
@@ -1667,6 +1699,78 @@ public class YColorLedCluster : YFunction
             res.Add(started);
             idx = idx + 1;
         }
+        return res;
+    }
+
+    public virtual int hsl2rgbInt(int temp1, int temp2, int temp3)
+    {
+        if (temp3 >= 170) {
+            return (((temp1 + 127)) / (255));
+        }
+        if (temp3 > 42) {
+            if (temp3 <= 127) {
+                return (((temp2 + 127)) / (255));
+            }
+            temp3 = 170 - temp3;
+        }
+        return (((temp1*255 + (temp2-temp1) * (6 * temp3) + 32512)) / (65025));
+    }
+
+    public virtual int hsl2rgb(int hslValue)
+    {
+        int R;
+        int G;
+        int B;
+        int H;
+        int S;
+        int L;
+        int temp1;
+        int temp2;
+        int temp3;
+        int res;
+        L = ((hslValue) & (0xff));
+        S = ((((hslValue) >> (8))) & (0xff));
+        H = ((((hslValue) >> (16))) & (0xff));
+        if (S==0) {
+            res = ((L) << (16))+((L) << (8))+L;
+            return res;
+        }
+        if (L<=127) {
+            temp2 = L * (255 + S);
+        } else {
+            temp2 = (L+S) * 255 - L*S;
+        }
+        temp1 = 510 * L - temp2;
+        // R
+        temp3 = (H + 85);
+        if (temp3 > 255) {
+            temp3 = temp3-255;
+        }
+        R = this.hsl2rgbInt(temp1, temp2, temp3);
+        // G
+        temp3 = H;
+        if (temp3 > 255) {
+            temp3 = temp3-255;
+        }
+        G = this.hsl2rgbInt(temp1, temp2, temp3);
+        // B
+        if (H >= 85) {
+            temp3 = H - 85 ;
+        } else {
+            temp3 = H + 170;
+        }
+        B = this.hsl2rgbInt(temp1, temp2, temp3);
+        // just in case
+        if (R>255) {
+            R=255;
+        }
+        if (G>255) {
+            G=255;
+        }
+        if (B>255) {
+            B=255;
+        }
+        res = ((R) << (16))+((G) << (8))+B;
         return res;
     }
 
