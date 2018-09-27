@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 31770 2018-08-20 09:54:36Z seb $
+ * $Id: yocto_api.cs 32376 2018-09-27 07:57:07Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -125,6 +125,7 @@ internal static class SafeNativeMethods
         public string firmware;
 
         public u8 beacon;
+        public u8 pad;
     }
 
     internal static yDeviceSt emptyDeviceSt()
@@ -1014,34 +1015,34 @@ internal static class SafeNativeMethods
         }
     }
     [DllImport("yapi", EntryPoint = "yapiHTTPRequestSyncStartOutOfBand", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
-    private extern static YRETCODE _yapiHTTPRequestSyncStartOutOfBand32(ref YIOHDL iohdl, int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr reply, ref int replysize, ref IntPtr progress_cb, IntPtr progress_ctx, StringBuilder errmsg);
+    private extern static YRETCODE _yapiHTTPRequestSyncStartOutOfBand32(ref YIOHDL iohdl, int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr reply, ref int replysize, IntPtr progress_cb, IntPtr progress_ctx, StringBuilder errmsg);
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequestSyncStartOutOfBand", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
-    private extern static YRETCODE _yapiHTTPRequestSyncStartOutOfBand64(ref YIOHDL iohdl, int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr reply, ref int replysize, ref IntPtr progress_cb, IntPtr progress_ctx, StringBuilder errmsg);
-    internal static YRETCODE _yapiHTTPRequestSyncStartOutOfBand(ref YIOHDL iohdl, int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr reply, ref int replysize, ref IntPtr progress_cb, IntPtr progress_ctx, StringBuilder errmsg)
+    private extern static YRETCODE _yapiHTTPRequestSyncStartOutOfBand64(ref YIOHDL iohdl, int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr reply, ref int replysize, IntPtr progress_cb, IntPtr progress_ctx, StringBuilder errmsg);
+    internal static YRETCODE _yapiHTTPRequestSyncStartOutOfBand(ref YIOHDL iohdl, int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr reply, ref int replysize, IntPtr progress_cb, IntPtr progress_ctx, StringBuilder errmsg)
     {
         if (IntPtr.Size == 4) {
-             return _yapiHTTPRequestSyncStartOutOfBand32(ref iohdl, channel, device, request, requestsize, ref reply, ref replysize, ref progress_cb, progress_ctx, errmsg);
+             return _yapiHTTPRequestSyncStartOutOfBand32(ref iohdl, channel, device, request, requestsize, ref reply, ref replysize, progress_cb, progress_ctx, errmsg);
         } else {
              try {
-                 return _yapiHTTPRequestSyncStartOutOfBand64(ref iohdl, channel, device, request, requestsize, ref reply, ref replysize, ref progress_cb, progress_ctx, errmsg);
+                 return _yapiHTTPRequestSyncStartOutOfBand64(ref iohdl, channel, device, request, requestsize, ref reply, ref replysize, progress_cb, progress_ctx, errmsg);
              } catch (System.DllNotFoundException) {
-                 return _yapiHTTPRequestSyncStartOutOfBand32(ref iohdl, channel, device, request, requestsize, ref reply, ref replysize, ref progress_cb, progress_ctx, errmsg);
+                 return _yapiHTTPRequestSyncStartOutOfBand32(ref iohdl, channel, device, request, requestsize, ref reply, ref replysize, progress_cb, progress_ctx, errmsg);
              }
         }
     }
     [DllImport("yapi", EntryPoint = "yapiHTTPRequestAsyncOutOfBand", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
-    private extern static YRETCODE _yapiHTTPRequestAsyncOutOfBand32(int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr callback, IntPtr context, StringBuilder errmsg);
+    private extern static YRETCODE _yapiHTTPRequestAsyncOutOfBand32(int channel, StringBuilder device, StringBuilder request, int requestsize, IntPtr callback, IntPtr context, StringBuilder errmsg);
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiHTTPRequestAsyncOutOfBand", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
-    private extern static YRETCODE _yapiHTTPRequestAsyncOutOfBand64(int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr callback, IntPtr context, StringBuilder errmsg);
-    internal static YRETCODE _yapiHTTPRequestAsyncOutOfBand(int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr callback, IntPtr context, StringBuilder errmsg)
+    private extern static YRETCODE _yapiHTTPRequestAsyncOutOfBand64(int channel, StringBuilder device, StringBuilder request, int requestsize, IntPtr callback, IntPtr context, StringBuilder errmsg);
+    internal static YRETCODE _yapiHTTPRequestAsyncOutOfBand(int channel, StringBuilder device, StringBuilder request, int requestsize, IntPtr callback, IntPtr context, StringBuilder errmsg)
     {
         if (IntPtr.Size == 4) {
-             return _yapiHTTPRequestAsyncOutOfBand32(channel, device, request, requestsize, ref callback, context, errmsg);
+             return _yapiHTTPRequestAsyncOutOfBand32(channel, device, request, requestsize, callback, context, errmsg);
         } else {
              try {
-                 return _yapiHTTPRequestAsyncOutOfBand64(channel, device, request, requestsize, ref callback, context, errmsg);
+                 return _yapiHTTPRequestAsyncOutOfBand64(channel, device, request, requestsize, callback, context, errmsg);
              } catch (System.DllNotFoundException) {
-                 return _yapiHTTPRequestAsyncOutOfBand32(channel, device, request, requestsize, ref callback, context, errmsg);
+                 return _yapiHTTPRequestAsyncOutOfBand32(channel, device, request, requestsize, callback, context, errmsg);
              }
         }
     }
@@ -1173,6 +1174,22 @@ internal static class SafeNativeMethods
              }
         }
     }
+    [DllImport("yapi", EntryPoint = "yapiRegisterBeaconCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static void _yapiRegisterBeaconCallback32(IntPtr beaconCallback);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiRegisterBeaconCallback", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static void _yapiRegisterBeaconCallback64(IntPtr beaconCallback);
+    internal static void _yapiRegisterBeaconCallback(IntPtr beaconCallback)
+    {
+        if (IntPtr.Size == 4) {
+             _yapiRegisterBeaconCallback32(beaconCallback);
+        } else {
+             try {
+                 _yapiRegisterBeaconCallback64(beaconCallback);
+             } catch (System.DllNotFoundException) {
+                 _yapiRegisterBeaconCallback32(beaconCallback);
+             }
+        }
+    }
 //--- (end of generated code: YFunction dlldef)
 }
 
@@ -1218,7 +1235,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "31897";
+    public const string YOCTO_API_BUILD_NO = "32391";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -1291,6 +1308,9 @@ public class YAPI
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void _yapiDeviceUpdateFunc(YDEV_DESCR dev);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void _yapiBeaconUpdateFunc(YDEV_DESCR dev, int beacon);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void _yapiFunctionUpdateFunc(YFUN_DESCR dev, IntPtr value);
@@ -2544,6 +2564,7 @@ public class YAPI
         private String _value;
         private List<int> _report;
         private double _timestamp;
+        private int _beacon;
 
         public DataEvent(YFunction fun, String value)
         {
@@ -2553,6 +2574,7 @@ public class YAPI
             _value = value;
             _report = null;
             _timestamp = 0;
+            _beacon = -1;
         }
 
         public DataEvent(YSensor sensor, double timestamp, List<int> report)
@@ -2563,6 +2585,7 @@ public class YAPI
             _value = null;
             _timestamp = timestamp;
             _report = report;
+            _beacon = -1;
         }
 
         public DataEvent(YModule module)
@@ -2573,7 +2596,20 @@ public class YAPI
             _value = null;
             _report = null;
             _timestamp = 0;
+            _beacon = -1;
         }
+
+        public DataEvent(YModule module, int beacon)
+        {
+            _fun = null;
+            _sensor = null;
+            _module = module;
+            _value = null;
+            _report = null;
+            _timestamp = 0;
+            _beacon = beacon;
+        }
+
 
         public void invoke()
         {
@@ -2584,7 +2620,11 @@ public class YAPI
                 // new value
                 _fun._invokeValueCallback(_value);
             } else {
-                _module._invokeConfigChangeCallback();
+                if (_beacon < 0) {
+                    _module._invokeConfigChangeCallback();
+                } else {
+                    _module._invokeBeaconCallback(_beacon);
+                }
             }
         }
     }
@@ -2791,9 +2831,27 @@ public class YAPI
         if (yapiGetDeviceInfo(d, ref infos, ref errmsg) != SUCCESS)
             return;
         YModule modul = YModule.FindModule(infos.serial + ".module");
-        ev = new DataEvent(modul);
-        _DataEvents.Add(ev);
+        if (YModule._moduleCallbackList.ContainsKey(modul) && YModule._moduleCallbackList[modul] > 0) {
+            ev = new DataEvent(modul);
+            _DataEvents.Add(ev);
+        }
     }
+
+    public static void native_yBeaconChangeCallback(YDEV_DESCR d, int beacon)
+    {
+        DataEvent ev;
+        SafeNativeMethods.yDeviceSt infos = SafeNativeMethods.emptyDeviceSt();
+        string errmsg = "";
+
+        if (yapiGetDeviceInfo(d, ref infos, ref errmsg) != SUCCESS)
+            return;
+        YModule modul = YModule.FindModule(infos.serial + ".module");
+        if (YModule._moduleCallbackList.ContainsKey(modul) && YModule._moduleCallbackList[modul] > 0) {
+            ev = new DataEvent(modul, beacon);
+            _DataEvents.Add(ev);
+        }
+    }
+
 
     private static void queuesCleanUp()
     {
@@ -3227,6 +3285,9 @@ public class YAPI
     public static _yapiDeviceUpdateFunc native_yDeviceConfigChangeDelegate = native_yDeviceConfigChangeCallback;
     static GCHandle native_yDeviceConfigChangeAnchor = GCHandle.Alloc(native_yDeviceConfigChangeDelegate);
 
+    public static _yapiBeaconUpdateFunc native_yBeaconChangeDelegate = native_yBeaconChangeCallback;
+    static GCHandle native_yBeaconChangeAnchor = GCHandle.Alloc(native_yBeaconChangeDelegate);
+
     public static _yapiDeviceLogCallback native_yDeviceLogDelegate = native_yDeviceLogCallback;
     static GCHandle native_yDeviceLogAnchor = GCHandle.Alloc(native_yDeviceLogDelegate);
 
@@ -3336,7 +3397,7 @@ public class YAPI
         YDevice_devCache = new List<YDevice>();
         _PlugEvents = new List<PlugEvent>(5);
         _DataEvents = new List<DataEvent>(10);
-        
+
         yArrival = null;
         yRemoval = null;
         yChange = null;
@@ -3354,6 +3415,7 @@ public class YAPI
         SafeNativeMethods._yapiRegisterDeviceRemovalCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceRemovalDelegate));
         SafeNativeMethods._yapiRegisterDeviceChangeCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceChangeDelegate));
         SafeNativeMethods._yapiRegisterDeviceConfigChangeCallback(Marshal.GetFunctionPointerForDelegate(native_yDeviceConfigChangeDelegate));
+        SafeNativeMethods._yapiRegisterBeaconCallback(Marshal.GetFunctionPointerForDelegate(native_yBeaconChangeDelegate));
         SafeNativeMethods._yapiRegisterFunctionUpdateCallback(Marshal.GetFunctionPointerForDelegate(native_yFunctionUpdateDelegate));
         SafeNativeMethods._yapiRegisterTimedReportCallback(Marshal.GetFunctionPointerForDelegate(native_yTimedReportDelegate));
         SafeNativeMethods._yapiRegisterHubDiscoveryCallback(Marshal.GetFunctionPointerForDelegate(native_yapiHubDiscoveryDelegate));
@@ -4327,12 +4389,12 @@ public class YFirmwareUpdate
                         this._progress = YAPI.IO_ERROR;
                         this._progress_msg = "Unable to update firmware";
                     } else {
-                        this._progress =  100;
+                        this._progress = 100;
                         this._progress_msg = "success";
                     }
                 }
             } else {
-                this._progress =  100;
+                this._progress = 100;
                 this._progress_msg = "success";
             }
         }
@@ -4519,7 +4581,7 @@ public class YFirmwareUpdate
         int leng;
         err = YAPI.DefaultEncoding.GetString(this._settings);
         leng = (err).Length;
-        if (( leng >= 6) && ("error:" == (err).Substring(0, 6))) {
+        if ((leng >= 6) && ("error:" == (err).Substring(0, 6))) {
             this._progress = -1;
             this._progress_msg = (err).Substring( 6, leng - 6);
         } else {
@@ -7535,6 +7597,7 @@ public class YModule : YFunction
     //--- (generated code: YModule definitions)
     public delegate void LogCallback(YModule module, string logline);
     public delegate void ConfigChangeCallback(YModule module);
+    public delegate void BeaconCallback(YModule module, int beacon);
     public new delegate void ValueCallback(YModule func, string value);
     public new delegate void TimedReportCallback(YModule func, YMeasure measure);
 
@@ -7570,7 +7633,9 @@ public class YModule : YFunction
     protected ValueCallback _valueCallbackModule = null;
     protected LogCallback _logCallback = null;
     protected ConfigChangeCallback _confChangeCallback = null;
+    protected BeaconCallback _beaconCallback = null;
     //--- (end of generated code: YModule definitions)
+    public static Dictionary<YModule, int> _moduleCallbackList = new Dictionary<YModule, int>();
 
     public YModule(string func) : base(func)
     {
@@ -7615,6 +7680,25 @@ public class YModule : YFunction
             return _logCallback;
         }
     }
+
+
+    static void _updateModuleCallbackList(YModule module, bool add)
+    {
+        if (add) {
+            module.isOnline();
+            if (!_moduleCallbackList.ContainsKey(module)) {
+                _moduleCallbackList[module] =1;
+            } else {
+                _moduleCallbackList[module] += 1;
+            }
+        } else {
+            if (_moduleCallbackList.ContainsKey(module) && _moduleCallbackList[module] > 1) {
+                _moduleCallbackList[module] -= 1;
+            }
+        }
+    }
+
+
 
     //--- (generated code: YModule implementation)
 
@@ -8322,6 +8406,11 @@ public class YModule : YFunction
      */
     public virtual int registerConfigChangeCallback(ConfigChangeCallback callback)
     {
+        if (callback != null) {
+            YModule._updateModuleCallbackList(this, true);
+        } else {
+            YModule._updateModuleCallbackList(this, false);
+        }
         this._confChangeCallback = callback;
         return 0;
     }
@@ -8336,6 +8425,39 @@ public class YModule : YFunction
 
     /**
      * <summary>
+     *   Register a callback function, to be called when the localization beacon of the module
+     *   has been changed.
+     * <para>
+     *   The callback function should take two arguments: the YModule object of
+     *   which the beacon has changed, and an integer describing the new beacon state.
+     * </para>
+     * </summary>
+     * <param name="callback">
+     *   The callback function to call, or <c>null</c> to unregister a
+     *   previously registered callback.
+     * </param>
+     */
+    public virtual int registerBeaconCallback(BeaconCallback callback)
+    {
+        if (callback != null) {
+            YModule._updateModuleCallbackList(this, true);
+        } else {
+            YModule._updateModuleCallbackList(this, false);
+        }
+        this._beaconCallback = callback;
+        return 0;
+    }
+
+    public virtual int _invokeBeaconCallback(int beaconState)
+    {
+        if (this._beaconCallback != null) {
+            this._beaconCallback(this, beaconState);
+        }
+        return 0;
+    }
+
+    /**
+     * <summary>
      *   Triggers a configuration change callback, to check if they are supported or not.
      * <para>
      * </para>
@@ -8343,7 +8465,7 @@ public class YModule : YFunction
      */
     public virtual int triggerConfigChangeCallback()
     {
-        this._setAttr("persistentSettings","2");
+        this._setAttr("persistentSettings", "2");
         return 0;
     }
 
@@ -8388,7 +8510,7 @@ public class YModule : YFunction
         }
         //may throw an exception
         serial = this.get_serialNumber();
-        tmp_res = YFirmwareUpdate.CheckFirmware(serial,path, release);
+        tmp_res = YFirmwareUpdate.CheckFirmware(serial, path, release);
         if ((tmp_res).IndexOf("error:") == 0) {
             this._throw(YAPI.INVALID_ARGUMENT, tmp_res);
         }
@@ -8658,10 +8780,10 @@ public class YModule : YFunction
         int i;
         string fid;
 
-        count  = this.functionCount();
+        count = this.functionCount();
         i = 0;
         while (i < count) {
-            fid  = this.functionId(i);
+            fid = this.functionId(i);
             if (fid == funcId) {
                 return true;
             }
@@ -10817,7 +10939,7 @@ public class YSensor : YFunction
             return null;
         }
         hwid = serial + ".dataLogger";
-        logger  = YDataLogger.FindDataLogger(hwid);
+        logger = YDataLogger.FindDataLogger(hwid);
         return logger;
     }
 
