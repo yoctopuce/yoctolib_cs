@@ -1,4 +1,18 @@
-﻿using System;
+/*********************************************************************
+ *
+ *  $Id: main.cs 32713 2018-10-19 15:30:53Z seb $
+ *
+ *  An example that show how to use a  Yocto-4-20mA-Tx
+ *
+ *  You can find more information on our web site:
+ *   Yocto-4-20mA-Tx documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-4-20ma-tx/doc.html
+ *   C# API Reference:
+ *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-cs-EN.html
+ *
+ *********************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -65,7 +79,8 @@ namespace ConsoleApplication1
 
         Console.WriteLine("current loop set to " + value.ToString() + " mA");
       } else {
-        Console.WriteLine("Module not connected (check identification and USB cable)");
+        Console.WriteLine("Module not connected");
+        Console.WriteLine("check identification and USB cable");
       }
       YAPI.FreeAPI();
     }

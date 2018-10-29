@@ -1,10 +1,10 @@
 /*********************************************************************
  *
- * $Id: yocto_relay.cs 31373 2018-07-26 12:44:19Z seb $
+ *  $Id: yocto_relay.cs 32610 2018-10-10 06:52:20Z seb $
  *
- * Implements yFindRelay(), the high-level API for Relay functions
+ *  Implements yFindRelay(), the high-level API for Relay functions
  *
- * - - - - - - - - - License information: - - - - - - - - -
+ *  - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *

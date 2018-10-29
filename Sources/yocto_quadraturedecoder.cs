@@ -1,10 +1,10 @@
 /*********************************************************************
  *
- * $Id: yocto_quadraturedecoder.cs 31373 2018-07-26 12:44:19Z seb $
+ *  $Id: yocto_quadraturedecoder.cs 32610 2018-10-10 06:52:20Z seb $
  *
- * Implements yFindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
+ *  Implements yFindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
- * - - - - - - - - - License information: - - - - - - - - -
+ *  - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *

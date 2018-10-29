@@ -1,10 +1,10 @@
 /*********************************************************************
  *
- * $Id: yocto_currentloopoutput.cs 31373 2018-07-26 12:44:19Z seb $
+ *  $Id: yocto_currentloopoutput.cs 32610 2018-10-10 06:52:20Z seb $
  *
- * Implements yFindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
+ *  Implements yFindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
- * - - - - - - - - - License information: - - - - - - - - -
+ *  - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *

@@ -1,4 +1,18 @@
-﻿using System;
+/*********************************************************************
+ *
+ *  $Id: main.cs 32713 2018-10-19 15:30:53Z seb $
+ *
+ *  An example that show how to use a  Yocto-MaxiCoupler
+ *
+ *  You can find more information on our web site:
+ *   Yocto-MaxiCoupler documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-maxicoupler/doc.html
+ *   C# API Reference:
+ *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-cs-EN.html
+ *
+ *********************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -57,7 +71,8 @@ namespace ConsoleApplication1
         else
           relay.set_output(YRelay.OUTPUT_OFF);
       } else {
-        Console.WriteLine("Module not connected (check identification and USB cable)");
+        Console.WriteLine("Module not connected");
+        Console.WriteLine("check identification and USB cable");
       }
       YAPI.FreeAPI();
     }

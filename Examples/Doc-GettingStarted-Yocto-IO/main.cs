@@ -1,4 +1,18 @@
-﻿using System;
+/*********************************************************************
+ *
+ *  $Id: main.cs 32621 2018-10-10 13:10:25Z seb $
+ *
+ *  An example that show how to use a  Yocto-IO
+ *
+ *  You can find more information on our web site:
+ *   Yocto-IO documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-io/doc.html
+ *   C# API Reference:
+ *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-cs-EN.html
+ *
+ *********************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

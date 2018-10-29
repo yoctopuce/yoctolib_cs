@@ -1,10 +1,10 @@
 /*********************************************************************
  *
- * $Id: yocto_voltageoutput.cs 31373 2018-07-26 12:44:19Z seb $
+ *  $Id: yocto_voltageoutput.cs 32610 2018-10-10 06:52:20Z seb $
  *
- * Implements yFindVoltageOutput(), the high-level API for VoltageOutput functions
+ *  Implements yFindVoltageOutput(), the high-level API for VoltageOutput functions
  *
- * - - - - - - - - - License information: - - - - - - - - -
+ *  - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *

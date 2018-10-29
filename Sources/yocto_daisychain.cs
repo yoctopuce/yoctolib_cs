@@ -1,10 +1,10 @@
 /*********************************************************************
  *
- * $Id: yocto_daisychain.cs 31373 2018-07-26 12:44:19Z seb $
+ *  $Id: yocto_daisychain.cs 32610 2018-10-10 06:52:20Z seb $
  *
- * Implements yFindDaisyChain(), the high-level API for DaisyChain functions
+ *  Implements yFindDaisyChain(), the high-level API for DaisyChain functions
  *
- * - - - - - - - - - License information: - - - - - - - - -
+ *  - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *

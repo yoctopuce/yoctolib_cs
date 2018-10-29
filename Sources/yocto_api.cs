@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 32376 2018-09-27 07:57:07Z seb $
+ * $Id: yocto_api.cs 32517 2018-10-05 08:19:15Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1235,7 +1235,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "32391";
+    public const string YOCTO_API_BUILD_NO = "32759";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6960,7 +6960,7 @@ public class YFunction
      * </para>
      */
 
-    public string get_hardwareId()
+    public virtual string get_hardwareId()
     {
         YRETCODE retcode;
         YFUN_DESCR fundesc = 0;
@@ -9381,6 +9381,28 @@ public class YModule : YFunction
         }
         this.clearCache();
         return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
+     *   Returns the unique hardware identifier of the module.
+     * <para>
+     *   The unique hardware identifier is made of the device serial
+     *   number followed by string ".module".
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string that uniquely identifies the module
+     * </returns>
+     */
+    public override string get_hardwareId()
+    {
+        string serial;
+
+        serial = this.get_serialNumber();
+        return serial + ".module";
     }
 
     /**

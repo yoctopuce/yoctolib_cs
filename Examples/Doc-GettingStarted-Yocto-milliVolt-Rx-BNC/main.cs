@@ -1,4 +1,18 @@
-﻿using System;
+/*********************************************************************
+ *
+ *  $Id: main.cs 32713 2018-10-19 15:30:53Z seb $
+ *
+ *  An example that show how to use a  Yocto-milliVolt-Rx-BNC
+ *
+ *  You can find more information on our web site:
+ *   Yocto-milliVolt-Rx-BNC documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-millivolt-rx-bnc/doc.html
+ *   C# API Reference:
+ *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-cs-EN.html
+ *
+ *********************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -60,7 +74,8 @@ namespace ConsoleApplication1
         YAPI.Sleep(1000, ref errmsg);
       }
       YAPI.FreeAPI();
-      Console.WriteLine("Module not connected (check identification and USB cable)");
+      Console.WriteLine("Module not connected");
+      Console.WriteLine("check identification and USB cable");
     }
   }
 }

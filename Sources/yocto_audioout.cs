@@ -1,10 +1,10 @@
 /*********************************************************************
  *
- * $Id: yocto_audioout.cs 31373 2018-07-26 12:44:19Z seb $
+ *  $Id: yocto_audioout.cs 32610 2018-10-10 06:52:20Z seb $
  *
- * Implements yFindAudioOut(), the high-level API for AudioOut functions
+ *  Implements yFindAudioOut(), the high-level API for AudioOut functions
  *
- * - - - - - - - - - License information: - - - - - - - - -
+ *  - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *

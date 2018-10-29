@@ -1,4 +1,18 @@
-﻿using System;
+/*********************************************************************
+ *
+ *  $Id: main.cs 32713 2018-10-19 15:30:53Z seb $
+ *
+ *  An example that show how to use a  Yocto-Knob
+ *
+ *  You can find more information on our web site:
+ *   Yocto-Knob documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-knob/doc.html
+ *   C# API Reference:
+ *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-cs-EN.html
+ *
+ *********************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -47,7 +61,8 @@ namespace ConsoleApplication1
       input5 = YAnButton.FindAnButton(target + ".anButton5");
 
       if (!input1.isOnline()) {
-        Console.WriteLine("Module not connected (check identification and USB cable)");
+        Console.WriteLine("Module not connected");
+        Console.WriteLine("check identification and USB cable");
         Environment.Exit(0);
       }
       while (input1.isOnline()) {

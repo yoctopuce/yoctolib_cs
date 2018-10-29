@@ -1,4 +1,16 @@
-﻿using System;
+/*********************************************************************
+ *
+ *  $Id: main.cs 32621 2018-10-10 13:10:25Z seb $
+ *
+ *  Doc-SaveSettings example
+ *
+ *  You can find more information on our web site:
+ *   C# API Reference:
+ *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-cs-EN.html
+ *
+ *********************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

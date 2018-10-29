@@ -1,4 +1,18 @@
-﻿using System;
+/*********************************************************************
+ *
+ *  $Id: main.cs 32621 2018-10-10 13:10:25Z seb $
+ *
+ *  An example that show how to use a  Yocto-PWM-Rx
+ *
+ *  You can find more information on our web site:
+ *   Yocto-PWM-Rx documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-pwm-rx/doc.html
+ *   C# API Reference:
+ *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-cs-EN.html
+ *
+ *********************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
