@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- *  $Id: yocto_compass.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_tvoc.cs 33270 2018-11-22 08:41:15Z seb $
  *
- *  Implements yFindCompass(), the high-level API for Compass functions
+ *  Implements yFindTvoc(), the high-level API for Tvoc functions
  *
  *  - - - - - - - - - License information: - - - - - - - - -
  *
@@ -47,184 +47,54 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
-    //--- (YCompass return codes)
-    //--- (end of YCompass return codes)
-//--- (YCompass dlldef)
-//--- (end of YCompass dlldef)
-//--- (YCompass yapiwrapper)
-//--- (end of YCompass yapiwrapper)
-//--- (YCompass class start)
+    //--- (YTvoc return codes)
+    //--- (end of YTvoc return codes)
+//--- (YTvoc dlldef)
+//--- (end of YTvoc dlldef)
+//--- (YTvoc yapiwrapper)
+//--- (end of YTvoc yapiwrapper)
+//--- (YTvoc class start)
 /**
  * <summary>
- *   The YSensor class is the parent class for all Yoctopuce sensors.
+ *   The Yoctopuce class YTvoc allows you to read and configure Yoctopuce Total Volatile Organic
+ *   Compound sensors.
  * <para>
- *   It can be
- *   used to read the current value and unit of any sensor, read the min/max
- *   value, configure autonomous recording frequency and access recorded data.
- *   It also provide a function to register a callback invoked each time the
- *   observed value changes, or at a predefined interval. Using this class rather
- *   than a specific subclass makes it possible to create generic applications
- *   that work with any Yoctopuce sensor, even those that do not yet exist.
- *   Note: The YAnButton class is the only analog input which does not inherit
- *   from YSensor.
+ *   It inherits from YSensor class the core functions to read measurements,
+ *   to register callback functions, to access the autonomous datalogger.
  * </para>
  * <para>
  * </para>
  * </summary>
  */
-public class YCompass : YSensor
+public class YTvoc : YSensor
 {
-//--- (end of YCompass class start)
-    //--- (YCompass definitions)
-    public new delegate void ValueCallback(YCompass func, string value);
-    public new delegate void TimedReportCallback(YCompass func, YMeasure measure);
+//--- (end of YTvoc class start)
+    //--- (YTvoc definitions)
+    public new delegate void ValueCallback(YTvoc func, string value);
+    public new delegate void TimedReportCallback(YTvoc func, YMeasure measure);
 
-    public const int BANDWIDTH_INVALID = YAPI.INVALID_INT;
-    public const int AXIS_X = 0;
-    public const int AXIS_Y = 1;
-    public const int AXIS_Z = 2;
-    public const int AXIS_INVALID = -1;
-    public const double MAGNETICHEADING_INVALID = YAPI.INVALID_DOUBLE;
-    protected int _bandwidth = BANDWIDTH_INVALID;
-    protected int _axis = AXIS_INVALID;
-    protected double _magneticHeading = MAGNETICHEADING_INVALID;
-    protected ValueCallback _valueCallbackCompass = null;
-    protected TimedReportCallback _timedReportCallbackCompass = null;
-    //--- (end of YCompass definitions)
+    protected ValueCallback _valueCallbackTvoc = null;
+    protected TimedReportCallback _timedReportCallbackTvoc = null;
+    //--- (end of YTvoc definitions)
 
-    public YCompass(string func)
+    public YTvoc(string func)
         : base(func)
     {
-        _className = "Compass";
-        //--- (YCompass attributes initialization)
-        //--- (end of YCompass attributes initialization)
+        _className = "Tvoc";
+        //--- (YTvoc attributes initialization)
+        //--- (end of YTvoc attributes initialization)
     }
 
-    //--- (YCompass implementation)
+    //--- (YTvoc implementation)
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.has("bandwidth"))
-        {
-            _bandwidth = json_val.getInt("bandwidth");
-        }
-        if (json_val.has("axis"))
-        {
-            _axis = json_val.getInt("axis");
-        }
-        if (json_val.has("magneticHeading"))
-        {
-            _magneticHeading = Math.Round(json_val.getDouble("magneticHeading") * 1000.0 / 65536.0) / 1000.0;
-        }
         base._parseAttr(json_val);
     }
 
     /**
      * <summary>
-     *   Returns the measure update frequency, measured in Hz (Yocto-3D-V2 only).
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns <c>YCompass.BANDWIDTH_INVALID</c>.
-     * </para>
-     */
-    public int get_bandwidth()
-    {
-        int res;
-        lock (_thisLock) {
-            if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
-                    return BANDWIDTH_INVALID;
-                }
-            }
-            res = this._bandwidth;
-        }
-        return res;
-    }
-
-    /**
-     * <summary>
-     *   Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only).
-     * <para>
-     *   When the
-     *   frequency is lower, the device performs averaging.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="newval">
-     *   an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
-     * </param>
-     * <para>
-     * </para>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public int set_bandwidth(int newval)
-    {
-        string rest_val;
-        lock (_thisLock) {
-            rest_val = (newval).ToString();
-            return _setAttr("bandwidth", rest_val);
-        }
-    }
-
-    public int get_axis()
-    {
-        int res;
-        lock (_thisLock) {
-            if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
-                    return AXIS_INVALID;
-                }
-            }
-            res = this._axis;
-        }
-        return res;
-    }
-
-    /**
-     * <summary>
-     *   Returns the magnetic heading, regardless of the configured bearing.
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   a floating point number corresponding to the magnetic heading, regardless of the configured bearing
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns <c>YCompass.MAGNETICHEADING_INVALID</c>.
-     * </para>
-     */
-    public double get_magneticHeading()
-    {
-        double res;
-        lock (_thisLock) {
-            if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
-                    return MAGNETICHEADING_INVALID;
-                }
-            }
-            res = this._magneticHeading;
-        }
-        return res;
-    }
-
-    /**
-     * <summary>
-     *   Retrieves a compass for a given identifier.
+     *   Retrieves a Total  Volatile Organic Compound sensor for a given identifier.
      * <para>
      *   The identifier can be specified using several formats:
      * </para>
@@ -248,11 +118,11 @@ public class YCompass : YSensor
      * <para>
      * </para>
      * <para>
-     *   This function does not require that the compass is online at the time
+     *   This function does not require that the Total  Volatile Organic Compound sensor is online at the time
      *   it is invoked. The returned object is nevertheless valid.
-     *   Use the method <c>YCompass.isOnline()</c> to test if the compass is
+     *   Use the method <c>YTvoc.isOnline()</c> to test if the Total  Volatile Organic Compound sensor is
      *   indeed online at a given time. In case of ambiguity when looking for
-     *   a compass by logical name, no error is notified: the first instance
+     *   a Total  Volatile Organic Compound sensor by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
      * </para>
@@ -265,20 +135,20 @@ public class YCompass : YSensor
      * </para>
      * </summary>
      * <param name="func">
-     *   a string that uniquely characterizes the compass
+     *   a string that uniquely characterizes the Total  Volatile Organic Compound sensor
      * </param>
      * <returns>
-     *   a <c>YCompass</c> object allowing you to drive the compass.
+     *   a <c>YTvoc</c> object allowing you to drive the Total  Volatile Organic Compound sensor.
      * </returns>
      */
-    public static YCompass FindCompass(string func)
+    public static YTvoc FindTvoc(string func)
     {
-        YCompass obj;
+        YTvoc obj;
         lock (YAPI.globalLock) {
-            obj = (YCompass) YFunction._FindFromCache("Compass", func);
+            obj = (YTvoc) YFunction._FindFromCache("Tvoc", func);
             if (obj == null) {
-                obj = new YCompass(func);
-                YFunction._AddToCache("Compass", func, obj);
+                obj = new YTvoc(func);
+                YFunction._AddToCache("Tvoc", func, obj);
             }
         }
         return obj;
@@ -310,7 +180,7 @@ public class YCompass : YSensor
         } else {
             YFunction._UpdateValueCallbackList(this, false);
         }
-        this._valueCallbackCompass = callback;
+        this._valueCallbackTvoc = callback;
         // Immediately invoke value callback with current value
         if (callback != null && this.isOnline()) {
             val = this._advertisedValue;
@@ -323,8 +193,8 @@ public class YCompass : YSensor
 
     public override int _invokeValueCallback(string value)
     {
-        if (this._valueCallbackCompass != null) {
-            this._valueCallbackCompass(this, value);
+        if (this._valueCallbackTvoc != null) {
+            this._valueCallbackTvoc(this, value);
         } else {
             base._invokeValueCallback(value);
         }
@@ -358,14 +228,14 @@ public class YCompass : YSensor
         } else {
             YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
-        this._timedReportCallbackCompass = callback;
+        this._timedReportCallbackTvoc = callback;
         return 0;
     }
 
     public override int _invokeTimedReportCallback(YMeasure value)
     {
-        if (this._timedReportCallbackCompass != null) {
-            this._timedReportCallbackCompass(this, value);
+        if (this._timedReportCallbackTvoc != null) {
+            this._timedReportCallbackTvoc(this, value);
         } else {
             base._invokeTimedReportCallback(value);
         }
@@ -374,48 +244,48 @@ public class YCompass : YSensor
 
     /**
      * <summary>
-     *   Continues the enumeration of compasses started using <c>yFirstCompass()</c>.
+     *   Continues the enumeration of Total Volatile Organic Compound sensors started using <c>yFirstTvoc()</c>.
      * <para>
-     *   Caution: You can't make any assumption about the returned compasses order.
-     *   If you want to find a specific a compass, use <c>Compass.findCompass()</c>
+     *   Caution: You can't make any assumption about the returned Total Volatile Organic Compound sensors order.
+     *   If you want to find a specific a Total  Volatile Organic Compound sensor, use <c>Tvoc.findTvoc()</c>
      *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>
-     *   a pointer to a <c>YCompass</c> object, corresponding to
-     *   a compass currently online, or a <c>null</c> pointer
-     *   if there are no more compasses to enumerate.
+     *   a pointer to a <c>YTvoc</c> object, corresponding to
+     *   a Total  Volatile Organic Compound sensor currently online, or a <c>null</c> pointer
+     *   if there are no more Total Volatile Organic Compound sensors to enumerate.
      * </returns>
      */
-    public YCompass nextCompass()
+    public YTvoc nextTvoc()
     {
         string hwid = "";
         if (YAPI.YISERR(_nextFunction(ref hwid)))
             return null;
         if (hwid == "")
             return null;
-        return FindCompass(hwid);
+        return FindTvoc(hwid);
     }
 
-    //--- (end of YCompass implementation)
+    //--- (end of YTvoc implementation)
 
-    //--- (YCompass functions)
+    //--- (YTvoc functions)
 
     /**
      * <summary>
-     *   Starts the enumeration of compasses currently accessible.
+     *   Starts the enumeration of Total Volatile Organic Compound sensors currently accessible.
      * <para>
-     *   Use the method <c>YCompass.nextCompass()</c> to iterate on
-     *   next compasses.
+     *   Use the method <c>YTvoc.nextTvoc()</c> to iterate on
+     *   next Total Volatile Organic Compound sensors.
      * </para>
      * </summary>
      * <returns>
-     *   a pointer to a <c>YCompass</c> object, corresponding to
-     *   the first compass currently online, or a <c>null</c> pointer
+     *   a pointer to a <c>YTvoc</c> object, corresponding to
+     *   the first Total Volatile Organic Compound sensor currently online, or a <c>null</c> pointer
      *   if there are none.
      * </returns>
      */
-    public static YCompass FirstCompass()
+    public static YTvoc FirstTvoc()
     {
         YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
         YDEV_DESCR dev = default(YDEV_DESCR);
@@ -428,7 +298,7 @@ public class YCompass : YSensor
         string errmsg = "";
         int size = Marshal.SizeOf(v_fundescr[0]);
         IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
-        err = YAPI.apiGetFunctionsByClass("Compass", 0, p, size, ref neededsize, ref errmsg);
+        err = YAPI.apiGetFunctionsByClass("Tvoc", 0, p, size, ref neededsize, ref errmsg);
         Marshal.Copy(p, v_fundescr, 0, 1);
         Marshal.FreeHGlobal(p);
         if ((YAPI.YISERR(err) | (neededsize == 0)))
@@ -440,10 +310,10 @@ public class YCompass : YSensor
         errmsg = "";
         if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
             return null;
-        return FindCompass(serial + "." + funcId);
+        return FindTvoc(serial + "." + funcId);
     }
 
 
 
-    //--- (end of YCompass functions)
+    //--- (end of YTvoc functions)
 }

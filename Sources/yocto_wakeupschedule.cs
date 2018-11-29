@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_wakeupschedule.cs 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: yocto_wakeupschedule.cs 32899 2018-11-02 10:12:03Z seb $
  *
  *  Implements yFindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -663,6 +663,9 @@ public class YWakeUpSchedule : YFunction
      * <summary>
      *   Continues the enumeration of wake up schedules started using <c>yFirstWakeUpSchedule()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned wake up schedules order.
+     *   If you want to find a specific a wake up schedule, use <c>WakeUpSchedule.findWakeUpSchedule()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

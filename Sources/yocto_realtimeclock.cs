@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_realtimeclock.cs 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: yocto_realtimeclock.cs 32899 2018-11-02 10:12:03Z seb $
  *
  *  Implements yFindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -408,6 +408,9 @@ public class YRealTimeClock : YFunction
      * <summary>
      *   Continues the enumeration of clocks started using <c>yFirstRealTimeClock()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned clocks order.
+     *   If you want to find a specific a clock, use <c>RealTimeClock.findRealTimeClock()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

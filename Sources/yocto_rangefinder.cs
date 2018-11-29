@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_rangefinder.cs 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: yocto_rangefinder.cs 32899 2018-11-02 10:12:03Z seb $
  *
  *  Implements yFindRangeFinder(), the high-level API for RangeFinder functions
  *
@@ -589,6 +589,9 @@ public class YRangeFinder : YSensor
      * <summary>
      *   Continues the enumeration of range finders started using <c>yFirstRangeFinder()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned range finders order.
+     *   If you want to find a specific a range finder, use <c>RangeFinder.findRangeFinder()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

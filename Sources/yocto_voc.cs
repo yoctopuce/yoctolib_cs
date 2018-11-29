@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_voc.cs 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: yocto_voc.cs 32899 2018-11-02 10:12:03Z seb $
  *
  *  Implements yFindVoc(), the high-level API for Voc functions
  *
@@ -246,6 +246,9 @@ public class YVoc : YSensor
      * <summary>
      *   Continues the enumeration of Volatile Organic Compound sensors started using <c>yFirstVoc()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned Volatile Organic Compound sensors order.
+     *   If you want to find a specific a Volatile Organic Compound sensor, use <c>Voc.findVoc()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

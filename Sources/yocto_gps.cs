@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_gps.cs 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: yocto_gps.cs 32899 2018-11-02 10:12:03Z seb $
  *
  *  Implements yFindGps(), the high-level API for Gps functions
  *
@@ -731,6 +731,9 @@ public class YGps : YFunction
      * <summary>
      *   Continues the enumeration of GPS started using <c>yFirstGps()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned GPS order.
+     *   If you want to find a specific a GPS, use <c>Gps.findGps()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

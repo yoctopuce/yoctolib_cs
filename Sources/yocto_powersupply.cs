@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_powersupply.cs 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: yocto_powersupply.cs 32899 2018-11-02 10:12:03Z seb $
  *
  *  Implements yFindPowerSupply(), the high-level API for PowerSupply functions
  *
@@ -861,6 +861,9 @@ public class YPowerSupply : YFunction
      * <summary>
      *   Continues the enumeration of regulated power supplies started using <c>yFirstPowerSupply()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned regulated power supplies order.
+     *   If you want to find a specific a regulated power supply, use <c>PowerSupply.findPowerSupply()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

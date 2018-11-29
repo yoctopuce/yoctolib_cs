@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- *  $Id: yocto_led.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_multisenscontroller.cs 33270 2018-11-22 08:41:15Z seb $
  *
- *  Implements yFindLed(), the high-level API for Led functions
+ *  Implements yFindMultiSensController(), the high-level API for MultiSensController functions
  *
  *  - - - - - - - - - License information: - - - - - - - - -
  *
@@ -47,114 +47,117 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
-    //--- (YLed return codes)
-    //--- (end of YLed return codes)
-//--- (YLed dlldef)
-//--- (end of YLed dlldef)
-//--- (YLed yapiwrapper)
-//--- (end of YLed yapiwrapper)
-//--- (YLed class start)
+    //--- (YMultiSensController return codes)
+    //--- (end of YMultiSensController return codes)
+//--- (YMultiSensController dlldef)
+//--- (end of YMultiSensController dlldef)
+//--- (YMultiSensController yapiwrapper)
+//--- (end of YMultiSensController yapiwrapper)
+//--- (YMultiSensController class start)
 /**
  * <summary>
- *   The Yoctopuce application programming interface
- *   allows you not only to drive the intensity of the LED, but also to
- *   have it blink at various preset frequencies.
+ *   The Yoctopuce application programming interface allows you to drive a stepper motor.
  * <para>
  * </para>
  * <para>
  * </para>
  * </summary>
  */
-public class YLed : YFunction
+public class YMultiSensController : YFunction
 {
-//--- (end of YLed class start)
-    //--- (YLed definitions)
-    public new delegate void ValueCallback(YLed func, string value);
-    public new delegate void TimedReportCallback(YLed func, YMeasure measure);
+//--- (end of YMultiSensController class start)
+    //--- (YMultiSensController definitions)
+    public new delegate void ValueCallback(YMultiSensController func, string value);
+    public new delegate void TimedReportCallback(YMultiSensController func, YMeasure measure);
 
-    public const int POWER_OFF = 0;
-    public const int POWER_ON = 1;
-    public const int POWER_INVALID = -1;
-    public const int LUMINOSITY_INVALID = YAPI.INVALID_UINT;
-    public const int BLINKING_STILL = 0;
-    public const int BLINKING_RELAX = 1;
-    public const int BLINKING_AWARE = 2;
-    public const int BLINKING_RUN = 3;
-    public const int BLINKING_CALL = 4;
-    public const int BLINKING_PANIC = 5;
-    public const int BLINKING_INVALID = -1;
-    protected int _power = POWER_INVALID;
-    protected int _luminosity = LUMINOSITY_INVALID;
-    protected int _blinking = BLINKING_INVALID;
-    protected ValueCallback _valueCallbackLed = null;
-    //--- (end of YLed definitions)
+    public const int NSENSORS_INVALID = YAPI.INVALID_UINT;
+    public const int MAXSENSORS_INVALID = YAPI.INVALID_UINT;
+    public const int MAINTENANCEMODE_FALSE = 0;
+    public const int MAINTENANCEMODE_TRUE = 1;
+    public const int MAINTENANCEMODE_INVALID = -1;
+    public const string COMMAND_INVALID = YAPI.INVALID_STRING;
+    protected int _nSensors = NSENSORS_INVALID;
+    protected int _maxSensors = MAXSENSORS_INVALID;
+    protected int _maintenanceMode = MAINTENANCEMODE_INVALID;
+    protected string _command = COMMAND_INVALID;
+    protected ValueCallback _valueCallbackMultiSensController = null;
+    //--- (end of YMultiSensController definitions)
 
-    public YLed(string func)
+    public YMultiSensController(string func)
         : base(func)
     {
-        _className = "Led";
-        //--- (YLed attributes initialization)
-        //--- (end of YLed attributes initialization)
+        _className = "MultiSensController";
+        //--- (YMultiSensController attributes initialization)
+        //--- (end of YMultiSensController attributes initialization)
     }
 
-    //--- (YLed implementation)
+    //--- (YMultiSensController implementation)
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
-        if (json_val.has("power"))
+        if (json_val.has("nSensors"))
         {
-            _power = json_val.getInt("power") > 0 ? 1 : 0;
+            _nSensors = json_val.getInt("nSensors");
         }
-        if (json_val.has("luminosity"))
+        if (json_val.has("maxSensors"))
         {
-            _luminosity = json_val.getInt("luminosity");
+            _maxSensors = json_val.getInt("maxSensors");
         }
-        if (json_val.has("blinking"))
+        if (json_val.has("maintenanceMode"))
         {
-            _blinking = json_val.getInt("blinking");
+            _maintenanceMode = json_val.getInt("maintenanceMode") > 0 ? 1 : 0;
+        }
+        if (json_val.has("command"))
+        {
+            _command = json_val.getString("command");
         }
         base._parseAttr(json_val);
     }
 
     /**
      * <summary>
-     *   Returns the current LED state.
+     *   Returns the number of sensors to poll.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   either <c>YLed.POWER_OFF</c> or <c>YLed.POWER_ON</c>, according to the current LED state
+     *   an integer corresponding to the number of sensors to poll
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns <c>YLed.POWER_INVALID</c>.
+     *   On failure, throws an exception or returns <c>YMultiSensController.NSENSORS_INVALID</c>.
      * </para>
      */
-    public int get_power()
+    public int get_nSensors()
     {
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
-                    return POWER_INVALID;
+                    return NSENSORS_INVALID;
                 }
             }
-            res = this._power;
+            res = this._nSensors;
         }
         return res;
     }
 
     /**
      * <summary>
-     *   Changes the state of the LED.
+     *   Changes the number of sensors to poll.
      * <para>
+     *   Remember to call the
+     *   <c>saveToFlash()</c> method of the module if the
+     *   modification must be kept. Il is recommended to restart the
+     *   device with  <c>module->reboot()</c> after modifing
+     *   (and saving) this settings
      * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="newval">
-     *   either <c>YLed.POWER_OFF</c> or <c>YLed.POWER_ON</c>, according to the state of the LED
+     *   an integer corresponding to the number of sensors to poll
      * </param>
      * <para>
      * </para>
@@ -165,138 +168,132 @@ public class YLed : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public int set_power(int newval)
+    public int set_nSensors(int newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("nSensors", rest_val);
+        }
+    }
+
+    /**
+     * <summary>
+     *   Returns the maximum configurable sensor count allowed on this device.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the maximum configurable sensor count allowed on this device
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YMultiSensController.MAXSENSORS_INVALID</c>.
+     * </para>
+     */
+    public int get_maxSensors()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return MAXSENSORS_INVALID;
+                }
+            }
+            res = this._maxSensors;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Returns true when the device is in maintenance mode.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   either <c>YMultiSensController.MAINTENANCEMODE_FALSE</c> or <c>YMultiSensController.MAINTENANCEMODE_TRUE</c>,
+     *   according to true when the device is in maintenance mode
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YMultiSensController.MAINTENANCEMODE_INVALID</c>.
+     * </para>
+     */
+    public int get_maintenanceMode()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return MAINTENANCEMODE_INVALID;
+                }
+            }
+            res = this._maintenanceMode;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Changes the device mode to enable maintenance and stop sensors polling.
+     * <para>
+     *   This way, the device will not restart automatically in case it cannot
+     *   communicate with one of the sensors.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   either <c>YMultiSensController.MAINTENANCEMODE_FALSE</c> or <c>YMultiSensController.MAINTENANCEMODE_TRUE</c>,
+     *   according to the device mode to enable maintenance and stop sensors polling
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_maintenanceMode(int newval)
     {
         string rest_val;
         lock (_thisLock) {
             rest_val = (newval > 0 ? "1" : "0");
-            return _setAttr("power", rest_val);
+            return _setAttr("maintenanceMode", rest_val);
         }
     }
 
-    /**
-     * <summary>
-     *   Returns the current LED intensity (in per cent).
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   an integer corresponding to the current LED intensity (in per cent)
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns <c>YLed.LUMINOSITY_INVALID</c>.
-     * </para>
-     */
-    public int get_luminosity()
+    public string get_command()
     {
-        int res;
+        string res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
-                    return LUMINOSITY_INVALID;
+                    return COMMAND_INVALID;
                 }
             }
-            res = this._luminosity;
+            res = this._command;
         }
         return res;
     }
 
-    /**
-     * <summary>
-     *   Changes the current LED intensity (in per cent).
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="newval">
-     *   an integer corresponding to the current LED intensity (in per cent)
-     * </param>
-     * <para>
-     * </para>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public int set_luminosity(int newval)
+    public int set_command(string newval)
     {
         string rest_val;
         lock (_thisLock) {
-            rest_val = (newval).ToString();
-            return _setAttr("luminosity", rest_val);
+            rest_val = newval;
+            return _setAttr("command", rest_val);
         }
     }
 
     /**
      * <summary>
-     *   Returns the current LED signaling mode.
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   a value among <c>YLed.BLINKING_STILL</c>, <c>YLed.BLINKING_RELAX</c>, <c>YLed.BLINKING_AWARE</c>,
-     *   <c>YLed.BLINKING_RUN</c>, <c>YLed.BLINKING_CALL</c> and <c>YLed.BLINKING_PANIC</c> corresponding to
-     *   the current LED signaling mode
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns <c>YLed.BLINKING_INVALID</c>.
-     * </para>
-     */
-    public int get_blinking()
-    {
-        int res;
-        lock (_thisLock) {
-            if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
-                    return BLINKING_INVALID;
-                }
-            }
-            res = this._blinking;
-        }
-        return res;
-    }
-
-    /**
-     * <summary>
-     *   Changes the current LED signaling mode.
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="newval">
-     *   a value among <c>YLed.BLINKING_STILL</c>, <c>YLed.BLINKING_RELAX</c>, <c>YLed.BLINKING_AWARE</c>,
-     *   <c>YLed.BLINKING_RUN</c>, <c>YLed.BLINKING_CALL</c> and <c>YLed.BLINKING_PANIC</c> corresponding to
-     *   the current LED signaling mode
-     * </param>
-     * <para>
-     * </para>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public int set_blinking(int newval)
-    {
-        string rest_val;
-        lock (_thisLock) {
-            rest_val = (newval).ToString();
-            return _setAttr("blinking", rest_val);
-        }
-    }
-
-    /**
-     * <summary>
-     *   Retrieves a LED for a given identifier.
+     *   Retrieves a multi-sensor controller for a given identifier.
      * <para>
      *   The identifier can be specified using several formats:
      * </para>
@@ -320,11 +317,11 @@ public class YLed : YFunction
      * <para>
      * </para>
      * <para>
-     *   This function does not require that the LED is online at the time
+     *   This function does not require that the multi-sensor controller is online at the time
      *   it is invoked. The returned object is nevertheless valid.
-     *   Use the method <c>YLed.isOnline()</c> to test if the LED is
+     *   Use the method <c>YMultiSensController.isOnline()</c> to test if the multi-sensor controller is
      *   indeed online at a given time. In case of ambiguity when looking for
-     *   a LED by logical name, no error is notified: the first instance
+     *   a multi-sensor controller by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
      * </para>
@@ -337,20 +334,20 @@ public class YLed : YFunction
      * </para>
      * </summary>
      * <param name="func">
-     *   a string that uniquely characterizes the LED
+     *   a string that uniquely characterizes the multi-sensor controller
      * </param>
      * <returns>
-     *   a <c>YLed</c> object allowing you to drive the LED.
+     *   a <c>YMultiSensController</c> object allowing you to drive the multi-sensor controller.
      * </returns>
      */
-    public static YLed FindLed(string func)
+    public static YMultiSensController FindMultiSensController(string func)
     {
-        YLed obj;
+        YMultiSensController obj;
         lock (YAPI.globalLock) {
-            obj = (YLed) YFunction._FindFromCache("Led", func);
+            obj = (YMultiSensController) YFunction._FindFromCache("MultiSensController", func);
             if (obj == null) {
-                obj = new YLed(func);
-                YFunction._AddToCache("Led", func, obj);
+                obj = new YMultiSensController(func);
+                YFunction._AddToCache("MultiSensController", func, obj);
             }
         }
         return obj;
@@ -382,7 +379,7 @@ public class YLed : YFunction
         } else {
             YFunction._UpdateValueCallbackList(this, false);
         }
-        this._valueCallbackLed = callback;
+        this._valueCallbackMultiSensController = callback;
         // Immediately invoke value callback with current value
         if (callback != null && this.isOnline()) {
             val = this._advertisedValue;
@@ -395,8 +392,8 @@ public class YLed : YFunction
 
     public override int _invokeValueCallback(string value)
     {
-        if (this._valueCallbackLed != null) {
-            this._valueCallbackLed(this, value);
+        if (this._valueCallbackMultiSensController != null) {
+            this._valueCallbackMultiSensController(this, value);
         } else {
             base._invokeValueCallback(value);
         }
@@ -405,48 +402,76 @@ public class YLed : YFunction
 
     /**
      * <summary>
-     *   Continues the enumeration of LEDs started using <c>yFirstLed()</c>.
+     *   Configure the I2C address of the only sensor connected to the device.
      * <para>
-     *   Caution: You can't make any assumption about the returned LEDs order.
-     *   If you want to find a specific a LED, use <c>Led.findLed()</c>
+     *   It is recommanded to put the the device in maintenance mode before
+     *   changing Sensors addresses.  This method is only intended to work with a single
+     *   sensor connected to the device, if several sensors are connected, result
+     *   is unpredictible.
+     *   Note that the device is probably expecting to find a string of sensors with specific
+     *   addresses. Check the device documentation to find out which addresses should be used.
+     * </para>
+     * </summary>
+     * <param name="addr">
+     *   new address of the connected sensor
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     *   On failure, throws an exception or returns a negative error code.
+     * </returns>
+     */
+    public virtual int setupAddress(int addr)
+    {
+        string cmd;
+        cmd = "A"+Convert.ToString(addr);
+        return this.set_command(cmd);
+    }
+
+    /**
+     * <summary>
+     *   Continues the enumeration of multi-sensor controllers started using <c>yFirstMultiSensController()</c>.
+     * <para>
+     *   Caution: You can't make any assumption about the returned multi-sensor controllers order.
+     *   If you want to find a specific a multi-sensor controller, use
+     *   <c>MultiSensController.findMultiSensController()</c>
      *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>
-     *   a pointer to a <c>YLed</c> object, corresponding to
-     *   a LED currently online, or a <c>null</c> pointer
-     *   if there are no more LEDs to enumerate.
+     *   a pointer to a <c>YMultiSensController</c> object, corresponding to
+     *   a multi-sensor controller currently online, or a <c>null</c> pointer
+     *   if there are no more multi-sensor controllers to enumerate.
      * </returns>
      */
-    public YLed nextLed()
+    public YMultiSensController nextMultiSensController()
     {
         string hwid = "";
         if (YAPI.YISERR(_nextFunction(ref hwid)))
             return null;
         if (hwid == "")
             return null;
-        return FindLed(hwid);
+        return FindMultiSensController(hwid);
     }
 
-    //--- (end of YLed implementation)
+    //--- (end of YMultiSensController implementation)
 
-    //--- (YLed functions)
+    //--- (YMultiSensController functions)
 
     /**
      * <summary>
-     *   Starts the enumeration of LEDs currently accessible.
+     *   Starts the enumeration of multi-sensor controllers currently accessible.
      * <para>
-     *   Use the method <c>YLed.nextLed()</c> to iterate on
-     *   next LEDs.
+     *   Use the method <c>YMultiSensController.nextMultiSensController()</c> to iterate on
+     *   next multi-sensor controllers.
      * </para>
      * </summary>
      * <returns>
-     *   a pointer to a <c>YLed</c> object, corresponding to
-     *   the first LED currently online, or a <c>null</c> pointer
+     *   a pointer to a <c>YMultiSensController</c> object, corresponding to
+     *   the first multi-sensor controller currently online, or a <c>null</c> pointer
      *   if there are none.
      * </returns>
      */
-    public static YLed FirstLed()
+    public static YMultiSensController FirstMultiSensController()
     {
         YFUN_DESCR[] v_fundescr = new YFUN_DESCR[1];
         YDEV_DESCR dev = default(YDEV_DESCR);
@@ -459,7 +484,7 @@ public class YLed : YFunction
         string errmsg = "";
         int size = Marshal.SizeOf(v_fundescr[0]);
         IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(v_fundescr[0]));
-        err = YAPI.apiGetFunctionsByClass("Led", 0, p, size, ref neededsize, ref errmsg);
+        err = YAPI.apiGetFunctionsByClass("MultiSensController", 0, p, size, ref neededsize, ref errmsg);
         Marshal.Copy(p, v_fundescr, 0, 1);
         Marshal.FreeHGlobal(p);
         if ((YAPI.YISERR(err) | (neededsize == 0)))
@@ -471,10 +496,10 @@ public class YLed : YFunction
         errmsg = "";
         if ((YAPI.YISERR(YAPI.yapiGetFunctionInfo(v_fundescr[0], ref dev, ref serial, ref funcId, ref funcName, ref funcVal, ref errmsg))))
             return null;
-        return FindLed(serial + "." + funcId);
+        return FindMultiSensController(serial + "." + funcId);
     }
 
 
 
-    //--- (end of YLed functions)
+    //--- (end of YMultiSensController functions)
 }

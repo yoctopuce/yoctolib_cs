@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_accelerometer.cs 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: yocto_accelerometer.cs 32899 2018-11-02 10:12:03Z seb $
  *
  *  Implements yFindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -454,6 +454,9 @@ public class YAccelerometer : YSensor
      * <summary>
      *   Continues the enumeration of accelerometers started using <c>yFirstAccelerometer()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned accelerometers order.
+     *   If you want to find a specific an accelerometer, use <c>Accelerometer.findAccelerometer()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

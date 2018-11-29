@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_altitude.cs 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: yocto_altitude.cs 32950 2018-11-05 17:15:46Z seb $
  *
  *  Implements yFindAltitude(), the high-level API for Altitude functions
  *
@@ -143,7 +143,7 @@ public class YAltitude : YSensor
      *   the altitude (QNH).
      * <para>
      *   This enables you to compensate for atmospheric pressure
-     *   changes due to weather conditions.
+     *   changes due to weather conditions. Applicable to barometric altimeters only.
      * </para>
      * <para>
      * </para>
@@ -175,6 +175,7 @@ public class YAltitude : YSensor
      *   Returns the barometric pressure adjusted to sea level used to compute
      *   the altitude (QNH).
      * <para>
+     *   Applicable to barometric altimeters only.
      * </para>
      * <para>
      * </para>
@@ -387,6 +388,9 @@ public class YAltitude : YSensor
      * <summary>
      *   Continues the enumeration of altimeters started using <c>yFirstAltitude()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned altimeters order.
+     *   If you want to find a specific an altimeter, use <c>Altitude.findAltitude()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

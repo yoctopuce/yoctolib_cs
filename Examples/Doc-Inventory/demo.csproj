@@ -185,6 +185,9 @@
 <Compile Include="..\..\Sources\yocto_multicellweighscale.cs">
 <Link>yocto_api\yocto_multicellweighscale.cs</Link>
 </Compile>
+<Compile Include="..\..\Sources\yocto_multisenscontroller.cs">
+<Link>yocto_api\yocto_multisenscontroller.cs</Link>
+</Compile>
 <Compile Include="..\..\Sources\yocto_network.cs">
 <Link>yocto_api\yocto_network.cs</Link>
 </Compile>
@@ -250,6 +253,9 @@
 </Compile>
 <Compile Include="..\..\Sources\yocto_tilt.cs">
 <Link>yocto_api\yocto_tilt.cs</Link>
+</Compile>
+<Compile Include="..\..\Sources\yocto_tvoc.cs">
+<Link>yocto_api\yocto_tvoc.cs</Link>
 </Compile>
 <Compile Include="..\..\Sources\yocto_voc.cs">
 <Link>yocto_api\yocto_voc.cs</Link>

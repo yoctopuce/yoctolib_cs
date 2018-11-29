@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 31373 2018-07-26 12:44:19Z seb $
+ * $Id: yocto_display.cs 32899 2018-11-02 10:12:03Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -1834,6 +1834,9 @@ public class YDisplay : YFunction
      * <summary>
      *   Continues the enumeration of displays started using <c>yFirstDisplay()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned displays order.
+     *   If you want to find a specific a display, use <c>Display.findDisplay()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

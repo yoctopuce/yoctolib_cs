@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_gyro.cs 31373 2018-07-26 12:44:19Z seb $
+ * $Id: yocto_gyro.cs 32899 2018-11-02 10:12:03Z seb $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -245,6 +245,9 @@ public class YQt : YSensor
      * <summary>
      *   Continues the enumeration of quaternion components started using <c>yFirstQt()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned quaternion components order.
+     *   If you want to find a specific a quaternion component, use <c>Qt.findQt()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>
@@ -1095,6 +1098,9 @@ public class YGyro : YSensor
      * <summary>
      *   Continues the enumeration of gyroscopes started using <c>yFirstGyro()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned gyroscopes order.
+     *   If you want to find a specific a gyroscope, use <c>Gyro.findGyro()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

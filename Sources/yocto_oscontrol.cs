@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_oscontrol.cs 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: yocto_oscontrol.cs 32899 2018-11-02 10:12:03Z seb $
  *
  *  Implements yFindOsControl(), the high-level API for OsControl functions
  *
@@ -270,6 +270,9 @@ public class YOsControl : YFunction
      * <summary>
      *   Continues the enumeration of OS control started using <c>yFirstOsControl()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned OS control order.
+     *   If you want to find a specific OS control, use <c>OsControl.findOsControl()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

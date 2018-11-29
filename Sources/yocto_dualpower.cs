@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_dualpower.cs 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: yocto_dualpower.cs 32899 2018-11-02 10:12:03Z seb $
  *
  *  Implements yFindDualPower(), the high-level API for DualPower functions
  *
@@ -352,6 +352,9 @@ public class YDualPower : YFunction
      * <summary>
      *   Continues the enumeration of dual power controls started using <c>yFirstDualPower()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned dual power controls order.
+     *   If you want to find a specific a dual power control, use <c>DualPower.findDualPower()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

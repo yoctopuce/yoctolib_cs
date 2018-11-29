@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_daisychain.cs 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: yocto_daisychain.cs 32899 2018-11-02 10:12:03Z seb $
  *
  *  Implements yFindDaisyChain(), the high-level API for DaisyChain functions
  *
@@ -347,6 +347,9 @@ public class YDaisyChain : YFunction
      * <summary>
      *   Continues the enumeration of module chains started using <c>yFirstDaisyChain()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned module chains order.
+     *   If you want to find a specific a module chain, use <c>DaisyChain.findDaisyChain()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

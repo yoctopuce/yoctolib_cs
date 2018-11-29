@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_genericsensor.cs 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: yocto_genericsensor.cs 33114 2018-11-09 21:58:19Z mvuilleu $
  *
  *  Implements yFindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -84,6 +84,7 @@ public class YGenericSensor : YSensor
     public const int SIGNALSAMPLING_HIGH_RATE_FILTERED = 1;
     public const int SIGNALSAMPLING_LOW_NOISE = 2;
     public const int SIGNALSAMPLING_LOW_NOISE_FILTERED = 3;
+    public const int SIGNALSAMPLING_HIGHEST_RATE = 4;
     public const int SIGNALSAMPLING_INVALID = -1;
     protected double _signalValue = SIGNALVALUE_INVALID;
     protected string _signalUnit = SIGNALUNIT_INVALID;
@@ -419,9 +420,9 @@ public class YGenericSensor : YSensor
      * </summary>
      * <returns>
      *   a value among <c>YGenericSensor.SIGNALSAMPLING_HIGH_RATE</c>,
-     *   <c>YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED</c>, <c>YGenericSensor.SIGNALSAMPLING_LOW_NOISE</c>
-     *   and <c>YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED</c> corresponding to the electric signal
-     *   sampling method to use
+     *   <c>YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED</c>, <c>YGenericSensor.SIGNALSAMPLING_LOW_NOISE</c>,
+     *   <c>YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED</c> and <c>YGenericSensor.SIGNALSAMPLING_HIGHEST_RATE</c>
+     *   corresponding to the electric signal sampling method to use
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YGenericSensor.SIGNALSAMPLING_INVALID</c>.
@@ -456,9 +457,9 @@ public class YGenericSensor : YSensor
      * </summary>
      * <param name="newval">
      *   a value among <c>YGenericSensor.SIGNALSAMPLING_HIGH_RATE</c>,
-     *   <c>YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED</c>, <c>YGenericSensor.SIGNALSAMPLING_LOW_NOISE</c>
-     *   and <c>YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED</c> corresponding to the electric signal
-     *   sampling method to use
+     *   <c>YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED</c>, <c>YGenericSensor.SIGNALSAMPLING_LOW_NOISE</c>,
+     *   <c>YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED</c> and <c>YGenericSensor.SIGNALSAMPLING_HIGHEST_RATE</c>
+     *   corresponding to the electric signal sampling method to use
      * </param>
      * <para>
      * </para>
@@ -657,6 +658,9 @@ public class YGenericSensor : YSensor
      * <summary>
      *   Continues the enumeration of generic sensors started using <c>yFirstGenericSensor()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned generic sensors order.
+     *   If you want to find a specific a generic sensor, use <c>GenericSensor.findGenericSensor()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

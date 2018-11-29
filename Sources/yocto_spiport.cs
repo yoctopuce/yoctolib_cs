@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_spiport.cs 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: yocto_spiport.cs 32899 2018-11-02 10:12:03Z seb $
  *
  *  Implements yFindSpiPort(), the high-level API for SpiPort functions
  *
@@ -1740,6 +1740,9 @@ public class YSpiPort : YFunction
      * <summary>
      *   Continues the enumeration of SPI ports started using <c>yFirstSpiPort()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned SPI ports order.
+     *   If you want to find a specific a SPI port, use <c>SpiPort.findSpiPort()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

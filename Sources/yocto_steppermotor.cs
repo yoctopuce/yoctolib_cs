@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_steppermotor.cs 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: yocto_steppermotor.cs 32899 2018-11-02 10:12:03Z seb $
  *
  *  Implements yFindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -1253,6 +1253,9 @@ public class YStepperMotor : YFunction
      * <summary>
      *   Continues the enumeration of stepper motors started using <c>yFirstStepperMotor()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned stepper motors order.
+     *   If you want to find a specific a stepper motor, use <c>StepperMotor.findStepperMotor()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

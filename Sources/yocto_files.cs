@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs 31373 2018-07-26 12:44:19Z seb $
+ * $Id: yocto_files.cs 32899 2018-11-02 10:12:03Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -488,6 +488,9 @@ public class YFiles : YFunction
      * <summary>
      *   Continues the enumeration of filesystems started using <c>yFirstFiles()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned filesystems order.
+     *   If you want to find a specific a filesystem, use <c>Files.findFiles()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

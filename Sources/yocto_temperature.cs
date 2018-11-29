@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_temperature.cs 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: yocto_temperature.cs 33082 2018-11-08 18:08:16Z seb $
  *
  *  Implements yFindTemperature(), the high-level API for Temperature functions
  *
@@ -90,6 +90,7 @@ public class YTemperature : YSensor
     public const int SENSORTYPE_RES_NTC = 12;
     public const int SENSORTYPE_RES_LINEAR = 13;
     public const int SENSORTYPE_RES_INTERNAL = 14;
+    public const int SENSORTYPE_IR = 15;
     public const int SENSORTYPE_INVALID = -1;
     public const double SIGNALVALUE_INVALID = YAPI.INVALID_DOUBLE;
     public const string SIGNALUNIT_INVALID = YAPI.INVALID_STRING;
@@ -186,8 +187,9 @@ public class YTemperature : YSensor
      *   <c>YTemperature.SENSORTYPE_TYPE_S</c>, <c>YTemperature.SENSORTYPE_TYPE_T</c>,
      *   <c>YTemperature.SENSORTYPE_PT100_4WIRES</c>, <c>YTemperature.SENSORTYPE_PT100_3WIRES</c>,
      *   <c>YTemperature.SENSORTYPE_PT100_2WIRES</c>, <c>YTemperature.SENSORTYPE_RES_OHM</c>,
-     *   <c>YTemperature.SENSORTYPE_RES_NTC</c>, <c>YTemperature.SENSORTYPE_RES_LINEAR</c> and
-     *   <c>YTemperature.SENSORTYPE_RES_INTERNAL</c> corresponding to the temperature sensor type
+     *   <c>YTemperature.SENSORTYPE_RES_NTC</c>, <c>YTemperature.SENSORTYPE_RES_LINEAR</c>,
+     *   <c>YTemperature.SENSORTYPE_RES_INTERNAL</c> and <c>YTemperature.SENSORTYPE_IR</c> corresponding to
+     *   the temperature sensor type
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YTemperature.SENSORTYPE_INVALID</c>.
@@ -227,8 +229,9 @@ public class YTemperature : YSensor
      *   <c>YTemperature.SENSORTYPE_TYPE_S</c>, <c>YTemperature.SENSORTYPE_TYPE_T</c>,
      *   <c>YTemperature.SENSORTYPE_PT100_4WIRES</c>, <c>YTemperature.SENSORTYPE_PT100_3WIRES</c>,
      *   <c>YTemperature.SENSORTYPE_PT100_2WIRES</c>, <c>YTemperature.SENSORTYPE_RES_OHM</c>,
-     *   <c>YTemperature.SENSORTYPE_RES_NTC</c>, <c>YTemperature.SENSORTYPE_RES_LINEAR</c> and
-     *   <c>YTemperature.SENSORTYPE_RES_INTERNAL</c> corresponding to the temperature sensor type
+     *   <c>YTemperature.SENSORTYPE_RES_NTC</c>, <c>YTemperature.SENSORTYPE_RES_LINEAR</c>,
+     *   <c>YTemperature.SENSORTYPE_RES_INTERNAL</c> and <c>YTemperature.SENSORTYPE_IR</c> corresponding to
+     *   the temperature sensor type
      * </param>
      * <para>
      * </para>
@@ -682,6 +685,9 @@ public class YTemperature : YSensor
      * <summary>
      *   Continues the enumeration of temperature sensors started using <c>yFirstTemperature()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned temperature sensors order.
+     *   If you want to find a specific a temperature sensor, use <c>Temperature.findTemperature()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

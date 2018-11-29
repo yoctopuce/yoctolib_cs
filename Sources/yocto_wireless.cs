@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wireless.cs 31373 2018-07-26 12:44:19Z seb $
+ * $Id: yocto_wireless.cs 32899 2018-11-02 10:12:03Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -669,6 +669,9 @@ public class YWireless : YFunction
      * <summary>
      *   Continues the enumeration of wireless lan interfaces started using <c>yFirstWireless()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned wireless lan interfaces order.
+     *   If you want to find a specific a wireless lan interface, use <c>Wireless.findWireless()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

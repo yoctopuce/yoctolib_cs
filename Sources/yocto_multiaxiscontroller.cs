@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_multiaxiscontroller.cs 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: yocto_multiaxiscontroller.cs 32899 2018-11-02 10:12:03Z seb $
  *
  *  Implements yFindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -531,6 +531,9 @@ public class YMultiAxisController : YFunction
      * <summary>
      *   Continues the enumeration of multi-axis controllers started using <c>yFirstMultiAxisController()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned multi-axis controllers order.
+     *   If you want to find a specific a multi-axis controller, use <c>MultiAxisController.findMultiAxisController()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

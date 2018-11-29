@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 31373 2018-07-26 12:44:19Z seb $
+ * $Id: yocto_serialport.cs 32899 2018-11-02 10:12:03Z seb $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
@@ -2392,6 +2392,9 @@ public class YSerialPort : YFunction
      * <summary>
      *   Continues the enumeration of serial ports started using <c>yFirstSerialPort()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned serial ports order.
+     *   If you want to find a specific a serial port, use <c>SerialPort.findSerialPort()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

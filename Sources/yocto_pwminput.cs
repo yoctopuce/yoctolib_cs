@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_pwminput.cs 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: yocto_pwminput.cs 32899 2018-11-02 10:12:03Z seb $
  *
  *  Implements yFindPwmInput(), the high-level API for PwmInput functions
  *
@@ -676,6 +676,9 @@ public class YPwmInput : YSensor
      * <summary>
      *   Continues the enumeration of PWM inputs started using <c>yFirstPwmInput()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned PWM inputs order.
+     *   If you want to find a specific a PWM input, use <c>PwmInput.findPwmInput()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>

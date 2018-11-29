@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_messagebox.cs 31373 2018-07-26 12:44:19Z seb $
+ * $Id: yocto_messagebox.cs 32899 2018-11-02 10:12:03Z seb $
  *
  * Implements yFindMessageBox(), the high-level API for MessageBox functions
  *
@@ -2329,6 +2329,9 @@ public class YMessageBox : YFunction
      * <summary>
      *   Continues the enumeration of MessageBox interfaces started using <c>yFirstMessageBox()</c>.
      * <para>
+     *   Caution: You can't make any assumption about the returned MessageBox interfaces order.
+     *   If you want to find a specific a MessageBox interface, use <c>MessageBox.findMessageBox()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>
