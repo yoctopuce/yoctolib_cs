@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 33505 2018-12-05 14:45:46Z seb $
+ * $Id: yocto_api.cs 33601 2018-12-09 14:30:31Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -1235,7 +1235,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "33576";
+    public const string YOCTO_API_BUILD_NO = "33636";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -11581,6 +11581,7 @@ public class YDataLogger : YFunction
     public const int BEACONDRIVEN_OFF = 0;
     public const int BEACONDRIVEN_ON = 1;
     public const int BEACONDRIVEN_INVALID = -1;
+    public const int USAGE_INVALID = YAPI.INVALID_UINT;
     public const int CLEARHISTORY_FALSE = 0;
     public const int CLEARHISTORY_TRUE = 1;
     public const int CLEARHISTORY_INVALID = -1;
@@ -11589,6 +11590,7 @@ public class YDataLogger : YFunction
     protected int _recording = RECORDING_INVALID;
     protected int _autoStart = AUTOSTART_INVALID;
     protected int _beaconDriven = BEACONDRIVEN_INVALID;
+    protected int _usage = USAGE_INVALID;
     protected int _clearHistory = CLEARHISTORY_INVALID;
     protected ValueCallback _valueCallbackDataLogger = null;
     //--- (end of generated code: YDataLogger definitions)
@@ -11624,6 +11626,10 @@ public class YDataLogger : YFunction
         if (json_val.has("beaconDriven"))
         {
             _beaconDriven = json_val.getInt("beaconDriven") > 0 ? 1 : 0;
+        }
+        if (json_val.has("usage"))
+        {
+            _usage = json_val.getInt("usage");
         }
         if (json_val.has("clearHistory"))
         {
@@ -11904,6 +11910,35 @@ public class YDataLogger : YFunction
             rest_val = (newval > 0 ? "1" : "0");
             return _setAttr("beaconDriven", rest_val);
         }
+    }
+
+    /**
+     * <summary>
+     *   Returns the percentage of datalogger memory in use.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the percentage of datalogger memory in use
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YDataLogger.USAGE_INVALID</c>.
+     * </para>
+     */
+    public int get_usage()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return USAGE_INVALID;
+                }
+            }
+            res = this._usage;
+        }
+        return res;
     }
 
     public int get_clearHistory()

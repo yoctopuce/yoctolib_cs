@@ -1,4 +1,3 @@
-C# v1.10.33576
+C# v1.10.33636
 
-- Fix missing measure in YDataSet
-- Improve disconnection detection of YoctoHubs/VirtualHub.
+- Add support for data logger usage attribute
