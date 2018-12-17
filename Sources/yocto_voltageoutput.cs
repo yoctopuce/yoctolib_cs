@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_voltageoutput.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_voltageoutput.cs 33708 2018-12-14 14:17:39Z seb $
  *
  *  Implements yFindVoltageOutput(), the high-level API for VoltageOutput functions
  *
@@ -359,7 +359,7 @@ public class YVoltageOutput : YFunction
 
     /**
      * <summary>
-     *   Performs a smooth transistion of output voltage.
+     *   Performs a smooth transition of output voltage.
      * <para>
      *   Any explicit voltage
      *   change cancels any ongoing transition process.

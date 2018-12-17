@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_relay.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_relay.cs 33708 2018-12-14 14:17:39Z seb $
  *
  *  Implements yFindRelay(), the high-level API for Relay functions
  *
@@ -520,7 +520,7 @@ public class YRelay : YFunction
      * </para>
      * </summary>
      * <param name="ms_duration">
-     *   pulse duration, in millisecondes
+     *   pulse duration, in milliseconds
      * </param>
      * <para>
      * </para>
@@ -570,10 +570,10 @@ public class YRelay : YFunction
      * </para>
      * </summary>
      * <param name="ms_delay">
-     *   waiting time before the pulse, in millisecondes
+     *   waiting time before the pulse, in milliseconds
      * </param>
      * <param name="ms_duration">
-     *   pulse duration, in millisecondes
+     *   pulse duration, in milliseconds
      * </param>
      * <para>
      * </para>

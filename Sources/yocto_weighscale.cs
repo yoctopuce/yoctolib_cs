@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_weighscale.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_weighscale.cs 33708 2018-12-14 14:17:39Z seb $
  *
  *  Implements yFindWeighScale(), the high-level API for WeighScale functions
  *
@@ -242,7 +242,7 @@ public class YWeighScale : YSensor
      * <para>
      *   The purpose of this adaptation ratio is to model the thermal inertia of the load cell.
      *   The averaged temperature is updated every 10 seconds, by applying this adaptation rate
-     *   to the difference between the measures ambiant temperature and the current compensation
+     *   to the difference between the measures ambient temperature and the current compensation
      *   temperature. The standard rate is 0.2 per mille, and the maximal rate is 65 per mille.
      * </para>
      * <para>
@@ -275,7 +275,7 @@ public class YWeighScale : YSensor
      * <para>
      *   The purpose of this adaptation ratio is to model the thermal inertia of the load cell.
      *   The averaged temperature is updated every 10 seconds, by applying this adaptation rate
-     *   to the difference between the measures ambiant temperature and the current compensation
+     *   to the difference between the measures ambient temperature and the current compensation
      *   temperature. The standard rate is 0.2 per mille, and the maximal rate is 65 per mille.
      * </para>
      * <para>
@@ -307,7 +307,7 @@ public class YWeighScale : YSensor
      *   Changes the temperature change update rate, in per mille.
      * <para>
      *   The temperature change is updated every 10 seconds, by applying this adaptation rate
-     *   to the difference between the measures ambiant temperature and the current temperature used for
+     *   to the difference between the measures ambient temperature and the current temperature used for
      *   change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 pour mille.
      * </para>
      * <para>
@@ -339,7 +339,7 @@ public class YWeighScale : YSensor
      *   Returns the temperature change update rate, in per mille.
      * <para>
      *   The temperature change is updated every 10 seconds, by applying this adaptation rate
-     *   to the difference between the measures ambiant temperature and the current temperature used for
+     *   to the difference between the measures ambient temperature and the current temperature used for
      *   change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 pour mille.
      * </para>
      * <para>
@@ -724,7 +724,7 @@ public class YWeighScale : YSensor
      *   reference weight presently on the load cell.
      * </param>
      * <param name="maxWeight">
-     *   maximum weight to be expectect on the load cell.
+     *   maximum weight to be expected on the load cell.
      * </param>
      * <returns>
      *   <c>YAPI.SUCCESS</c> if the call succeeds.

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_steppermotor.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_steppermotor.cs 33708 2018-12-14 14:17:39Z seb $
  *
  *  Implements yFindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -1178,7 +1178,7 @@ public class YStepperMotor : YFunction
      * <summary>
      *   Move one step in the direction opposite the direction set when the most recent alert was raised.
      * <para>
-     *   The move occures even if the system is still in alert mode (end switch depressed). Caution.
+     *   The move occurs even if the system is still in alert mode (end switch depressed). Caution.
      *   use this function with great care as it may cause mechanical damages !
      * </para>
      * </summary>
@@ -1196,12 +1196,12 @@ public class YStepperMotor : YFunction
      * <summary>
      *   Move one single step in the selected direction without regards to end switches.
      * <para>
-     *   The move occures even if the system is still in alert mode (end switch depressed). Caution.
+     *   The move occurs even if the system is still in alert mode (end switch depressed). Caution.
      *   use this function with great care as it may cause mechanical damages !
      * </para>
      * </summary>
      * <param name="dir">
-     *   Value +1 ou -1, according to the desired direction of the move
+     *   Value +1 or -1, according to the desired direction of the move
      * </param>
      * <returns>
      *   <c>YAPI.SUCCESS</c> if the call succeeds.

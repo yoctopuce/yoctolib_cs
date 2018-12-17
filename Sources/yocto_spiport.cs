@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_spiport.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_spiport.cs 33722 2018-12-14 15:04:43Z seb $
  *
  *  Implements yFindSpiPort(), the high-level API for SpiPort functions
  *
@@ -96,9 +96,9 @@ public class YSpiPort : YFunction
     public const int SSPOLARITY_ACTIVE_LOW = 0;
     public const int SSPOLARITY_ACTIVE_HIGH = 1;
     public const int SSPOLARITY_INVALID = -1;
-    public const int SHITFTSAMPLING_OFF = 0;
-    public const int SHITFTSAMPLING_ON = 1;
-    public const int SHITFTSAMPLING_INVALID = -1;
+    public const int SHIFTSAMPLING_OFF = 0;
+    public const int SHIFTSAMPLING_ON = 1;
+    public const int SHIFTSAMPLING_INVALID = -1;
     protected int _rxCount = RXCOUNT_INVALID;
     protected int _txCount = TXCOUNT_INVALID;
     protected int _errCount = ERRCOUNT_INVALID;
@@ -112,7 +112,7 @@ public class YSpiPort : YFunction
     protected string _protocol = PROTOCOL_INVALID;
     protected string _spiMode = SPIMODE_INVALID;
     protected int _ssPolarity = SSPOLARITY_INVALID;
-    protected int _shitftSampling = SHITFTSAMPLING_INVALID;
+    protected int _shiftSampling = SHIFTSAMPLING_INVALID;
     protected ValueCallback _valueCallbackSpiPort = null;
     protected int _rxptr = 0;
     protected byte[] _rxbuff;
@@ -183,9 +183,9 @@ public class YSpiPort : YFunction
         {
             _ssPolarity = json_val.getInt("ssPolarity") > 0 ? 1 : 0;
         }
-        if (json_val.has("shitftSampling"))
+        if (json_val.has("shiftSampling"))
         {
-            _shitftSampling = json_val.getInt("shitftSampling") > 0 ? 1 : 0;
+            _shiftSampling = json_val.getInt("shiftSampling") > 0 ? 1 : 0;
         }
         base._parseAttr(json_val);
     }
@@ -779,23 +779,23 @@ public class YSpiPort : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   either <c>YSpiPort.SHITFTSAMPLING_OFF</c> or <c>YSpiPort.SHITFTSAMPLING_ON</c>, according to true
+     *   either <c>YSpiPort.SHIFTSAMPLING_OFF</c> or <c>YSpiPort.SHIFTSAMPLING_ON</c>, according to true
      *   when the SDI line phase is shifted with regards to the SDO line
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns <c>YSpiPort.SHITFTSAMPLING_INVALID</c>.
+     *   On failure, throws an exception or returns <c>YSpiPort.SHIFTSAMPLING_INVALID</c>.
      * </para>
      */
-    public int get_shitftSampling()
+    public int get_shiftSampling()
     {
         int res;
         lock (_thisLock) {
             if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
-                    return SHITFTSAMPLING_INVALID;
+                    return SHIFTSAMPLING_INVALID;
                 }
             }
-            res = this._shitftSampling;
+            res = this._shiftSampling;
         }
         return res;
     }
@@ -812,8 +812,8 @@ public class YSpiPort : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   either <c>YSpiPort.SHITFTSAMPLING_OFF</c> or <c>YSpiPort.SHITFTSAMPLING_ON</c>, according to the
-     *   SDI line sampling shift
+     *   either <c>YSpiPort.SHIFTSAMPLING_OFF</c> or <c>YSpiPort.SHIFTSAMPLING_ON</c>, according to the SDI
+     *   line sampling shift
      * </param>
      * <para>
      * </para>
@@ -824,12 +824,12 @@ public class YSpiPort : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public int set_shitftSampling(int newval)
+    public int set_shiftSampling(int newval)
     {
         string rest_val;
         lock (_thisLock) {
             rest_val = (newval > 0 ? "1" : "0");
-            return _setAttr("shitftSampling", rest_val);
+            return _setAttr("shiftSampling", rest_val);
         }
     }
 

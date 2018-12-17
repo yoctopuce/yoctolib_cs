@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 33601 2018-12-09 14:30:31Z mvuilleu $
+ * $Id: yocto_api.cs 33723 2018-12-14 15:05:15Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1235,7 +1235,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "33657";
+    public const string YOCTO_API_BUILD_NO = "33736";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -3387,7 +3387,7 @@ public class YAPI
         }
 
         if (api_ver != YOCTO_API_VERSION_BCD) {
-            errmsg = "yapi.dll does does not match the version of the Libary (Libary=" + YOCTO_API_VERSION_STR + "." + YOCTO_API_BUILD_NO;
+            errmsg = "yapi.dll does does not match the version of the Library (Library=" + YOCTO_API_VERSION_STR + "." + YOCTO_API_BUILD_NO;
             errmsg += " yapi.dll=" + version + ")";
             return VERSION_MISMATCH;
         }
@@ -3465,7 +3465,7 @@ public class YAPI
      * </para>
      * <para>
      *   <b>usb</b>: When the <c>usb</c> keyword is used, the API will work with
-     *   devices connected directly to the USB bus. Some programming languages such a Javascript,
+     *   devices connected directly to the USB bus. Some programming languages such a JavaScript,
      *   PHP, and Java don't provide direct access to USB hardware, so <c>usb</c> will
      *   not work with these. In this case, use a VirtualHub or a networked YoctoHub (see below).
      * </para>
@@ -5553,7 +5553,7 @@ public class YDataSet
         summaryStartMs = YAPI.MAX_DOUBLE;
         summaryStopMs = YAPI.MIN_DOUBLE;
 
-        // Parse comlete streams
+        // Parse complete streams
         for (int ii = 0; ii <  this._streams.Count; ii++) {
             streamStartTimeMs = Math.Round( this._streams[ii].get_realStartTimeUTC() *1000);
             streamDuration =  this._streams[ii].get_realDuration() ;
@@ -5568,7 +5568,7 @@ public class YDataSet
                 previewDuration = streamDuration;
             } else {
                 // stream that are partially in the dataset
-                // we need to parse data to filter value outide the dataset
+                // we need to parse data to filter value outside the dataset
                 url =  this._streams[ii]._get_url();
                 data = this._parent._download(url);
                 this._streams[ii]._parseStream(data);
@@ -8012,14 +8012,14 @@ public class YModule : YFunction
 
     /**
      * <summary>
-     *   Returns the luminosity of the  module informative leds (from 0 to 100).
+     *   Returns the luminosity of the  module informative LEDs (from 0 to 100).
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the luminosity of the  module informative leds (from 0 to 100)
+     *   an integer corresponding to the luminosity of the  module informative LEDs (from 0 to 100)
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YModule.LUMINOSITY_INVALID</c>.
@@ -10573,7 +10573,7 @@ public class YSensor : YFunction
      * <para>
      *   The frequency can be specified as samples per second,
      *   as sample per minute (for instance "15/m") or in samples per
-     *   hour (eg. "4/h"). To disable timed value notifications for this
+     *   hour (e.g. "4/h"). To disable timed value notifications for this
      *   function, use the value "OFF".
      * </para>
      * <para>
@@ -10930,7 +10930,7 @@ public class YSensor : YFunction
                     return 0;
                 }
             }
-            // New 32bit text format
+            // New 32 bits text format
             this._offset = 0;
             this._scale = 1000;
             maxpos = iCalib.Count;
@@ -11130,13 +11130,13 @@ public class YSensor : YFunction
      *   the start of the desired measure time interval,
      *   as a Unix timestamp, i.e. the number of seconds since
      *   January 1, 1970 UTC. The special value 0 can be used
-     *   to include any meaasure, without initial limit.
+     *   to include any measure, without initial limit.
      * </param>
      * <param name="endTime">
      *   the end of the desired measure time interval,
      *   as a Unix timestamp, i.e. the number of seconds since
      *   January 1, 1970 UTC. The special value 0 can be used
-     *   to include any meaasure, without ending limit.
+     *   to include any measure, without ending limit.
      * </param>
      * <returns>
      *   an instance of YDataSet, providing access to historical
@@ -11368,7 +11368,7 @@ public class YSensor : YFunction
         if (startTime == 0) {
             startTime = endTime;
         }
-        // 32bit timed report format
+        // 32 bits timed report format
         if (report.Count <= 5) {
             // sub-second report, 1-4 bytes
             poww = 1;

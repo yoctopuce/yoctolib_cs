@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_latitude.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_latitude.cs 33708 2018-12-14 14:17:39Z seb $
  *
  *  Implements yFindLatitude(), the high-level API for Latitude functions
  *
@@ -57,7 +57,7 @@ using YFUN_DESCR = System.Int32;
 /**
  * <summary>
  *   The Yoctopuce class YLatitude allows you to read the latitude from Yoctopuce
- *   geolocalization sensors.
+ *   geolocation sensors.
  * <para>
  *   It inherits from the YSensor class the core functions to
  *   read measurements, to register callback functions, to access the autonomous

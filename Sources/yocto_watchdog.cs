@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_watchdog.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_watchdog.cs 33708 2018-12-14 14:17:39Z seb $
  *
  *  Implements yFindWatchdog(), the high-level API for Watchdog functions
  *
@@ -56,13 +56,13 @@ using YFUN_DESCR = System.Int32;
 //--- (YWatchdog class start)
 /**
  * <summary>
- *   The watchog function works like a relay and can cause a brief power cut
+ *   The watchdog function works like a relay and can cause a brief power cut
  *   to an appliance after a preset delay to force this appliance to
  *   reset.
  * <para>
  *   The Watchdog must be called from time to time to reset the
  *   timer and prevent the appliance reset.
- *   The watchdog can be driven direcly with <i>pulse</i> and <i>delayedpulse</i> methods to switch
+ *   The watchdog can be driven directly with <i>pulse</i> and <i>delayedpulse</i> methods to switch
  *   off an appliance for a given duration.
  * </para>
  * <para>
@@ -549,7 +549,7 @@ public class YWatchdog : YFunction
      * </para>
      * </summary>
      * <param name="ms_duration">
-     *   pulse duration, in millisecondes
+     *   pulse duration, in milliseconds
      * </param>
      * <para>
      * </para>
@@ -599,10 +599,10 @@ public class YWatchdog : YFunction
      * </para>
      * </summary>
      * <param name="ms_delay">
-     *   waiting time before the pulse, in millisecondes
+     *   waiting time before the pulse, in milliseconds
      * </param>
      * <param name="ms_duration">
-     *   pulse duration, in millisecondes
+     *   pulse duration, in milliseconds
      * </param>
      * <para>
      * </para>
@@ -653,7 +653,7 @@ public class YWatchdog : YFunction
 
     /**
      * <summary>
-     *   Returns the watchdog runing state at module power on.
+     *   Returns the watchdog running state at module power on.
      * <para>
      * </para>
      * <para>
@@ -661,7 +661,7 @@ public class YWatchdog : YFunction
      * </summary>
      * <returns>
      *   either <c>YWatchdog.AUTOSTART_OFF</c> or <c>YWatchdog.AUTOSTART_ON</c>, according to the watchdog
-     *   runing state at module power on
+     *   running state at module power on
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YWatchdog.AUTOSTART_INVALID</c>.
@@ -683,7 +683,7 @@ public class YWatchdog : YFunction
 
     /**
      * <summary>
-     *   Changes the watchdog runningsttae at module power on.
+     *   Changes the watchdog running state at module power on.
      * <para>
      *   Remember to call the
      *   <c>saveToFlash()</c> method and then to reboot the module to apply this setting.
@@ -693,7 +693,7 @@ public class YWatchdog : YFunction
      * </summary>
      * <param name="newval">
      *   either <c>YWatchdog.AUTOSTART_OFF</c> or <c>YWatchdog.AUTOSTART_ON</c>, according to the watchdog
-     *   runningsttae at module power on
+     *   running state at module power on
      * </param>
      * <para>
      * </para>
@@ -777,7 +777,7 @@ public class YWatchdog : YFunction
      *   Resets the watchdog.
      * <para>
      *   When the watchdog is running, this function
-     *   must be called on a regular basis to prevent the watchog to
+     *   must be called on a regular basis to prevent the watchdog to
      *   trigger
      * </para>
      * <para>

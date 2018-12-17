@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_refframe.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_refframe.cs 33708 2018-12-14 14:17:39Z seb $
  *
  *  Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -653,7 +653,7 @@ public enum   MOUNTORIENTATION
      *   The calibration procedure is completed when the method
      *   <c>get_3DCalibrationProgress</c> returns 100. At this point,
      *   the computed calibration parameters can be applied using method
-     *   <c>save3DCalibration</c>. The calibration process can be canceled
+     *   <c>save3DCalibration</c>. The calibration process can be cancelled
      *   at any time using method <c>cancel3DCalibration</c>.
      * </para>
      * <para>
@@ -732,7 +732,7 @@ public enum   MOUNTORIENTATION
         if (this._calibProgress == 100) {
             return YAPI.SUCCESS;
         }
-        // make sure we leave at least 160ms between samples
+        // make sure we leave at least 160 ms between samples
         currTick =  (int) ((YAPI.GetTickCount()) & (0x7FFFFFFF));
         if (((currTick - this._calibPrevTick) & (0x7FFFFFFF)) < 160) {
             return YAPI.SUCCESS;

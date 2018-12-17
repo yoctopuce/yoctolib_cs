@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_quadraturedecoder.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_quadraturedecoder.cs 33708 2018-12-14 14:17:39Z seb $
  *
  *  Implements yFindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -110,7 +110,7 @@ public class YQuadratureDecoder : YSensor
      * <summary>
      *   Changes the current expected position of the quadrature decoder.
      * <para>
-     *   Invoking this function implicitely activates the quadrature decoder.
+     *   Invoking this function implicitly activates the quadrature decoder.
      * </para>
      * <para>
      * </para>
