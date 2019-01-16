@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 33708 2018-12-14 14:17:39Z seb $
+ * $Id: yocto_display.cs 33877 2018-12-26 12:19:48Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -393,7 +393,8 @@ public enum   ALIGN
      * </para>
      * </summary>
      * <param name="fontname">
-     *   the font file name
+     *   the font file name, embedded fonts are 8x8.yfm, Small.yfm, Medium.yfm, Large.yfm (not available on
+     *   Yocto-MiniDisplay).
      * </param>
      * <returns>
      *   <c>YAPI.SUCCESS</c> if the call succeeds.
