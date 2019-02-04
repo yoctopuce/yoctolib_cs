@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_buzzer.cs 33708 2018-12-14 14:17:39Z seb $
+ *  $Id: yocto_buzzer.cs 34289 2019-02-03 21:12:49Z mvuilleu $
  *
  *  Implements yFindBuzzer(), the high-level API for Buzzer functions
  *
@@ -786,6 +786,38 @@ public class YBuzzer : YFunction
     public virtual int oncePlaySeq()
     {
         return this.sendCommand("s");
+    }
+
+    /**
+     * <summary>
+     *   Saves the preprogrammed playing sequence to flash memory.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     *   On failure, throws an exception or returns a negative error code.
+     * </returns>
+     */
+    public virtual int savePlaySeq()
+    {
+        return this.sendCommand("W");
+    }
+
+    /**
+     * <summary>
+     *   Reloads the preprogrammed playing sequence from the flash memory.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     *   On failure, throws an exception or returns a negative error code.
+     * </returns>
+     */
+    public virtual int reloadPlaySeq()
+    {
+        return this.sendCommand("R");
     }
 
     /**
