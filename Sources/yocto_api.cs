@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 33916 2018-12-28 10:38:18Z seb $
+ * $Id: yocto_api.cs 34553 2019-03-06 10:16:15Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1235,7 +1235,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "34423";
+    public const string YOCTO_API_BUILD_NO = "34560";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -1480,6 +1480,7 @@ public class YAPI
             char sti = data[start];
             while (start < stop && (sti == '\n' || sti == '\r' || sti == ' ')) {
                 start++;
+                sti = data[start];
             }
 
             return start;
@@ -1524,7 +1525,7 @@ public class YAPI
         {
             int cur_pos = SkipGarbage(_data, _data_start, _data_boundary);
 
-            if (_data[cur_pos] != '[') {
+            if (cur_pos >= _data_boundary || _data[cur_pos] != '[') {
                 throw new System.Exception(FormatError("Opening braces was expected", cur_pos));
             }
 
@@ -1689,7 +1690,7 @@ public class YAPI
             string value = "";
             int cur_pos = SkipGarbage(_data, _data_start, _data_boundary);
 
-            if (_data[cur_pos] != '"') {
+            if (cur_pos >= _data_boundary || _data[cur_pos] != '"') {
                 throw new System.Exception(FormatError("double quote was expected", cur_pos));
             }
 
@@ -1897,7 +1898,7 @@ public class YAPI
             int name_start = _data_start;
             int cur_pos = SkipGarbage(_data, _data_start, _data_boundary);
 
-            if (_data.Length <= cur_pos || _data[cur_pos] != '{') {
+            if (_data.Length <= cur_pos || cur_pos >= _data_boundary || _data[cur_pos] != '{') {
                 throw new System.Exception(FormatError("Opening braces was expected", cur_pos));
             }
 
@@ -7377,7 +7378,8 @@ public class YFunction
 
     protected List<string> _json_get_array(byte[] data)
     {
-        YAPI.YJSONArray array = new YAPI.YJSONArray(YAPI.DefaultEncoding.GetString(data));
+        string debug = YAPI.DefaultEncoding.GetString(data);
+        YAPI.YJSONArray array = new YAPI.YJSONArray(debug);
         array.parse();
         List<string> list = new List<string>();
         int len = array.Length;

@@ -1,3 +1,3 @@
-C# v1.10.34423
+C# v1.10.34560
 
-- Add Linux and macOS version of the yapi shared library in the /Sources/dll folder
+- Fix in Json parser.
