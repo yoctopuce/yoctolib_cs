@@ -1,3 +1,4 @@
-C# v1.10.34560
+C# v1.10.34639
 
-- Fix in Json parser.
+- Add support for .NET Core 2.x
+- Improve mono support (dllmap entry are no more needed")
