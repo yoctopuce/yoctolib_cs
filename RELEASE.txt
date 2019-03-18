@@ -1,4 +1,3 @@
-C# v1.10.34639
+C# v1.10.34665
 
-- Add support for .NET Core 2.x
-- Improve mono support (dllmap entry are no more needed")
+- Fix NuGet package

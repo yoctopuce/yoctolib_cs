@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs 33708 2018-12-14 14:17:39Z seb $
+ * $Id: yocto_files.cs 34651 2019-03-15 17:21:54Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -48,6 +48,16 @@ using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
 //--- (generated code: YFileRecord class start)
+/**
+ * <summary>
+ *   YFileRecord objects are used to describe a file that is stored on a Yoctopuce device.
+ * <para>
+ *   These objects are used in particular in conjunction with the YFiles class.
+ * </para>
+ * <para>
+ * </para>
+ * </summary>
+ */
 public class YFileRecord
 {
 //--- (end of generated code: YFileRecord class start)
@@ -72,16 +82,46 @@ public class YFileRecord
     //--- (generated code: YFileRecord implementation)
 
 
+    /**
+     * <summary>
+     *   Returns the name of the file.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string with the name of the file.
+     * </returns>
+     */
     public virtual string get_name()
     {
         return this._name;
     }
 
+    /**
+     * <summary>
+     *   Returns the size of the file in bytes.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   the size of the file.
+     * </returns>
+     */
     public virtual int get_size()
     {
         return this._size;
     }
 
+    /**
+     * <summary>
+     *   Returns the 32-bit CRC of the file content.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   the 32-bit CRC of the file content.
+     * </returns>
+     */
     public virtual int get_crc()
     {
         return this._crc;

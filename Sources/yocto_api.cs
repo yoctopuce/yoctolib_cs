@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 34615 2019-03-13 08:28:45Z seb $
+ * $Id: yocto_api.cs 34651 2019-03-15 17:21:54Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -45,6 +45,7 @@ using System.Security;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+
 using YHANDLE = System.Int32;
 using YRETCODE = System.Int32;
 using s8 = System.SByte;
@@ -208,6 +209,8 @@ internal static class SafeNativeMethods
     {
         Boolean is64 = IntPtr.Size == 8;
 
+        
+
         PlatformID platform = Environment.OSVersion.Platform;
         if (platform == PlatformID.MacOSX) {
             if (is64) {
@@ -236,13 +239,13 @@ internal static class SafeNativeMethods
                 _dllVersion = YAPIDLL_VERSION.WIN32;
             }
         }
-        //Console.WriteLine("Detected platform is "+_dllVersion.ToString());
+        Console.WriteLine("Detected platform is "+_dllVersion.ToString());
         bool can_retry = true;
         do {
             try {
                 return _yapiGetAPIVersion(ref version, ref dat_);
             } catch (System.DllNotFoundException ex) {
-                //Console.WriteLine(ex.ToString());
+                Console.WriteLine(ex.ToString());
                 switch (_dllVersion) {
                     default:
                     case YAPIDLL_VERSION.WIN32:
@@ -262,7 +265,7 @@ internal static class SafeNativeMethods
                         _dllVersion = YAPIDLL_VERSION.LIN32;
                         break;
                 }
-                //Console.WriteLine("retry with platform " + _dllVersion.ToString());
+                Console.WriteLine("retry with platform " + _dllVersion.ToString());
             }
 
         } while (can_retry);
@@ -2301,7 +2304,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "34639";
+    public const string YOCTO_API_BUILD_NO = "34665";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
