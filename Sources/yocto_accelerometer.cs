@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_accelerometer.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_accelerometer.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YAccelerometer return codes)
     //--- (end of YAccelerometer return codes)
 //--- (YAccelerometer dlldef)
@@ -525,3 +526,4 @@ public class YAccelerometer : YSensor
 
     //--- (end of YAccelerometer functions)
 }
+#pragma warning restore 1591

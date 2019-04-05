@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_tvoc.cs 33270 2018-11-22 08:41:15Z seb $
+ *  $Id: yocto_tvoc.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindTvoc(), the high-level API for Tvoc functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YTvoc return codes)
     //--- (end of YTvoc return codes)
 //--- (YTvoc dlldef)
@@ -317,3 +318,4 @@ public class YTvoc : YSensor
 
     //--- (end of YTvoc functions)
 }
+#pragma warning restore 1591

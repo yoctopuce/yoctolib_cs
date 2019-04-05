@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_groundspeed.cs 33708 2018-12-14 14:17:39Z seb $
+ *  $Id: yocto_groundspeed.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindGroundSpeed(), the high-level API for GroundSpeed functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YGroundSpeed return codes)
     //--- (end of YGroundSpeed return codes)
 //--- (YGroundSpeed dlldef)
@@ -318,3 +319,4 @@ public class YGroundSpeed : YSensor
 
     //--- (end of YGroundSpeed functions)
 }
+#pragma warning restore 1591

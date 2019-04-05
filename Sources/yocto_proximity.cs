@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_proximity.cs 33708 2018-12-14 14:17:39Z seb $
+ *  $Id: yocto_proximity.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindProximity(), the high-level API for Proximity functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YProximity return codes)
     //--- (end of YProximity return codes)
 //--- (YProximity dlldef)
@@ -918,3 +919,4 @@ public class YProximity : YSensor
 
     //--- (end of YProximity functions)
 }
+#pragma warning restore 1591

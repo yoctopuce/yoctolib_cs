@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_refframe.cs 33708 2018-12-14 14:17:39Z seb $
+ *  $Id: yocto_refframe.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YRefFrame return codes)
     //--- (end of YRefFrame return codes)
 //--- (YRefFrame dlldef)
@@ -1239,3 +1240,4 @@ public enum   MOUNTORIENTATION
 
     //--- (end of YRefFrame functions)
 }
+#pragma warning restore 1591

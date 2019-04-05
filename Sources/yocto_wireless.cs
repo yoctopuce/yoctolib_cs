@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wireless.cs 34651 2019-03-15 17:21:54Z seb $
+ * $Id: yocto_wireless.cs 34989 2019-04-05 13:41:16Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -48,6 +48,7 @@ using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
 
+#pragma warning disable 1591
 //--- (generated code: YWlanRecord class start)
 /**
  * <summary>
@@ -791,3 +792,4 @@ public class YWireless : YFunction
 
     //--- (end of generated code: YWireless functions)
 }
+#pragma warning restore 1591

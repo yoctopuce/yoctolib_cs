@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_humidity.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_humidity.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindHumidity(), the high-level API for Humidity functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YHumidity return codes)
     //--- (end of YHumidity return codes)
 //--- (YHumidity dlldef)
@@ -424,3 +425,4 @@ public class YHumidity : YSensor
 
     //--- (end of YHumidity functions)
 }
+#pragma warning restore 1591

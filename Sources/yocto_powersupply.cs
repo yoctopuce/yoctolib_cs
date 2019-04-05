@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_powersupply.cs 34115 2019-01-23 14:23:54Z seb $
+ *  $Id: yocto_powersupply.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindPowerSupply(), the high-level API for PowerSupply functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YPowerSupply return codes)
     //--- (end of YPowerSupply return codes)
 //--- (YPowerSupply dlldef)
@@ -932,3 +933,4 @@ public class YPowerSupply : YFunction
 
     //--- (end of YPowerSupply functions)
 }
+#pragma warning restore 1591

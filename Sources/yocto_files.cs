@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs 34651 2019-03-15 17:21:54Z seb $
+ * $Id: yocto_files.cs 34989 2019-04-05 13:41:16Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -46,6 +46,8 @@ using System.Diagnostics;
 using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
+
+#pragma warning disable 1591
 
 //--- (generated code: YFileRecord class start)
 /**
@@ -600,3 +602,4 @@ public class YFiles : YFunction
     //--- (end of generated code: YFiles functions)
 
 }
+#pragma warning restore 1591

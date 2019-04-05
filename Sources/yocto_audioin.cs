@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_audioin.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_audioin.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindAudioIn(), the high-level API for AudioIn functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YAudioIn return codes)
     //--- (end of YAudioIn return codes)
 //--- (YAudioIn dlldef)
@@ -513,3 +514,4 @@ public class YAudioIn : YFunction
 
     //--- (end of YAudioIn functions)
 }
+#pragma warning restore 1591

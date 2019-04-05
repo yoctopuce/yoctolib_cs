@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_spiport.cs 33722 2018-12-14 15:04:43Z seb $
+ *  $Id: yocto_spiport.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindSpiPort(), the high-level API for SpiPort functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YSpiPort return codes)
     //--- (end of YSpiPort return codes)
 //--- (YSpiPort dlldef)
@@ -1811,3 +1812,4 @@ public class YSpiPort : YFunction
 
     //--- (end of YSpiPort functions)
 }
+#pragma warning restore 1591

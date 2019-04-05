@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_segmenteddisplay.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_segmenteddisplay.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YSegmentedDisplay return codes)
     //--- (end of YSegmentedDisplay return codes)
 //--- (YSegmentedDisplay dlldef)
@@ -369,3 +370,4 @@ public class YSegmentedDisplay : YFunction
 
     //--- (end of YSegmentedDisplay functions)
 }
+#pragma warning restore 1591

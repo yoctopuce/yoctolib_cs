@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_colorled.cs 33708 2018-12-14 14:17:39Z seb $
+ *  $Id: yocto_colorled.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindColorLed(), the high-level API for ColorLed functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YColorLed return codes)
     //--- (end of YColorLed return codes)
 //--- (YColorLed dlldef)
@@ -854,3 +855,4 @@ public class YColorLed : YFunction
 
     //--- (end of YColorLed functions)
 }
+#pragma warning restore 1591

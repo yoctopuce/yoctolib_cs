@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_colorledcluster.cs 33708 2018-12-14 14:17:39Z seb $
+ *  $Id: yocto_colorledcluster.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YColorLedCluster return codes)
     //--- (end of YColorLedCluster return codes)
 //--- (YColorLedCluster dlldef)
@@ -1849,3 +1850,4 @@ public class YColorLedCluster : YFunction
 
     //--- (end of YColorLedCluster functions)
 }
+#pragma warning restore 1591

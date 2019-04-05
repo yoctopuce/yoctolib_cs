@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 33877 2018-12-26 12:19:48Z seb $
+ * $Id: yocto_display.cs 34989 2019-04-05 13:41:16Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -48,6 +48,7 @@ using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
 
+#pragma warning disable 1591
 //--- (generated code: YDisplayLayer class start)
 /**
  * <summary>
@@ -1977,3 +1978,4 @@ public class YDisplay : YFunction
 
     //--- (end of generated code: YDisplay functions)
 }
+#pragma warning restore 1591

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_watchdog.cs 33708 2018-12-14 14:17:39Z seb $
+ *  $Id: yocto_watchdog.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindWatchdog(), the high-level API for Watchdog functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YWatchdog return codes)
     //--- (end of YWatchdog return codes)
 //--- (YWatchdog dlldef)
@@ -119,6 +120,7 @@ public class YWatchdog : YFunction
     protected long _triggerDelay = TRIGGERDELAY_INVALID;
     protected long _triggerDuration = TRIGGERDURATION_INVALID;
     protected ValueCallback _valueCallbackWatchdog = null;
+    protected int _firm = 0;
     //--- (end of YWatchdog definitions)
 
     public YWatchdog(string func)
@@ -1025,6 +1027,48 @@ public class YWatchdog : YFunction
 
     /**
      * <summary>
+     *   Switch the relay to the opposite state.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int toggle()
+    {
+        int sta;
+        string fw;
+        YModule mo;
+        if (this._firm == 0) {
+            mo = this.get_module();
+            fw = mo.get_firmwareRelease();
+            if (fw == YModule.FIRMWARERELEASE_INVALID) {
+                return STATE_INVALID;
+            }
+            this._firm = YAPI._atoi(fw);
+        }
+        if (this._firm < 34921) {
+            sta = this.get_state();
+            if (sta == STATE_INVALID) {
+                return STATE_INVALID;
+            }
+            if (sta == STATE_B) {
+                this.set_state(STATE_A);
+            } else {
+                this.set_state(STATE_B);
+            }
+            return YAPI.SUCCESS;
+        } else {
+            return this._setAttr("state","X");
+        }
+    }
+
+    /**
+     * <summary>
      *   Continues the enumeration of watchdog started using <c>yFirstWatchdog()</c>.
      * <para>
      *   Caution: You can't make any assumption about the returned watchdog order.
@@ -1098,3 +1142,4 @@ public class YWatchdog : YFunction
 
     //--- (end of YWatchdog functions)
 }
+#pragma warning restore 1591

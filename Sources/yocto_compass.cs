@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_compass.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_compass.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindCompass(), the high-level API for Compass functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YCompass return codes)
     //--- (end of YCompass return codes)
 //--- (YCompass dlldef)
@@ -447,3 +448,4 @@ public class YCompass : YSensor
 
     //--- (end of YCompass functions)
 }
+#pragma warning restore 1591

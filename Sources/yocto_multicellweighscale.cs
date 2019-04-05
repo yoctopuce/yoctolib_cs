@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_multicellweighscale.cs 33708 2018-12-14 14:17:39Z seb $
+ *  $Id: yocto_multicellweighscale.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindMultiCellWeighScale(), the high-level API for MultiCellWeighScale functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YMultiCellWeighScale return codes)
     //--- (end of YMultiCellWeighScale return codes)
 //--- (YMultiCellWeighScale dlldef)
@@ -878,3 +879,4 @@ public class YMultiCellWeighScale : YSensor
 
     //--- (end of YMultiCellWeighScale functions)
 }
+#pragma warning restore 1591

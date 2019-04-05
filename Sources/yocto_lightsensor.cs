@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_lightsensor.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_lightsensor.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindLightSensor(), the high-level API for LightSensor functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YLightSensor return codes)
     //--- (end of YLightSensor return codes)
 //--- (YLightSensor dlldef)
@@ -440,3 +441,4 @@ public class YLightSensor : YSensor
 
     //--- (end of YLightSensor functions)
 }
+#pragma warning restore 1591

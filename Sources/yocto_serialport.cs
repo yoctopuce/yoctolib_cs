@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 32899 2018-11-02 10:12:03Z seb $
+ * $Id: yocto_serialport.cs 34989 2019-04-05 13:41:16Z seb $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
@@ -48,6 +48,7 @@ using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
 
+#pragma warning disable 1591
 //--- (generated code: YSnoopingRecord class start)
 public class YSnoopingRecord
 {
@@ -2463,3 +2464,4 @@ public class YSerialPort : YFunction
 
     //--- (end of generated code: YSerialPort functions)
 }
+#pragma warning restore 1591

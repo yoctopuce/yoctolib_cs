@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_relay.cs 33708 2018-12-14 14:17:39Z seb $
+ *  $Id: yocto_relay.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindRelay(), the high-level API for Relay functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YRelay return codes)
     //--- (end of YRelay return codes)
 //--- (YRelay dlldef)
@@ -107,6 +108,7 @@ public class YRelay : YFunction
     protected YRelayDelayedPulse _delayedPulseTimer = new YRelayDelayedPulse();
     protected long _countdown = COUNTDOWN_INVALID;
     protected ValueCallback _valueCallbackRelay = null;
+    protected int _firm = 0;
     //--- (end of YRelay definitions)
 
     public YRelay(string func)
@@ -733,6 +735,48 @@ public class YRelay : YFunction
 
     /**
      * <summary>
+     *   Switch the relay to the opposite state.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int toggle()
+    {
+        int sta;
+        string fw;
+        YModule mo;
+        if (this._firm == 0) {
+            mo = this.get_module();
+            fw = mo.get_firmwareRelease();
+            if (fw == YModule.FIRMWARERELEASE_INVALID) {
+                return STATE_INVALID;
+            }
+            this._firm = YAPI._atoi(fw);
+        }
+        if (this._firm < 34921) {
+            sta = this.get_state();
+            if (sta == STATE_INVALID) {
+                return STATE_INVALID;
+            }
+            if (sta == STATE_B) {
+                this.set_state(STATE_A);
+            } else {
+                this.set_state(STATE_B);
+            }
+            return YAPI.SUCCESS;
+        } else {
+            return this._setAttr("state","X");
+        }
+    }
+
+    /**
+     * <summary>
      *   Continues the enumeration of relays started using <c>yFirstRelay()</c>.
      * <para>
      *   Caution: You can't make any assumption about the returned relays order.
@@ -806,3 +850,4 @@ public class YRelay : YFunction
 
     //--- (end of YRelay functions)
 }
+#pragma warning restore 1591

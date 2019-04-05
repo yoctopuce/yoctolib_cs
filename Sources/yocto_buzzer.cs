@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_buzzer.cs 34289 2019-02-03 21:12:49Z mvuilleu $
+ *  $Id: yocto_buzzer.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindBuzzer(), the high-level API for Buzzer functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YBuzzer return codes)
     //--- (end of YBuzzer return codes)
 //--- (YBuzzer dlldef)
@@ -994,3 +995,4 @@ public class YBuzzer : YFunction
 
     //--- (end of YBuzzer functions)
 }
+#pragma warning restore 1591

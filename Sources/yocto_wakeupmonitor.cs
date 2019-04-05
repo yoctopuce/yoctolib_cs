@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_wakeupmonitor.cs 32899 2018-11-02 10:12:03Z seb $
+ *  $Id: yocto_wakeupmonitor.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YWakeUpMonitor return codes)
     //--- (end of YWakeUpMonitor return codes)
 //--- (YWakeUpMonitor dlldef)
@@ -698,3 +699,4 @@ public class YWakeUpMonitor : YFunction
 
     //--- (end of YWakeUpMonitor functions)
 }
+#pragma warning restore 1591

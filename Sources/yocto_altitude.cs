@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_altitude.cs 34115 2019-01-23 14:23:54Z seb $
+ *  $Id: yocto_altitude.cs 34989 2019-04-05 13:41:16Z seb $
  *
  *  Implements yFindAltitude(), the high-level API for Altitude functions
  *
@@ -47,6 +47,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
+ #pragma warning disable 1591
     //--- (YAltitude return codes)
     //--- (end of YAltitude return codes)
 //--- (YAltitude dlldef)
@@ -459,3 +460,4 @@ public class YAltitude : YSensor
 
     //--- (end of YAltitude functions)
 }
+#pragma warning restore 1591
