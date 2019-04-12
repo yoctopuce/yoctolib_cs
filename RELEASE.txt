@@ -1,5 +1,3 @@
-C# v1.10.34990
+C# v1.10.35124
 
-- Add toggle() method in YRelay class
-- Add XML documentation in nuget package
-- Remove some debug logs
+- Fix handling of '=' character in parameters for the queryLine() method
