@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_voltage.cs 34989 2019-04-05 13:41:16Z seb $
+ *  $Id: yocto_voltage.cs 35360 2019-05-09 09:02:29Z mvuilleu $
  *
  *  Implements yFindVoltage(), the high-level API for Voltage functions
  *
@@ -101,6 +101,22 @@ public class YVoltage : YSensor
         base._parseAttr(json_val);
     }
 
+    /**
+     * <summary>
+     *   Returns the activation state of this input.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   either <c>YVoltage.ENABLED_FALSE</c> or <c>YVoltage.ENABLED_TRUE</c>, according to the activation
+     *   state of this input
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YVoltage.ENABLED_INVALID</c>.
+     * </para>
+     */
     public int get_enabled()
     {
         int res;
@@ -115,6 +131,30 @@ public class YVoltage : YSensor
         return res;
     }
 
+    /**
+     * <summary>
+     *   Changes the activation state of this input.
+     * <para>
+     *   When an input is disabled,
+     *   its value is no more updated. On some devices, disabling an input can
+     *   improve the refresh rate of the other active inputs.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   either <c>YVoltage.ENABLED_FALSE</c> or <c>YVoltage.ENABLED_TRUE</c>, according to the activation
+     *   state of this input
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
     public int set_enabled(int newval)
     {
         string rest_val;

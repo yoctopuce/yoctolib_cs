@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_poweroutput.cs 34989 2019-04-05 13:41:16Z seb $
+ *  $Id: yocto_poweroutput.cs 35462 2019-05-16 14:37:06Z seb $
  *
  *  Implements yFindPowerOutput(), the high-level API for PowerOutput functions
  *
@@ -75,6 +75,8 @@ public class YPowerOutput : YFunction
     public const int VOLTAGE_OFF = 0;
     public const int VOLTAGE_OUT3V3 = 1;
     public const int VOLTAGE_OUT5V = 2;
+    public const int VOLTAGE_OUT4V7 = 3;
+    public const int VOLTAGE_OUT1V8 = 4;
     public const int VOLTAGE_INVALID = -1;
     protected int _voltage = VOLTAGE_INVALID;
     protected ValueCallback _valueCallbackPowerOutput = null;
@@ -108,8 +110,9 @@ public class YPowerOutput : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   a value among <c>YPowerOutput.VOLTAGE_OFF</c>, <c>YPowerOutput.VOLTAGE_OUT3V3</c> and
-     *   <c>YPowerOutput.VOLTAGE_OUT5V</c> corresponding to the voltage on the power output featured by the module
+     *   a value among <c>YPowerOutput.VOLTAGE_OFF</c>, <c>YPowerOutput.VOLTAGE_OUT3V3</c>,
+     *   <c>YPowerOutput.VOLTAGE_OUT5V</c>, <c>YPowerOutput.VOLTAGE_OUT4V7</c> and
+     *   <c>YPowerOutput.VOLTAGE_OUT1V8</c> corresponding to the voltage on the power output featured by the module
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YPowerOutput.VOLTAGE_INVALID</c>.
@@ -141,8 +144,9 @@ public class YPowerOutput : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   a value among <c>YPowerOutput.VOLTAGE_OFF</c>, <c>YPowerOutput.VOLTAGE_OUT3V3</c> and
-     *   <c>YPowerOutput.VOLTAGE_OUT5V</c> corresponding to the voltage on the power output provided by the
+     *   a value among <c>YPowerOutput.VOLTAGE_OFF</c>, <c>YPowerOutput.VOLTAGE_OUT3V3</c>,
+     *   <c>YPowerOutput.VOLTAGE_OUT5V</c>, <c>YPowerOutput.VOLTAGE_OUT4V7</c> and
+     *   <c>YPowerOutput.VOLTAGE_OUT1V8</c> corresponding to the voltage on the power output provided by the
      *   module
      * </param>
      * <para>
