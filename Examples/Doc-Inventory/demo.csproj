@@ -92,6 +92,9 @@
 <Compile Include="..\..\Sources\yocto_anbutton.cs">
 <Link>yocto_api\yocto_anbutton.cs</Link>
 </Compile>
+<Compile Include="..\..\Sources\yocto_arithmeticsensor.cs">
+<Link>yocto_api\yocto_arithmeticsensor.cs</Link>
+</Compile>
 <Compile Include="..\..\Sources\yocto_audioin.cs">
 <Link>yocto_api\yocto_audioin.cs</Link>
 </Compile>
