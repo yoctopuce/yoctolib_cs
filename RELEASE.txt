@@ -1,7 +1,4 @@
-C# v1.10.35944
+C# v1.10.35983
 
-(C-sharp)- Add support for aarch64
-(Libs)- Add YArithmeticSensor class
-(Misc)- arithmericsensor:fix return value of defineExpression
-(Misc)- serial devices:add support for arithmetic expressions in job files
-(Misc)- datalogger:add recovery code in case of flash memory corruption (Fwerr)
+- Add support for aarch64 (arm64)
+- Add YArithmeticSensor class
