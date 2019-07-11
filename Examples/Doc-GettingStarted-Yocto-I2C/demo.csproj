@@ -83,17 +83,17 @@
       <Link>yocto_api\yocto_api.cs</Link>
     </Compile>
     
-<Compile Include="..\..\Sources\yocto_carbondioxide.cs">
-<Link>yocto_api\yocto_carbondioxide.cs</Link>
+<Compile Include="..\..\Sources\yocto_files.cs">
+<Link>yocto_api\yocto_files.cs</Link>
 </Compile>
-<Compile Include="..\..\Sources\yocto_humidity.cs">
-<Link>yocto_api\yocto_humidity.cs</Link>
+<Compile Include="..\..\Sources\yocto_genericsensor.cs">
+<Link>yocto_api\yocto_genericsensor.cs</Link>
 </Compile>
-<Compile Include="..\..\Sources\yocto_pressure.cs">
-<Link>yocto_api\yocto_pressure.cs</Link>
+<Compile Include="..\..\Sources\yocto_i2cport.cs">
+<Link>yocto_api\yocto_i2cport.cs</Link>
 </Compile>
-<Compile Include="..\..\Sources\yocto_temperature.cs">
-<Link>yocto_api\yocto_temperature.cs</Link>
+<Compile Include="..\..\Sources\yocto_poweroutput.cs">
+<Link>yocto_api\yocto_poweroutput.cs</Link>
 </Compile>
 
     <Compile Include="main.cs" />

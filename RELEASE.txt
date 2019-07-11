@@ -1,4 +1,5 @@
-C# v1.10.35983
+C# v1.10.36218
 
-- Add support for aarch64 (arm64)
-- Add YArithmeticSensor class
+- Add ConsolidatedDataSet class and Prog-ExportCSV
+- Add support for Yocto-I2c
+- Improve handling of network disconnect in Websocket mode

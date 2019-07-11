@@ -161,6 +161,9 @@
 <Compile Include="..\..\Sources\yocto_humidity.cs">
 <Link>yocto_api\yocto_humidity.cs</Link>
 </Compile>
+<Compile Include="..\..\Sources\yocto_i2cport.cs">
+<Link>yocto_api\yocto_i2cport.cs</Link>
+</Compile>
 <Compile Include="..\..\Sources\yocto_latitude.cs">
 <Link>yocto_api\yocto_latitude.cs</Link>
 </Compile>
