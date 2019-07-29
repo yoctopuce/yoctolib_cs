@@ -14,12 +14,12 @@ namespace ConsoleApplication1
 
         static void sensorValueChangeCallBack(YSensor fct, string value)
         {
-            Console.WriteLine(fct.get_hardwareId() + ": " + value + " (new value)");
+            Console.WriteLine(fct.get_hardwareId() + ": " + value + " " + fct.get_userData() + " (new value)");
         }
 
         static void sensorTimedReportCallBack(YSensor fct, YMeasure measure)
         {
-            Console.WriteLine(fct.get_hardwareId() + ": " + measure.get_averageValue() + " " + fct.get_unit() + " (timed report)");
+            Console.WriteLine(fct.get_hardwareId() + ": " + measure.get_averageValue() + " " + fct.get_userData() + " (timed report)");
         }
 
         static void deviceLog(YModule module, string logline)
@@ -64,6 +64,8 @@ namespace ConsoleApplication1
                 if (sensor.get_module().get_serialNumber() == serial) {
                     string hardwareId = sensor.get_hardwareId();
                     Console.WriteLine("- " + hardwareId);
+                    string unit = sensor.get_unit();
+                    sensor.set_userData(unit);
                     sensor.registerValueCallback(sensorValueChangeCallBack);
                     sensor.registerTimedReportCallback(sensorTimedReportCallBack);
                 }
@@ -77,18 +79,21 @@ namespace ConsoleApplication1
             Console.WriteLine("Device removal : " + m.get_serialNumber());
         }
 
+        private static void log(string line)
+        {
+            Console.Write("LOG : " + line);
+        }
 
         static void Main(string[] args)
         {
             string errmsg = "";
 
+            YAPI.RegisterLogFunction(log);
+
             if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS) {
                 Console.WriteLine("RegisterHub error : " + errmsg);
                 Environment.Exit(0);
             }
-
-            YAPI.UpdateDeviceList(ref errmsg); // traps plug/unplug events
-            YAPI.Sleep(2000, ref errmsg); // traps others events
 
             YAPI.RegisterDeviceArrivalCallback(deviceArrival);
             YAPI.RegisterDeviceRemovalCallback(deviceRemoval);
