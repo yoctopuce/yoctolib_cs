@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 36141 2019-07-08 17:51:33Z mvuilleu $
+ * $Id: yocto_api.cs 36629 2019-07-31 13:03:53Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -2579,7 +2579,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "36518";
+    public const string YOCTO_API_BUILD_NO = "36692";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6052,7 +6052,15 @@ public class YDataStream
             val = 0;
         }
         this._nRows = val;
-        this._duration = this._nRows * this._dataSamplesInterval;
+        if (this._nRows > 0) {
+            if (this._firstMeasureDuration > 0) {
+                this._duration = this._firstMeasureDuration + (this._nRows - 1) * this._dataSamplesInterval;
+            } else {
+                this._duration = this._nRows * this._dataSamplesInterval;
+            }
+        } else {
+            this._duration = 0;
+        }
         // precompute decoding parameters
         iCalib = dataset._get_calibration();
         this._caltyp = iCalib[0];
@@ -8057,10 +8065,12 @@ public class YFunction
                 break;
         }
 
-        if (found >= buffer.Length - 4)
+        if (found > buffer.Length - 4)
         {
             _throw(YAPI.IO_ERROR, "http request failed");
             return null;
+        } else if (found == buffer.Length - 4) {
+            return new byte[0];
         }
 
         body = found + 4;
@@ -9497,14 +9507,15 @@ public class YModule : YFunction
 
     /**
      * <summary>
-     *   Returns the hardware release version of the module.
+     *   Returns the release number of the module hardware, preprogrammed at the factory.
      * <para>
+     *   The original hardware release returns value 1, revision B returns value 2, etc.
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the hardware release version of the module
+     *   an integer corresponding to the release number of the module hardware, preprogrammed at the factory
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YModule.PRODUCTRELEASE_INVALID</c>.
@@ -9514,7 +9525,7 @@ public class YModule : YFunction
     {
         int res;
         lock (_thisLock) {
-            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this._cacheExpiration == 0) {
                 if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return PRODUCTRELEASE_INVALID;
                 }
@@ -9970,6 +9981,22 @@ public class YModule : YFunction
             base._invokeValueCallback(value);
         }
         return 0;
+    }
+
+    public virtual string get_productNameAndRevision()
+    {
+        string prodname;
+        int prodrel;
+        string fullname;
+
+        prodname = this.get_productName();
+        prodrel = this.get_productRelease();
+        if (prodrel > 1) {
+            fullname = ""+ prodname+" rev. "+((char)(64+prodrel)).ToString();
+        } else {
+            fullname = prodname;
+        }
+        return fullname;
     }
 
     /**
