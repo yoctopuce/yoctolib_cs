@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 36629 2019-07-31 13:03:53Z seb $
+ * $Id: yocto_api.cs 36790 2019-08-08 16:52:32Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -45,7 +45,7 @@ using System.Security;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-
+using System.Reflection;
 using YHANDLE = System.Int32;
 using YRETCODE = System.Int32;
 using s8 = System.SByte;
@@ -101,6 +101,13 @@ public class YAPI_Exception : Exception
     }
 }
 
+
+static class NativeMethods
+{
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr LoadLibrary(string dllToLoad);
+
+}
 
 [SuppressUnmanagedCodeSecurityAttribute]
 internal static class SafeNativeMethods
@@ -240,35 +247,83 @@ internal static class SafeNativeMethods
             }
         }
         //Console.WriteLine("Detected platform is "+_dllVersion.ToString());
+
+        string currentDirectory = Directory.GetCurrentDirectory();
+        //Console.WriteLine("Current Dir is " + currentDirectory);
+        string assemblyDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        //Console.WriteLine("Assembly Dir is " + assemblyDir);
+        if (currentDirectory != assemblyDir) {
+            string dll_path;
+            switch (_dllVersion)
+            {
+                default:
+                case YAPIDLL_VERSION.WIN32:
+                    dll_path = assemblyDir + "\\yapi.dll";
+                    break;
+                case YAPIDLL_VERSION.WIN64:
+                    dll_path = assemblyDir + "\\amd64\\yapi.dll";
+                    break;
+                case YAPIDLL_VERSION.MACOS32:
+                    dll_path = assemblyDir + "\\libyapi32";
+                    break;
+                case YAPIDLL_VERSION.MACOS64:
+                    dll_path = assemblyDir + "\\libyapi64";
+                    break;
+                case YAPIDLL_VERSION.LIN64:
+                    dll_path = assemblyDir + "\\libyapi-amd64";
+                    break;
+                case YAPIDLL_VERSION.LIN32:
+                    dll_path = assemblyDir + "\\libyapi-i386";
+                    break;
+                case YAPIDLL_VERSION.LINARMHF:
+                    dll_path = assemblyDir + "\\libyapi-armhf";
+                    break;
+                case YAPIDLL_VERSION.LINAARCH64:
+                    dll_path = assemblyDir + "\\libyapi-aarch64";
+                    break;
+            }
+            IntPtr loadLibrary = NativeMethods.LoadLibrary(dll_path);
+            /*
+            if (loadLibrary == IntPtr.Zero)
+            {
+                Console.WriteLine("Unable to preload dll with :" + dll_path);
+            } else {
+                Console.WriteLine("YAPI preloaded from " + dll_path);
+            }
+            */
+        }
+
         bool can_retry = true;
         do {
             try {
                 return _yapiGetAPIVersion(ref version, ref dat_);
-            } catch (System.DllNotFoundException ex) {
+            } catch (System.DllNotFoundException) {
                 //Console.WriteLine(ex.ToString());
-                switch (_dllVersion) {
-                    default:
-                    case YAPIDLL_VERSION.WIN32:
-                        throw ex;
-                    case YAPIDLL_VERSION.WIN64:
-                    case YAPIDLL_VERSION.MACOS32:
-                    case YAPIDLL_VERSION.LINARMHF:
-                    case YAPIDLL_VERSION.LINAARCH64:
-                        _dllVersion = YAPIDLL_VERSION.WIN32;
-                        break;
-                    case YAPIDLL_VERSION.MACOS64:
-                        _dllVersion = YAPIDLL_VERSION.MACOS32;
-                        break;
-                    case YAPIDLL_VERSION.LIN32:
-                        _dllVersion = YAPIDLL_VERSION.LINARMHF;
-                        break;
-                    case YAPIDLL_VERSION.LIN64:
-                        _dllVersion = YAPIDLL_VERSION.LINAARCH64;
-                        break;
-                }
-                //Console.WriteLine("retry with platform " + _dllVersion.ToString());
+            } catch (System.BadImageFormatException) {
+                //Console.WriteLine(ex.ToString());
             }
-
+            switch (_dllVersion)
+            {
+                default:
+                case YAPIDLL_VERSION.WIN32:
+                    throw new System.DllNotFoundException("Unable to load YAPI dynamic library");
+                case YAPIDLL_VERSION.WIN64:
+                case YAPIDLL_VERSION.MACOS32:
+                case YAPIDLL_VERSION.LINARMHF:
+                case YAPIDLL_VERSION.LINAARCH64:
+                    _dllVersion = YAPIDLL_VERSION.WIN32;
+                    break;
+                case YAPIDLL_VERSION.MACOS64:
+                    _dllVersion = YAPIDLL_VERSION.MACOS32;
+                    break;
+                case YAPIDLL_VERSION.LIN32:
+                    _dllVersion = YAPIDLL_VERSION.LINARMHF;
+                    break;
+                case YAPIDLL_VERSION.LIN64:
+                    _dllVersion = YAPIDLL_VERSION.LINAARCH64;
+                    break;
+            }
+            //Console.WriteLine("retry with platform " + _dllVersion.ToString());
         } while (can_retry);
         return 0;
     }
@@ -2531,6 +2586,44 @@ internal static class SafeNativeMethods
                   return _yapiIsModuleWritableLINAARCH64(serial, errmsg);
         }
     }
+    [DllImport("yapi", EntryPoint = "yapiGetDLLPath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetDLLPathWIN32(StringBuilder path, int pathsize, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetDLLPath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetDLLPathWIN64(StringBuilder path, int pathsize, StringBuilder errmsg);
+    [DllImport("libyapi32", EntryPoint = "yapiGetDLLPath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetDLLPathMACOS32(StringBuilder path, int pathsize, StringBuilder errmsg);
+    [DllImport("libyapi64", EntryPoint = "yapiGetDLLPath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetDLLPathMACOS64(StringBuilder path, int pathsize, StringBuilder errmsg);
+    [DllImport("libyapi-amd64", EntryPoint = "yapiGetDLLPath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetDLLPathLIN64(StringBuilder path, int pathsize, StringBuilder errmsg);
+    [DllImport("libyapi-i386", EntryPoint = "yapiGetDLLPath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetDLLPathLIN32(StringBuilder path, int pathsize, StringBuilder errmsg);
+    [DllImport("libyapi-armhf", EntryPoint = "yapiGetDLLPath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetDLLPathLINARMHF(StringBuilder path, int pathsize, StringBuilder errmsg);
+    [DllImport("libyapi-aarch64", EntryPoint = "yapiGetDLLPath", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetDLLPathLINAARCH64(StringBuilder path, int pathsize, StringBuilder errmsg);
+    internal static YRETCODE _yapiGetDLLPath(StringBuilder path, int pathsize, StringBuilder errmsg)
+    {
+        switch (_dllVersion) {
+             default:
+             case YAPIDLL_VERSION.WIN32:
+                  return _yapiGetDLLPathWIN32(path, pathsize, errmsg);
+             case YAPIDLL_VERSION.WIN64:
+                  return _yapiGetDLLPathWIN64(path, pathsize, errmsg);
+             case YAPIDLL_VERSION.MACOS32:
+                  return _yapiGetDLLPathMACOS32(path, pathsize, errmsg);
+             case YAPIDLL_VERSION.MACOS64:
+                  return _yapiGetDLLPathMACOS64(path, pathsize, errmsg);
+             case YAPIDLL_VERSION.LIN64:
+                  return _yapiGetDLLPathLIN64(path, pathsize, errmsg);
+             case YAPIDLL_VERSION.LIN32:
+                  return _yapiGetDLLPathLIN32(path, pathsize, errmsg);
+             case YAPIDLL_VERSION.LINARMHF:
+                  return _yapiGetDLLPathLINARMHF(path, pathsize, errmsg);
+             case YAPIDLL_VERSION.LINAARCH64:
+                  return _yapiGetDLLPathLINAARCH64(path, pathsize, errmsg);
+        }
+    }
 //--- (end of generated code: YFunction dlldef)
 }
 
@@ -2579,7 +2672,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "36692";
+    public const string YOCTO_API_BUILD_NO = "36794";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -3822,6 +3915,25 @@ public class YAPI
             return this.HTTPRequestAsync(YAPI.DefaultEncoding.GetBytes(request), ref errmsg);
         }
     }
+
+
+
+    public static string GetYAPIDllPath()
+    {
+        StringBuilder errmsg = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
+        StringBuilder smallbuff = new StringBuilder(1024);
+        int yapi_res;
+        string path;
+        YAPI.GetAPIVersion();
+        yapi_res = SafeNativeMethods._yapiGetDLLPath(smallbuff, 1024, errmsg);
+        if (yapi_res < 0)
+        {
+            return "";
+        }
+        path = smallbuff.ToString();
+        return path;
+    }
+
 
 
     /**
