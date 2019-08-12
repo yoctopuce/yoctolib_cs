@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 36790 2019-08-08 16:52:32Z seb $
+ * $Id: yocto_api.cs 36813 2019-08-09 16:32:21Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -106,7 +106,6 @@ static class NativeMethods
 {
     [DllImport("kernel32.dll")]
     public static extern IntPtr LoadLibrary(string dllToLoad);
-
 }
 
 [SuppressUnmanagedCodeSecurityAttribute]
@@ -246,64 +245,65 @@ internal static class SafeNativeMethods
                 _dllVersion = YAPIDLL_VERSION.WIN32;
             }
         }
-        //Console.WriteLine("Detected platform is "+_dllVersion.ToString());
 
-        string currentDirectory = Directory.GetCurrentDirectory();
-        //Console.WriteLine("Current Dir is " + currentDirectory);
-        string assemblyDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-        //Console.WriteLine("Assembly Dir is " + assemblyDir);
-        if (currentDirectory != assemblyDir) {
-            string dll_path;
-            switch (_dllVersion)
-            {
-                default:
-                case YAPIDLL_VERSION.WIN32:
-                    dll_path = assemblyDir + "\\yapi.dll";
-                    break;
-                case YAPIDLL_VERSION.WIN64:
-                    dll_path = assemblyDir + "\\amd64\\yapi.dll";
-                    break;
-                case YAPIDLL_VERSION.MACOS32:
-                    dll_path = assemblyDir + "\\libyapi32";
-                    break;
-                case YAPIDLL_VERSION.MACOS64:
-                    dll_path = assemblyDir + "\\libyapi64";
-                    break;
-                case YAPIDLL_VERSION.LIN64:
-                    dll_path = assemblyDir + "\\libyapi-amd64";
-                    break;
-                case YAPIDLL_VERSION.LIN32:
-                    dll_path = assemblyDir + "\\libyapi-i386";
-                    break;
-                case YAPIDLL_VERSION.LINARMHF:
-                    dll_path = assemblyDir + "\\libyapi-armhf";
-                    break;
-                case YAPIDLL_VERSION.LINAARCH64:
-                    dll_path = assemblyDir + "\\libyapi-aarch64";
-                    break;
+        debugDll("Detected platform is " + _dllVersion.ToString());
+
+        System.Reflection.Assembly ass = Assembly.GetEntryAssembly();
+        if (ass != null) {
+            string currentDirectory = Directory.GetCurrentDirectory();
+            debugDll("Current Dir is " + currentDirectory);
+            string assemblyDir = Path.GetDirectoryName(ass.Location);
+            debugDll("Assembly Dir is " + assemblyDir);
+            if (currentDirectory != assemblyDir) {
+                string dll_path;
+                switch (_dllVersion) {
+                    default:
+                    case YAPIDLL_VERSION.WIN32:
+                        dll_path = assemblyDir + "\\yapi.dll";
+                        break;
+                    case YAPIDLL_VERSION.WIN64:
+                        dll_path = assemblyDir + "\\amd64\\yapi.dll";
+                        break;
+                    case YAPIDLL_VERSION.MACOS32:
+                        dll_path = assemblyDir + "\\libyapi32";
+                        break;
+                    case YAPIDLL_VERSION.MACOS64:
+                        dll_path = assemblyDir + "\\libyapi64";
+                        break;
+                    case YAPIDLL_VERSION.LIN64:
+                        dll_path = assemblyDir + "\\libyapi-amd64";
+                        break;
+                    case YAPIDLL_VERSION.LIN32:
+                        dll_path = assemblyDir + "\\libyapi-i386";
+                        break;
+                    case YAPIDLL_VERSION.LINARMHF:
+                        dll_path = assemblyDir + "\\libyapi-armhf";
+                        break;
+                    case YAPIDLL_VERSION.LINAARCH64:
+                        dll_path = assemblyDir + "\\libyapi-aarch64";
+                        break;
+                }
+
+                IntPtr loadLibrary = NativeMethods.LoadLibrary(dll_path);
+                if (loadLibrary == IntPtr.Zero) {
+                    debugDll("Unable to preload dll with :" + dll_path);
+                } else {
+                    debugDll("YAPI preloaded from " + dll_path);
+                }
             }
-            IntPtr loadLibrary = NativeMethods.LoadLibrary(dll_path);
-            /*
-            if (loadLibrary == IntPtr.Zero)
-            {
-                Console.WriteLine("Unable to preload dll with :" + dll_path);
-            } else {
-                Console.WriteLine("YAPI preloaded from " + dll_path);
-            }
-            */
         }
 
         bool can_retry = true;
         do {
             try {
                 return _yapiGetAPIVersion(ref version, ref dat_);
-            } catch (System.DllNotFoundException) {
-                //Console.WriteLine(ex.ToString());
-            } catch (System.BadImageFormatException) {
-                //Console.WriteLine(ex.ToString());
+            } catch (System.DllNotFoundException ex) {
+                debugDll(ex.ToString());
+            } catch (System.BadImageFormatException ex) {
+                debugDll(ex.ToString());
             }
-            switch (_dllVersion)
-            {
+
+            switch (_dllVersion) {
                 default:
                 case YAPIDLL_VERSION.WIN32:
                     throw new System.DllNotFoundException("Unable to load YAPI dynamic library");
@@ -323,9 +323,20 @@ internal static class SafeNativeMethods
                     _dllVersion = YAPIDLL_VERSION.LINAARCH64;
                     break;
             }
-            //Console.WriteLine("retry with platform " + _dllVersion.ToString());
+
+            debugDll("retry with platform " + _dllVersion.ToString());
         } while (can_retry);
+
         return 0;
+    }
+
+    private static void debugDll(string line)
+    {
+        /*
+        DateTime localDate = DateTime.Now;
+        string fmt = "[yyyy-MM-dd/hh:mm:ss] ";
+        System.IO.File.AppendAllText("c:\\tmp\\debugDllLoad.txt", localDate.ToString(fmt) + line + "\n");
+        */
     }
 
 
@@ -2672,7 +2683,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "36794";
+    public const string YOCTO_API_BUILD_NO = "36828";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -3917,7 +3928,6 @@ public class YAPI
     }
 
 
-
     public static string GetYAPIDllPath()
     {
         StringBuilder errmsg = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
@@ -3926,14 +3936,13 @@ public class YAPI
         string path;
         YAPI.GetAPIVersion();
         yapi_res = SafeNativeMethods._yapiGetDLLPath(smallbuff, 1024, errmsg);
-        if (yapi_res < 0)
-        {
+        if (yapi_res < 0) {
             return "";
         }
+
         path = smallbuff.ToString();
         return path;
     }
-
 
 
     /**
@@ -8171,14 +8180,12 @@ public class YFunction
     private byte[] _strip_http_header(byte[] buffer)
     {
         int found, body;
-        for (found = 0; found < buffer.Length - 4; found++)
-        {
+        for (found = 0; found < buffer.Length - 4; found++) {
             if (buffer[found] == 13 && buffer[found + 1] == 10 && buffer[found + 2] == 13 && buffer[found + 3] == 10)
                 break;
         }
 
-        if (found > buffer.Length - 4)
-        {
+        if (found > buffer.Length - 4) {
             _throw(YAPI.IO_ERROR, "http request failed");
             return null;
         } else if (found == buffer.Length - 4) {
@@ -8189,7 +8196,6 @@ public class YFunction
         byte[] res = new byte[buffer.Length - body];
         Buffer.BlockCopy(buffer, body, res, 0, buffer.Length - body);
         return res;
-
     }
 
     // Method used to send http request to the device (not the function)
@@ -8256,10 +8262,11 @@ public class YFunction
     public int _upload(string path, byte[] content)
     {
         byte[] buffer;
-        buffer = _uploadEx(path,content);
+        buffer = _uploadEx(path, content);
         if (buffer == null) {
             return YAPI.IO_ERROR;
         }
+
         return YAPI.SUCCESS;
     }
 
@@ -11689,7 +11696,7 @@ public class YModule : YFunction
             char first = funcId[0];
             int i;
             for (i = funcId.Length; i > 0; i--) {
-                if (Char.IsLetter(funcId[i-1])) {
+                if (Char.IsLetter(funcId[i - 1])) {
                     break;
                 }
             }

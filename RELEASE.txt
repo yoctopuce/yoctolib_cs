@@ -1,3 +1,3 @@
-C# v1.10.36794
+C# v1.10.36828
 
-- Fix compilation warnings when installing the library from NuGet
+- Fix potential null pointer exception
