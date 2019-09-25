@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_refframe.cs 36755 2019-08-08 07:00:25Z seb $
+ *  $Id: yocto_refframe.cs 37000 2019-09-03 06:40:17Z mvuilleu $
  *
  *  Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -320,7 +320,8 @@ public enum   MOUNTORIENTATION
      * <summary>
      *   Change the BNO055 fusion mode.
      * <para>
-     *   Note this feature is only availabe on Yocto-3D-V2.
+     *   Note: this feature is only availabe on Yocto-3D-V2.
+     *   Remember to call the matching module <c>saveToFlash()</c> method to save the setting permanently.
      * </para>
      * <para>
      * </para>

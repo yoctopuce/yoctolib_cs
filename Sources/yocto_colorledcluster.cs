@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_colorledcluster.cs 34989 2019-04-05 13:41:16Z seb $
+ *  $Id: yocto_colorledcluster.cs 37000 2019-09-03 06:40:17Z mvuilleu $
  *
  *  Implements yFindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -168,6 +168,8 @@ public class YColorLedCluster : YFunction
      * <summary>
      *   Changes the number of LEDs currently handled by the device.
      * <para>
+     *   Remember to call the matching module
+     *   <c>saveToFlash()</c> method to save the setting permanently.
      * </para>
      * <para>
      * </para>
@@ -227,6 +229,8 @@ public class YColorLedCluster : YFunction
      * <summary>
      *   Changes the RGB LED type currently handled by the device.
      * <para>
+     *   Remember to call the matching module
+     *   <c>saveToFlash()</c> method to save the setting permanently.
      * </para>
      * <para>
      * </para>

@@ -59,7 +59,7 @@ namespace ConsoleApplication1
       i2cPort = YI2cPort.FindI2cPort(target + ".i2cPort");
       if (i2cPort.isOnline()) {
         i2cPort.set_i2cMode("400kbps");
-        i2cPort.set_voltageLevel(YI2cPort.VOLTAGELEVEL_TTL3V);
+        i2cPort.set_i2cVoltageLevel(YI2cPort.I2CVOLTAGELEVEL_3V3);
         i2cPort.reset();
         // do not forget to configure the powerOutput and 
         // of the Yocto-I2C as well if used

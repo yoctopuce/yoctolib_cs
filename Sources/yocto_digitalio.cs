@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_digitalio.cs 34989 2019-04-05 13:41:16Z seb $
+ *  $Id: yocto_digitalio.cs 37149 2019-09-12 21:24:53Z mvuilleu $
  *
  *  Implements yFindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -471,7 +471,7 @@ public class YDigitalIO : YFunction
     {
         int res;
         lock (_thisLock) {
-            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+            if (this._cacheExpiration == 0) {
                 if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return PORTSIZE_INVALID;
                 }
