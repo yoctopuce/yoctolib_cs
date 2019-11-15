@@ -1,3 +1,9 @@
-C# v1.10.37796
+C# v1.10.38155
 
-- Fix "System.EntryPointNotFoundException" exception on mono if the assembly was not in the working directory (Linux Only)
+(C-sharp)- Add dll architecture detection function
+(Libs)- Improve every class description (add sample product name)
+(Libs)- Generate new classes using u31 for unsigned ints
+(Misc)- Set AssemblyFileVersion to all CS.Net assembly
+(Misc)- labview/cs:fix few details
+(Misc)- dot net proxy:added ref keeper class
+(yapi)- Add warning on Raspberry Pi 4 with old boot EEPROM
