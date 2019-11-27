@@ -86,6 +86,15 @@
 <Compile Include="..\..\Sources\yocto_carbondioxide.cs">
 <Link>yocto_api\yocto_carbondioxide.cs</Link>
 </Compile>
+<Compile Include="..\..\Sources\yocto_humidity.cs">
+<Link>yocto_api\yocto_humidity.cs</Link>
+</Compile>
+<Compile Include="..\..\Sources\yocto_pressure.cs">
+<Link>yocto_api\yocto_pressure.cs</Link>
+</Compile>
+<Compile Include="..\..\Sources\yocto_temperature.cs">
+<Link>yocto_api\yocto_temperature.cs</Link>
+</Compile>
 
     <Compile Include="main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
