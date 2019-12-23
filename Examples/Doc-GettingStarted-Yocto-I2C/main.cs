@@ -61,14 +61,14 @@ namespace ConsoleApplication1
         i2cPort.set_i2cMode("400kbps");
         i2cPort.set_i2cVoltageLevel(YI2cPort.I2CVOLTAGELEVEL_3V3);
         i2cPort.reset();
-        // do not forget to configure the powerOutput and 
+        // do not forget to configure the powerOutput and
         // of the Yocto-I2C as well if used
         Console.WriteLine("****************************");
         Console.WriteLine("* make sure voltage levels *");
         Console.WriteLine("* are properly configured  *");
         Console.WriteLine("****************************");
 
-        List<int> toSend = new List<int>(new int[]{0x05});
+        List<int> toSend = new List<int>(new int[] {0x05});
         List<int> received = i2cPort.i2cSendAndReceiveArray(0x1f, toSend, 2);
         int tempReg = (received[0] << 8) + received[1];
         if ((tempReg & 0x1000) != 0) {
@@ -76,7 +76,7 @@ namespace ConsoleApplication1
         } else {
           tempReg &= 0x0fff;    // clear status bits
         }
-        Console.WriteLine("Ambiant temperature: "+ String.Format("{0:0.000}", (tempReg / 16.0)));
+        Console.WriteLine("Ambiant temperature: " + String.Format("{0:0.000}", (tempReg / 16.0)));
       } else {
         Console.WriteLine("Module not connected");
         Console.WriteLine("check identification and USB cable");
