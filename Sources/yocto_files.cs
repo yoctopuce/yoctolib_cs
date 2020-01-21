@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs 38913 2019-12-20 18:59:49Z mvuilleu $
+ * $Id: yocto_files.cs 38934 2019-12-23 09:29:53Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -290,7 +290,7 @@ public class YFiles : YFunction
      * </summary>
      * <param name="func">
      *   a string that uniquely characterizes the filesystem, for instance
-     *   <c>YRGBLED2.files</c>.
+     *   <c>YBUZZER2.files</c>.
      * </param>
      * <returns>
      *   a <c>YFiles</c> object allowing you to drive the filesystem.

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_i2cport.cs 38913 2019-12-20 18:59:49Z mvuilleu $
+ *  $Id: yocto_i2cport.cs 38934 2019-12-23 09:29:53Z seb $
  *
  *  Implements yFindI2cPort(), the high-level API for I2cPort functions
  *
@@ -704,7 +704,7 @@ public class YI2cPort : YFunction
 
     /**
      * <summary>
-     *   Returns the SPI port communication parameters, as a string such as
+     *   Returns the I2C port communication parameters, as a string such as
      *   "400kbps,2000ms,NoRestart".
      * <para>
      *   The string includes the baud rate, the
@@ -716,7 +716,7 @@ public class YI2cPort : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   a string corresponding to the SPI port communication parameters, as a string such as
+     *   a string corresponding to the I2C port communication parameters, as a string such as
      *   "400kbps,2000ms,NoRestart"
      * </returns>
      * <para>
@@ -739,7 +739,7 @@ public class YI2cPort : YFunction
 
     /**
      * <summary>
-     *   Changes the SPI port communication parameters, with a string such as
+     *   Changes the I2C port communication parameters, with a string such as
      *   "400kbps,2000ms".
      * <para>
      *   The string includes the baud rate, the
@@ -753,7 +753,7 @@ public class YI2cPort : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   a string corresponding to the SPI port communication parameters, with a string such as
+     *   a string corresponding to the I2C port communication parameters, with a string such as
      *   "400kbps,2000ms"
      * </param>
      * <para>
