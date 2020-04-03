@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_temperature.cs 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: yocto_temperature.cs 39648 2020-03-12 13:56:10Z mvuilleu $
  *
  *  Implements yFindTemperature(), the high-level API for Temperature functions
  *
@@ -92,6 +92,7 @@ public class YTemperature : YSensor
     public const int SENSORTYPE_RES_INTERNAL = 14;
     public const int SENSORTYPE_IR = 15;
     public const int SENSORTYPE_RES_PT1000 = 16;
+    public const int SENSORTYPE_CHANNEL_OFF = 17;
     public const int SENSORTYPE_INVALID = -1;
     public const double SIGNALVALUE_INVALID = YAPI.INVALID_DOUBLE;
     public const string SIGNALUNIT_INVALID = YAPI.INVALID_STRING;
@@ -190,8 +191,9 @@ public class YTemperature : YSensor
      *   <c>YTemperature.SENSORTYPE_PT100_4WIRES</c>, <c>YTemperature.SENSORTYPE_PT100_3WIRES</c>,
      *   <c>YTemperature.SENSORTYPE_PT100_2WIRES</c>, <c>YTemperature.SENSORTYPE_RES_OHM</c>,
      *   <c>YTemperature.SENSORTYPE_RES_NTC</c>, <c>YTemperature.SENSORTYPE_RES_LINEAR</c>,
-     *   <c>YTemperature.SENSORTYPE_RES_INTERNAL</c>, <c>YTemperature.SENSORTYPE_IR</c> and
-     *   <c>YTemperature.SENSORTYPE_RES_PT1000</c> corresponding to the temperature sensor type
+     *   <c>YTemperature.SENSORTYPE_RES_INTERNAL</c>, <c>YTemperature.SENSORTYPE_IR</c>,
+     *   <c>YTemperature.SENSORTYPE_RES_PT1000</c> and <c>YTemperature.SENSORTYPE_CHANNEL_OFF</c>
+     *   corresponding to the temperature sensor type
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YTemperature.SENSORTYPE_INVALID</c>.
@@ -232,8 +234,9 @@ public class YTemperature : YSensor
      *   <c>YTemperature.SENSORTYPE_PT100_4WIRES</c>, <c>YTemperature.SENSORTYPE_PT100_3WIRES</c>,
      *   <c>YTemperature.SENSORTYPE_PT100_2WIRES</c>, <c>YTemperature.SENSORTYPE_RES_OHM</c>,
      *   <c>YTemperature.SENSORTYPE_RES_NTC</c>, <c>YTemperature.SENSORTYPE_RES_LINEAR</c>,
-     *   <c>YTemperature.SENSORTYPE_RES_INTERNAL</c>, <c>YTemperature.SENSORTYPE_IR</c> and
-     *   <c>YTemperature.SENSORTYPE_RES_PT1000</c> corresponding to the temperature sensor type
+     *   <c>YTemperature.SENSORTYPE_RES_INTERNAL</c>, <c>YTemperature.SENSORTYPE_IR</c>,
+     *   <c>YTemperature.SENSORTYPE_RES_PT1000</c> and <c>YTemperature.SENSORTYPE_CHANNEL_OFF</c>
+     *   corresponding to the temperature sensor type
      * </param>
      * <para>
      * </para>
