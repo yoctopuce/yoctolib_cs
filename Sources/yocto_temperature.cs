@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_temperature.cs 39648 2020-03-12 13:56:10Z mvuilleu $
+ *  $Id: yocto_temperature.cs 40281 2020-05-04 13:39:55Z seb $
  *
  *  Implements yFindTemperature(), the high-level API for Temperature functions
  *
@@ -581,11 +581,20 @@ public class YTemperature : YSensor
         double currTemp;
         double idxres;
         siz = tempValues.Count;
-        if (!(siz >= 2)) { this._throw( YAPI.INVALID_ARGUMENT, "thermistor response table must have at least two points"); return YAPI.INVALID_ARGUMENT; }
-        if (!(siz == resValues.Count)) { this._throw( YAPI.INVALID_ARGUMENT, "table sizes mismatch"); return YAPI.INVALID_ARGUMENT; }
+        if (!(siz >= 2)) {
+            this._throw(YAPI.INVALID_ARGUMENT, "thermistor response table must have at least two points");
+            return YAPI.INVALID_ARGUMENT;
+        }
+        if (!(siz == resValues.Count)) {
+            this._throw(YAPI.INVALID_ARGUMENT, "table sizes mismatch");
+            return YAPI.INVALID_ARGUMENT;
+        }
 
         res = this.set_command("Z");
-        if (!(res==YAPI.SUCCESS)) { this._throw( YAPI.IO_ERROR, "unable to reset thermistor parameters"); return YAPI.IO_ERROR; }
+        if (!(res==YAPI.SUCCESS)) {
+            this._throw(YAPI.IO_ERROR, "unable to reset thermistor parameters");
+            return YAPI.IO_ERROR;
+        }
         // add records in growing resistance value
         found = 1;
         prev = 0.0;
@@ -605,7 +614,10 @@ public class YTemperature : YSensor
             }
             if (found > 0) {
                 res = this.set_command("m"+Convert.ToString( (int) Math.Round(1000*curr))+":"+Convert.ToString((int) Math.Round(1000*currTemp)));
-                if (!(res==YAPI.SUCCESS)) { this._throw( YAPI.IO_ERROR, "unable to reset thermistor parameters"); return YAPI.IO_ERROR; }
+                if (!(res==YAPI.SUCCESS)) {
+                    this._throw(YAPI.IO_ERROR, "unable to reset thermistor parameters");
+                    return YAPI.IO_ERROR;
+                }
                 prev = curr;
             }
         }
@@ -669,7 +681,7 @@ public class YTemperature : YSensor
         templist.Clear();
         idx = 0;
         while (idx < siz) {
-            temp = Double.Parse(paramlist[2*idx+1])/1000.0;
+            temp = YAPI._atof(paramlist[2*idx+1])/1000.0;
             templist.Add(temp);
             idx = idx + 1;
         }
@@ -687,7 +699,7 @@ public class YTemperature : YSensor
                 temp = templist[idx];
                 if ((temp > prev) && (temp < curr)) {
                     curr = temp;
-                    currRes = Double.Parse(paramlist[2*idx])/1000.0;
+                    currRes = YAPI._atof(paramlist[2*idx])/1000.0;
                     found = 1;
                 }
                 idx = idx + 1;

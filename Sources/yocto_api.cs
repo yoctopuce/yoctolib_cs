@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 38914 2019-12-20 19:14:33Z mvuilleu $
+ * $Id: yocto_api.cs 40281 2020-05-04 13:39:55Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -43,6 +43,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Security;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -2771,7 +2772,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "39863";
+    public const string YOCTO_API_BUILD_NO = "40411";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -4732,10 +4733,79 @@ public class YAPI
         }
 
         if (start < p) {
-            return int.Parse(val.Substring(start, p - start));
+            Int32 res;
+            Int32.TryParse(val.Substring(start, p - start), NumberStyles.Integer, CultureInfo.InvariantCulture, out res);
+            return res;
         }
 
         return 0;
+    }
+
+    public static Int64 _atol(string val)
+    {
+        int p = 0;
+        while (p < val.Length && Char.IsWhiteSpace(val[p])) {
+            p++;
+        }
+
+        int start = p;
+        if (p < val.Length && (val[p] == '-' || val[p] == '+'))
+            p++;
+        while (p < val.Length && Char.IsDigit(val[p])) {
+            p++;
+        }
+
+        if (start < p) {
+            Int64 res;
+            Int64.TryParse(val.Substring(start, p - start), NumberStyles.Integer, CultureInfo.InvariantCulture, out res);
+            return res;
+        }
+
+        return 0;
+    }
+
+    public static UInt64 _atoul(string val)
+    {
+        int p = 0;
+        while (p < val.Length && Char.IsWhiteSpace(val[p])) {
+            p++;
+        }
+
+        int start = p;
+        if (p < val.Length && val[p] == '+')
+            p++;
+        while (p < val.Length && Char.IsDigit(val[p])) {
+            p++;
+        }
+
+        if (start < p) {
+            UInt64 res;
+            UInt64.TryParse(val.Substring(start, p - start), NumberStyles.Integer, CultureInfo.InvariantCulture, out res);
+            return res;
+        }
+
+        return 0;
+    }
+
+    public static Double _atof(string val)
+    {
+        Double res;
+        Double.TryParse(val, NumberStyles.Number, CultureInfo.InvariantCulture, out res);
+        return res;
+    }
+
+    public static int _hexStrToInt(string hex_str)
+    {
+        Int32 res;
+        Int32.TryParse(hex_str, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out res);
+        return res;
+    }
+
+    public static Int64 _hexStrToLong(string hex_str)
+    {
+        Int64 res;
+        Int64.TryParse(hex_str, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out res);
+        return res;
     }
 
     protected const string _hexArray = "0123456789ABCDEF";
@@ -10945,7 +11015,10 @@ public class YModule : YFunction
             down = this._download("files.json?a=format");
             res = this._get_json_path(YAPI.DefaultEncoding.GetString(down), "res");
             res = this._decode_json_string(res);
-            if (!(res == "ok")) { this._throw( YAPI.IO_ERROR, "format failed"); return YAPI.IO_ERROR; }
+            if (!(res == "ok")) {
+                this._throw(YAPI.IO_ERROR, "format failed");
+                return YAPI.IO_ERROR;
+            }
             json_files = this._get_json_path(json, "files");
             files = this._json_get_array(YAPI.DefaultEncoding.GetBytes(json_files));
             for (int ii = 0; ii <  files.Count; ii++) {
@@ -11220,7 +11293,7 @@ public class YModule : YFunction
                     }
                 } else {
                     if (paramVer == 0) {
-                        ratio = Double.Parse(param);
+                        ratio = YAPI._atof(param);
                         if (ratio > 0) {
                             calibData.Add(0.0);
                             calibData.Add(0.0);
@@ -13271,7 +13344,10 @@ public class YSensor : YFunction
         byte[] res;
 
         res = this._download("api/dataLogger/recording?recording=1");
-        if (!((res).Length>0)) { this._throw( YAPI.IO_ERROR, "unable to start datalogger"); return YAPI.IO_ERROR; }
+        if (!((res).Length>0)) {
+            this._throw(YAPI.IO_ERROR, "unable to start datalogger");
+            return YAPI.IO_ERROR;
+        }
         return YAPI.SUCCESS;
     }
 
@@ -13291,7 +13367,10 @@ public class YSensor : YFunction
         byte[] res;
 
         res = this._download("api/dataLogger/recording?recording=0");
-        if (!((res).Length>0)) { this._throw( YAPI.IO_ERROR, "unable to stop datalogger"); return YAPI.IO_ERROR; }
+        if (!((res).Length>0)) {
+            this._throw(YAPI.IO_ERROR, "unable to stop datalogger");
+            return YAPI.IO_ERROR;
+        }
         return YAPI.SUCCESS;
     }
 

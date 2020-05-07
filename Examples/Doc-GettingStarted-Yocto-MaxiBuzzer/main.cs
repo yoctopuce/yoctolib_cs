@@ -1,12 +1,12 @@
 /*********************************************************************
  *
- *  $Id: main.cs 40404 2020-05-07 12:37:00Z seb $
+ *  $Id: svn_id $
  *
- *  An example that show how to use a  Yocto-Buzzer
+ *  An example that show how to use a  yocto-MaxiBuzzer
  *
  *  You can find more information on our web site:
- *   Yocto-Buzzer documentation:
- *      https://www.yoctopuce.com/EN/products/yocto-buzzer/doc.html
+ *   yocto-MaxiBuzzer documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-maxibuzzer/doc.html
  *   C# API Reference:
  *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-cs-EN.html
  *
@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Lifetime;
 using System.Text;
 
 namespace ConsoleApplication1
@@ -37,7 +38,7 @@ namespace ConsoleApplication1
       string errmsg = "";
       string target, serial;
       YBuzzer buz;
-      YLed led, led1, led2;
+      YColorLed led;
       YAnButton button1, button2;
 
       if (args.Length < 1) usage();
@@ -63,8 +64,7 @@ namespace ConsoleApplication1
       }
 
       serial = buz.get_module().get_serialNumber();
-      led1 = YLed.FindLed(serial + ".led1");
-      led2 = YLed.FindLed(serial + ".led2");
+      led = YColorLed.FindColorLed(serial + ".colorLed");
       button1 = YAnButton.FindAnButton(serial + ".anButton1");
       button2 = YAnButton.FindAnButton(serial + ".anButton2");
 
@@ -72,30 +72,38 @@ namespace ConsoleApplication1
 
       while (buz.isOnline()) {
         int frequency;
+        int color;
+        int volume;
         bool b1 = (button1.get_isPressed() == YAnButton.ISPRESSED_TRUE);
         bool b2 = (button2.get_isPressed() == YAnButton.ISPRESSED_TRUE);
         if (b1 || b2) {
           if (b1) {
-            led = led1;
+            volume = 60;
             frequency = 1500;
+            color = 0xff0000;
           } else {
-            led = led2;
+            volume = 30;
+            color = 0x00ff00;
             frequency = 750;
           }
-
-          led.set_power(YLed.POWER_ON);
-          led.set_luminosity(100);
-          led.set_blinking(YLed.BLINKING_PANIC);
-          for (int i = 0; i < 5; i++) { // this can be done using sequence as well
+          led.resetBlinkSeq();
+          led.addRgbMoveToBlinkSeq(color, 100);
+          led.addRgbMoveToBlinkSeq(0, 100);
+          led.startBlinkSeq();
+          buz.set_volume(volume);
+          for (int i = 0; i < 5; i++) {
+            // this can be done using sequence as well
             buz.set_frequency(frequency);
             buz.freqMove(2 * frequency, 250);
             YAPI.Sleep(250, ref errmsg);
           }
-          buz.set_frequency(0);
-          led.set_power(YLed.POWER_OFF);
-        }
 
+          buz.set_frequency(0);
+          led.stopBlinkSeq();
+          led.set_rgbColor(0);
+        }
       }
+
       YAPI.FreeAPI();
     }
   }
