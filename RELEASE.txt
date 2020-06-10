@@ -1,4 +1,4 @@
-C# v1.10.40411
+C# v1.10.40924
 
-- Add example for Yocto-MaxiBuzzer
-- Add fallback to HTTP protocol on old YoctoHubs
+- Fix set_allSettingsAndFiles() that was accepting files with \r\n line ending
+- Fix RegisterHubDiscoveryCallback that was ignored when invoked before InitAPI

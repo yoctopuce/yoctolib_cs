@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 40281 2020-05-04 13:39:55Z seb $
+ * $Id: yocto_api.cs 40900 2020-06-10 07:24:46Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -2730,16 +2730,6 @@ internal static class SafeNativeMethods
 
 public class YAPI
 {
-    public static Encoding DefaultEncoding = System.Text.Encoding.GetEncoding("iso-8859-1");
-
-    // Switch to turn off exceptions and use return codes instead, for source-code compatibility
-    // with languages without exception support like C
-    public static bool ExceptionsDisabled = false;
-
-    internal static Object globalLock = new Object();
-
-    static bool _apiInitialized = false;
-    internal static YAPIContext _yapiContext = new YAPIContext();
     public const string INVALID_STRING = "!INVALID!";
     public const double INVALID_DOUBLE = -1.79769313486231E+308;
     public const double MIN_DOUBLE = Double.MinValue;
@@ -2761,18 +2751,16 @@ public class YAPI
     public const int Y_RESEND_MISSING_PKT = 4;
     public const int Y_DETECT_ALL = Y_DETECT_USB | Y_DETECT_NET;
 
-
     public const int DETECT_NONE = 0;
     public const int DETECT_USB = 1;
     public const int DETECT_NET = 2;
     public const int RESEND_MISSING_PKT = 4;
     public const int DETECT_ALL = DETECT_USB | DETECT_NET;
 
-
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "40411";
+    public const string YOCTO_API_BUILD_NO = "40924";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -2800,9 +2788,7 @@ public class YAPI
 
     // Calibration types
     public const int YOCTO_CALIB_TYPE_OFS = 30;
-
     public const int yUnknowSize = 1024;
-
 
     // --- (generated code: YFunction return codes)
 // Yoctopuce error codes, used by default as function return value
@@ -2823,8 +2809,27 @@ public class YAPI
     public const int FILE_NOT_FOUND = -14;          // the file is not found
     //--- (end of generated code: YFunction return codes)
 
+    /*
+     * All static global and persitent variables (NOT reset in YAPI.FreeAPI()
+     */
+    public static Encoding DefaultEncoding = System.Text.Encoding.GetEncoding("iso-8859-1");
+    public static bool ExceptionsDisabled = false;
+    internal static Object globalLock = new Object();
+    static bool _apiInitialized = false;
+    internal static YAPIContext _yapiContext = new YAPIContext();
 
+
+    /*
+     * All static variables (reset in YAPI.FreeAPI()
+     */
+    private static yLogFunc ylog = null;
+    private static yDeviceUpdateFunc yArrival = null;
+    private static yDeviceUpdateFunc yRemoval = null;
+    private static yDeviceUpdateFunc yChange = null;
+    private static YHubDiscoveryCallback _HubDiscoveryCallback = null;
     static List<YDevice> YDevice_devCache;
+    static List<PlugEvent> _PlugEvents;
+    static List<DataEvent> _DataEvents;
 
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -2861,12 +2866,6 @@ public class YAPI
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void _yapiDeviceLogCallback(YFUN_DESCR dev, IntPtr data);
 
-    // - Variables used to store public yocto_api callbacks
-    private static yLogFunc ylog = null;
-    private static yDeviceUpdateFunc yArrival = null;
-    private static yDeviceUpdateFunc yRemoval = null;
-    private static yDeviceUpdateFunc yChange = null;
-    private static YHubDiscoveryCallback _HubDiscoveryCallback = null;
 
     public static bool YISERR(YRETCODE retcode)
     {
@@ -4239,9 +4238,7 @@ public class YAPI
     }
 
 
-    static List<PlugEvent> _PlugEvents;
-    static List<DataEvent> _DataEvents;
-
+    
     private static void native_HubDiscoveryCallback(IntPtr serial_ptr, IntPtr url_ptr)
     {
         String serial = Marshal.PtrToStringAnsi(serial_ptr);
@@ -4271,6 +4268,11 @@ public class YAPI
     public static void RegisterHubDiscoveryCallback(YHubDiscoveryCallback hubDiscoveryCallback)
     {
         String errmsg = "";
+
+        if (!_apiInitialized)
+        {
+            InitAPI(0, ref errmsg);
+        }
         _HubDiscoveryCallback = hubDiscoveryCallback;
         TriggerHubDiscovery(ref errmsg);
     }
@@ -4407,15 +4409,6 @@ public class YAPI
             ev = new DataEvent(modul, beacon);
             _DataEvents.Add(ev);
         }
-    }
-
-
-    private static void queuesCleanUp()
-    {
-        _PlugEvents.Clear();
-        _PlugEvents = null;
-        _DataEvents.Clear();
-        _DataEvents = null;
     }
 
     private static void native_yFunctionUpdateCallback(YFUN_DESCR fundesc, IntPtr data)
@@ -5053,10 +5046,6 @@ public class YAPI
         _PlugEvents = new List<PlugEvent>(5);
         _DataEvents = new List<DataEvent>(10);
 
-        yArrival = null;
-        yRemoval = null;
-        yChange = null;
-        _HubDiscoveryCallback = null;
         buffer.Length = 0;
         res = SafeNativeMethods._yapiInitAPI(mode, buffer);
         if (res != YAPI.DEVICE_BUSY) {
@@ -5086,11 +5075,27 @@ public class YAPI
 
     /**
      * <summary>
-     *   Frees dynamically allocated memory blocks used by the Yoctopuce library.
+     *   Waits for all pending communications with Yoctopuce devices to be
+     *   completed then frees dynamically allocated resources used by
+     *   the Yoctopuce library.
      * <para>
-     *   It is generally not required to call this function, unless you
-     *   want to free all dynamically allocated memory blocks in order to
-     *   track a memory leak for instance.
+     * </para>
+     * <para>
+     *   From an operating system standpoint, it is generally not required to call
+     *   this function since the OS will automatically free allocated resources
+     *   once your program is completed. However there are two situations when
+     *   you may really want to use that function:
+     * </para>
+     * <para>
+     *   - Free all dynamically allocated memory blocks in order to
+     *   track a memory leak.
+     * </para>
+     * <para>
+     *   - Send commands to devices right before the end
+     *   of the program. Since commands are sent in an asynchronous way
+     *   the program could exit before all commands are effectively sent.
+     * </para>
+     * <para>
      *   You should not call any other library function after calling
      *   <c>yFreeAPI()</c>, or your program will crash.
      * </para>
@@ -5100,6 +5105,11 @@ public class YAPI
     {
         if (_apiInitialized) {
             SafeNativeMethods._yapiFreeAPI();
+            ylog = null;
+            yArrival = null;
+            yRemoval = null;
+            yChange = null;
+            _HubDiscoveryCallback = null;
             YDevice_devCache.Clear();
             YDevice_devCache = null;
             _PlugEvents.Clear();
@@ -5111,7 +5121,6 @@ public class YAPI
             YFunction._ClearCache();
             YFunction._CalibHandlers.Clear();
             YModule._moduleCallbackList.Clear();
-            ylog = null;
             _apiInitialized = false;
         }
     }
@@ -10997,6 +11006,9 @@ public class YModule : YFunction
         string json_api;
         string json_files;
         string json_extra;
+        int fuperror;
+        int globalres;
+        fuperror = 0;
         json = YAPI.DefaultEncoding.GetString(settings);
         json_api = this._get_json_path(json, "api");
         if (json_api == "") {
@@ -11026,11 +11038,20 @@ public class YModule : YFunction
                 name = this._decode_json_string(name);
                 data = this._get_json_path( files[ii], "data");
                 data = this._decode_json_string(data);
-                this._upload(name, YAPI._hexStrToBin(data));
+                if (name == "") {
+                    fuperror = fuperror + 1;
+                } else {
+                    this._upload(name, YAPI._hexStrToBin(data));
+                }
             }
         }
         // Apply settings a second time for file-dependent settings and dynamic sensor nodes
-        return this.set_allSettings(YAPI.DefaultEncoding.GetBytes(json_api));
+        globalres = this.set_allSettings(YAPI.DefaultEncoding.GetBytes(json_api));
+        if (!(fuperror == 0)) {
+            this._throw(YAPI.IO_ERROR, "Error during file upload");
+            return YAPI.IO_ERROR;
+        }
+        return globalres;
     }
 
 
