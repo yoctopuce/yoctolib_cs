@@ -1,3 +1,4 @@
-C# v1.10.41115
+C# v1.10.41480
 
-- Fix potential timeout during datalogger access
+- Assign strong name to NuGet package
+- Add function to retrieve all messages (snooping) for SpiPort and I2cPort
