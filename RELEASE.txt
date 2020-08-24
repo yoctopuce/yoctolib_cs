@@ -1,4 +1,3 @@
-C# v1.10.41480
+C# v1.10.41536
 
-- Assign strong name to NuGet package
-- Add function to retrieve all messages (snooping) for SpiPort and I2cPort
+- Fix Yoctopuce.Yoctolib.dll build number (only used by NuGet)
