@@ -1,3 +1,5 @@
-C# v1.10.41536
+C# v1.10.42060
 
-- Fix Yoctopuce.Yoctolib.dll build number (only used by NuGet)
+- Add decodePLMN support into YCellular
+- Improve firmware update speed
+- Fix slight error in NTC parameters computation
