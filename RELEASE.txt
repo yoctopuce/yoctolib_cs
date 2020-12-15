@@ -1,5 +1,3 @@
-C# v1.10.42060
+C# v1.10.42982
 
-- Add decodePLMN support into YCellular
-- Improve firmware update speed
-- Fix slight error in NTC parameters computation
+- Add Example for Yocto-Inclinometer
