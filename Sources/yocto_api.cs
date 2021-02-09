@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 41171 2020-07-02 17:49:00Z mvuilleu $
+ * $Id: yocto_api.cs 43619 2021-01-29 09:14:45Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -2760,7 +2760,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "42982";
+    public const string YOCTO_API_BUILD_NO = "43781";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -9032,7 +9032,7 @@ public class YFunction
      *   a string corresponding to the serial number of the module, as set by the factory.
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns YModule.SERIALNUMBER_INVALID.
+     *   On failure, throws an exception or returns YFunction.SERIALNUMBER_INVALID.
      * </para>
      */
     public virtual string get_serialNumber()
@@ -9721,7 +9721,7 @@ public class YFunction
      *   an identifier of type <c>YFUN_DESCR</c>.
      * </returns>
      * <para>
-     *   If the function has never been contacted, the returned value is <c>YFunction.FUNCTIONDESCRIPTOR_INVALID</c>.
+     *   If the function has never been contacted, the returned value is <c>Y$CLASSNAME$.FUNCTIONDESCRIPTOR_INVALID</c>.
      * </para>
      */
     public YFUN_DESCR get_functionDescriptor()
@@ -12010,7 +12010,7 @@ public class YModule : YFunction
      *   (ex: <c>MyCustomName.relay1</c>)
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns  <c>YModule.FRIENDLYNAME_INVALID</c>.
+     *   On failure, throws an exception or returns  <c>YFunction.FRIENDLYNAME_INVALID</c>.
      * </para>
      */
 
@@ -14320,7 +14320,7 @@ public class YDataLogger : YFunction
      * </summary>
      * <param name="func">
      *   a string that uniquely characterizes the data logger, for instance
-     *   <c>LIGHTMK3.dataLogger</c>.
+     *   <c>RX420MA1.dataLogger</c>.
      * </param>
      * <returns>
      *   a <c>YDataLogger</c> object allowing you to drive the data logger.
