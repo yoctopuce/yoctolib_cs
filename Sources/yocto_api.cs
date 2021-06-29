@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 45292 2021-05-25 23:27:54Z mvuilleu $
+ * $Id: yocto_api.cs 45551 2021-06-14 13:51:37Z web $
  *
  * High-level programming interface, common to all modules
  *
@@ -2798,7 +2798,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "45343";
+    public const string YOCTO_API_BUILD_NO = "45664";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -2845,6 +2845,7 @@ public class YAPI
     public const int UNAUTHORIZED = -12;            // unauthorized access to password-protected device
     public const int RTC_NOT_READY = -13;           // real-time clock has not been initialized (or time was lost)
     public const int FILE_NOT_FOUND = -14;          // the file is not found
+    public const int SSL_ERROR = -15;               // Error reported by mbedSSL
     //--- (end of generated code: YFunction return codes)
 
     /*
