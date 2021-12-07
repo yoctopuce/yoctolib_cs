@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: svn_id $
+ *  $Id: main.cs 46632 2021-09-28 08:44:25Z web $
  *
  *  An example that show how to use a  Yocto-Inclinometer
  *
