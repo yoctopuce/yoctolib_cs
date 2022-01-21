@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 46904 2021-10-25 15:34:15Z seb $
+ * $Id: yocto_api.cs 48017 2022-01-12 08:17:52Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -2798,7 +2798,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "47660";
+    public const string YOCTO_API_BUILD_NO = "48220";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6151,7 +6151,7 @@ public class YFirmwareUpdate
     //--- (generated code: YFirmwareUpdate definitions)
 
     protected string _serial;
-    protected byte[] _settings;
+    protected byte[] _settings = new byte[0];
     protected string _firmwarepath;
     protected string _progress_msg;
     protected int _progress_c = 0;
@@ -9098,7 +9098,7 @@ public class YFunction
     public virtual string loadAttribute(string attrName)
     {
         string url;
-        byte[] attrVal;
+        byte[] attrVal = new byte[0];
         url = "api/"+ this.get_functionId()+"/"+attrName;
         attrVal = this._download(url);
         return YAPI.DefaultEncoding.GetString(attrVal);
@@ -10929,7 +10929,7 @@ public class YModule : YFunction
     public virtual YFirmwareUpdate updateFirmwareEx(string path, bool force)
     {
         string serial;
-        byte[] settings;
+        byte[] settings = new byte[0];
 
         serial = this.get_serialNumber();
         settings = this.get_allSettings();
@@ -10983,9 +10983,9 @@ public class YModule : YFunction
      */
     public virtual byte[] get_allSettings()
     {
-        byte[] settings;
-        byte[] json;
-        byte[] res;
+        byte[] settings = new byte[0];
+        byte[] json = new byte[0];
+        byte[] res = new byte[0];
         string sep;
         string name;
         string item;
@@ -10993,8 +10993,8 @@ public class YModule : YFunction
         string id;
         string url;
         string file_data;
-        byte[] file_data_bin;
-        byte[] temp_data_bin;
+        byte[] file_data_bin = new byte[0];
+        byte[] temp_data_bin = new byte[0];
         string ext_settings;
         List<string> filelist = new List<string>();
         List<string> templist = new List<string>();
@@ -11116,7 +11116,7 @@ public class YModule : YFunction
      */
     public virtual int set_allSettingsAndFiles(byte[] settings)
     {
-        byte[] down;
+        byte[] down = new byte[0];
         string json;
         string json_api;
         string json_files;
@@ -11556,12 +11556,12 @@ public class YModule : YFunction
     public virtual int set_allSettings(byte[] settings)
     {
         List<string> restoreLast = new List<string>();
-        byte[] old_json_flat;
+        byte[] old_json_flat = new byte[0];
         List<string> old_dslist = new List<string>();
         List<string> old_jpath = new List<string>();
         List<int> old_jpath_len = new List<int>();
         List<string> old_val_arr = new List<string>();
-        byte[] actualSettings;
+        byte[] actualSettings = new byte[0];
         List<string> new_dslist = new List<string>();
         List<string> new_jpath = new List<string>();
         List<int> new_jpath_len = new List<int>();
@@ -11939,7 +11939,7 @@ public class YModule : YFunction
      */
     public virtual string get_lastLogs()
     {
-        byte[] content;
+        byte[] content = new byte[0];
 
         content = this._download("logs.txt");
         return YAPI.DefaultEncoding.GetString(content);
@@ -13477,7 +13477,7 @@ public class YSensor : YFunction
      */
     public virtual int startDataLogger()
     {
-        byte[] res;
+        byte[] res = new byte[0];
 
         res = this._download("api/dataLogger/recording?recording=1");
         if (!((res).Length>0)) {
@@ -13500,7 +13500,7 @@ public class YSensor : YFunction
      */
     public virtual int stopDataLogger()
     {
-        byte[] res;
+        byte[] res = new byte[0];
 
         res = this._download("api/dataLogger/recording?recording=0");
         if (!((res).Length>0)) {
