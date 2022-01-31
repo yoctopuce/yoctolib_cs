@@ -1,3 +1,4 @@
-C# v1.10.48304
+C# v1.10.48405
 
-- Fix support of .Net Core 3 (and following versions)
+- Add a .NET Core example
+- Fix load of YAPI dynamic library load under linux

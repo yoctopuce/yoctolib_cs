@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: main.cs 46632 2021-09-28 08:44:25Z web $
+ *  $Id: main.cs 48374 2022-01-28 15:44:48Z mvuilleu $
  *
  *  An example that show how to use a  Yocto-I2C
  *
@@ -58,7 +58,7 @@ namespace ConsoleApplication1
 
       i2cPort = YI2cPort.FindI2cPort(target + ".i2cPort");
       if (i2cPort.isOnline()) {
-        i2cPort.set_i2cMode("400kbps");
+        i2cPort.set_i2cMode("100kbps");
         i2cPort.set_i2cVoltageLevel(YI2cPort.I2CVOLTAGELEVEL_3V3);
         i2cPort.reset();
         // do not forget to configure the powerOutput and

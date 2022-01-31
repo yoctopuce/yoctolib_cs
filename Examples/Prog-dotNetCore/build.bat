@@ -1,0 +1,1 @@
+@echo "This example has to be compiled unsing dotnetcore 6.0"
