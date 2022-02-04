@@ -16,8 +16,6 @@ class Program
         YModule m;
         string errmsg = "";
 
-        YAPI.logDllLoad(true);
-
         if (YAPI.RegisterHub("usb", ref errmsg) != YAPI.SUCCESS)
         {
             Console.WriteLine("RegisterHub error: " + errmsg);
