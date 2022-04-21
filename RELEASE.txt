@@ -1,3 +1,4 @@
-C# v1.10.48512
+C# v1.10.49504
 
-- Fix loading of YAPI shared library on armhf
+- Improve error reporting when some function are called before YAPI.RegisterHub or YAPI.InitAPI
+- Improve MultiSensController class (add support for reading sensor address)

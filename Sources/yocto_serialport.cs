@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 48017 2022-01-12 08:17:52Z seb $
+ * $Id: yocto_serialport.cs 48954 2022-03-14 09:55:13Z seb $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
@@ -1833,6 +1833,34 @@ public class YSerialPort : YFunction
             ofs = ofs + 1;
         }
         return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Emits a BREAK condition on the serial interface.
+     * <para>
+     *   When the specified
+     *   duration is 0, the BREAK signal will be exactly one character wide.
+     *   When the duration is between 1 and 100, the BREAK condition will
+     *   be hold for the specified number of milliseconds.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="duration">
+     *   0 for a standard BREAK, or duration between 1 and 100 ms
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int sendBreak(int duration)
+    {
+        return this.sendCommand("B"+Convert.ToString(duration));
     }
 
 
