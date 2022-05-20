@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 49452 2022-04-11 12:20:28Z seb $
+ * $Id: yocto_api.cs 49750 2022-05-13 07:10:42Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -3294,7 +3294,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "49504";
+    public const string YOCTO_API_BUILD_NO = "49822";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6766,9 +6766,6 @@ public class YFirmwareUpdate
      * <summary>
      *   Returns a list of all the modules in "firmware update" mode.
      * <para>
-     *   Only devices
-     *   connected over USB are listed. For devices connected to a YoctoHub, you
-     *   must connect yourself to the YoctoHub web interface.
      * </para>
      * <para>
      * </para>

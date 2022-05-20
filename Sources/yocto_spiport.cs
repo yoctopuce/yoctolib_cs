@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_spiport.cs 48017 2022-01-12 08:17:52Z seb $
+ *  $Id: yocto_spiport.cs 49744 2022-05-11 15:13:45Z mvuilleu $
  *
  *  Implements yFindSpiPort(), the high-level API for SpiPort functions
  *
@@ -174,6 +174,7 @@ public class YSpiPort : YFunction
     public const int VOLTAGELEVEL_RS232 = 5;
     public const int VOLTAGELEVEL_RS485 = 6;
     public const int VOLTAGELEVEL_TTL1V8 = 7;
+    public const int VOLTAGELEVEL_SDI12 = 8;
     public const int VOLTAGELEVEL_INVALID = -1;
     public const string SPIMODE_INVALID = YAPI.INVALID_STRING;
     public const int SSPOLARITY_ACTIVE_LOW = 0;
@@ -753,8 +754,8 @@ public class YSpiPort : YFunction
      *   a value among <c>YSpiPort.VOLTAGELEVEL_OFF</c>, <c>YSpiPort.VOLTAGELEVEL_TTL3V</c>,
      *   <c>YSpiPort.VOLTAGELEVEL_TTL3VR</c>, <c>YSpiPort.VOLTAGELEVEL_TTL5V</c>,
      *   <c>YSpiPort.VOLTAGELEVEL_TTL5VR</c>, <c>YSpiPort.VOLTAGELEVEL_RS232</c>,
-     *   <c>YSpiPort.VOLTAGELEVEL_RS485</c> and <c>YSpiPort.VOLTAGELEVEL_TTL1V8</c> corresponding to the
-     *   voltage level used on the serial line
+     *   <c>YSpiPort.VOLTAGELEVEL_RS485</c>, <c>YSpiPort.VOLTAGELEVEL_TTL1V8</c> and
+     *   <c>YSpiPort.VOLTAGELEVEL_SDI12</c> corresponding to the voltage level used on the serial line
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YSpiPort.VOLTAGELEVEL_INVALID</c>.
@@ -793,8 +794,8 @@ public class YSpiPort : YFunction
      *   a value among <c>YSpiPort.VOLTAGELEVEL_OFF</c>, <c>YSpiPort.VOLTAGELEVEL_TTL3V</c>,
      *   <c>YSpiPort.VOLTAGELEVEL_TTL3VR</c>, <c>YSpiPort.VOLTAGELEVEL_TTL5V</c>,
      *   <c>YSpiPort.VOLTAGELEVEL_TTL5VR</c>, <c>YSpiPort.VOLTAGELEVEL_RS232</c>,
-     *   <c>YSpiPort.VOLTAGELEVEL_RS485</c> and <c>YSpiPort.VOLTAGELEVEL_TTL1V8</c> corresponding to the
-     *   voltage type used on the serial line
+     *   <c>YSpiPort.VOLTAGELEVEL_RS485</c>, <c>YSpiPort.VOLTAGELEVEL_TTL1V8</c> and
+     *   <c>YSpiPort.VOLTAGELEVEL_SDI12</c> corresponding to the voltage type used on the serial line
      * </param>
      * <para>
      * </para>

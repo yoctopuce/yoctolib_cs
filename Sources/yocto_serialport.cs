@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 48954 2022-03-14 09:55:13Z seb $
+ * $Id: yocto_serialport.cs 49818 2022-05-19 09:57:42Z seb $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
@@ -152,6 +152,13 @@ public class YSerialPort : YFunction
     //--- (generated code: YSerialPort definitions)
     public new delegate void ValueCallback(YSerialPort func, string value);
     public new delegate void TimedReportCallback(YSerialPort func, YMeasure measure);
+    public delegate void YSnoopingCallback(YSerialPort obj, YSnoopingRecord rec);
+
+    protected static void yInternalEventCallback(YSerialPort obj, String value)
+    {
+        obj._internalEventHandler(value);
+    }
+
 
     public const int RXCOUNT_INVALID = YAPI.INVALID_UINT;
     public const int TXCOUNT_INVALID = YAPI.INVALID_UINT;
@@ -173,6 +180,7 @@ public class YSerialPort : YFunction
     public const int VOLTAGELEVEL_RS232 = 5;
     public const int VOLTAGELEVEL_RS485 = 6;
     public const int VOLTAGELEVEL_TTL1V8 = 7;
+    public const int VOLTAGELEVEL_SDI12 = 8;
     public const int VOLTAGELEVEL_INVALID = -1;
     public const string SERIALMODE_INVALID = YAPI.INVALID_STRING;
     protected int _rxCount = RXCOUNT_INVALID;
@@ -193,6 +201,8 @@ public class YSerialPort : YFunction
     protected int _rxptr = 0;
     protected byte[] _rxbuff = new byte[0];
     protected int _rxbuffptr = 0;
+    protected YSnoopingCallback _eventCallback;
+    protected int _eventPos = 0;
     //--- (end of generated code: YSerialPort definitions)
 
     public YSerialPort(string func)
@@ -746,8 +756,8 @@ public class YSerialPort : YFunction
      *   a value among <c>YSerialPort.VOLTAGELEVEL_OFF</c>, <c>YSerialPort.VOLTAGELEVEL_TTL3V</c>,
      *   <c>YSerialPort.VOLTAGELEVEL_TTL3VR</c>, <c>YSerialPort.VOLTAGELEVEL_TTL5V</c>,
      *   <c>YSerialPort.VOLTAGELEVEL_TTL5VR</c>, <c>YSerialPort.VOLTAGELEVEL_RS232</c>,
-     *   <c>YSerialPort.VOLTAGELEVEL_RS485</c> and <c>YSerialPort.VOLTAGELEVEL_TTL1V8</c> corresponding to
-     *   the voltage level used on the serial line
+     *   <c>YSerialPort.VOLTAGELEVEL_RS485</c>, <c>YSerialPort.VOLTAGELEVEL_TTL1V8</c> and
+     *   <c>YSerialPort.VOLTAGELEVEL_SDI12</c> corresponding to the voltage level used on the serial line
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YSerialPort.VOLTAGELEVEL_INVALID</c>.
@@ -786,8 +796,8 @@ public class YSerialPort : YFunction
      *   a value among <c>YSerialPort.VOLTAGELEVEL_OFF</c>, <c>YSerialPort.VOLTAGELEVEL_TTL3V</c>,
      *   <c>YSerialPort.VOLTAGELEVEL_TTL3VR</c>, <c>YSerialPort.VOLTAGELEVEL_TTL5V</c>,
      *   <c>YSerialPort.VOLTAGELEVEL_TTL5VR</c>, <c>YSerialPort.VOLTAGELEVEL_RS232</c>,
-     *   <c>YSerialPort.VOLTAGELEVEL_RS485</c> and <c>YSerialPort.VOLTAGELEVEL_TTL1V8</c> corresponding to
-     *   the voltage type used on the serial line
+     *   <c>YSerialPort.VOLTAGELEVEL_RS485</c>, <c>YSerialPort.VOLTAGELEVEL_TTL1V8</c> and
+     *   <c>YSerialPort.VOLTAGELEVEL_SDI12</c> corresponding to the voltage type used on the serial line
      * </param>
      * <para>
      * </para>
@@ -1971,6 +1981,72 @@ public class YSerialPort : YFunction
             idx = idx + 1;
         }
         return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Registers a callback function to be called each time that a message is sent or
+     *   received by the serial port.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="callback">
+     *   the callback function to call, or a null pointer.
+     *   The callback function should take four arguments:
+     *   the <c>YSerialPort</c> object that emitted the event, and
+     *   the <c>SnoopingRecord</c> object that describes the message
+     *   sent or received.
+     *   On failure, throws an exception or returns a negative error code.
+     * </param>
+     */
+    public virtual int registerSnoopingCallback(YSnoopingCallback callback)
+    {
+        if (callback != null) {
+            this.registerValueCallback(yInternalEventCallback);
+        } else {
+            this.registerValueCallback((ValueCallback) null);
+        }
+        // register user callback AFTER the internal pseudo-event,
+        // to make sure we start with future events only
+        this._eventCallback = callback;
+        return 0;
+    }
+
+
+    public virtual int _internalEventHandler(string advstr)
+    {
+        string url;
+        byte[] msgbin = new byte[0];
+        List<string> msgarr = new List<string>();
+        int msglen;
+        int idx;
+        if (!(this._eventCallback != null)) {
+            // first simulated event, use it only to initialize reference values
+            this._eventPos = 0;
+        }
+
+        url = "rxmsg.json?pos="+Convert.ToString(this._eventPos)+"&maxw=0&t=0";
+        msgbin = this._download(url);
+        msgarr = this._json_get_array(msgbin);
+        msglen = msgarr.Count;
+        if (msglen == 0) {
+            return YAPI.SUCCESS;
+        }
+        // last element of array is the new position
+        msglen = msglen - 1;
+        if (!(this._eventCallback != null)) {
+            // first simulated event, use it only to initialize reference values
+            this._eventPos = YAPI._atoi(msgarr[msglen]);
+            return YAPI.SUCCESS;
+        }
+        this._eventPos = YAPI._atoi(msgarr[msglen]);
+        idx = 0;
+        while (idx < msglen) {
+            this._eventCallback(this, new YSnoopingRecord(msgarr[idx]));
+            idx = idx + 1;
+        }
+        return YAPI.SUCCESS;
     }
 
 

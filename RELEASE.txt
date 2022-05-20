@@ -1,4 +1,4 @@
-C# v1.10.49504
+C# v1.10.49822
 
-- Improve error reporting when some function are called before YAPI.RegisterHub or YAPI.InitAPI
-- Improve MultiSensController class (add support for reading sensor address)
+- Add support for registerSnoopingCallback in YSerialPort
+- Add SDI12 levels

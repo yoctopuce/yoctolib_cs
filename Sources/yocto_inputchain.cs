@@ -71,11 +71,11 @@ public class YInputChain : YFunction
     //--- (YInputChain definitions)
     public new delegate void ValueCallback(YInputChain func, string value);
     public new delegate void TimedReportCallback(YInputChain func, YMeasure measure);
-    public delegate void YEventCallback(YInputChain inputChain, int timestamp, string eventType, string eventData, string eventChange);
+    public delegate void YEventCallback(YInputChain obj, int timestamp, string eventType, string eventData, string eventChange);
 
-    protected static void yInternalEventCallback(YInputChain inputChain, String value)
+    protected static void yInternalEventCallback(YInputChain obj, String value)
     {
-        inputChain._internalEventHandler(value);
+        obj._internalEventHandler(value);
     }
 
 
