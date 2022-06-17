@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_spiport.cs 49744 2022-05-11 15:13:45Z mvuilleu $
+ *  $Id: yocto_spiport.cs 49903 2022-05-25 14:18:36Z mvuilleu $
  *
  *  Implements yFindSpiPort(), the high-level API for SpiPort functions
  *
@@ -203,6 +203,7 @@ public class YSpiPort : YFunction
     protected int _rxptr = 0;
     protected byte[] _rxbuff = new byte[0];
     protected int _rxbuffptr = 0;
+    protected int _eventPos = 0;
     //--- (end of generated code: YSpiPort definitions)
 
     public YSpiPort(string func)
@@ -1471,6 +1472,7 @@ public class YSpiPort : YFunction
      */
     public virtual int reset()
     {
+        this._eventPos = 0;
         this._rxptr = 0;
         this._rxbuffptr = 0;
         this._rxbuff = new byte[0];

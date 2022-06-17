@@ -905,7 +905,13 @@ public class YInputChain : YFunction
     /**
      * <summary>
      *   Registers a callback function to be called each time that an event is detected on the
-     *   input chain.
+     *   i
+     * <para>
+     *   nput chain.The callback is invoked only during the execution of
+     *   <c>ySleep</c> or <c>yHandleEvents</c>. This provides control over the time when
+     *   the callback is triggered. For good responsiveness, remember to call one of these
+     *   two functions periodically. To unregister a callback, pass a null pointer as argument.
+     * </para>
      * <para>
      * </para>
      * </summary>

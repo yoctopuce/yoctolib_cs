@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 49818 2022-05-19 09:57:42Z seb $
+ * $Id: yocto_serialport.cs 49903 2022-05-25 14:18:36Z mvuilleu $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
@@ -201,8 +201,8 @@ public class YSerialPort : YFunction
     protected int _rxptr = 0;
     protected byte[] _rxbuff = new byte[0];
     protected int _rxbuffptr = 0;
-    protected YSnoopingCallback _eventCallback;
     protected int _eventPos = 0;
+    protected YSnoopingCallback _eventCallback;
     //--- (end of generated code: YSerialPort definitions)
 
     public YSerialPort(string func)
@@ -1350,6 +1350,7 @@ public class YSerialPort : YFunction
      */
     public virtual int reset()
     {
+        this._eventPos = 0;
         this._rxptr = 0;
         this._rxbuffptr = 0;
         this._rxbuff = new byte[0];
@@ -1989,13 +1990,19 @@ public class YSerialPort : YFunction
      *   Registers a callback function to be called each time that a message is sent or
      *   received by the serial port.
      * <para>
+     *   The callback is invoked only during the execution of
+     *   <c>ySleep</c> or <c>yHandleEvents</c>. This provides control over the time when
+     *   the callback is triggered. For good responsiveness, remember to call one of these
+     *   two functions periodically. To unregister a callback, pass a null pointer as argument.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="callback">
      *   the callback function to call, or a null pointer.
      *   The callback function should take four arguments:
      *   the <c>YSerialPort</c> object that emitted the event, and
-     *   the <c>SnoopingRecord</c> object that describes the message
+     *   the <c>YSnoopingRecord</c> object that describes the message
      *   sent or received.
      *   On failure, throws an exception or returns a negative error code.
      * </param>
