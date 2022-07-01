@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_colorledcluster.cs 48017 2022-01-12 08:17:52Z seb $
+ *  $Id: yocto_colorledcluster.cs 50281 2022-06-30 07:21:14Z mvuilleu $
  *
  *  Implements yFindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -85,12 +85,14 @@ public class YColorLedCluster : YFunction
     public const int LEDTYPE_WS2811 = 2;
     public const int LEDTYPE_INVALID = -1;
     public const int MAXLEDCOUNT_INVALID = YAPI.INVALID_UINT;
+    public const int DYNAMICLEDCOUNT_INVALID = YAPI.INVALID_UINT;
     public const int BLINKSEQMAXCOUNT_INVALID = YAPI.INVALID_UINT;
     public const int BLINKSEQMAXSIZE_INVALID = YAPI.INVALID_UINT;
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _activeLedCount = ACTIVELEDCOUNT_INVALID;
     protected int _ledType = LEDTYPE_INVALID;
     protected int _maxLedCount = MAXLEDCOUNT_INVALID;
+    protected int _dynamicLedCount = DYNAMICLEDCOUNT_INVALID;
     protected int _blinkSeqMaxCount = BLINKSEQMAXCOUNT_INVALID;
     protected int _blinkSeqMaxSize = BLINKSEQMAXSIZE_INVALID;
     protected string _command = COMMAND_INVALID;
@@ -120,6 +122,10 @@ public class YColorLedCluster : YFunction
         if (json_val.has("maxLedCount"))
         {
             _maxLedCount = json_val.getInt("maxLedCount");
+        }
+        if (json_val.has("dynamicLedCount"))
+        {
+            _dynamicLedCount = json_val.getInt("dynamicLedCount");
         }
         if (json_val.has("blinkSeqMaxCount"))
         {
@@ -286,6 +292,36 @@ public class YColorLedCluster : YFunction
                 }
             }
             res = this._maxLedCount;
+        }
+        return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the maximum number of LEDs that can perform autonomous transitions and sequences.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the maximum number of LEDs that can perform autonomous transitions and sequences
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YColorLedCluster.DYNAMICLEDCOUNT_INVALID</c>.
+     * </para>
+     */
+    public int get_dynamicLedCount()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration == 0) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return DYNAMICLEDCOUNT_INVALID;
+                }
+            }
+            res = this._dynamicLedCount;
         }
         return res;
     }

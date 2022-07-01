@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 49750 2022-05-13 07:10:42Z seb $
+ * $Id: yocto_api.cs 50357 2022-07-01 12:18:08Z martinm $
  *
  * High-level programming interface, common to all modules
  *
@@ -267,8 +267,12 @@ internal static class SafeNativeMethods
         Boolean is64 = IntPtr.Size == 8;
         YAPIDLL_PRELOAD_TYPE preloadType = YAPIDLL_PRELOAD_TYPE.NONE;
         Boolean loaded = false;
+        String loadDescription = "";
+        string dll_path ="";
+        List<String> loadlogs = new List<String>();
+        string ErrorCause = "Unable to load YAPI dynamic library.";
 
-        while(!loaded) {
+        while (!loaded) {
             PlatformID platform = Environment.OSVersion.Platform;
             if (platform == PlatformID.MacOSX) {
                 if (is64) {
@@ -301,6 +305,13 @@ internal static class SafeNativeMethods
             do
             {
                 debugDll("Try YAPI load with " + _dllVersion + " and " + preloadType);
+                loadDescription = "(" + _dllVersion + " and " + preloadType + ", ";
+                #if NETCOREAPP3_0_OR_GREATER
+                    loadDescription += ".Net Core)";
+                   
+                #else
+                    loadDescription += ".Net Framework)";          
+                #endif
 
                 if (preloadType != YAPIDLL_PRELOAD_TYPE.NONE) {
                     string dir = "";
@@ -321,7 +332,7 @@ internal static class SafeNativeMethods
                             break;
                     }
 
-                    string dll_path;
+                   
                     switch (_dllVersion) {
                         default:
                         case YAPIDLL_VERSION.WIN32:
@@ -353,30 +364,40 @@ internal static class SafeNativeMethods
                     try {
                         IntPtr loadLibrary;
 #if NETCOREAPP3_0_OR_GREATER
-                        debugDll("preload library using " + dll_path + " (.Net Core)");
+                        debugDll("preload library using " + dll_path + " (.Net Core)\n");
                         loadLibrary = NativeLibrary.Load(dll_path);
 #else
-                    debugDll("preload library using "+dll_path+" (.Net Framework)");
-                    loadLibrary = NativeMethods.LoadLibrary(dll_path);
+                        debugDll("preload library with path \""+dll_path+"\" (.Net Framework)\n");
+                        loadLibrary = NativeMethods.LoadLibrary(dll_path);
 #endif
                         if (loadLibrary == IntPtr.Zero) {
-                            debugDll("Unable to preload dll with :" + dll_path);
+                            debugDll("Unable to preload dll with \"" + dll_path + "\"\n");
+                            ErrorCause = "NULL rersult";
+                            loadlogs.Add("Tried to load \"" + dll_path + "\" " + loadDescription + " -> result was null.");
                         } else {
-                            debugDll("YAPI preloaded from " + dll_path);
+                            debugDll("YAPI preloaded from \"" + dll_path + "\"\n");
                         }
                     } catch (System.EntryPointNotFoundException ex) {
-                        debugDll("Entry point not found:" + ex.Message);
+                        ErrorCause = ex.Message;
+                        debugDll("Entry point not found :" + ErrorCause + "\n");
+                        loadlogs.Add("Tried to load \"" + dll_path + "\" " + loadDescription + " -> Entry point not found. " + ErrorCause);
                     } catch (System.DllNotFoundException ex) {
-                        debugDll("Unable to load dll with :" + ex.Message);
-                    }
+                        ErrorCause = ex.Message;
+                        debugDll("Unable to load dll with : " + ErrorCause + "\n");
+                        loadlogs.Add("Tried to load \"" + dll_path + "\" " + loadDescription + " -> File not found. " + ErrorCause);
+                     }
                 }
 
                 try {
                     return _yapiGetAPIVersion(ref version, ref dat_);
                 } catch (System.DllNotFoundException ex) {
-                    debugDll(ex.ToString());
+                    debugDll(ex.Message + "\n");
+                    ErrorCause = ex.Message;
+                    loadlogs.Add("Tried to load \"" + dll_path + "\" " + loadDescription + " -> DLL not found. " + ErrorCause);
                 } catch (System.BadImageFormatException ex) {
-                    debugDll(ex.ToString());
+                    debugDll(ex.Message + "\n");
+                    ErrorCause = ex.Message;
+                    loadlogs.Add("Tried to load \"" + dll_path + "\" " + loadDescription + " -> Bad architecture. " + ErrorCause);
                 }
 
                 switch (_dllVersion) {
@@ -393,8 +414,9 @@ internal static class SafeNativeMethods
                                 preloadType = YAPIDLL_PRELOAD_TYPE.ABS_CURRENT_DIR;
                                 break;
                             case YAPIDLL_PRELOAD_TYPE.ABS_CURRENT_DIR:
-                                throw new System.DllNotFoundException("Unable to load YAPI dynamic library");
-
+                                for (int i = 0; i < loadlogs.Count; i++) YAPI.innerLog(loadlogs[i]);
+                                YAPI.innerLog("Failed to load YAPI dynamic library.");
+                                throw new System.DllNotFoundException(ErrorCause);
                         }
 
                         no_alternate_platform = true;
@@ -424,7 +446,7 @@ internal static class SafeNativeMethods
     private static void debugDll(string line)
     {
         if (YAPI._debugDllLoad) {
-            Console.WriteLine(line);
+            Console.Write(line);
         }
     }
 
@@ -3294,7 +3316,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "50144";
+    public const string YOCTO_API_BUILD_NO = "50357";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -3353,7 +3375,6 @@ public class YAPI
     static bool _apiInitialized = false;
     internal static YAPIContext _yapiContext = new YAPIContext();
     internal static bool _debugDllLoad = false;
-
 
     /*
      * All static variables (reset in YAPI.FreeAPI()
@@ -4606,6 +4627,8 @@ public class YAPI
     {
         ExceptionsDisabled = false;
     }
+
+    public static void innerLog(string msg) { if (ylog != null) ylog(msg); }
 
     // - Internal callback registered into YAPI using a protected delegate
     private static void native_yLogFunction(IntPtr log, u32 loglen)

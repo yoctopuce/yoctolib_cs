@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 48017 2022-01-12 08:17:52Z seb $
+ * $Id: yocto_cellular.cs 50281 2022-06-30 07:21:14Z mvuilleu $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *
@@ -6098,6 +6098,54 @@ public class YCellular : YFunction
     public virtual string decodePLMN(string mccmnc)
     {
         return this.imm_decodePLMN(mccmnc);
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the list available radio communication profiles, as a string array
+     *   (YoctoHub-GSM-4G only).
+     * <para>
+     *   Each string is a made of a numerical ID, followed by a colon,
+     *   followed by the profile description.
+     * </para>
+     * </summary>
+     * <returns>
+     *   a list of string describing available radio communication profiles.
+     * </returns>
+     */
+    public virtual List<string> get_communicationProfiles()
+    {
+        string profiles;
+        List<string> lines = new List<string>();
+        int nlines;
+        int idx;
+        string line;
+        int cpos;
+        int profno;
+        List<string> res = new List<string>();
+
+        profiles = this._AT("+UMNOPROF=?");
+        lines = new List<string>(profiles.Split(new Char[] {'\n'}));
+        nlines = lines.Count;
+        if (!(nlines > 0)) {
+            this._throw(YAPI.IO_ERROR, "fail to retrieve profile list");
+            return res;
+        }
+        res.Clear();
+        idx = 0;
+        while (idx < nlines) {
+            line = lines[idx];
+            cpos = (line).IndexOf(":");
+            if (cpos > 0) {
+                profno = YAPI._atoi((line).Substring( 0, cpos));
+                if (profno > 0) {
+                    res.Add(line);
+                }
+            }
+            idx = idx + 1;
+        }
+        return res;
     }
 
     /**
