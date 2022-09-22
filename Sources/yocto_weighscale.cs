@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_weighscale.cs 48017 2022-01-12 08:17:52Z seb $
+ *  $Id: yocto_weighscale.cs 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements yFindWeighScale(), the high-level API for WeighScale functions
  *
@@ -116,27 +116,27 @@ public class YWeighScale : YSensor
         }
         if (json_val.has("tempAvgAdaptRatio"))
         {
-            _tempAvgAdaptRatio = Math.Round(json_val.getDouble("tempAvgAdaptRatio") * 1000.0 / 65536.0) / 1000.0;
+            _tempAvgAdaptRatio = Math.Round(json_val.getDouble("tempAvgAdaptRatio") / 65.536) / 1000.0;
         }
         if (json_val.has("tempChgAdaptRatio"))
         {
-            _tempChgAdaptRatio = Math.Round(json_val.getDouble("tempChgAdaptRatio") * 1000.0 / 65536.0) / 1000.0;
+            _tempChgAdaptRatio = Math.Round(json_val.getDouble("tempChgAdaptRatio") / 65.536) / 1000.0;
         }
         if (json_val.has("compTempAvg"))
         {
-            _compTempAvg = Math.Round(json_val.getDouble("compTempAvg") * 1000.0 / 65536.0) / 1000.0;
+            _compTempAvg = Math.Round(json_val.getDouble("compTempAvg") / 65.536) / 1000.0;
         }
         if (json_val.has("compTempChg"))
         {
-            _compTempChg = Math.Round(json_val.getDouble("compTempChg") * 1000.0 / 65536.0) / 1000.0;
+            _compTempChg = Math.Round(json_val.getDouble("compTempChg") / 65.536) / 1000.0;
         }
         if (json_val.has("compensation"))
         {
-            _compensation = Math.Round(json_val.getDouble("compensation") * 1000.0 / 65536.0) / 1000.0;
+            _compensation = Math.Round(json_val.getDouble("compensation") / 65.536) / 1000.0;
         }
         if (json_val.has("zeroTracking"))
         {
-            _zeroTracking = Math.Round(json_val.getDouble("zeroTracking") * 1000.0 / 65536.0) / 1000.0;
+            _zeroTracking = Math.Round(json_val.getDouble("zeroTracking") / 65.536) / 1000.0;
         }
         if (json_val.has("command"))
         {

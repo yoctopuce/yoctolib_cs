@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_refframe.cs 48017 2022-01-12 08:17:52Z seb $
+ *  $Id: yocto_refframe.cs 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -152,7 +152,7 @@ public class YRefFrame : YFunction
         }
         if (json_val.has("bearing"))
         {
-            _bearing = Math.Round(json_val.getDouble("bearing") * 1000.0 / 65536.0) / 1000.0;
+            _bearing = Math.Round(json_val.getDouble("bearing") / 65.536) / 1000.0;
         }
         if (json_val.has("calibrationParam"))
         {

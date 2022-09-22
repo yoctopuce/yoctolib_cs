@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_currentloopoutput.cs 38913 2019-12-20 18:59:49Z mvuilleu $
+ *  $Id: yocto_currentloopoutput.cs 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements yFindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -101,7 +101,7 @@ public class YCurrentLoopOutput : YFunction
     {
         if (json_val.has("current"))
         {
-            _current = Math.Round(json_val.getDouble("current") * 1000.0 / 65536.0) / 1000.0;
+            _current = Math.Round(json_val.getDouble("current") / 65.536) / 1000.0;
         }
         if (json_val.has("currentTransition"))
         {
@@ -109,7 +109,7 @@ public class YCurrentLoopOutput : YFunction
         }
         if (json_val.has("currentAtStartUp"))
         {
-            _currentAtStartUp = Math.Round(json_val.getDouble("currentAtStartUp") * 1000.0 / 65536.0) / 1000.0;
+            _currentAtStartUp = Math.Round(json_val.getDouble("currentAtStartUp") / 65.536) / 1000.0;
         }
         if (json_val.has("loopPower"))
         {

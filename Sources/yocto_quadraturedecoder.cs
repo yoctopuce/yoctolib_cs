@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_quadraturedecoder.cs 45843 2021-08-04 07:51:59Z mvuilleu $
+ *  $Id: yocto_quadraturedecoder.cs 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements yFindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -99,7 +99,7 @@ public class YQuadratureDecoder : YSensor
     {
         if (json_val.has("speed"))
         {
-            _speed = Math.Round(json_val.getDouble("speed") * 1000.0 / 65536.0) / 1000.0;
+            _speed = Math.Round(json_val.getDouble("speed") / 65.536) / 1000.0;
         }
         if (json_val.has("decoding"))
         {

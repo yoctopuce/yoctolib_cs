@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_proximity.cs 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: yocto_proximity.cs 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements yFindProximity(), the high-level API for Proximity functions
  *
@@ -120,7 +120,7 @@ public class YProximity : YSensor
     {
         if (json_val.has("signalValue"))
         {
-            _signalValue = Math.Round(json_val.getDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
+            _signalValue = Math.Round(json_val.getDouble("signalValue") / 65.536) / 1000.0;
         }
         if (json_val.has("detectionThreshold"))
         {

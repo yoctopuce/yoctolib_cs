@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_pwminput.cs 41348 2020-08-10 15:12:57Z seb $
+ *  $Id: yocto_pwminput.cs 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements yFindPwmInput(), the high-level API for PwmInput functions
  *
@@ -124,19 +124,19 @@ public class YPwmInput : YSensor
     {
         if (json_val.has("dutyCycle"))
         {
-            _dutyCycle = Math.Round(json_val.getDouble("dutyCycle") * 1000.0 / 65536.0) / 1000.0;
+            _dutyCycle = Math.Round(json_val.getDouble("dutyCycle") / 65.536) / 1000.0;
         }
         if (json_val.has("pulseDuration"))
         {
-            _pulseDuration = Math.Round(json_val.getDouble("pulseDuration") * 1000.0 / 65536.0) / 1000.0;
+            _pulseDuration = Math.Round(json_val.getDouble("pulseDuration") / 65.536) / 1000.0;
         }
         if (json_val.has("frequency"))
         {
-            _frequency = Math.Round(json_val.getDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
+            _frequency = Math.Round(json_val.getDouble("frequency") / 65.536) / 1000.0;
         }
         if (json_val.has("period"))
         {
-            _period = Math.Round(json_val.getDouble("period") * 1000.0 / 65536.0) / 1000.0;
+            _period = Math.Round(json_val.getDouble("period") / 65.536) / 1000.0;
         }
         if (json_val.has("pulseCounter"))
         {

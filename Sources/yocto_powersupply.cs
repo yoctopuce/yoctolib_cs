@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_powersupply.cs 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: yocto_powersupply.cs 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements yFindPowerSupply(), the high-level API for PowerSupply functions
  *
@@ -120,11 +120,11 @@ public class YPowerSupply : YFunction
     {
         if (json_val.has("voltageSetPoint"))
         {
-            _voltageSetPoint = Math.Round(json_val.getDouble("voltageSetPoint") * 1000.0 / 65536.0) / 1000.0;
+            _voltageSetPoint = Math.Round(json_val.getDouble("voltageSetPoint") / 65.536) / 1000.0;
         }
         if (json_val.has("currentLimit"))
         {
-            _currentLimit = Math.Round(json_val.getDouble("currentLimit") * 1000.0 / 65536.0) / 1000.0;
+            _currentLimit = Math.Round(json_val.getDouble("currentLimit") / 65.536) / 1000.0;
         }
         if (json_val.has("powerOutput"))
         {
@@ -136,23 +136,23 @@ public class YPowerSupply : YFunction
         }
         if (json_val.has("measuredVoltage"))
         {
-            _measuredVoltage = Math.Round(json_val.getDouble("measuredVoltage") * 1000.0 / 65536.0) / 1000.0;
+            _measuredVoltage = Math.Round(json_val.getDouble("measuredVoltage") / 65.536) / 1000.0;
         }
         if (json_val.has("measuredCurrent"))
         {
-            _measuredCurrent = Math.Round(json_val.getDouble("measuredCurrent") * 1000.0 / 65536.0) / 1000.0;
+            _measuredCurrent = Math.Round(json_val.getDouble("measuredCurrent") / 65.536) / 1000.0;
         }
         if (json_val.has("inputVoltage"))
         {
-            _inputVoltage = Math.Round(json_val.getDouble("inputVoltage") * 1000.0 / 65536.0) / 1000.0;
+            _inputVoltage = Math.Round(json_val.getDouble("inputVoltage") / 65.536) / 1000.0;
         }
         if (json_val.has("vInt"))
         {
-            _vInt = Math.Round(json_val.getDouble("vInt") * 1000.0 / 65536.0) / 1000.0;
+            _vInt = Math.Round(json_val.getDouble("vInt") / 65.536) / 1000.0;
         }
         if (json_val.has("ldoTemperature"))
         {
-            _ldoTemperature = Math.Round(json_val.getDouble("ldoTemperature") * 1000.0 / 65536.0) / 1000.0;
+            _ldoTemperature = Math.Round(json_val.getDouble("ldoTemperature") / 65.536) / 1000.0;
         }
         if (json_val.has("voltageTransition"))
         {
@@ -160,11 +160,11 @@ public class YPowerSupply : YFunction
         }
         if (json_val.has("voltageAtStartUp"))
         {
-            _voltageAtStartUp = Math.Round(json_val.getDouble("voltageAtStartUp") * 1000.0 / 65536.0) / 1000.0;
+            _voltageAtStartUp = Math.Round(json_val.getDouble("voltageAtStartUp") / 65.536) / 1000.0;
         }
         if (json_val.has("currentAtStartUp"))
         {
-            _currentAtStartUp = Math.Round(json_val.getDouble("currentAtStartUp") * 1000.0 / 65536.0) / 1000.0;
+            _currentAtStartUp = Math.Round(json_val.getDouble("currentAtStartUp") / 65.536) / 1000.0;
         }
         if (json_val.has("command"))
         {

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_power.cs 41290 2020-07-24 10:02:23Z mvuilleu $
+ *  $Id: yocto_power.cs 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements yFindPower(), the high-level API for Power functions
  *
@@ -102,19 +102,19 @@ public class YPower : YSensor
     {
         if (json_val.has("cosPhi"))
         {
-            _cosPhi = Math.Round(json_val.getDouble("cosPhi") * 1000.0 / 65536.0) / 1000.0;
+            _cosPhi = Math.Round(json_val.getDouble("cosPhi") / 65.536) / 1000.0;
         }
         if (json_val.has("meter"))
         {
-            _meter = Math.Round(json_val.getDouble("meter") * 1000.0 / 65536.0) / 1000.0;
+            _meter = Math.Round(json_val.getDouble("meter") / 65.536) / 1000.0;
         }
         if (json_val.has("deliveredEnergyMeter"))
         {
-            _deliveredEnergyMeter = Math.Round(json_val.getDouble("deliveredEnergyMeter") * 1000.0 / 65536.0) / 1000.0;
+            _deliveredEnergyMeter = Math.Round(json_val.getDouble("deliveredEnergyMeter") / 65.536) / 1000.0;
         }
         if (json_val.has("receivedEnergyMeter"))
         {
-            _receivedEnergyMeter = Math.Round(json_val.getDouble("receivedEnergyMeter") * 1000.0 / 65536.0) / 1000.0;
+            _receivedEnergyMeter = Math.Round(json_val.getDouble("receivedEnergyMeter") / 65.536) / 1000.0;
         }
         if (json_val.has("meterTimer"))
         {

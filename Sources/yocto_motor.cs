@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_motor.cs 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: yocto_motor.cs 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements yFindMotor(), the high-level API for Motor functions
  *
@@ -123,15 +123,15 @@ public class YMotor : YFunction
         }
         if (json_val.has("drivingForce"))
         {
-            _drivingForce = Math.Round(json_val.getDouble("drivingForce") * 1000.0 / 65536.0) / 1000.0;
+            _drivingForce = Math.Round(json_val.getDouble("drivingForce") / 65.536) / 1000.0;
         }
         if (json_val.has("brakingForce"))
         {
-            _brakingForce = Math.Round(json_val.getDouble("brakingForce") * 1000.0 / 65536.0) / 1000.0;
+            _brakingForce = Math.Round(json_val.getDouble("brakingForce") / 65.536) / 1000.0;
         }
         if (json_val.has("cutOffVoltage"))
         {
-            _cutOffVoltage = Math.Round(json_val.getDouble("cutOffVoltage") * 1000.0 / 65536.0) / 1000.0;
+            _cutOffVoltage = Math.Round(json_val.getDouble("cutOffVoltage") / 65.536) / 1000.0;
         }
         if (json_val.has("overCurrentLimit"))
         {
@@ -139,7 +139,7 @@ public class YMotor : YFunction
         }
         if (json_val.has("frequency"))
         {
-            _frequency = Math.Round(json_val.getDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
+            _frequency = Math.Round(json_val.getDouble("frequency") / 65.536) / 1000.0;
         }
         if (json_val.has("starterTime"))
         {

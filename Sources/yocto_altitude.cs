@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_altitude.cs 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: yocto_altitude.cs 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements yFindAltitude(), the high-level API for Altitude functions
  *
@@ -97,7 +97,7 @@ public class YAltitude : YSensor
     {
         if (json_val.has("qnh"))
         {
-            _qnh = Math.Round(json_val.getDouble("qnh") * 1000.0 / 65536.0) / 1000.0;
+            _qnh = Math.Round(json_val.getDouble("qnh") / 65.536) / 1000.0;
         }
         if (json_val.has("technology"))
         {

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 50357 2022-07-01 12:18:08Z martinm $
+ * $Id: yocto_api.cs 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -3316,7 +3316,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "50357";
+    public const string YOCTO_API_BUILD_NO = "51008";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -13096,19 +13096,19 @@ public class YSensor : YFunction
         }
         if (json_val.has("currentValue"))
         {
-            _currentValue = Math.Round(json_val.getDouble("currentValue") * 1000.0 / 65536.0) / 1000.0;
+            _currentValue = Math.Round(json_val.getDouble("currentValue") / 65.536) / 1000.0;
         }
         if (json_val.has("lowestValue"))
         {
-            _lowestValue = Math.Round(json_val.getDouble("lowestValue") * 1000.0 / 65536.0) / 1000.0;
+            _lowestValue = Math.Round(json_val.getDouble("lowestValue") / 65.536) / 1000.0;
         }
         if (json_val.has("highestValue"))
         {
-            _highestValue = Math.Round(json_val.getDouble("highestValue") * 1000.0 / 65536.0) / 1000.0;
+            _highestValue = Math.Round(json_val.getDouble("highestValue") / 65.536) / 1000.0;
         }
         if (json_val.has("currentRawValue"))
         {
-            _currentRawValue = Math.Round(json_val.getDouble("currentRawValue") * 1000.0 / 65536.0) / 1000.0;
+            _currentRawValue = Math.Round(json_val.getDouble("currentRawValue") / 65.536) / 1000.0;
         }
         if (json_val.has("logFrequency"))
         {
@@ -13128,7 +13128,7 @@ public class YSensor : YFunction
         }
         if (json_val.has("resolution"))
         {
-            _resolution = Math.Round(json_val.getDouble("resolution") * 1000.0 / 65536.0) / 1000.0;
+            _resolution = Math.Round(json_val.getDouble("resolution") / 65.536) / 1000.0;
         }
         if (json_val.has("sensorState"))
         {
