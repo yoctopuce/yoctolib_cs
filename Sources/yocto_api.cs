@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 50689 2022-08-17 14:37:15Z mvuilleu $
+ * $Id: yocto_api.cs 51266 2022-10-10 09:18:25Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -3316,7 +3316,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "51050";
+    public const string YOCTO_API_BUILD_NO = "51266";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -12377,6 +12377,35 @@ public class YModule : YFunction
         }
         this.clearCache();
         return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Adds a file to the uploaded data at the next HTTP callback.
+     * <para>
+     *   This function only affects the next HTTP callback and only works in
+     *   HTTP callback mode.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="filename">
+     *   the name of the file to upload at the next HTTP callback
+     * </param>
+     * <returns>
+     *   nothing.
+     * </returns>
+     */
+    public virtual int addFileToHTTPCallback(string filename)
+    {
+        byte[] content = new byte[0];
+
+        content = this._download("@YCB+" + filename);
+        if ((content).Length == 0) {
+            return YAPI.NOT_SUPPORTED;
+        }
+        return YAPI.SUCCESS;
     }
 
 
