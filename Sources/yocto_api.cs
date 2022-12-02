@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 51266 2022-10-10 09:18:25Z seb $
+ * $Id: yocto_api.cs 51903 2022-11-29 17:25:59Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -3316,7 +3316,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "51266";
+    public const string YOCTO_API_BUILD_NO = "52094";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -7026,6 +7026,7 @@ public class YDataStream
     protected List<double> _calraw = new List<double>();
     protected List<double> _calref = new List<double>();
     protected List<List<double>> _values = new List<List<double>>();
+    protected bool _isLoaded;
     //--- (end of generated code: YDataStream definitions)
 
     protected YAPI.yCalibrationHandler _calhdl;
@@ -7154,6 +7155,9 @@ public class YDataStream
         int idx;
         List<int> udat = new List<int>();
         List<double> dat = new List<double>();
+        if (this._isLoaded && !(this._isClosed)) {
+            return YAPI.SUCCESS;
+        }
         if ((sdata).Length == 0) {
             this._nRows = 0;
             return YAPI.SUCCESS;
@@ -7191,7 +7195,14 @@ public class YDataStream
         }
 
         this._nRows = this._values.Count;
+        this._isLoaded = true;
         return YAPI.SUCCESS;
+    }
+
+
+    public virtual bool _wasLoaded()
+    {
+        return this._isLoaded;
     }
 
 
@@ -7200,6 +7211,23 @@ public class YDataStream
         string url;
         url = "logger.json?id="+
         this._functionId+"&run="+Convert.ToString(this._runNo)+"&utc="+Convert.ToString(this._utcStamp);
+        return url;
+    }
+
+
+    public virtual string _get_baseurl()
+    {
+        string url;
+        url = "logger.json?id="+
+        this._functionId+"&run="+Convert.ToString(this._runNo)+"&utc=";
+        return url;
+    }
+
+
+    public virtual string _get_urlsuffix()
+    {
+        string url;
+        url = ""+Convert.ToString(this._utcStamp);
         return url;
     }
 
@@ -7822,6 +7850,7 @@ public class YDataSet
     protected string _hardwareId;
     protected string _functionId;
     protected string _unit;
+    protected int _bulkLoad = 0;
     protected double _startTimeMs = 0;
     protected double _endTimeMs = 0;
     protected int _progress = 0;
@@ -7882,6 +7911,9 @@ public class YDataSet
 
         this._functionId = p.getString("id");
         this._unit = p.getString("unit");
+        if (p.has("bulk")) {
+            this._bulkLoad = Convert.ToInt32(p.getString("bulk"));
+        }
         if (p.has("calib")) {
             this._calib = YAPI._decodeFloats(p.getString("calib"));
             this._calib[0] = this._calib[0] / 1000;
@@ -7992,9 +8024,11 @@ public class YDataSet
             } else {
                 // stream that are partially in the dataset
                 // we need to parse data to filter value outside the dataset
-                url =  this._streams[ii]._get_url();
-                data = this._parent._download(url);
-                this._streams[ii]._parseStream(data);
+                if (!( this._streams[ii]._wasLoaded())) {
+                    url =  this._streams[ii]._get_url();
+                    data = this._parent._download(url);
+                    this._streams[ii]._parseStream(data);
+                }
                 dataRows =  this._streams[ii].get_dataRows();
                 if (dataRows.Count == 0) {
                     return this.get_progress();
@@ -8045,8 +8079,10 @@ public class YDataSet
                         if (previewMaxVal < maxVal) {
                             previewMaxVal = maxVal;
                         }
-                        previewTotalAvg = previewTotalAvg + (avgVal * mitv);
-                        previewTotalTime = previewTotalTime + mitv;
+                        if (!(Double.IsNaN(avgVal))) {
+                            previewTotalAvg = previewTotalAvg + (avgVal * mitv);
+                            previewTotalTime = previewTotalTime + mitv;
+                        }
                     }
                     tim = end_;
                     m_pos = m_pos + 1;
@@ -8104,6 +8140,15 @@ public class YDataSet
         int avgCol;
         int maxCol;
         bool firstMeasure;
+        string baseurl;
+        string url;
+        string suffix;
+        List<string> suffixes = new List<string>();
+        int idx;
+        byte[] bulkFile = new byte[0];
+        List<string> streamStr = new List<string>();
+        int urlIdx;
+        byte[] streamBin = new byte[0];
 
         if (progress != this._progress) {
             return this._progress;
@@ -8112,7 +8157,9 @@ public class YDataSet
             return this.loadSummary(data);
         }
         stream = this._streams[this._progress];
-        stream._parseStream(data);
+        if (!(stream._wasLoaded())) {
+            stream._parseStream(data);
+        }
         dataRows = stream.get_dataRows();
         this._progress = this._progress + 1;
         if (dataRows.Count == 0) {
@@ -8153,6 +8200,40 @@ public class YDataSet
                 this._measures.Add(new YMeasure(tim / 1000, end_ / 1000, dataRows[ii][minCol], avgv, dataRows[ii][maxCol]));
             }
             tim = end_;
+        }
+        // Perform bulk preload to speed-up network transfer
+        if ((this._bulkLoad > 0) && (this._progress < this._streams.Count)) {
+            stream = this._streams[this._progress];
+            if (stream._wasLoaded()) {
+                return this.get_progress();
+            }
+            baseurl = stream._get_baseurl();
+            url = stream._get_url();
+            suffix = stream._get_urlsuffix();
+            suffixes.Add(suffix);
+            idx = this._progress+1;
+            while ((idx < this._streams.Count) && (suffixes.Count < this._bulkLoad)) {
+                stream = this._streams[idx];
+                if (!(stream._wasLoaded()) && (stream._get_baseurl() == baseurl)) {
+                    suffix = stream._get_urlsuffix();
+                    suffixes.Add(suffix);
+                    url = url + "," + suffix;
+                }
+                idx = idx + 1;
+            }
+            bulkFile = this._parent._download(url);
+            streamStr = this._parent._json_get_array(bulkFile);
+            urlIdx = 0;
+            idx = this._progress;
+            while ((idx < this._streams.Count) && (urlIdx < suffixes.Count) && (urlIdx < streamStr.Count)) {
+                stream = this._streams[idx];
+                if ((stream._get_baseurl() == baseurl) && (stream._get_urlsuffix() == suffixes[urlIdx])) {
+                    streamBin = YAPI.DefaultEncoding.GetBytes(streamStr[urlIdx]);
+                    stream._parseStream(streamBin);
+                    urlIdx = urlIdx + 1;
+                }
+                idx = idx + 1;
+            }
         }
         return this.get_progress();
     }
@@ -8369,6 +8450,10 @@ public class YDataSet
                 return 100;
             } else {
                 stream = this._streams[this._progress];
+                if (stream._wasLoaded()) {
+                    // Do not reload stream if it was already loaded
+                    return this.processMore(this._progress, YAPI.DefaultEncoding.GetBytes(""));
+                }
                 url = stream._get_url();
             }
         }
@@ -10093,7 +10178,7 @@ public class YFunction
         throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "No key " + key + "in JSON struct");
     }
 
-    protected List<string> _json_get_array(byte[] data)
+    public List<string> _json_get_array(byte[] data)
     {
         string debug = YAPI.DefaultEncoding.GetString(data);
         YAPI.YJSONArray array = new YAPI.YJSONArray(debug);
