@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 51903 2022-11-29 17:25:59Z mvuilleu $
+ * $Id: yocto_api.cs 52313 2022-12-12 17:28:00Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -3316,7 +3316,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "52094";
+    public const string YOCTO_API_BUILD_NO = "52382";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -10414,6 +10414,9 @@ public class YFunction
         string funcValue = "";
 
         lock (_thisLock) {
+            if (_serial != "") {
+                return YModule.FindModule(_serial + ".module");
+            }
             fundescr = YAPI.yapiGetFunction(_className, _func, ref errmsg);
             if (!YAPI.YISERR(fundescr)) {
                 if (!YAPI.YISERR(YAPI.yapiGetFunctionInfo(fundescr, ref devdescr, ref serial, ref funcId, ref funcName, ref funcValue, ref errmsg))) {

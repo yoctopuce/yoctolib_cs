@@ -37,16 +37,16 @@ namespace ConsoleApplication1
         slave = Convert.ToInt32(Console.ReadLine());
       } while (slave < 1 || slave > 255);
       do {
-        Console.WriteLine("Please select a Coil No (>=1), Input Bit No (>=10001+),");
-        Console.WriteLine("       Register No (>=30001) or Input Register No (>=40001)");
+        Console.WriteLine("Please select a Coil No (>=1), Input Bit No (>=10001),");
+        Console.WriteLine("Input Register No (>=30001) or Holding Register No (>=40001)");
         Console.Write("No: ");
         reg = Convert.ToInt32(Console.ReadLine());
       } while (reg < 1 || reg >= 50000 || (reg % 10000) == 0);
       while (true) {
         if (reg >= 40001) {
-          val = serialPort.modbusReadInputRegisters(slave, reg - 40001, 1)[0];
+          val = serialPort.modbusReadRegisters(slave, reg - 40001, 1)[0];
         } else if (reg >= 30001) {
-          val = serialPort.modbusReadRegisters(slave, reg - 30001, 1)[0];
+          val = serialPort.modbusReadInputRegisters(slave, reg - 30001, 1)[0];
         } else if (reg >= 10001) {
           val = serialPort.modbusReadInputBits(slave, reg - 10001, 1)[0];
         } else {
@@ -54,16 +54,16 @@ namespace ConsoleApplication1
         }
         Console.WriteLine("Current value: " + val.ToString());
         Console.Write("Press ENTER to read again, Q to quit");
-        if ((reg % 30000) < 10000) {
+        if ((reg % 40000) < 10000) {
           Console.Write(" or enter a new value");
         }
         Console.Write(": ");
         cmd = Console.ReadLine();
         if (cmd == "q" || cmd == "Q") break;
-        if (cmd != "" && (reg % 30000) < 10000) {
+        if (cmd != "" && (reg % 40000) < 10000) {
           val = Convert.ToInt32(cmd);
-          if (reg >= 30001) {
-            serialPort.modbusWriteRegister(slave, reg - 30001, val);
+          if (reg >= 40001) {
+            serialPort.modbusWriteRegister(slave, reg - 40001, val);
           } else {
             serialPort.modbusWriteBit(slave, reg - 1, val);
           }
