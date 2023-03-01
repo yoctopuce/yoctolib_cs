@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 52313 2022-12-12 17:28:00Z seb $
+ * $Id: yocto_api.cs 53299 2023-02-28 09:49:46Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -3316,7 +3316,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "52382";
+    public const string YOCTO_API_BUILD_NO = "53327";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -4739,8 +4739,14 @@ public class YAPI
                 YMeasure mesure = _sensor._decodeTimedReport(_timestamp, _duration, _report);
                 _sensor._invokeTimedReportCallback(mesure);
             } else if (_fun != null) {
-                // new value
-                _fun._invokeValueCallback(_value);
+                if (_value == null) {
+                    // force refresh of the function
+                    _fun.isOnline();
+                }else {
+                    // new value
+                    _fun._invokeValueCallback(_value);
+                }
+
             } else {
                 if (_beacon < 0) {
                     _module._invokeConfigChangeCallback();
@@ -4848,11 +4854,15 @@ public class YAPI
         SafeNativeMethods.yDeviceSt infos = SafeNativeMethods.emptyDeviceSt();
         PlugEvent ev;
         string errmsg = "";
-
+        for (int i = 0; i < YFunction._ValueCallbackList.Count; i++) {
+            if (YFunction._ValueCallbackList[i].get_functionDescriptor() == YFunction.FUNCTIONDESCRIPTOR_INVALID) {
+                DataEvent d_ev = new DataEvent(YFunction._ValueCallbackList[i], null);
+                _DataEvents.Add(d_ev);
+            }
+        }
         if (yapiGetDeviceInfo(d, ref infos, ref errmsg) != SUCCESS) {
             return;
         }
-
         YDevice.PlugDevice(d);
         YModule modul = YModule.FindModule(infos.serial + ".module");
         modul.setImmutableAttributes(infos);
@@ -5708,9 +5718,16 @@ public class YAPI
      * <para>
      *   <b><i>x.x.x.x</i></b> or <b><i>hostname</i></b>: The API will use the devices connected to the
      *   host with the given IP address or hostname. That host can be a regular computer
-     *   running a VirtualHub, or a networked YoctoHub such as YoctoHub-Ethernet or
+     *   running a <i>native VirtualHub</i>, a <i>VirtualHub for web</i> hosted on a server,
+     *   or a networked YoctoHub such as YoctoHub-Ethernet or
      *   YoctoHub-Wireless. If you want to use the VirtualHub running on you local
-     *   computer, use the IP address 127.0.0.1.
+     *   computer, use the IP address 127.0.0.1. If the given IP is unresponsive, <c>yRegisterHub</c>
+     *   will not return until a time-out defined by <c>ySetNetworkTimeout</c> has elapsed.
+     *   However, it is possible to preventively test a connection  with <c>yTestHub</c>.
+     *   If you cannot afford a network time-out, you can use the non blocking <c>yPregisterHub</c>
+     *   function that will establish the connection as soon as it is available.
+     * </para>
+     * <para>
      * </para>
      * <para>
      *   <b>callback</b>: that keyword make the API run in "<i>HTTP Callback</i>" mode.
@@ -5784,7 +5801,8 @@ public class YAPI
      *   This function has the same
      *   purpose and same arguments as <c>yRegisterHub()</c>, but does not trigger
      *   an error when the selected hub is not available at the time of the function call.
-     *   This makes it possible to register a network hub independently of the current
+     *   If the connexion cannot be established immediately, a background task will automatically
+     *   perform periodic retries. This makes it possible to register a network hub independently of the current
      *   connectivity, and to try to contact it only when a device is actively needed.
      * </para>
      * <para>
@@ -8418,7 +8436,7 @@ public class YDataSet
 
     /**
      * <summary>
-     *   Loads the the next block of measures from the dataLogger, and updates
+     *   Loads the next block of measures from the dataLogger, and updates
      *   the progress indicator.
      * <para>
      * </para>
@@ -10414,7 +10432,7 @@ public class YFunction
         string funcValue = "";
 
         lock (_thisLock) {
-            if (_serial != "") {
+            if (_serial != null &&_serial != "") {
                 return YModule.FindModule(_serial + ".module");
             }
             fundescr = YAPI.yapiGetFunction(_className, _func, ref errmsg);

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_spiport.cs 49903 2022-05-25 14:18:36Z mvuilleu $
+ *  $Id: yocto_spiport.cs 52892 2023-01-25 10:13:30Z seb $
  *
  *  Implements yFindSpiPort(), the high-level API for SpiPort functions
  *
@@ -1292,16 +1292,30 @@ public class YSpiPort : YFunction
      */
     public virtual int read_avail()
     {
-        byte[] buff = new byte[0];
-        int bufflen;
+        string availPosStr;
+        int atPos;
         int res;
+        byte[] databin = new byte[0];
 
-        buff = this._download("rxcnt.bin?pos="+Convert.ToString(this._rxptr));
-        bufflen = (buff).Length - 1;
-        while ((bufflen > 0) && (buff[bufflen] != 64)) {
-            bufflen = bufflen - 1;
-        }
-        res = YAPI._atoi((YAPI.DefaultEncoding.GetString(buff)).Substring( 0, bufflen));
+        databin = this._download("rxcnt.bin?pos="+Convert.ToString(this._rxptr));
+        availPosStr = YAPI.DefaultEncoding.GetString(databin);
+        atPos = (availPosStr).IndexOf("@");
+        res = YAPI._atoi((availPosStr).Substring( 0, atPos));
+        return res;
+    }
+
+
+    public virtual int end_tell()
+    {
+        string availPosStr;
+        int atPos;
+        int res;
+        byte[] databin = new byte[0];
+
+        databin = this._download("rxcnt.bin?pos="+Convert.ToString(this._rxptr));
+        availPosStr = YAPI.DefaultEncoding.GetString(databin);
+        atPos = (availPosStr).IndexOf("@");
+        res = YAPI._atoi((availPosStr).Substring( atPos+1, (availPosStr).Length-atPos-1));
         return res;
     }
 
@@ -1329,13 +1343,22 @@ public class YSpiPort : YFunction
      */
     public virtual string queryLine(string query, int maxWait)
     {
+        int prevpos;
         string url;
         byte[] msgbin = new byte[0];
         List<string> msgarr = new List<string>();
         int msglen;
         string res;
+        if ((query).Length <= 80) {
+            // fast query
+            url = "rxmsg.json?len=1&maxw="+Convert.ToString( maxWait)+"&cmd=!"+this._escapeAttr(query);
+        } else {
+            // long query
+            prevpos = this.end_tell();
+            this._upload("txdata", YAPI.DefaultEncoding.GetBytes(query + "\r\n"));
+            url = "rxmsg.json?len=1&maxw="+Convert.ToString( maxWait)+"&pos="+Convert.ToString(prevpos);
+        }
 
-        url = "rxmsg.json?len=1&maxw="+Convert.ToString( maxWait)+"&cmd=!"+this._escapeAttr(query);
         msgbin = this._download(url);
         msgarr = this._json_get_array(msgbin);
         msglen = msgarr.Count;
@@ -1377,13 +1400,22 @@ public class YSpiPort : YFunction
      */
     public virtual string queryHex(string hexString, int maxWait)
     {
+        int prevpos;
         string url;
         byte[] msgbin = new byte[0];
         List<string> msgarr = new List<string>();
         int msglen;
         string res;
+        if ((hexString).Length <= 80) {
+            // fast query
+            url = "rxmsg.json?len=1&maxw="+Convert.ToString( maxWait)+"&cmd=$"+hexString;
+        } else {
+            // long query
+            prevpos = this.end_tell();
+            this._upload("txdata", YAPI._hexStrToBin(hexString));
+            url = "rxmsg.json?len=1&maxw="+Convert.ToString( maxWait)+"&pos="+Convert.ToString(prevpos);
+        }
 
-        url = "rxmsg.json?len=1&maxw="+Convert.ToString( maxWait)+"&cmd=$"+hexString;
         msgbin = this._download(url);
         msgarr = this._json_get_array(msgbin);
         msglen = msgarr.Count;

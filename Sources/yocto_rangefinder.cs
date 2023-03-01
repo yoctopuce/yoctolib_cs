@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_rangefinder.cs 50689 2022-08-17 14:37:15Z mvuilleu $
+ *  $Id: yocto_rangefinder.cs 52848 2023-01-20 15:49:48Z mvuilleu $
  *
  *  Implements yFindRangeFinder(), the high-level API for RangeFinder functions
  *
@@ -618,7 +618,7 @@ public class YRangeFinder : YSensor
      * <summary>
      *   Triggers the photon detector hardware calibration.
      * <para>
-     *   This function is part of the calibration procedure to compensate for the the effect
+     *   This function is part of the calibration procedure to compensate for the effect
      *   of a cover glass. Make sure to read the chapter about hardware calibration for details
      *   on the calibration procedure for proper results.
      * </para>
@@ -668,7 +668,7 @@ public class YRangeFinder : YSensor
      * <summary>
      *   Triggers the hardware cross-talk calibration of the distance sensor.
      * <para>
-     *   This function is part of the calibration procedure to compensate for the the effect
+     *   This function is part of the calibration procedure to compensate for the effect
      *   of a cover glass. Make sure to read the chapter about hardware calibration for details
      *   on the calibration procedure for proper results.
      * </para>
