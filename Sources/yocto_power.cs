@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_power.cs 52318 2022-12-13 10:58:18Z seb $
+ *  $Id: yocto_power.cs 53420 2023-03-06 10:38:51Z mvuilleu $
  *
  *  Implements yFindPower(), the high-level API for Power functions
  *
@@ -74,11 +74,13 @@ public class YPower : YSensor
     public new delegate void ValueCallback(YPower func, string value);
     public new delegate void TimedReportCallback(YPower func, YMeasure measure);
 
+    public const double POWERFACTOR_INVALID = YAPI.INVALID_DOUBLE;
     public const double COSPHI_INVALID = YAPI.INVALID_DOUBLE;
     public const double METER_INVALID = YAPI.INVALID_DOUBLE;
     public const double DELIVEREDENERGYMETER_INVALID = YAPI.INVALID_DOUBLE;
     public const double RECEIVEDENERGYMETER_INVALID = YAPI.INVALID_DOUBLE;
     public const int METERTIMER_INVALID = YAPI.INVALID_UINT;
+    protected double _powerFactor = POWERFACTOR_INVALID;
     protected double _cosPhi = COSPHI_INVALID;
     protected double _meter = METER_INVALID;
     protected double _deliveredEnergyMeter = DELIVEREDENERGYMETER_INVALID;
@@ -100,6 +102,10 @@ public class YPower : YSensor
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
+        if (json_val.has("powerFactor"))
+        {
+            _powerFactor = Math.Round(json_val.getDouble("powerFactor") / 65.536) / 1000.0;
+        }
         if (json_val.has("cosPhi"))
         {
             _cosPhi = Math.Round(json_val.getDouble("cosPhi") / 65.536) / 1000.0;
@@ -126,16 +132,54 @@ public class YPower : YSensor
 
     /**
      * <summary>
-     *   Returns the power factor (the ratio between the real power consumed,
-     *   measured in W, and the apparent power provided, measured in VA).
+     *   Returns the power factor (PF), i.e.
      * <para>
+     *   ratio between the active power consumed (in W)
+     *   and the apparent power provided (VA).
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   a floating point number corresponding to the power factor (the ratio between the real power consumed,
-     *   measured in W, and the apparent power provided, measured in VA)
+     *   a floating point number corresponding to the power factor (PF), i.e
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YPower.POWERFACTOR_INVALID</c>.
+     * </para>
+     */
+    public double get_powerFactor()
+    {
+        double res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return POWERFACTOR_INVALID;
+                }
+            }
+            res = this._powerFactor;
+            if (res == POWERFACTOR_INVALID) {
+                res = this._cosPhi;
+            }
+            res = Math.Round(res * 1000) / 1000;
+        }
+        return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the Displacement Power factor (DPF), i.e.
+     * <para>
+     *   cosine of the phase shift between
+     *   the voltage and current fundamentals.
+     *   On the Yocto-Watt (V1), the value returned by this method correponds to the
+     *   power factor as this device is cannot estimate the true DPF.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a floating point number corresponding to the Displacement Power factor (DPF), i.e
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YPower.COSPHI_INVALID</c>.
