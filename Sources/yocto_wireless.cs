@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wireless.cs 48017 2022-01-12 08:17:52Z seb $
+ * $Id: yocto_wireless.cs 53886 2023-04-05 08:06:39Z mvuilleu $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -736,8 +736,8 @@ public class YWireless : YFunction
         json = this._download("wlan.json?by=name");
         wlanlist = this._json_get_array(json);
         res.Clear();
-        for (int ii = 0; ii < wlanlist.Count; ii++) {
-            res.Add(new YWlanRecord(wlanlist[ii]));
+        for (int ii_0 = 0; ii_0 <  wlanlist.Count; ii_0++) {
+            res.Add(new YWlanRecord(wlanlist[ii_0]));
         }
         return res;
     }

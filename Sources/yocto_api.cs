@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 53299 2023-02-28 09:49:46Z seb $
+ * $Id: yocto_api.cs 53912 2023-04-05 14:24:54Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -3316,7 +3316,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "53532";
+    public const string YOCTO_API_BUILD_NO = "54037";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -8027,33 +8027,33 @@ public class YDataSet
         summaryStopMs = YAPI.MIN_DOUBLE;
 
         // Parse complete streams
-        for (int ii = 0; ii <  this._streams.Count; ii++) {
-            streamStartTimeMs = Math.Round( this._streams[ii].get_realStartTimeUTC() *1000);
-            streamDuration =  this._streams[ii].get_realDuration() ;
+        for (int ii_0 = 0; ii_0 <   this._streams.Count; ii_0++) {
+            streamStartTimeMs = Math.Round( this._streams[ii_0].get_realStartTimeUTC() *1000);
+            streamDuration =  this._streams[ii_0].get_realDuration() ;
             streamEndTimeMs = streamStartTimeMs + Math.Round(streamDuration * 1000);
             if ((streamStartTimeMs >= this._startTimeMs) && ((this._endTimeMs == 0) || (streamEndTimeMs <= this._endTimeMs))) {
                 // stream that are completely inside the dataset
-                previewMinVal =  this._streams[ii].get_minValue();
-                previewAvgVal =  this._streams[ii].get_averageValue();
-                previewMaxVal =  this._streams[ii].get_maxValue();
+                previewMinVal =  this._streams[ii_0].get_minValue();
+                previewAvgVal =  this._streams[ii_0].get_averageValue();
+                previewMaxVal =  this._streams[ii_0].get_maxValue();
                 previewStartMs = streamStartTimeMs;
                 previewStopMs = streamEndTimeMs;
                 previewDuration = streamDuration;
             } else {
                 // stream that are partially in the dataset
                 // we need to parse data to filter value outside the dataset
-                if (!( this._streams[ii]._wasLoaded())) {
-                    url =  this._streams[ii]._get_url();
+                if (!( this._streams[ii_0]._wasLoaded())) {
+                    url =  this._streams[ii_0]._get_url();
                     data = this._parent._download(url);
-                    this._streams[ii]._parseStream(data);
+                    this._streams[ii_0]._parseStream(data);
                 }
-                dataRows =  this._streams[ii].get_dataRows();
+                dataRows =  this._streams[ii_0].get_dataRows();
                 if (dataRows.Count == 0) {
                     return this.get_progress();
                 }
                 tim = streamStartTimeMs;
-                fitv = Math.Round( this._streams[ii].get_firstDataSamplesInterval() * 1000);
-                itv = Math.Round( this._streams[ii].get_dataSamplesInterval() * 1000);
+                fitv = Math.Round( this._streams[ii_0].get_firstDataSamplesInterval() * 1000);
+                itv = Math.Round( this._streams[ii_0].get_dataSamplesInterval() * 1000);
                 nCols = dataRows[0].Count;
                 minCol = 0;
                 if (nCols > 2) {
@@ -8206,16 +8206,16 @@ public class YDataSet
         }
 
         firstMeasure = true;
-        for (int ii = 0; ii < dataRows.Count; ii++) {
+        for (int ii_0 = 0; ii_0 <  dataRows.Count; ii_0++) {
             if (firstMeasure) {
                 end_ = tim + fitv;
                 firstMeasure = false;
             } else {
                 end_ = tim + itv;
             }
-            avgv = dataRows[ii][avgCol];
+            avgv = dataRows[ii_0][avgCol];
             if ((end_ > this._startTimeMs) && ((this._endTimeMs == 0) || (tim < this._endTimeMs)) && !(Double.IsNaN(avgv))) {
-                this._measures.Add(new YMeasure(tim / 1000, end_ / 1000, dataRows[ii][minCol], avgv, dataRows[ii][maxCol]));
+                this._measures.Add(new YMeasure(tim / 1000, end_ / 1000, dataRows[ii_0][minCol], avgv, dataRows[ii_0][maxCol]));
             }
             tim = end_;
         }
@@ -8584,9 +8584,9 @@ public class YDataSet
 
         startUtcMs = measure.get_startTimeUTC() * 1000;
         stream = null;
-        for (int ii = 0; ii < this._streams.Count; ii++) {
-            if (Math.Round(this._streams[ii].get_realStartTimeUTC() *1000) == startUtcMs) {
-                stream = this._streams[ii];
+        for (int ii_0 = 0; ii_0 <  this._streams.Count; ii_0++) {
+            if (Math.Round(this._streams[ii_0].get_realStartTimeUTC() *1000) == startUtcMs) {
+                stream = this._streams[ii_0];
             }
         }
         if (stream == null) {
@@ -8614,10 +8614,10 @@ public class YDataSet
             maxCol = 0;
         }
 
-        for (int ii = 0; ii < dataRows.Count; ii++) {
+        for (int ii_1 = 0; ii_1 <  dataRows.Count; ii_1++) {
             end_ = tim + itv;
             if ((end_ > this._startTimeMs) && ((this._endTimeMs == 0) || (tim < this._endTimeMs))) {
-                measures.Add(new YMeasure(tim / 1000.0, end_ / 1000.0, dataRows[ii][minCol], dataRows[ii][avgCol], dataRows[ii][maxCol]));
+                measures.Add(new YMeasure(tim / 1000.0, end_ / 1000.0, dataRows[ii_1][minCol], dataRows[ii_1][avgCol], dataRows[ii_1][maxCol]));
             }
             tim = end_;
         }
@@ -9734,16 +9734,16 @@ public class YFunction
 
     /**
      * <summary>
-     *   Test if the function is readOnly.
+     *   Indicates whether changes to the function are prohibited or allowed.
      * <para>
-     *   Return <c>true</c> if the function is write protected
-     *   or that the function is not available.
+     *   Returns <c>true</c> if the function is blocked by an admin password
+     *   or if the function is not available.
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   <c>true</c> if the function is readOnly or not online.
+     *   <c>true</c> if the function is write-protected or not online.
      * </returns>
      */
     public virtual bool isReadOnly()
@@ -11636,18 +11636,18 @@ public class YModule : YFunction
         ext_settings = ", \"extras\":[";
         templist = this.get_functionIds("Temperature");
         sep = "";
-        for (int ii = 0; ii <  templist.Count; ii++) {
+        for (int ii_0 = 0; ii_0 <   templist.Count; ii_0++) {
             if (YAPI._atoi(this.get_firmwareRelease()) > 9000) {
-                url = "api/"+ templist[ii]+"/sensorType";
+                url = "api/"+ templist[ii_0]+"/sensorType";
                 t_type = YAPI.DefaultEncoding.GetString(this._download(url));
                 if (t_type == "RES_NTC" || t_type == "RES_LINEAR") {
-                    id = ( templist[ii]).Substring( 11, ( templist[ii]).Length - 11);
+                    id = ( templist[ii_0]).Substring( 11, ( templist[ii_0]).Length - 11);
                     if (id == "") {
                         id = "1";
                     }
                     temp_data_bin = this._download("extra.json?page="+id);
                     if ((temp_data_bin).Length > 0) {
-                        item = ""+ sep+"{\"fid\":\""+  templist[ii]+"\", \"json\":"+YAPI.DefaultEncoding.GetString(temp_data_bin)+"}\n";
+                        item = ""+ sep+"{\"fid\":\""+  templist[ii_0]+"\", \"json\":"+YAPI.DefaultEncoding.GetString(temp_data_bin)+"}\n";
                         ext_settings = ext_settings + item;
                         sep = ",";
                     }
@@ -11662,8 +11662,8 @@ public class YModule : YFunction
             }
             filelist = this._json_get_array(json);
             sep = "";
-            for (int ii = 0; ii <  filelist.Count; ii++) {
-                name = this._json_get_key(YAPI.DefaultEncoding.GetBytes( filelist[ii]), "name");
+            for (int ii_1 = 0; ii_1 <   filelist.Count; ii_1++) {
+                name = this._json_get_key(YAPI.DefaultEncoding.GetBytes( filelist[ii_1]), "name");
                 if (((name).Length > 0) && !(name == "startupConf.json")) {
                     file_data_bin = this._download(this._escapeAttr(name));
                     file_data = YAPI._bytesToHexStr(file_data_bin, 0, file_data_bin.Length);
@@ -11710,10 +11710,10 @@ public class YModule : YFunction
         string functionId;
         string data;
         extras = this._json_get_array(YAPI.DefaultEncoding.GetBytes(jsonExtra));
-        for (int ii = 0; ii <  extras.Count; ii++) {
-            functionId = this._get_json_path( extras[ii], "fid");
+        for (int ii_0 = 0; ii_0 <   extras.Count; ii_0++) {
+            functionId = this._get_json_path( extras[ii_0], "fid");
             functionId = this._decode_json_string(functionId);
-            data = this._get_json_path( extras[ii], "json");
+            data = this._get_json_path( extras[ii_0], "json");
             if (this.hasFunction(functionId)) {
                 this.loadThermistorExtra(functionId, data);
             }
@@ -11778,10 +11778,10 @@ public class YModule : YFunction
             }
             json_files = this._get_json_path(json, "files");
             files = this._json_get_array(YAPI.DefaultEncoding.GetBytes(json_files));
-            for (int ii = 0; ii <  files.Count; ii++) {
-                name = this._get_json_path( files[ii], "name");
+            for (int ii_0 = 0; ii_0 <   files.Count; ii_0++) {
+                name = this._get_json_path( files[ii_0], "name");
                 name = this._decode_json_string(name);
-                data = this._get_json_path( files[ii], "data");
+                data = this._get_json_path( files[ii_0], "data");
                 data = this._decode_json_string(data);
                 if (name == "") {
                     fuperror = fuperror + 1;
@@ -12040,8 +12040,8 @@ public class YModule : YFunction
             } else {
                 if (paramVer == 1) {
                     words_str = new List<string>(param.Split(new Char[] {','}));
-                    for (int ii = 0; ii < words_str.Count; ii++) {
-                        words.Add(YAPI._atoi(words_str[ii]));
+                    for (int ii_0 = 0; ii_0 <  words_str.Count; ii_0++) {
+                        words.Add(YAPI._atoi(words_str[ii_0]));
                     }
                     if (param == "" || (words[0] > 10)) {
                         paramScale = 0;
@@ -12229,8 +12229,8 @@ public class YModule : YFunction
         newval = "";
         old_json_flat = this._flattenJsonStruct(settings);
         old_dslist = this._json_get_array(old_json_flat);
-        for (int ii = 0; ii < old_dslist.Count; ii++) {
-            each_str = this._json_get_string(YAPI.DefaultEncoding.GetBytes(old_dslist[ii]));
+        for (int ii_0 = 0; ii_0 <  old_dslist.Count; ii_0++) {
+            each_str = this._json_get_string(YAPI.DefaultEncoding.GetBytes(old_dslist[ii_0]));
             // split json path and attr
             leng = (each_str).Length;
             eqpos = (each_str).IndexOf("=");
@@ -12255,9 +12255,9 @@ public class YModule : YFunction
         }
         actualSettings = this._flattenJsonStruct(actualSettings);
         new_dslist = this._json_get_array(actualSettings);
-        for (int ii = 0; ii < new_dslist.Count; ii++) {
+        for (int ii_1 = 0; ii_1 <  new_dslist.Count; ii_1++) {
             // remove quotes
-            each_str = this._json_get_string(YAPI.DefaultEncoding.GetBytes(new_dslist[ii]));
+            each_str = this._json_get_string(YAPI.DefaultEncoding.GetBytes(new_dslist[ii_1]));
             // split json path and attr
             leng = (each_str).Length;
             eqpos = (each_str).IndexOf("=");
@@ -12475,8 +12475,8 @@ public class YModule : YFunction
             }
             i = i + 1;
         }
-        for (int ii = 0; ii < restoreLast.Count; ii++) {
-            subres = this._tryExec(restoreLast[ii]);
+        for (int ii_2 = 0; ii_2 <  restoreLast.Count; ii_2++) {
+            subres = this._tryExec(restoreLast[ii_2]);
             if ((res == YAPI.SUCCESS) && (subres != YAPI.SUCCESS)) {
                 res = subres;
             }
@@ -14349,11 +14349,11 @@ public class YSensor : YFunction
             }
             rawValues.Clear();
             refValues.Clear();
-            for (int ii = 0; ii < this._calraw.Count; ii++) {
-                rawValues.Add(this._calraw[ii]);
+            for (int ii_0 = 0; ii_0 <  this._calraw.Count; ii_0++) {
+                rawValues.Add(this._calraw[ii_0]);
             }
-            for (int ii = 0; ii < this._calref.Count; ii++) {
-                refValues.Add(this._calref[ii]);
+            for (int ii_1 = 0; ii_1 <  this._calref.Count; ii_1++) {
+                refValues.Add(this._calref[ii_1]);
             }
         }
         return YAPI.SUCCESS;
@@ -15218,9 +15218,9 @@ public class YDataLogger : YFunction
 
         dslist = this._json_get_array(json);
         res.Clear();
-        for (int ii = 0; ii < dslist.Count; ii++) {
+        for (int ii_0 = 0; ii_0 <  dslist.Count; ii_0++) {
             dataset = new YDataSet(this);
-            dataset._parse(dslist[ii]);
+            dataset._parse(dslist[ii_0]);
             res.Add(dataset);
         }
         return res;
