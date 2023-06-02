@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_powersupply.cs 50689 2022-08-17 14:37:15Z mvuilleu $
+ *  $Id: yocto_powersupply.cs 54768 2023-05-26 06:46:41Z seb $
  *
  *  Implements yFindPowerSupply(), the high-level API for PowerSupply functions
  *
@@ -78,14 +78,9 @@ public class YPowerSupply : YFunction
     public const int POWEROUTPUT_OFF = 0;
     public const int POWEROUTPUT_ON = 1;
     public const int POWEROUTPUT_INVALID = -1;
-    public const int VOLTAGESENSE_INT = 0;
-    public const int VOLTAGESENSE_EXT = 1;
-    public const int VOLTAGESENSE_INVALID = -1;
     public const double MEASUREDVOLTAGE_INVALID = YAPI.INVALID_DOUBLE;
     public const double MEASUREDCURRENT_INVALID = YAPI.INVALID_DOUBLE;
     public const double INPUTVOLTAGE_INVALID = YAPI.INVALID_DOUBLE;
-    public const double VINT_INVALID = YAPI.INVALID_DOUBLE;
-    public const double LDOTEMPERATURE_INVALID = YAPI.INVALID_DOUBLE;
     public const string VOLTAGETRANSITION_INVALID = YAPI.INVALID_STRING;
     public const double VOLTAGEATSTARTUP_INVALID = YAPI.INVALID_DOUBLE;
     public const double CURRENTATSTARTUP_INVALID = YAPI.INVALID_DOUBLE;
@@ -93,12 +88,9 @@ public class YPowerSupply : YFunction
     protected double _voltageSetPoint = VOLTAGESETPOINT_INVALID;
     protected double _currentLimit = CURRENTLIMIT_INVALID;
     protected int _powerOutput = POWEROUTPUT_INVALID;
-    protected int _voltageSense = VOLTAGESENSE_INVALID;
     protected double _measuredVoltage = MEASUREDVOLTAGE_INVALID;
     protected double _measuredCurrent = MEASUREDCURRENT_INVALID;
     protected double _inputVoltage = INPUTVOLTAGE_INVALID;
-    protected double _vInt = VINT_INVALID;
-    protected double _ldoTemperature = LDOTEMPERATURE_INVALID;
     protected string _voltageTransition = VOLTAGETRANSITION_INVALID;
     protected double _voltageAtStartUp = VOLTAGEATSTARTUP_INVALID;
     protected double _currentAtStartUp = CURRENTATSTARTUP_INVALID;
@@ -130,10 +122,6 @@ public class YPowerSupply : YFunction
         {
             _powerOutput = json_val.getInt("powerOutput") > 0 ? 1 : 0;
         }
-        if (json_val.has("voltageSense"))
-        {
-            _voltageSense = json_val.getInt("voltageSense");
-        }
         if (json_val.has("measuredVoltage"))
         {
             _measuredVoltage = Math.Round(json_val.getDouble("measuredVoltage") / 65.536) / 1000.0;
@@ -145,14 +133,6 @@ public class YPowerSupply : YFunction
         if (json_val.has("inputVoltage"))
         {
             _inputVoltage = Math.Round(json_val.getDouble("inputVoltage") / 65.536) / 1000.0;
-        }
-        if (json_val.has("vInt"))
-        {
-            _vInt = Math.Round(json_val.getDouble("vInt") / 65.536) / 1000.0;
-        }
-        if (json_val.has("ldoTemperature"))
-        {
-            _ldoTemperature = Math.Round(json_val.getDouble("ldoTemperature") / 65.536) / 1000.0;
         }
         if (json_val.has("voltageTransition"))
         {
@@ -355,67 +335,6 @@ public class YPowerSupply : YFunction
 
     /**
      * <summary>
-     *   Returns the output voltage control point.
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   either <c>YPowerSupply.VOLTAGESENSE_INT</c> or <c>YPowerSupply.VOLTAGESENSE_EXT</c>, according to
-     *   the output voltage control point
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns <c>YPowerSupply.VOLTAGESENSE_INVALID</c>.
-     * </para>
-     */
-    public int get_voltageSense()
-    {
-        int res;
-        lock (_thisLock) {
-            if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
-                    return VOLTAGESENSE_INVALID;
-                }
-            }
-            res = this._voltageSense;
-        }
-        return res;
-    }
-
-    /**
-     * <summary>
-     *   Changes the voltage control point.
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="newval">
-     *   either <c>YPowerSupply.VOLTAGESENSE_INT</c> or <c>YPowerSupply.VOLTAGESENSE_EXT</c>, according to
-     *   the voltage control point
-     * </param>
-     * <para>
-     * </para>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public int set_voltageSense(int newval)
-    {
-        string rest_val;
-        lock (_thisLock) {
-            rest_val = (newval).ToString();
-            return _setAttr("voltageSense", rest_val);
-        }
-    }
-
-
-    /**
-     * <summary>
      *   Returns the measured output voltage, in V.
      * <para>
      * </para>
@@ -499,66 +418,6 @@ public class YPowerSupply : YFunction
                 }
             }
             res = this._inputVoltage;
-        }
-        return res;
-    }
-
-
-    /**
-     * <summary>
-     *   Returns the internal voltage, in V.
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   a floating point number corresponding to the internal voltage, in V
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns <c>YPowerSupply.VINT_INVALID</c>.
-     * </para>
-     */
-    public double get_vInt()
-    {
-        double res;
-        lock (_thisLock) {
-            if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
-                    return VINT_INVALID;
-                }
-            }
-            res = this._vInt;
-        }
-        return res;
-    }
-
-
-    /**
-     * <summary>
-     *   Returns the LDO temperature, in Celsius.
-     * <para>
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   a floating point number corresponding to the LDO temperature, in Celsius
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns <c>YPowerSupply.LDOTEMPERATURE_INVALID</c>.
-     * </para>
-     */
-    public double get_ldoTemperature()
-    {
-        double res;
-        lock (_thisLock) {
-            if (this._cacheExpiration <= YAPI.GetTickCount()) {
-                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
-                    return LDOTEMPERATURE_INVALID;
-                }
-            }
-            res = this._ldoTemperature;
         }
         return res;
     }

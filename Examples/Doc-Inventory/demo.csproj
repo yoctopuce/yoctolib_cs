@@ -164,6 +164,9 @@
 <Compile Include="..\..\Sources\yocto_i2cport.cs">
 <Link>yocto_api\yocto_i2cport.cs</Link>
 </Compile>
+<Compile Include="..\..\Sources\yocto_inputcapture.cs">
+<Link>yocto_api\yocto_inputcapture.cs</Link>
+</Compile>
 <Compile Include="..\..\Sources\yocto_inputchain.cs">
 <Link>yocto_api\yocto_inputchain.cs</Link>
 </Compile>

@@ -83,15 +83,6 @@
       <Link>yocto_api\yocto_api.cs</Link>
     </Compile>
     
-<Compile Include="..\..\Sources\yocto_humidity.cs">
-<Link>yocto_api\yocto_humidity.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_temperature.cs">
-<Link>yocto_api\yocto_temperature.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_tvoc.cs">
-<Link>yocto_api\yocto_tvoc.cs</Link>
-</Compile>
 <Compile Include="..\..\Sources\yocto_voc.cs">
 <Link>yocto_api\yocto_voc.cs</Link>
 </Compile>
