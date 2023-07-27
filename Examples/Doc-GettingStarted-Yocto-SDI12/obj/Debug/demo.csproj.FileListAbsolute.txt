@@ -1,0 +1,8 @@
+D:\yoctopuce\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Doc-GettingStarted-Yocto-SDI12\bin\Debug\amd64\yapi.dll
+D:\yoctopuce\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Doc-GettingStarted-Yocto-SDI12\bin\Debug\yapi.dll
+D:\yoctopuce\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Doc-GettingStarted-Yocto-SDI12\bin\Debug\demo.exe
+D:\yoctopuce\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Doc-GettingStarted-Yocto-SDI12\bin\Debug\demo.pdb
+D:\yoctopuce\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Doc-GettingStarted-Yocto-SDI12\obj\Debug\demo.csproj.AssemblyReference.cache
+D:\yoctopuce\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Doc-GettingStarted-Yocto-SDI12\obj\Debug\demo.csproj.CoreCompileInputs.cache
+D:\yoctopuce\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Doc-GettingStarted-Yocto-SDI12\obj\Debug\demo.exe
+D:\yoctopuce\yoctoprod\yoctolib\v1.0\Public\C-sharp\Examples\Doc-GettingStarted-Yocto-SDI12\obj\Debug\demo.pdb

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 54649 2023-05-22 10:09:20Z seb $
+ * $Id: yocto_api.cs 55096 2023-06-15 08:01:07Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -3496,7 +3496,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "54852";
+    public const string YOCTO_API_BUILD_NO = "55677";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -3527,7 +3527,7 @@ public class YAPI
     public const int yUnknowSize = 1024;
 
     // --- (generated code: YFunction return codes)
-// Yoctopuce error codes, used by default as function return value
+    // Yoctopuce error codes, used by default as function return value
     public const int SUCCESS = 0;                   // everything worked all right
     public const int NOT_INITIALIZED = -1;          // call yInitAPI() first !
     public const int INVALID_ARGUMENT = -2;         // one of the arguments passed to the function is invalid
@@ -3544,6 +3544,7 @@ public class YAPI
     public const int RTC_NOT_READY = -13;           // real-time clock has not been initialized (or time was lost)
     public const int FILE_NOT_FOUND = -14;          // the file is not found
     public const int SSL_ERROR = -15;               // Error reported by mbedSSL
+
     //--- (end of generated code: YFunction return codes)
 
     /*
@@ -6517,6 +6518,10 @@ public class YAPI
      */
     public static void SetDeviceListValidity(int deviceListValidity)
     {
+        if (!_apiInitialized) {
+            string errmsg = "";
+            InitAPI(0, ref errmsg);
+        }
         _yapiContext.SetDeviceListValidity(deviceListValidity);
     }
 
@@ -6533,6 +6538,10 @@ public class YAPI
      */
     public static int GetDeviceListValidity()
     {
+        if (!_apiInitialized) {
+            string errmsg = "";
+            InitAPI(0, ref errmsg);
+        }
         return _yapiContext.GetDeviceListValidity();
     }
 
@@ -6557,6 +6566,10 @@ public class YAPI
      */
     public static string AddUdevRule(bool force)
     {
+        if (!_apiInitialized) {
+            string errmsg = "";
+            InitAPI(0, ref errmsg);
+        }
         return _yapiContext.AddUdevRule(force);
     }
 
@@ -6579,6 +6592,10 @@ public class YAPI
      */
     public static void SetNetworkTimeout(int networkMsTimeout)
     {
+        if (!_apiInitialized) {
+            string errmsg = "";
+            InitAPI(0, ref errmsg);
+        }
         _yapiContext.SetNetworkTimeout(networkMsTimeout);
     }
 
@@ -6598,6 +6615,10 @@ public class YAPI
      */
     public static int GetNetworkTimeout()
     {
+        if (!_apiInitialized) {
+            string errmsg = "";
+            InitAPI(0, ref errmsg);
+        }
         return _yapiContext.GetNetworkTimeout();
     }
 
@@ -6621,6 +6642,10 @@ public class YAPI
      */
     public static void SetCacheValidity(ulong cacheValidityMs)
     {
+        if (!_apiInitialized) {
+            string errmsg = "";
+            InitAPI(0, ref errmsg);
+        }
         _yapiContext.SetCacheValidity(cacheValidityMs);
     }
 
@@ -6640,16 +6665,28 @@ public class YAPI
      */
     public static ulong GetCacheValidity()
     {
+        if (!_apiInitialized) {
+            string errmsg = "";
+            InitAPI(0, ref errmsg);
+        }
         return _yapiContext.GetCacheValidity();
     }
 
     public static YHub nextHubInUseInternal(int hubref)
     {
+        if (!_apiInitialized) {
+            string errmsg = "";
+            InitAPI(0, ref errmsg);
+        }
         return _yapiContext.nextHubInUseInternal(hubref);
     }
 
     public static YHub getYHubObj(int hubref)
     {
+        if (!_apiInitialized) {
+            string errmsg = "";
+            InitAPI(0, ref errmsg);
+        }
         return _yapiContext.getYHubObj(hubref);
     }
 //--- (end of generated code: YAPIContext yapiwrapper)
