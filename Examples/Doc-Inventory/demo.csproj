@@ -245,6 +245,9 @@
 <Compile Include="..\..\Sources\yocto_relay.cs">
 <Link>yocto_api\yocto_relay.cs</Link>
 </Compile>
+<Compile Include="..\..\Sources\yocto_rfidreader.cs">
+<Link>yocto_api\yocto_rfidreader.cs</Link>
+</Compile>
 <Compile Include="..\..\Sources\yocto_sdi12port.cs">
 <Link>yocto_api\yocto_sdi12port.cs</Link>
 </Compile>

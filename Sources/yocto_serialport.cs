@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 52892 2023-01-25 10:13:30Z seb $
+ * $Id: yocto_serialport.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
@@ -129,7 +129,7 @@ public class YSnoopingRecord
 
 
     //--- (generated code: YSerialPort return codes)
-    //--- (end of generated code: YSerialPort return codes)
+//--- (end of generated code: YSerialPort return codes)
 //--- (generated code: YSerialPort dlldef)
 //--- (end of generated code: YSerialPort dlldef)
 //--- (generated code: YSerialPort class start)
@@ -2874,8 +2874,6 @@ public class YSerialPort : YFunction
             return null;
         return FindSerialPort(serial + "." + funcId);
     }
-
-
 
     //--- (end of generated code: YSerialPort functions)
 }

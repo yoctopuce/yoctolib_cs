@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_motor.cs 50689 2022-08-17 14:37:15Z mvuilleu $
+ *  $Id: yocto_motor.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindMotor(), the high-level API for Motor functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YMotor return codes)
-    //--- (end of YMotor return codes)
+#pragma warning disable 1591
+//--- (YMotor return codes)
+//--- (end of YMotor return codes)
 //--- (YMotor dlldef)
 //--- (end of YMotor dlldef)
 //--- (YMotor yapiwrapper)
@@ -968,8 +968,7 @@ public class YMotor : YFunction
         return FindMotor(serial + "." + funcId);
     }
 
-
-
     //--- (end of YMotor functions)
 }
 #pragma warning restore 1591
+

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_power.cs 53420 2023-03-06 10:38:51Z mvuilleu $
+ *  $Id: yocto_power.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindPower(), the high-level API for Power functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YPower return codes)
-    //--- (end of YPower return codes)
+#pragma warning disable 1591
+//--- (YPower return codes)
+//--- (end of YPower return codes)
 //--- (YPower dlldef)
 //--- (end of YPower dlldef)
 //--- (YPower yapiwrapper)
@@ -587,8 +587,7 @@ public class YPower : YSensor
         return FindPower(serial + "." + funcId);
     }
 
-
-
     //--- (end of YPower functions)
 }
 #pragma warning restore 1591
+

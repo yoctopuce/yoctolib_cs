@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_digitalio.cs 40281 2020-05-04 13:39:55Z seb $
+ *  $Id: yocto_digitalio.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YDigitalIO return codes)
-    //--- (end of YDigitalIO return codes)
+#pragma warning disable 1591
+//--- (YDigitalIO return codes)
+//--- (end of YDigitalIO return codes)
 //--- (YDigitalIO dlldef)
 //--- (end of YDigitalIO dlldef)
 //--- (YDigitalIO yapiwrapper)
@@ -1070,8 +1070,7 @@ public class YDigitalIO : YFunction
         return FindDigitalIO(serial + "." + funcId);
     }
 
-
-
     //--- (end of YDigitalIO functions)
 }
 #pragma warning restore 1591
+

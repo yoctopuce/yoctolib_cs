@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_oscontrol.cs 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: yocto_oscontrol.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindOsControl(), the high-level API for OsControl functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YOsControl return codes)
-    //--- (end of YOsControl return codes)
+#pragma warning disable 1591
+//--- (YOsControl return codes)
+//--- (end of YOsControl return codes)
 //--- (YOsControl dlldef)
 //--- (end of YOsControl dlldef)
 //--- (YOsControl yapiwrapper)
@@ -344,8 +344,7 @@ public class YOsControl : YFunction
         return FindOsControl(serial + "." + funcId);
     }
 
-
-
     //--- (end of YOsControl functions)
 }
 #pragma warning restore 1591
+

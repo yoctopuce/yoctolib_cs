@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YInputChain return codes)
-    //--- (end of YInputChain return codes)
+#pragma warning disable 1591
+//--- (YInputChain return codes)
+//--- (end of YInputChain return codes)
 //--- (YInputChain dlldef)
 //--- (end of YInputChain dlldef)
 //--- (YInputChain yapiwrapper)
@@ -71,7 +71,7 @@ public class YInputChain : YFunction
     //--- (YInputChain definitions)
     public new delegate void ValueCallback(YInputChain func, string value);
     public new delegate void TimedReportCallback(YInputChain func, YMeasure measure);
-    public delegate void YEventCallback(YInputChain obj, int timestamp, string eventType, string eventData, string eventChange);
+    public delegate void YStateChangeCallback(YInputChain obj, int timestamp, string eventType, string eventData, string eventChange);
 
     protected static void yInternalEventCallback(YInputChain obj, String value)
     {
@@ -108,7 +108,7 @@ public class YInputChain : YFunction
     protected int _watchdogPeriod = WATCHDOGPERIOD_INVALID;
     protected int _chainDiags = CHAINDIAGS_INVALID;
     protected ValueCallback _valueCallbackInputChain = null;
-    protected YEventCallback _eventCallback;
+    protected YStateChangeCallback _stateChangeCallback;
     protected int _prevPos = 0;
     protected int _eventPos = 0;
     protected int _eventStamp = 0;
@@ -928,7 +928,7 @@ public class YInputChain : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </param>
      */
-    public virtual int registerEventCallback(YEventCallback callback)
+    public virtual int registerStateChangeCallback(YStateChangeCallback callback)
     {
         if (callback != null) {
             this.registerValueCallback(yInternalEventCallback);
@@ -937,7 +937,7 @@ public class YInputChain : YFunction
         }
         // register user callback AFTER the internal pseudo-event,
         // to make sure we start with future events only
-        this._eventCallback = callback;
+        this._stateChangeCallback = callback;
         return 0;
     }
 
@@ -970,7 +970,7 @@ public class YInputChain : YFunction
         if (newPos < this._eventPos) {
             return YAPI.SUCCESS;
         }
-        if (!(this._eventCallback != null)) {
+        if (!(this._stateChangeCallback != null)) {
             // first simulated event, use it to initialize reference values
             this._eventPos = newPos;
             this._eventChains.Clear();
@@ -1022,7 +1022,7 @@ public class YInputChain : YFunction
                             this._eventChains[chainIdx] = evtData;
                         }
                     }
-                    this._eventCallback(this, evtStamp, evtType, evtData, evtChange);
+                    this._stateChangeCallback(this, evtStamp, evtType, evtData, evtChange);
                 }
             }
             arrPos = arrPos + 1;
@@ -1153,8 +1153,7 @@ public class YInputChain : YFunction
         return FindInputChain(serial + "." + funcId);
     }
 
-
-
     //--- (end of YInputChain functions)
 }
 #pragma warning restore 1591
+

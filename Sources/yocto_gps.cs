@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_gps.cs 50689 2022-08-17 14:37:15Z mvuilleu $
+ *  $Id: yocto_gps.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindGps(), the high-level API for Gps functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YGps return codes)
-    //--- (end of YGps return codes)
+#pragma warning disable 1591
+//--- (YGps return codes)
+//--- (end of YGps return codes)
 //--- (YGps dlldef)
 //--- (end of YGps dlldef)
 //--- (YGps yapiwrapper)
@@ -982,8 +982,7 @@ public class YGps : YFunction
         return FindGps(serial + "." + funcId);
     }
 
-
-
     //--- (end of YGps functions)
 }
 #pragma warning restore 1591
+

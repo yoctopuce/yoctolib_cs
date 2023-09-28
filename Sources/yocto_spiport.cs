@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_spiport.cs 52892 2023-01-25 10:13:30Z seb $
+ *  $Id: yocto_spiport.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindSpiPort(), the high-level API for SpiPort functions
  *
@@ -128,7 +128,7 @@ public class YSpiSnoopingRecord
 }
 
     //--- (generated code: YSpiPort return codes)
-    //--- (end of generated code: YSpiPort return codes)
+//--- (end of generated code: YSpiPort return codes)
 //--- (generated code: YSpiPort dlldef)
 //--- (end of generated code: YSpiPort dlldef)
 //--- (generated code: YSpiPort yapiwrapper)
@@ -2143,8 +2143,6 @@ public class YSpiPort : YFunction
             return null;
         return FindSpiPort(serial + "." + funcId);
     }
-
-
 
     //--- (end of generated code: YSpiPort functions)
 }

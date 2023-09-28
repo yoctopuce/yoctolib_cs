@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_currentloopoutput.cs 50689 2022-08-17 14:37:15Z mvuilleu $
+ *  $Id: yocto_currentloopoutput.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YCurrentLoopOutput return codes)
-    //--- (end of YCurrentLoopOutput return codes)
+#pragma warning disable 1591
+//--- (YCurrentLoopOutput return codes)
+//--- (end of YCurrentLoopOutput return codes)
 //--- (YCurrentLoopOutput dlldef)
 //--- (end of YCurrentLoopOutput dlldef)
 //--- (YCurrentLoopOutput yapiwrapper)
@@ -517,8 +517,7 @@ public class YCurrentLoopOutput : YFunction
         return FindCurrentLoopOutput(serial + "." + funcId);
     }
 
-
-
     //--- (end of YCurrentLoopOutput functions)
 }
 #pragma warning restore 1591
+

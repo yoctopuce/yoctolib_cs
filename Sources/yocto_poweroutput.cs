@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_poweroutput.cs 38913 2019-12-20 18:59:49Z mvuilleu $
+ *  $Id: yocto_poweroutput.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindPowerOutput(), the high-level API for PowerOutput functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YPowerOutput return codes)
-    //--- (end of YPowerOutput return codes)
+#pragma warning disable 1591
+//--- (YPowerOutput return codes)
+//--- (end of YPowerOutput return codes)
 //--- (YPowerOutput dlldef)
 //--- (end of YPowerOutput dlldef)
 //--- (YPowerOutput yapiwrapper)
@@ -352,8 +352,7 @@ public class YPowerOutput : YFunction
         return FindPowerOutput(serial + "." + funcId);
     }
 
-
-
     //--- (end of YPowerOutput functions)
 }
 #pragma warning restore 1591
+

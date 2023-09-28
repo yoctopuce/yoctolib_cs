@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_i2cport.cs 52943 2023-01-26 15:46:47Z mvuilleu $
+ *  $Id: yocto_i2cport.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindI2cPort(), the high-level API for I2cPort functions
  *
@@ -127,7 +127,7 @@ public class YI2cSnoopingRecord
 }
 
     //--- (generated code: YI2cPort return codes)
-    //--- (end of generated code: YI2cPort return codes)
+//--- (end of generated code: YI2cPort return codes)
 //--- (generated code: YI2cPort dlldef)
 //--- (end of generated code: YI2cPort dlldef)
 //--- (generated code: YI2cPort yapiwrapper)
@@ -1977,8 +1977,6 @@ public class YI2cPort : YFunction
             return null;
         return FindI2cPort(serial + "." + funcId);
     }
-
-
 
     //--- (end of generated code: YI2cPort functions)
 }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_genericsensor.cs 50689 2022-08-17 14:37:15Z mvuilleu $
+ *  $Id: yocto_genericsensor.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YGenericSensor return codes)
-    //--- (end of YGenericSensor return codes)
+#pragma warning disable 1591
+//--- (YGenericSensor return codes)
+//--- (end of YGenericSensor return codes)
 //--- (YGenericSensor dlldef)
 //--- (end of YGenericSensor dlldef)
 //--- (YGenericSensor yapiwrapper)
@@ -838,8 +838,7 @@ public class YGenericSensor : YSensor
         return FindGenericSensor(serial + "." + funcId);
     }
 
-
-
     //--- (end of YGenericSensor functions)
 }
 #pragma warning restore 1591
+

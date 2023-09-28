@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_pwmpowersource.cs 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: yocto_pwmpowersource.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YPwmPowerSource return codes)
-    //--- (end of YPwmPowerSource return codes)
+#pragma warning disable 1591
+//--- (YPwmPowerSource return codes)
+//--- (end of YPwmPowerSource return codes)
 //--- (YPwmPowerSource dlldef)
 //--- (end of YPwmPowerSource dlldef)
 //--- (YPwmPowerSource yapiwrapper)
@@ -354,8 +354,7 @@ public class YPwmPowerSource : YFunction
         return FindPwmPowerSource(serial + "." + funcId);
     }
 
-
-
     //--- (end of YPwmPowerSource functions)
 }
 #pragma warning restore 1591
+

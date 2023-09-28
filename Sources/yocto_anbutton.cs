@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_anbutton.cs 43478 2021-01-21 13:49:12Z mvuilleu $
+ *  $Id: yocto_anbutton.cs 56268 2023-08-25 17:43:56Z mvuilleu $
  *
  *  Implements yFindAnButton(), the high-level API for AnButton functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YAnButton return codes)
-    //--- (end of YAnButton return codes)
+#pragma warning disable 1591
+//--- (YAnButton return codes)
+//--- (end of YAnButton return codes)
 //--- (YAnButton dlldef)
 //--- (end of YAnButton dlldef)
 //--- (YAnButton yapiwrapper)
@@ -95,6 +95,7 @@ public class YAnButton : YFunction
     public const int INPUTTYPE_ANALOG_FAST = 0;
     public const int INPUTTYPE_DIGITAL4 = 1;
     public const int INPUTTYPE_ANALOG_SMOOTH = 2;
+    public const int INPUTTYPE_DIGITAL_FAST = 3;
     public const int INPUTTYPE_INVALID = -1;
     protected int _calibratedValue = CALIBRATEDVALUE_INVALID;
     protected int _rawValue = RAWVALUE_INVALID;
@@ -664,9 +665,9 @@ public class YAnButton : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   a value among <c>YAnButton.INPUTTYPE_ANALOG_FAST</c>, <c>YAnButton.INPUTTYPE_DIGITAL4</c> and
-     *   <c>YAnButton.INPUTTYPE_ANALOG_SMOOTH</c> corresponding to the decoding method applied to the input
-     *   (analog or multiplexed binary switches)
+     *   a value among <c>YAnButton.INPUTTYPE_ANALOG_FAST</c>, <c>YAnButton.INPUTTYPE_DIGITAL4</c>,
+     *   <c>YAnButton.INPUTTYPE_ANALOG_SMOOTH</c> and <c>YAnButton.INPUTTYPE_DIGITAL_FAST</c> corresponding
+     *   to the decoding method applied to the input (analog or multiplexed binary switches)
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YAnButton.INPUTTYPE_INVALID</c>.
@@ -696,9 +697,9 @@ public class YAnButton : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   a value among <c>YAnButton.INPUTTYPE_ANALOG_FAST</c>, <c>YAnButton.INPUTTYPE_DIGITAL4</c> and
-     *   <c>YAnButton.INPUTTYPE_ANALOG_SMOOTH</c> corresponding to the decoding method applied to the input
-     *   (analog or multiplexed binary switches)
+     *   a value among <c>YAnButton.INPUTTYPE_ANALOG_FAST</c>, <c>YAnButton.INPUTTYPE_DIGITAL4</c>,
+     *   <c>YAnButton.INPUTTYPE_ANALOG_SMOOTH</c> and <c>YAnButton.INPUTTYPE_DIGITAL_FAST</c> corresponding
+     *   to the decoding method applied to the input (analog or multiplexed binary switches)
      * </param>
      * <para>
      * </para>
@@ -921,8 +922,7 @@ public class YAnButton : YFunction
         return FindAnButton(serial + "." + funcId);
     }
 
-
-
     //--- (end of YAnButton functions)
 }
 #pragma warning restore 1591
+

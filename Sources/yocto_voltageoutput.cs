@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_voltageoutput.cs 50689 2022-08-17 14:37:15Z mvuilleu $
+ *  $Id: yocto_voltageoutput.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindVoltageOutput(), the high-level API for VoltageOutput functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YVoltageOutput return codes)
-    //--- (end of YVoltageOutput return codes)
+#pragma warning disable 1591
+//--- (YVoltageOutput return codes)
+//--- (end of YVoltageOutput return codes)
 //--- (YVoltageOutput dlldef)
 //--- (end of YVoltageOutput dlldef)
 //--- (YVoltageOutput yapiwrapper)
@@ -470,8 +470,7 @@ public class YVoltageOutput : YFunction
         return FindVoltageOutput(serial + "." + funcId);
     }
 
-
-
     //--- (end of YVoltageOutput functions)
 }
 #pragma warning restore 1591
+

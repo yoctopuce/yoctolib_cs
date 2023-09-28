@@ -86,6 +86,9 @@
 <Compile Include="..\..\Sources\yocto_anbutton.cs">
 <Link>yocto_api\yocto_anbutton.cs</Link>
 </Compile>
+<Compile Include="..\..\Sources\yocto_quadraturedecoder.cs">
+<Link>yocto_api\yocto_quadraturedecoder.cs</Link>
+</Compile>
 
     <Compile Include="main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

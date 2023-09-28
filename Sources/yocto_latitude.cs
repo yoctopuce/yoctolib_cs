@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_latitude.cs 39658 2020-03-12 15:36:29Z seb $
+ *  $Id: yocto_latitude.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindLatitude(), the high-level API for Latitude functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YLatitude return codes)
-    //--- (end of YLatitude return codes)
+#pragma warning disable 1591
+//--- (YLatitude return codes)
+//--- (end of YLatitude return codes)
 //--- (YLatitude dlldef)
 //--- (end of YLatitude dlldef)
 //--- (YLatitude yapiwrapper)
@@ -319,8 +319,7 @@ public class YLatitude : YSensor
         return FindLatitude(serial + "." + funcId);
     }
 
-
-
     //--- (end of YLatitude functions)
 }
 #pragma warning restore 1591
+

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_watchdog.cs 44548 2021-04-13 09:56:42Z mvuilleu $
+ *  $Id: yocto_watchdog.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindWatchdog(), the high-level API for Watchdog functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YWatchdog return codes)
-    //--- (end of YWatchdog return codes)
+#pragma warning disable 1591
+//--- (YWatchdog return codes)
+//--- (end of YWatchdog return codes)
 //--- (YWatchdog dlldef)
 //--- (end of YWatchdog dlldef)
 //--- (YWatchdog yapiwrapper)
@@ -1213,8 +1213,7 @@ public class YWatchdog : YFunction
         return FindWatchdog(serial + "." + funcId);
     }
 
-
-
     //--- (end of YWatchdog functions)
 }
 #pragma warning restore 1591
+

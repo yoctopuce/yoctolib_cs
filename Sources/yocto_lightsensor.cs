@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_lightsensor.cs 45292 2021-05-25 23:27:54Z mvuilleu $
+ *  $Id: yocto_lightsensor.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindLightSensor(), the high-level API for LightSensor functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YLightSensor return codes)
-    //--- (end of YLightSensor return codes)
+#pragma warning disable 1591
+//--- (YLightSensor return codes)
+//--- (end of YLightSensor return codes)
 //--- (YLightSensor dlldef)
 //--- (end of YLightSensor dlldef)
 //--- (YLightSensor yapiwrapper)
@@ -446,8 +446,7 @@ public class YLightSensor : YSensor
         return FindLightSensor(serial + "." + funcId);
     }
 
-
-
     //--- (end of YLightSensor functions)
 }
 #pragma warning restore 1591
+

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_led.cs 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: yocto_led.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindLed(), the high-level API for Led functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YLed return codes)
-    //--- (end of YLed return codes)
+#pragma warning disable 1591
+//--- (YLed return codes)
+//--- (end of YLed return codes)
 //--- (YLed dlldef)
 //--- (end of YLed dlldef)
 //--- (YLed yapiwrapper)
@@ -484,8 +484,7 @@ public class YLed : YFunction
         return FindLed(serial + "." + funcId);
     }
 
-
-
     //--- (end of YLed functions)
 }
 #pragma warning restore 1591
+

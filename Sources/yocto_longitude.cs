@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_longitude.cs 39658 2020-03-12 15:36:29Z seb $
+ *  $Id: yocto_longitude.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindLongitude(), the high-level API for Longitude functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YLongitude return codes)
-    //--- (end of YLongitude return codes)
+#pragma warning disable 1591
+//--- (YLongitude return codes)
+//--- (end of YLongitude return codes)
 //--- (YLongitude dlldef)
 //--- (end of YLongitude dlldef)
 //--- (YLongitude yapiwrapper)
@@ -319,8 +319,7 @@ public class YLongitude : YSensor
         return FindLongitude(serial + "." + funcId);
     }
 
-
-
     //--- (end of YLongitude functions)
 }
 #pragma warning restore 1591
+

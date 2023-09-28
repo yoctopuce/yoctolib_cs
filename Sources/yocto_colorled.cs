@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_colorled.cs 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: yocto_colorled.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindColorLed(), the high-level API for ColorLed functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YColorLed return codes)
-    //--- (end of YColorLed return codes)
+#pragma warning disable 1591
+//--- (YColorLed return codes)
+//--- (end of YColorLed return codes)
 //--- (YColorLed dlldef)
 //--- (end of YColorLed dlldef)
 //--- (YColorLed yapiwrapper)
@@ -265,7 +265,7 @@ public class YColorLed : YFunction
 
     /**
      * <summary>
-     *   Changes the current color of the LED, using a color HSL.
+     *   Changes the current color of the LED, using a specific HSL color.
      * <para>
      *   Encoding is done as follows: 0xHHSSLL.
      * </para>
@@ -273,7 +273,7 @@ public class YColorLed : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to the current color of the LED, using a color HSL
+     *   an integer corresponding to the current color of the LED, using a specific HSL color
      * </param>
      * <para>
      * </para>
@@ -525,7 +525,7 @@ public class YColorLed : YFunction
 
     /**
      * <summary>
-     *   Return the blinking sequence signature.
+     *   Returns the blinking sequence signature.
      * <para>
      *   Since blinking
      *   sequences cannot be read from the device, this can be used
@@ -536,7 +536,7 @@ public class YColorLed : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   an integer
+     *   an integer corresponding to the blinking sequence signature
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YColorLed.BLINKSEQSIGNATURE_INVALID</c>.
@@ -872,8 +872,7 @@ public class YColorLed : YFunction
         return FindColorLed(serial + "." + funcId);
     }
 
-
-
     //--- (end of YColorLed functions)
 }
 #pragma warning restore 1591
+

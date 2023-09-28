@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_multiaxiscontroller.cs 48017 2022-01-12 08:17:52Z seb $
+ *  $Id: yocto_multiaxiscontroller.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YMultiAxisController return codes)
-    //--- (end of YMultiAxisController return codes)
+#pragma warning disable 1591
+//--- (YMultiAxisController return codes)
+//--- (end of YMultiAxisController return codes)
 //--- (YMultiAxisController dlldef)
 //--- (end of YMultiAxisController dlldef)
 //--- (YMultiAxisController yapiwrapper)
@@ -622,8 +622,7 @@ public class YMultiAxisController : YFunction
         return FindMultiAxisController(serial + "." + funcId);
     }
 
-
-
     //--- (end of YMultiAxisController functions)
 }
 #pragma warning restore 1591
+

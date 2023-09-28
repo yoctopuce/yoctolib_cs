@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_gyro.cs 54293 2023-05-01 12:35:14Z seb $
+ * $Id: yocto_gyro.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -50,7 +50,7 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 
 //--- (generated code: YQt return codes)
-    //--- (end of generated code: YQt return codes)
+//--- (end of generated code: YQt return codes)
 //--- (generated code: YQt class start)
 /**
  * <summary>
@@ -322,15 +322,13 @@ public class YQt : YSensor
         return FindQt(serial + "." + funcId);
     }
 
-
-
     //--- (end of generated code: YQt functions)
 }
 
 
 
 //--- (generated code: YGyro return codes)
-    //--- (end of generated code: YGyro return codes)
+//--- (end of generated code: YGyro return codes)
 //--- (generated code: YGyro class start)
 /**
  * <summary>
@@ -1194,8 +1192,6 @@ public class YGyro : YSensor
             return null;
         return FindGyro(serial + "." + funcId);
     }
-
-
 
     //--- (end of generated code: YGyro functions)
 }

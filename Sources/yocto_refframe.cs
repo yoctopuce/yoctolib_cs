@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_refframe.cs 50689 2022-08-17 14:37:15Z mvuilleu $
+ *  $Id: yocto_refframe.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YRefFrame return codes)
-    //--- (end of YRefFrame return codes)
+#pragma warning disable 1591
+//--- (YRefFrame return codes)
+//--- (end of YRefFrame return codes)
 //--- (YRefFrame dlldef)
 //--- (end of YRefFrame dlldef)
 //--- (YRefFrame yapiwrapper)
@@ -1313,8 +1313,7 @@ public class YRefFrame : YFunction
         return FindRefFrame(serial + "." + funcId);
     }
 
-
-
     //--- (end of YRefFrame functions)
 }
 #pragma warning restore 1591
+

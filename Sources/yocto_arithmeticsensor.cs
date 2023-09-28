@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_arithmeticsensor.cs 48017 2022-01-12 08:17:52Z seb $
+ *  $Id: yocto_arithmeticsensor.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindArithmeticSensor(), the high-level API for ArithmeticSensor functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YArithmeticSensor return codes)
-    //--- (end of YArithmeticSensor return codes)
+#pragma warning disable 1591
+//--- (YArithmeticSensor return codes)
+//--- (end of YArithmeticSensor return codes)
 //--- (YArithmeticSensor dlldef)
 //--- (end of YArithmeticSensor dlldef)
 //--- (YArithmeticSensor yapiwrapper)
@@ -602,8 +602,7 @@ public class YArithmeticSensor : YSensor
         return FindArithmeticSensor(serial + "." + funcId);
     }
 
-
-
     //--- (end of YArithmeticSensor functions)
 }
 #pragma warning restore 1591
+

@@ -150,7 +150,7 @@ public class YSdi12Sensor
         //--- (generated code: YSdi12Sensor attributes initialization)
         //--- (end of generated code: YSdi12Sensor attributes initialization)
         this._sdi12Port = sdi12Port;
-        this.parseInfoStr(infoStr);
+        this._parseInfoStr(infoStr);
     }
 
     //--- (generated code: YSdi12Sensor implementation)
@@ -235,7 +235,7 @@ public class YSdi12Sensor
     }
 
 
-    public virtual void parseInfoStr(string infoStr)
+    public virtual void _parseInfoStr(string infoStr)
     {
         string errmsg;
 
@@ -255,53 +255,53 @@ public class YSdi12Sensor
                 this._model = (infoStr).Substring( 11, 6);
                 this._ver = (infoStr).Substring( 17, 3);
                 this._sn = (infoStr).Substring( 20, (infoStr).Length-20);
-                this.queryValueInfo();
             }
         }
     }
 
 
-    public virtual void queryValueInfo()
+    public virtual void _queryValueInfo()
     {
         List<List<string>> val = new List<List<string>>();
-
         List<string> data = new List<string>();
         string infoNbVal;
         string cmd;
         string infoVal;
+        string value;
         int nbVal;
         int k;
         int i;
         int j;
+        List<string> listVal = new List<string>();
 
         k = 0;
         while (k < 10) {
             infoNbVal = this._sdi12Port.querySdi12(this._addr, "IM"+Convert.ToString(k), 5000);
             if ((infoNbVal).Length > 1) {
-                nbVal = YAPI._atoi((infoNbVal).Substring( 4, (infoNbVal).Length-4));
+                value = (infoNbVal).Substring( 4, (infoNbVal).Length-4);
+                nbVal = YAPI._atoi(value);
                 if (nbVal != 0) {
+                    val.Clear();
                     i = 0;
                     while (i < nbVal) {
                         cmd = "IM"+Convert.ToString( k)+"_00"+Convert.ToString(i+1);
                         infoVal = this._sdi12Port.querySdi12(this._addr, cmd, 5000);
-                        List<string> listVal = new List<string>();
-                        listVal.Clear();
-                        data.Clear();
-                        listVal.Add("M"+Convert.ToString(k));
-                        listVal.Add((i+1).ToString());
                         data = new List<string>(infoVal.Split(new Char[] {';'}));
                         data = new List<string>(data[0].Split(new Char[] {','}));
+                        listVal.Clear();
+                        listVal.Add("M"+Convert.ToString(k));
+                        listVal.Add((i+1).ToString());
                         j = 0;
                         while (j < data.Count) {
                             listVal.Add(data[j]);
-                            j= j +1;
+                            j = j + 1;
                         }
-                        val.Add(listVal);
-                        i= i +1;
+                        val.Add(new List<string>(listVal));
+                        i = i + 1;
                     }
                 }
             }
-            k = k+1;
+            k = k + 1;
         }
         this._valuesDesc = val;
     }
@@ -312,7 +312,7 @@ public class YSdi12Sensor
 
 
     //--- (generated code: YSdi12Port return codes)
-    //--- (end of generated code: YSdi12Port return codes)
+//--- (end of generated code: YSdi12Port return codes)
 //--- (generated code: YSdi12Port dlldef)
 //--- (end of generated code: YSdi12Port dlldef)
 //--- (generated code: YSdi12Port yapiwrapper)
@@ -2077,19 +2077,29 @@ public class YSdi12Port : YFunction
         List<string> msgarr = new List<string>();
         int msglen;
         string res;
+        cmdChar  = "";
 
         pattern = sensorAddr;
-        cmdChar = (cmd).Substring( 0, 1);
-        if (cmdChar == "M" || cmdChar == "D") {
-            pattern = ""+sensorAddr+":.*";
+        if ((cmd).Length > 0) {
+            cmdChar = (cmd).Substring( 0, 1);
+        }
+        if (sensorAddr == "?") {
+            pattern = ".*";
         } else {
-            pattern = ""+sensorAddr+".*";
+            if (cmdChar == "M" || cmdChar == "D") {
+                pattern = ""+sensorAddr+":.*";
+            } else {
+                pattern = ""+sensorAddr+".*";
+            }
         }
         pattern = this._escapeAttr(pattern);
         fullCmd = this._escapeAttr("+"+ sensorAddr+""+cmd+"!");
         url = "rxmsg.json?len=1&maxw="+Convert.ToString( maxWait)+"&cmd="+ fullCmd+"&pat="+pattern;
 
         msgbin = this._download(url);
+        if ((msgbin).Length<2) {
+            return "";
+        }
         msgarr = this._json_get_array(msgbin);
         msglen = msgarr.Count;
         if (msglen == 0) {
@@ -2106,12 +2116,28 @@ public class YSdi12Port : YFunction
     }
 
 
+    /**
+     * <summary>
+     *   Sends a discovery command to the bus, and reads the sensor information reply.
+     * <para>
+     *   This function is intended to be used when the serial port is configured for 'SDI-12' protocol.
+     *   This function work when only one sensor is connected.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   the reply returned by the sensor, as a YSdi12Sensor object.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty string.
+     * </para>
+     */
     public virtual YSdi12Sensor discoverSingleSensor()
     {
         string resStr;
-        YSdi12Sensor info;
 
-        resStr = this.querySdi12("?","!",5000);
+        resStr = this.querySdi12("?","",5000);
         if (resStr == "") {
             return new YSdi12Sensor(this, "ERSensor Not Found");
         }
@@ -2120,15 +2146,33 @@ public class YSdi12Port : YFunction
     }
 
 
+    /**
+     * <summary>
+     *   Sends a discovery command to the bus, and reads all sensors information reply.
+     * <para>
+     *   This function is intended to be used when the serial port is configured for 'SDI-12' protocol.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   all the information from every connected sensor, as an array of YSdi12Sensor object.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty string.
+     * </para>
+     */
     public virtual List<YSdi12Sensor> discoverAllSensors()
     {
-        List<YSdi12Sensor> addr = new List<YSdi12Sensor>();
+        List<YSdi12Sensor> sensors = new List<YSdi12Sensor>();
         List<string> idSens = new List<string>();
         string res;
         int i;
         string lettreMin;
         string lettreMaj;
 
+        // 1. Search for sensors present
+        idSens.Clear();
         i = 0 ;
         while (i < 10) {
             res = this.querySdi12((i).ToString(),"!",500);
@@ -2154,15 +2198,44 @@ public class YSdi12Port : YFunction
             }
             i = i +1;
         }
+        // 2. Query existing sensors information
         i = 0;
+        sensors.Clear();
         while (i < idSens.Count) {
-            addr.Add(this.getSensorInformation(idSens[i]));
+            sensors.Add(this.getSensorInformation(idSens[i]));
             i = i + 1;
         }
-        return addr;
+        return sensors;
     }
 
 
+    /**
+     * <summary>
+     *   Sends a mesurement command to the SDI-12 bus, and reads the sensor immediate reply.
+     * <para>
+     *   The supported commands are:
+     *   M: Measurement start control
+     *   M1...M9: Additional measurement start command
+     *   D: Measurement reading control
+     *   This function is intended to be used when the serial port is configured for 'SDI-12' protocol.
+     * </para>
+     * </summary>
+     * <param name="sensorAddr">
+     *   the sensor address, as a string
+     * </param>
+     * <param name="measCmd">
+     *   the SDI12 query to send (without address and exclamation point)
+     * </param>
+     * <param name="maxWait">
+     *   the maximum timeout to wait for a reply from sensor, in millisecond
+     * </param>
+     * <returns>
+     *   the reply returned by the sensor, without newline, as a list of float.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty string.
+     * </para>
+     */
     public virtual List<double> readSensor(string sensorAddr, string measCmd, int maxWait)
     {
         string resStr;
@@ -2180,17 +2253,36 @@ public class YSdi12Port : YFunction
         }
         valdouble = YAPI._atof(split[1]);
         res.Add(valdouble);
-
         i = 1;
-        while (i< tab.Count) {
+        while (i < tab.Count) {
             valdouble = YAPI._atof(tab[i]);
             res.Add(valdouble);
-            i = i+1;
+            i = i + 1;
         }
         return res;
     }
 
 
+    /**
+     * <summary>
+     *   Changes the address of the selected sensor, and returns the sensor information with the new address.
+     * <para>
+     *   This function is intended to be used when the serial port is configured for 'SDI-12' protocol.
+     * </para>
+     * </summary>
+     * <param name="oldAddress">
+     *   Actual sensor address, as a string
+     * </param>
+     * <param name="newAddress">
+     *   New sensor address, as a string
+     * </param>
+     * <returns>
+     *   the sensor address and information , as a YSdi12Sensor object.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty string.
+     * </para>
+     */
     public virtual YSdi12Sensor changeAddress(string oldAddress, string newAddress)
     {
         YSdi12Sensor addr;
@@ -2201,19 +2293,55 @@ public class YSdi12Port : YFunction
     }
 
 
+    /**
+     * <summary>
+     *   Sends a information command to the bus, and reads sensors information selected.
+     * <para>
+     *   This function is intended to be used when the serial port is configured for 'SDI-12' protocol.
+     * </para>
+     * </summary>
+     * <param name="sensorAddr">
+     *   Sensor address, as a string
+     * </param>
+     * <returns>
+     *   the reply returned by the sensor, as a YSdi12Port object.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty string.
+     * </para>
+     */
     public virtual YSdi12Sensor getSensorInformation(string sensorAddr)
     {
-        List<string> id = new List<string>();
         string res;
+        YSdi12Sensor sensor;
 
         res = this.querySdi12(sensorAddr,"I",1000);
         if (res == "") {
             return new YSdi12Sensor(this, "ERSensor Not Found");
         }
-        return new YSdi12Sensor(this, res);
+        sensor = new YSdi12Sensor(this, res);
+        sensor._queryValueInfo();
+        return sensor;
     }
 
 
+    /**
+     * <summary>
+     *   Sends a information command to the bus, and reads sensors information selected.
+     * <para>
+     *   This function is intended to be used when the serial port is configured for 'SDI-12' protocol.
+     * </para>
+     * </summary>
+     * <param name="sensorAddr">
+     *   Sensor address, as a string
+     * </param>
+     * <returns>
+     *   the reply returned by the sensor, as a YSdi12Port object.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty string.
+     * </para>
+     */
     public virtual List<double> readConcurrentMeasurements(string sensorAddr)
     {
         List<double> res = new List<double>();
@@ -2223,6 +2351,23 @@ public class YSdi12Port : YFunction
     }
 
 
+    /**
+     * <summary>
+     *   Sends a information command to the bus, and reads sensors information selected.
+     * <para>
+     *   This function is intended to be used when the serial port is configured for 'SDI-12' protocol.
+     * </para>
+     * </summary>
+     * <param name="sensorAddr">
+     *   Sensor address, as a string
+     * </param>
+     * <returns>
+     *   the reply returned by the sensor, as a YSdi12Port object.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty string.
+     * </para>
+     */
     public virtual int requestConcurrentMeasurements(string sensorAddr)
     {
         int timewait;
@@ -2353,8 +2498,6 @@ public class YSdi12Port : YFunction
             return null;
         return FindSdi12Port(serial + "." + funcId);
     }
-
-
 
     //--- (end of generated code: YSdi12Port functions)
 }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_tilt.cs 42951 2020-12-14 09:43:29Z seb $
+ *  $Id: yocto_tilt.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindTilt(), the high-level API for Tilt functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YTilt return codes)
-    //--- (end of YTilt return codes)
+#pragma warning disable 1591
+//--- (YTilt return codes)
+//--- (end of YTilt return codes)
 //--- (YTilt dlldef)
 //--- (end of YTilt dlldef)
 //--- (YTilt yapiwrapper)
@@ -469,8 +469,7 @@ public class YTilt : YSensor
         return FindTilt(serial + "." + funcId);
     }
 
-
-
     //--- (end of YTilt functions)
 }
 #pragma warning restore 1591
+

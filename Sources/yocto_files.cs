@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs 53886 2023-04-05 08:06:39Z mvuilleu $
+ * $Id: yocto_files.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -615,8 +615,6 @@ public class YFiles : YFunction
             return null;
         return FindFiles(serial + "." + funcId);
     }
-
-
 
     //--- (end of generated code: YFiles functions)
 

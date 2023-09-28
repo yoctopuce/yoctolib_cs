@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_wakeupschedule.cs 48183 2022-01-20 10:26:11Z mvuilleu $
+ *  $Id: yocto_wakeupschedule.cs 56230 2023-08-21 15:20:59Z mvuilleu $
  *
  *  Implements yFindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YWakeUpSchedule return codes)
-    //--- (end of YWakeUpSchedule return codes)
+#pragma warning disable 1591
+//--- (YWakeUpSchedule return codes)
+//--- (end of YWakeUpSchedule return codes)
 //--- (YWakeUpSchedule dlldef)
 //--- (end of YWakeUpSchedule dlldef)
 //--- (YWakeUpSchedule yapiwrapper)
@@ -80,6 +80,7 @@ public class YWakeUpSchedule : YFunction
     public const int WEEKDAYS_INVALID = YAPI.INVALID_UINT;
     public const int MONTHDAYS_INVALID = YAPI.INVALID_UINT;
     public const int MONTHS_INVALID = YAPI.INVALID_UINT;
+    public const int SECONDSBEFORE_INVALID = YAPI.INVALID_UINT;
     public const long NEXTOCCURENCE_INVALID = YAPI.INVALID_LONG;
     protected int _minutesA = MINUTESA_INVALID;
     protected int _minutesB = MINUTESB_INVALID;
@@ -87,6 +88,7 @@ public class YWakeUpSchedule : YFunction
     protected int _weekDays = WEEKDAYS_INVALID;
     protected int _monthDays = MONTHDAYS_INVALID;
     protected int _months = MONTHS_INVALID;
+    protected int _secondsBefore = SECONDSBEFORE_INVALID;
     protected long _nextOccurence = NEXTOCCURENCE_INVALID;
     protected ValueCallback _valueCallbackWakeUpSchedule = null;
     //--- (end of YWakeUpSchedule definitions)
@@ -126,6 +128,10 @@ public class YWakeUpSchedule : YFunction
         if (json_val.has("months"))
         {
             _months = json_val.getInt("months");
+        }
+        if (json_val.has("secondsBefore"))
+        {
+            _secondsBefore = json_val.getInt("secondsBefore");
         }
         if (json_val.has("nextOccurence"))
         {
@@ -503,6 +509,71 @@ public class YWakeUpSchedule : YFunction
 
     /**
      * <summary>
+     *   Returns the number of seconds to anticipate wake-up time to allow
+     *   the system to power-up.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the number of seconds to anticipate wake-up time to allow
+     *   the system to power-up
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YWakeUpSchedule.SECONDSBEFORE_INVALID</c>.
+     * </para>
+     */
+    public int get_secondsBefore()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return SECONDSBEFORE_INVALID;
+                }
+            }
+            res = this._secondsBefore;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Changes the number of seconds to anticipate wake-up time to allow
+     *   the system to power-up.
+     * <para>
+     *   Remember to call the <c>saveToFlash()</c> method of the module if the
+     *   modification must be kept.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the number of seconds to anticipate wake-up time to allow
+     *   the system to power-up
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_secondsBefore(int newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("secondsBefore", rest_val);
+        }
+    }
+
+
+    /**
+     * <summary>
      *   Returns the date/time (seconds) of the next wake up occurrence.
      * <para>
      * </para>
@@ -756,8 +827,7 @@ public class YWakeUpSchedule : YFunction
         return FindWakeUpSchedule(serial + "." + funcId);
     }
 
-
-
     //--- (end of YWakeUpSchedule functions)
 }
 #pragma warning restore 1591
+

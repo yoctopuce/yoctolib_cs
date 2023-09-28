@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_multisenscontroller.cs 49501 2022-04-21 07:09:25Z mvuilleu $
+ *  $Id: yocto_multisenscontroller.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindMultiSensController(), the high-level API for MultiSensController functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YMultiSensController return codes)
-    //--- (end of YMultiSensController return codes)
+#pragma warning disable 1591
+//--- (YMultiSensController return codes)
+//--- (end of YMultiSensController return codes)
 //--- (YMultiSensController dlldef)
 //--- (end of YMultiSensController dlldef)
 //--- (YMultiSensController yapiwrapper)
@@ -597,8 +597,7 @@ public class YMultiSensController : YFunction
         return FindMultiSensController(serial + "." + funcId);
     }
 
-
-
     //--- (end of YMultiSensController functions)
 }
 #pragma warning restore 1591
+

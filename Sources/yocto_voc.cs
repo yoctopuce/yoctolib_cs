@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_voc.cs 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: yocto_voc.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindVoc(), the high-level API for Voc functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YVoc return codes)
-    //--- (end of YVoc return codes)
+#pragma warning disable 1591
+//--- (YVoc return codes)
+//--- (end of YVoc return codes)
 //--- (YVoc dlldef)
 //--- (end of YVoc dlldef)
 //--- (YVoc yapiwrapper)
@@ -319,8 +319,7 @@ public class YVoc : YSensor
         return FindVoc(serial + "." + funcId);
     }
 
-
-
     //--- (end of YVoc functions)
 }
 #pragma warning restore 1591
+

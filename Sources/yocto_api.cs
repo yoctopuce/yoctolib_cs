@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 55096 2023-06-15 08:01:07Z seb $
+ * $Id: yocto_api.cs 56393 2023-09-05 08:36:51Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -3496,7 +3496,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "1.10";
     public const int YOCTO_API_VERSION_BCD = 0x0110;
 
-    public const string YOCTO_API_BUILD_NO = "55677";
+    public const string YOCTO_API_BUILD_NO = "56784";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -3526,7 +3526,7 @@ public class YAPI
     public const int YOCTO_CALIB_TYPE_OFS = 30;
     public const int yUnknowSize = 1024;
 
-    // --- (generated code: YFunction return codes)
+// --- (generated code: YFunction return codes)
     // Yoctopuce error codes, used by default as function return value
     public const int SUCCESS = 0;                   // everything worked all right
     public const int NOT_INITIALIZED = -1;          // call yInitAPI() first !
@@ -3544,8 +3544,11 @@ public class YAPI
     public const int RTC_NOT_READY = -13;           // real-time clock has not been initialized (or time was lost)
     public const int FILE_NOT_FOUND = -14;          // the file is not found
     public const int SSL_ERROR = -15;               // Error reported by mbedSSL
+    public const int RFID_SOFT_ERROR = -16;         // Recoverable error with RFID tag (eg. tag out of reach), check YRfidStatus for details
+    public const int RFID_HARD_ERROR = -17;         // Serious RFID error (eg. write-protected, out-of-boundary), check YRfidStatus for details
+    public const int BUFFER_TOO_SMALL = -18;        // The buffer provided is too small
 
-    //--- (end of generated code: YFunction return codes)
+//--- (end of generated code: YFunction return codes)
 
     /*
      * All static global and persitent variables (NOT reset in YAPI.FreeAPI()
@@ -6694,7 +6697,7 @@ public class YAPI
 
 
 //--- (generated code: YAPIContext return codes)
-    //--- (end of generated code: YAPIContext return codes)
+//--- (end of generated code: YAPIContext return codes)
 //--- (generated code: YAPIContext dlldef)
 //--- (end of generated code: YAPIContext dlldef)
 //--- (generated code: YAPIContext class start)
@@ -6938,8 +6941,6 @@ public class YAPIContext
 
 
     //--- (generated code: YAPIContext functions)
-
-
 
     //--- (end of generated code: YAPIContext functions)
 }
@@ -9518,8 +9519,6 @@ public class YHub
 
     //--- (generated code: YHub functions)
 
-
-
     //--- (end of generated code: YHub functions)
 }
 
@@ -10474,8 +10473,6 @@ public class YFunction
             return null;
         return FindFunction(serial + "." + funcId);
     }
-
-
 
     //--- (end of generated code: YFunction functions)
 
@@ -13573,13 +13570,15 @@ public class YModule : YFunction
      * <summary>
      *   Retrieves the type of the <i>n</i>th function on the module.
      * <para>
+     *   Yoctopuce functions type names match their class names without the <i>Y</i> prefix, for instance
+     *   <i>Relay</i>, <i>Temperature</i> etc..
      * </para>
      * </summary>
      * <param name="functionIndex">
      *   the index of the function for which the information is desired, starting at 0 for the first function.
      * </param>
      * <returns>
-     *   a string corresponding to the type of the function
+     *   a string corresponding to the type of the function.
      * </returns>
      * <para>
      *   On failure, throws an exception or returns an empty string.
@@ -13767,8 +13766,6 @@ public class YModule : YFunction
             return null;
         return FindModule(serial + "." + funcId);
     }
-
-
 
     //--- (end of generated code: YModule functions)
 }
@@ -15240,8 +15237,6 @@ public class YSensor : YFunction
         return FindSensor(serial + "." + funcId);
     }
 
-
-
     //--- (end of generated code: YSensor functions)
 }
 
@@ -15991,8 +15986,6 @@ public class YDataLogger : YFunction
             return null;
         return FindDataLogger(serial + "." + funcId);
     }
-
-
 
     //--- (end of generated code: YDataLogger functions)
 }

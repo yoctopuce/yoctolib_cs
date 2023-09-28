@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_wireless.cs 53886 2023-04-05 08:06:39Z mvuilleu $
+ * $Id: yocto_wireless.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -812,8 +812,6 @@ public class YWireless : YFunction
             return null;
         return FindWireless(serial + "." + funcId);
     }
-
-
 
     //--- (end of generated code: YWireless functions)
 }

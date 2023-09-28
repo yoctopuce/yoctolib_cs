@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_pressure.cs 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: yocto_pressure.cs 56058 2023-08-15 07:38:35Z mvuilleu $
  *
  *  Implements yFindPressure(), the high-level API for Pressure functions
  *
@@ -47,9 +47,9 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
- #pragma warning disable 1591
-    //--- (YPressure return codes)
-    //--- (end of YPressure return codes)
+#pragma warning disable 1591
+//--- (YPressure return codes)
+//--- (end of YPressure return codes)
 //--- (YPressure dlldef)
 //--- (end of YPressure dlldef)
 //--- (YPressure yapiwrapper)
@@ -319,8 +319,7 @@ public class YPressure : YSensor
         return FindPressure(serial + "." + funcId);
     }
 
-
-
     //--- (end of YPressure functions)
 }
 #pragma warning restore 1591
+
