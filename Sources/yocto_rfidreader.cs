@@ -884,9 +884,6 @@ public class YRfidStatus
             if (errCode == UNKNOWN_DWARFxx_ERROR_CODE) {
                 errMsg = "Unknown DWARF15 error code";
             }
-            if (errCode == RESPONSE_SHORT) {
-                errMsg = "Response too short";
-            }
             if (errCode == UNEXPECTED_TAG_ID_IN_RESPONSE) {
                 errMsg = "Unexpected Tag id in response";
             }
@@ -1170,14 +1167,14 @@ public class YRfidReader : YFunction
 
     /**
      * <summary>
-     *   Returns the desired refresh rate, measured in Hz.
+     *   Returns the tag list refresh rate, measured in Hz.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the desired refresh rate, measured in Hz
+     *   an integer corresponding to the tag list refresh rate, measured in Hz
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YRfidReader.REFRESHRATE_INVALID</c>.
@@ -1199,8 +1196,12 @@ public class YRfidReader : YFunction
 
     /**
      * <summary>
-     *   Changes the desired refresh rate, measured in Hz.
+     *   Changes the present tag list refresh rate, measured in Hz.
      * <para>
+     *   The reader will do
+     *   its best to respect it. Note that the reader cannot detect tag arrival or removal
+     *   while it is  communicating with a tag.  Maximum frequency is limited to 100Hz,
+     *   but in real life it will be difficult to do better than 50Hz.
      *   Remember to call the <c>saveToFlash()</c> method of the module if the
      *   modification must be kept.
      * </para>
@@ -1208,7 +1209,7 @@ public class YRfidReader : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to the desired refresh rate, measured in Hz
+     *   an integer corresponding to the present tag list refresh rate, measured in Hz
      * </param>
      * <para>
      * </para>
