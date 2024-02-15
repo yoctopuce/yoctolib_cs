@@ -3,12 +3,15 @@ if "%VCINSTALLDIR%"=="" call "%VS140COMNTOOLS%vsvars32.bat"
 if "%VCINSTALLDIR%"=="" call "%VS100COMNTOOLS%vsvars32.bat"
 if "%VCINSTALLDIR%"=="" call "%VS110COMNTOOLS%vsvars32.bat"
 if "%VCINSTALLDIR%"=="" call "%VS120COMNTOOLS%vsvars32.bat"
-if "%VCINSTALLDIR%"=="" call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat"
+if "%VCINSTALLDIR%"=="" call "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsDevCmd.bat"
+if "%VCINSTALLDIR%"=="" call "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Entreprise\Common7\Tools\VsDevCmd.bat"
+if "%VCINSTALLDIR%"=="" call "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
 if "%VCINSTALLDIR%"=="" call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Professional\Common7\Tools\VsDevCmd.bat"
 if "%VCINSTALLDIR%"=="" call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Entreprise\Common7\Tools\VsDevCmd.bat"
+if "%VCINSTALLDIR%"=="" call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat"
 echo.
-echo Build yapi static and dynamic libray for C#
-echo ============================================
+echo Build yapi static and dynamic libray for C# 2.0
+echo ===============================================
 
 
 set failled=

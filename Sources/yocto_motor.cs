@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_motor.cs 56058 2023-08-15 07:38:35Z mvuilleu $
+ *  $Id: yocto_motor.cs 56107 2023-08-16 09:15:27Z seb $
  *
  *  Implements yFindMotor(), the high-level API for Motor functions
  *

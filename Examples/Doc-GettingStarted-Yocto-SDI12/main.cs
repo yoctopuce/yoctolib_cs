@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- *  $Id: main.cs 55590 2023-07-25 09:07:23Z seb $
+ *  $Id: main.cs 58233 2023-12-04 10:57:58Z seb $
  *
- *  An example that show how to use a  Yocto-SDI12
+ *  An example that shows how to use a  Yocto-SDI12
  *
  *  You can find more information on our web site:
  *   Yocto-SDI12 documentation:

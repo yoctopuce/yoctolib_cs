@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_poweroutput.cs 56058 2023-08-15 07:38:35Z mvuilleu $
+ *  $Id: yocto_poweroutput.cs 56107 2023-08-16 09:15:27Z seb $
  *
  *  Implements yFindPowerOutput(), the high-level API for PowerOutput functions
  *

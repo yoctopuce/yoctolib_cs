@@ -1,13 +1,13 @@
 /*********************************************************************
  *
- *  $Id: main.cs 46632 2021-09-28 08:44:25Z web $
+ *  $Id: main.cs 58233 2023-12-04 10:57:58Z seb $
  *
- *  An example that show how to use a  Yocto-MaxiKnob
+ *  An example that shows how to use a  Yocto-MaxiKnob
  *
  *  You can find more information on our web site:
  *   Yocto-MaxiKnob documentation:
  *      https://www.yoctopuce.com/EN/products/yocto-maxiknob/doc.html
- *   C# API Reference:
+ *   C# V2 API Reference:
  *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-cs-EN.html
  *
  *********************************************************************/

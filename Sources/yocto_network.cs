@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_network.cs 56058 2023-08-15 07:38:35Z mvuilleu $
+ *  $Id: yocto_network.cs 56107 2023-08-16 09:15:27Z seb $
  *
  *  Implements yFindNetwork(), the high-level API for Network functions
  *
@@ -86,6 +86,7 @@ public class YNetwork : YFunction
     public const string USERPASSWORD_INVALID = YAPI.INVALID_STRING;
     public const string ADMINPASSWORD_INVALID = YAPI.INVALID_STRING;
     public const int HTTPPORT_INVALID = YAPI.INVALID_UINT;
+    public const int HTTPSPORT_INVALID = YAPI.INVALID_UINT;
     public const string DEFAULTPAGE_INVALID = YAPI.INVALID_STRING;
     public const int DISCOVERABLE_FALSE = 0;
     public const int DISCOVERABLE_TRUE = 1;
@@ -132,6 +133,7 @@ public class YNetwork : YFunction
     protected string _userPassword = USERPASSWORD_INVALID;
     protected string _adminPassword = ADMINPASSWORD_INVALID;
     protected int _httpPort = HTTPPORT_INVALID;
+    protected int _httpsPort = HTTPSPORT_INVALID;
     protected string _defaultPage = DEFAULTPAGE_INVALID;
     protected int _discoverable = DISCOVERABLE_INVALID;
     protected int _wwwWatchdogDelay = WWWWATCHDOGDELAY_INVALID;
@@ -211,6 +213,10 @@ public class YNetwork : YFunction
         if (json_val.has("httpPort"))
         {
             _httpPort = json_val.getInt("httpPort");
+        }
+        if (json_val.has("httpsPort"))
+        {
+            _httpsPort = json_val.getInt("httpsPort");
         }
         if (json_val.has("defaultPage"))
         {
@@ -906,6 +912,69 @@ public class YNetwork : YFunction
         lock (_thisLock) {
             rest_val = (newval).ToString();
             return _setAttr("httpPort", rest_val);
+        }
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the secure TCP port used to serve the hub web UI.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the secure TCP port used to serve the hub web UI
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YNetwork.HTTPSPORT_INVALID</c>.
+     * </para>
+     */
+    public int get_httpsPort()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return HTTPSPORT_INVALID;
+                }
+            }
+            res = this._httpsPort;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Changes the secure TCP port used to serve the hub web UI.
+     * <para>
+     *   The default value is port 4443,
+     *   which is the default for all Web servers. When you change this parameter, remember to call the
+     *   <c>saveToFlash()</c>
+     *   method of the module if the modification must be kept.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the secure TCP port used to serve the hub web UI
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_httpsPort(int newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("httpsPort", rest_val);
         }
     }
 

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 56393 2023-09-05 08:36:51Z seb $
+ * $Id: yocto_api.cs 59222 2024-02-05 15:50:11Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -3280,6 +3280,186 @@ internal static class SafeNativeMethods
                   return _yapiAddUdevRulesForYoctoLINAARCH64(force, errmsg);
         }
     }
+    [DllImport("yapi", EntryPoint = "yapiSetSSLCertificateSrv", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetSSLCertificateSrvWIN32(StringBuilder certfile, StringBuilder keyfile, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiSetSSLCertificateSrv", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetSSLCertificateSrvWIN64(StringBuilder certfile, StringBuilder keyfile, StringBuilder errmsg);
+    [DllImport("libyapi32", EntryPoint = "yapiSetSSLCertificateSrv", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetSSLCertificateSrvMACOS32(StringBuilder certfile, StringBuilder keyfile, StringBuilder errmsg);
+    [DllImport("libyapi64", EntryPoint = "yapiSetSSLCertificateSrv", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetSSLCertificateSrvMACOS64(StringBuilder certfile, StringBuilder keyfile, StringBuilder errmsg);
+    [DllImport("libyapi-amd64", EntryPoint = "yapiSetSSLCertificateSrv", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetSSLCertificateSrvLIN64(StringBuilder certfile, StringBuilder keyfile, StringBuilder errmsg);
+    [DllImport("libyapi-i386", EntryPoint = "yapiSetSSLCertificateSrv", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetSSLCertificateSrvLIN32(StringBuilder certfile, StringBuilder keyfile, StringBuilder errmsg);
+    [DllImport("libyapi-armhf", EntryPoint = "yapiSetSSLCertificateSrv", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetSSLCertificateSrvLINARMHF(StringBuilder certfile, StringBuilder keyfile, StringBuilder errmsg);
+    [DllImport("libyapi-aarch64", EntryPoint = "yapiSetSSLCertificateSrv", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetSSLCertificateSrvLINAARCH64(StringBuilder certfile, StringBuilder keyfile, StringBuilder errmsg);
+    internal static YRETCODE _yapiSetSSLCertificateSrv(StringBuilder certfile, StringBuilder keyfile, StringBuilder errmsg)
+    {
+        if  (_dllVersion == YAPIDLL_VERSION.NOT_INIT) {
+            string version = "";
+            string date = "";
+            YAPI.apiGetAPIVersion(ref version, ref date);
+        }
+        switch (_dllVersion) {
+            case YAPIDLL_VERSION.NOT_INIT:
+                throw new YAPI_Exception(YAPI.NOT_INITIALIZED, "API not initialized");
+            default:
+            case YAPIDLL_VERSION.WIN32:
+                  return _yapiSetSSLCertificateSrvWIN32(certfile, keyfile, errmsg);
+            case YAPIDLL_VERSION.WIN64:
+                  return _yapiSetSSLCertificateSrvWIN64(certfile, keyfile, errmsg);
+            case YAPIDLL_VERSION.MACOS32:
+                  return _yapiSetSSLCertificateSrvMACOS32(certfile, keyfile, errmsg);
+            case YAPIDLL_VERSION.MACOS64:
+                  return _yapiSetSSLCertificateSrvMACOS64(certfile, keyfile, errmsg);
+            case YAPIDLL_VERSION.LIN64:
+                  return _yapiSetSSLCertificateSrvLIN64(certfile, keyfile, errmsg);
+            case YAPIDLL_VERSION.LIN32:
+                  return _yapiSetSSLCertificateSrvLIN32(certfile, keyfile, errmsg);
+            case YAPIDLL_VERSION.LINARMHF:
+                  return _yapiSetSSLCertificateSrvLINARMHF(certfile, keyfile, errmsg);
+            case YAPIDLL_VERSION.LINAARCH64:
+                  return _yapiSetSSLCertificateSrvLINAARCH64(certfile, keyfile, errmsg);
+        }
+    }
+    [DllImport("yapi", EntryPoint = "yapiAddSSLCertificateCli", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiAddSSLCertificateCliWIN32(StringBuilder cert, int cert_len, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiAddSSLCertificateCli", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiAddSSLCertificateCliWIN64(StringBuilder cert, int cert_len, StringBuilder errmsg);
+    [DllImport("libyapi32", EntryPoint = "yapiAddSSLCertificateCli", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiAddSSLCertificateCliMACOS32(StringBuilder cert, int cert_len, StringBuilder errmsg);
+    [DllImport("libyapi64", EntryPoint = "yapiAddSSLCertificateCli", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiAddSSLCertificateCliMACOS64(StringBuilder cert, int cert_len, StringBuilder errmsg);
+    [DllImport("libyapi-amd64", EntryPoint = "yapiAddSSLCertificateCli", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiAddSSLCertificateCliLIN64(StringBuilder cert, int cert_len, StringBuilder errmsg);
+    [DllImport("libyapi-i386", EntryPoint = "yapiAddSSLCertificateCli", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiAddSSLCertificateCliLIN32(StringBuilder cert, int cert_len, StringBuilder errmsg);
+    [DllImport("libyapi-armhf", EntryPoint = "yapiAddSSLCertificateCli", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiAddSSLCertificateCliLINARMHF(StringBuilder cert, int cert_len, StringBuilder errmsg);
+    [DllImport("libyapi-aarch64", EntryPoint = "yapiAddSSLCertificateCli", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiAddSSLCertificateCliLINAARCH64(StringBuilder cert, int cert_len, StringBuilder errmsg);
+    internal static YRETCODE _yapiAddSSLCertificateCli(StringBuilder cert, int cert_len, StringBuilder errmsg)
+    {
+        if  (_dllVersion == YAPIDLL_VERSION.NOT_INIT) {
+            string version = "";
+            string date = "";
+            YAPI.apiGetAPIVersion(ref version, ref date);
+        }
+        switch (_dllVersion) {
+            case YAPIDLL_VERSION.NOT_INIT:
+                throw new YAPI_Exception(YAPI.NOT_INITIALIZED, "API not initialized");
+            default:
+            case YAPIDLL_VERSION.WIN32:
+                  return _yapiAddSSLCertificateCliWIN32(cert, cert_len, errmsg);
+            case YAPIDLL_VERSION.WIN64:
+                  return _yapiAddSSLCertificateCliWIN64(cert, cert_len, errmsg);
+            case YAPIDLL_VERSION.MACOS32:
+                  return _yapiAddSSLCertificateCliMACOS32(cert, cert_len, errmsg);
+            case YAPIDLL_VERSION.MACOS64:
+                  return _yapiAddSSLCertificateCliMACOS64(cert, cert_len, errmsg);
+            case YAPIDLL_VERSION.LIN64:
+                  return _yapiAddSSLCertificateCliLIN64(cert, cert_len, errmsg);
+            case YAPIDLL_VERSION.LIN32:
+                  return _yapiAddSSLCertificateCliLIN32(cert, cert_len, errmsg);
+            case YAPIDLL_VERSION.LINARMHF:
+                  return _yapiAddSSLCertificateCliLINARMHF(cert, cert_len, errmsg);
+            case YAPIDLL_VERSION.LINAARCH64:
+                  return _yapiAddSSLCertificateCliLINAARCH64(cert, cert_len, errmsg);
+        }
+    }
+    [DllImport("yapi", EntryPoint = "yapiSetNetworkSecurityOptions", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetNetworkSecurityOptionsWIN32(int options, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiSetNetworkSecurityOptions", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetNetworkSecurityOptionsWIN64(int options, StringBuilder errmsg);
+    [DllImport("libyapi32", EntryPoint = "yapiSetNetworkSecurityOptions", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetNetworkSecurityOptionsMACOS32(int options, StringBuilder errmsg);
+    [DllImport("libyapi64", EntryPoint = "yapiSetNetworkSecurityOptions", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetNetworkSecurityOptionsMACOS64(int options, StringBuilder errmsg);
+    [DllImport("libyapi-amd64", EntryPoint = "yapiSetNetworkSecurityOptions", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetNetworkSecurityOptionsLIN64(int options, StringBuilder errmsg);
+    [DllImport("libyapi-i386", EntryPoint = "yapiSetNetworkSecurityOptions", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetNetworkSecurityOptionsLIN32(int options, StringBuilder errmsg);
+    [DllImport("libyapi-armhf", EntryPoint = "yapiSetNetworkSecurityOptions", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetNetworkSecurityOptionsLINARMHF(int options, StringBuilder errmsg);
+    [DllImport("libyapi-aarch64", EntryPoint = "yapiSetNetworkSecurityOptions", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetNetworkSecurityOptionsLINAARCH64(int options, StringBuilder errmsg);
+    internal static YRETCODE _yapiSetNetworkSecurityOptions(int options, StringBuilder errmsg)
+    {
+        if  (_dllVersion == YAPIDLL_VERSION.NOT_INIT) {
+            string version = "";
+            string date = "";
+            YAPI.apiGetAPIVersion(ref version, ref date);
+        }
+        switch (_dllVersion) {
+            case YAPIDLL_VERSION.NOT_INIT:
+                throw new YAPI_Exception(YAPI.NOT_INITIALIZED, "API not initialized");
+            default:
+            case YAPIDLL_VERSION.WIN32:
+                  return _yapiSetNetworkSecurityOptionsWIN32(options, errmsg);
+            case YAPIDLL_VERSION.WIN64:
+                  return _yapiSetNetworkSecurityOptionsWIN64(options, errmsg);
+            case YAPIDLL_VERSION.MACOS32:
+                  return _yapiSetNetworkSecurityOptionsMACOS32(options, errmsg);
+            case YAPIDLL_VERSION.MACOS64:
+                  return _yapiSetNetworkSecurityOptionsMACOS64(options, errmsg);
+            case YAPIDLL_VERSION.LIN64:
+                  return _yapiSetNetworkSecurityOptionsLIN64(options, errmsg);
+            case YAPIDLL_VERSION.LIN32:
+                  return _yapiSetNetworkSecurityOptionsLIN32(options, errmsg);
+            case YAPIDLL_VERSION.LINARMHF:
+                  return _yapiSetNetworkSecurityOptionsLINARMHF(options, errmsg);
+            case YAPIDLL_VERSION.LINAARCH64:
+                  return _yapiSetNetworkSecurityOptionsLINAARCH64(options, errmsg);
+        }
+    }
+    [DllImport("yapi", EntryPoint = "yapiGetRemoteCertificate", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetRemoteCertificateWIN32(StringBuilder rooturl, u64 timeout, StringBuilder buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetRemoteCertificate", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetRemoteCertificateWIN64(StringBuilder rooturl, u64 timeout, StringBuilder buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+    [DllImport("libyapi32", EntryPoint = "yapiGetRemoteCertificate", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetRemoteCertificateMACOS32(StringBuilder rooturl, u64 timeout, StringBuilder buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+    [DllImport("libyapi64", EntryPoint = "yapiGetRemoteCertificate", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetRemoteCertificateMACOS64(StringBuilder rooturl, u64 timeout, StringBuilder buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+    [DllImport("libyapi-amd64", EntryPoint = "yapiGetRemoteCertificate", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetRemoteCertificateLIN64(StringBuilder rooturl, u64 timeout, StringBuilder buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+    [DllImport("libyapi-i386", EntryPoint = "yapiGetRemoteCertificate", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetRemoteCertificateLIN32(StringBuilder rooturl, u64 timeout, StringBuilder buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+    [DllImport("libyapi-armhf", EntryPoint = "yapiGetRemoteCertificate", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetRemoteCertificateLINARMHF(StringBuilder rooturl, u64 timeout, StringBuilder buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+    [DllImport("libyapi-aarch64", EntryPoint = "yapiGetRemoteCertificate", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiGetRemoteCertificateLINAARCH64(StringBuilder rooturl, u64 timeout, StringBuilder buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+    internal static YRETCODE _yapiGetRemoteCertificate(StringBuilder rooturl, u64 timeout, StringBuilder buffer, int maxsize, ref int neededsize, StringBuilder errmsg)
+    {
+        if  (_dllVersion == YAPIDLL_VERSION.NOT_INIT) {
+            string version = "";
+            string date = "";
+            YAPI.apiGetAPIVersion(ref version, ref date);
+        }
+        switch (_dllVersion) {
+            case YAPIDLL_VERSION.NOT_INIT:
+                throw new YAPI_Exception(YAPI.NOT_INITIALIZED, "API not initialized");
+            default:
+            case YAPIDLL_VERSION.WIN32:
+                  return _yapiGetRemoteCertificateWIN32(rooturl, timeout, buffer, maxsize, ref neededsize, errmsg);
+            case YAPIDLL_VERSION.WIN64:
+                  return _yapiGetRemoteCertificateWIN64(rooturl, timeout, buffer, maxsize, ref neededsize, errmsg);
+            case YAPIDLL_VERSION.MACOS32:
+                  return _yapiGetRemoteCertificateMACOS32(rooturl, timeout, buffer, maxsize, ref neededsize, errmsg);
+            case YAPIDLL_VERSION.MACOS64:
+                  return _yapiGetRemoteCertificateMACOS64(rooturl, timeout, buffer, maxsize, ref neededsize, errmsg);
+            case YAPIDLL_VERSION.LIN64:
+                  return _yapiGetRemoteCertificateLIN64(rooturl, timeout, buffer, maxsize, ref neededsize, errmsg);
+            case YAPIDLL_VERSION.LIN32:
+                  return _yapiGetRemoteCertificateLIN32(rooturl, timeout, buffer, maxsize, ref neededsize, errmsg);
+            case YAPIDLL_VERSION.LINARMHF:
+                  return _yapiGetRemoteCertificateLINARMHF(rooturl, timeout, buffer, maxsize, ref neededsize, errmsg);
+            case YAPIDLL_VERSION.LINAARCH64:
+                  return _yapiGetRemoteCertificateLINAARCH64(rooturl, timeout, buffer, maxsize, ref neededsize, errmsg);
+        }
+    }
     [DllImport("yapi", EntryPoint = "yapiGetNextHubRef", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static int _yapiGetNextHubRefWIN32(int hubref);
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiGetNextHubRef", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
@@ -3493,10 +3673,10 @@ public class YAPI
     public const int RESEND_MISSING_PKT = 4;
     public const int DETECT_ALL = DETECT_USB | DETECT_NET;
 
-    public const string YOCTO_API_VERSION_STR = "1.10";
-    public const int YOCTO_API_VERSION_BCD = 0x0110;
+    public const string YOCTO_API_VERSION_STR = "2.0";
+    public const int YOCTO_API_VERSION_BCD = 0x0200;
 
-    public const string YOCTO_API_BUILD_NO = "57762";
+    public const string YOCTO_API_BUILD_NO = "59414";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -3547,6 +3727,13 @@ public class YAPI
     public const int RFID_SOFT_ERROR = -16;         // Recoverable error with RFID tag (eg. tag out of reach), check YRfidStatus for details
     public const int RFID_HARD_ERROR = -17;         // Serious RFID error (eg. write-protected, out-of-boundary), check YRfidStatus for details
     public const int BUFFER_TOO_SMALL = -18;        // The buffer provided is too small
+    public const int DNS_ERROR = -19;               // Error during name resolutions (invalid hostname or dns communication error)
+    public const int SSL_UNK_CERT = -20;            // The certificate is not correctly signed by the trusted CA
+
+    // TLS / SSL definitions
+    public const int NO_TRUSTED_CA_CHECK = 1;       // Disables certificate checking
+    public const int NO_EXPIRATION_CHECK = 2;       // Disables certificate expiration date checking
+    public const int NO_HOSTNAME_CHECK = 4;         // Disable hostname checking
 
 //--- (end of generated code: YFunction return codes)
 
@@ -4326,8 +4513,19 @@ public class YAPI
 
         public string getString(string key)
         {
-            YJSONString ystr = (YJSONString) parsed[key];
-            return ystr.getString();
+            if(parsed[key].getJSONType() == YJSONType.STRING)
+            {
+                YJSONString ystr = (YJSONString)parsed[key];
+                return ystr.getString();
+            }
+            else if (parsed[key].getJSONType() == YJSONType.NUMBER) {
+                YJSONNumber yint = (YJSONNumber)parsed[key];
+                return yint.getInt().ToString();
+            }
+            else
+            {
+                return "<JSON_getString_error>";
+            }
         }
 
         public int getInt(string key)
@@ -6578,6 +6776,84 @@ public class YAPI
 
     /**
      * <summary>
+     *   Download the TLS/SSL certificate from the hub.
+     * <para>
+     *   This function allows to download a TLS/SSL certificate to add it
+     *   to the list of trusted certificates using the AddTrustedCertificates method.
+     * </para>
+     * </summary>
+     * <param name="url">
+     *   the root URL of the VirtualHub V2 or HTTP server.
+     * </param>
+     * <param name="mstimeout">
+     *   the number of milliseconds available to download the certificate.
+     * </param>
+     * <returns>
+     *   a string containing the certificate. In case of error, returns a string starting with "error:".
+     * </returns>
+     */
+    public static byte[] DownloadHostCertificate(string url, ulong mstimeout)
+    {
+        if (!_apiInitialized) {
+            string errmsg = "";
+            InitAPI(0, ref errmsg);
+        }
+        return _yapiContext.DownloadHostCertificate(url, mstimeout);
+    }
+
+    /**
+     * <summary>
+     *   Adds a TLS/SSL certificate to the list of trusted certificates.
+     * <para>
+     *   By default, the library
+     *   library will reject TLS/SSL connections to servers whose certificate is not known. This function
+     *   function allows to add a list of known certificates. It is also possible to disable the verification
+     *   using the SetNetworkSecurityOptions method.
+     * </para>
+     * </summary>
+     * <param name="certificate">
+     *   a string containing one or more certificates.
+     * </param>
+     * <returns>
+     *   an empty string if the certificate has been added correctly.
+     *   In case of error, returns a string starting with "error:".
+     * </returns>
+     */
+    public static string AddTrustedCertificates(string certificate)
+    {
+        if (!_apiInitialized) {
+            string errmsg = "";
+            InitAPI(0, ref errmsg);
+        }
+        return _yapiContext.AddTrustedCertificates(certificate);
+    }
+
+    /**
+     * <summary>
+     *   Enables or disables certain TLS/SSL certificate checks.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="options">
+     *   The options: <c>YAPI.NO_TRUSTED_CA_CHECK</c>,
+     *   <c>YAPI.NO_EXPIRATION_CHECK</c>, <c>YAPI.NO_HOSTNAME_CHECK</c>.
+     * </param>
+     * <returns>
+     *   an empty string if the options are taken into account.
+     *   On error, returns a string beginning with "error:".
+     * </returns>
+     */
+    public static string SetNetworkSecurityOptions(int options)
+    {
+        if (!_apiInitialized) {
+            string errmsg = "";
+            InitAPI(0, ref errmsg);
+        }
+        return _yapiContext.SetNetworkSecurityOptions(options);
+    }
+
+    /**
+     * <summary>
      *   Modifies the network connection delay for <c>yRegisterHub()</c> and <c>yUpdateDeviceList()</c>.
      * <para>
      *   This delay impacts only the YoctoHubs and VirtualHub
@@ -6801,6 +7077,120 @@ public class YAPIContext
             msg = "";
         }
         return msg;
+    }
+
+
+    /**
+     * <summary>
+     *   Download the TLS/SSL certificate from the hub.
+     * <para>
+     *   This function allows to download a TLS/SSL certificate to add it
+     *   to the list of trusted certificates using the AddTrustedCertificates method.
+     * </para>
+     * </summary>
+     * <param name="url">
+     *   the root URL of the VirtualHub V2 or HTTP server.
+     * </param>
+     * <param name="mstimeout">
+     *   the number of milliseconds available to download the certificate.
+     * </param>
+     * <returns>
+     *   a string containing the certificate. In case of error, returns a string starting with "error:".
+     * </returns>
+     */
+    public virtual byte[] DownloadHostCertificate(string url, ulong mstimeout)
+    {
+        StringBuilder errmsg = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
+        StringBuilder smallbuff = new StringBuilder(4096);
+        StringBuilder bigbuff = null;
+        int buffsize;
+        int fullsize;
+        int res;
+        string certifcate;
+        fullsize = 0;
+        res = SafeNativeMethods._yapiGetRemoteCertificate(new StringBuilder(url), mstimeout, smallbuff, 4096, ref fullsize, errmsg);
+        if (res < 0) {
+            if (res == YAPI.BUFFER_TOO_SMALL) {
+                fullsize = fullsize * 2;
+                buffsize = fullsize;
+                bigbuff = new StringBuilder(buffsize);
+                res = SafeNativeMethods._yapiGetRemoteCertificate(new StringBuilder(url), mstimeout, bigbuff, buffsize, ref fullsize, errmsg);
+                if (res < 0) {
+                    certifcate = "error:" + errmsg.ToString();
+                } else {
+                    certifcate = bigbuff.ToString();
+                }
+                bigbuff = null;
+            } else {
+                certifcate = "error:" + errmsg.ToString();
+            }
+            return YAPI.DefaultEncoding.GetBytes(certifcate);
+        } else {
+            certifcate = smallbuff.ToString();
+        }
+        return YAPI.DefaultEncoding.GetBytes(certifcate);
+    }
+
+
+    /**
+     * <summary>
+     *   Adds a TLS/SSL certificate to the list of trusted certificates.
+     * <para>
+     *   By default, the library
+     *   library will reject TLS/SSL connections to servers whose certificate is not known. This function
+     *   function allows to add a list of known certificates. It is also possible to disable the verification
+     *   using the SetNetworkSecurityOptions method.
+     * </para>
+     * </summary>
+     * <param name="certificate">
+     *   a string containing one or more certificates.
+     * </param>
+     * <returns>
+     *   an empty string if the certificate has been added correctly.
+     *   In case of error, returns a string starting with "error:".
+     * </returns>
+     */
+    public virtual string AddTrustedCertificates(string certificate)
+    {
+        StringBuilder errmsg = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
+        int size;
+        int res;
+        // null char must be inclued
+        size = (certificate).Length + 1;
+        res = SafeNativeMethods._yapiAddSSLCertificateCli(new StringBuilder(certificate), size, errmsg);
+        if (res < 0) {
+            return errmsg.ToString();
+        } else {
+            return "";
+        }
+    }
+
+
+    /**
+     * <summary>
+     *   Enables or disables certain TLS/SSL certificate checks.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="options">
+     *   The options: <c>YAPI.NO_TRUSTED_CA_CHECK</c>,
+     *   <c>YAPI.NO_EXPIRATION_CHECK</c>, <c>YAPI.NO_HOSTNAME_CHECK</c>.
+     * </param>
+     * <returns>
+     *   an empty string if the options are taken into account.
+     *   On error, returns a string beginning with "error:".
+     * </returns>
+     */
+    public virtual string SetNetworkSecurityOptions(int options)
+    {
+        StringBuilder errmsg = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
+        int res;
+        res = SafeNativeMethods._yapiSetNetworkSecurityOptions(options, errmsg);
+        if (res < 0) {
+            return errmsg.ToString();
+        } else {
+            return "";
+        }
     }
 
 
@@ -7039,7 +7429,7 @@ public class YFirmwareUpdate
             this._progress = ((this._progress_c * 9) / (10));
             this._progress_msg = errmsg.ToString();
         } else {
-            if (((this._settings).Length != 0)) {
+            if (((this._settings).Length != 0) && ( this._progress_c != 101)) {
                 this._progress_msg = "restoring settings";
                 m = YModule.FindModule(this._serial + ".module");
                 if (!(m.isOnline())) {
@@ -12003,8 +12393,10 @@ public class YModule : YFunction
      * </para>
      * </summary>
      * <param name="callback">
-     *   the callback function to call, or a null pointer. The callback function should take two
-     *   arguments: the module object that emitted the log message, and the character string containing the log.
+     *   the callback function to call, or a null pointer.
+     *   The callback function should take two
+     *   arguments: the module object that emitted the log message,
+     *   and the character string containing the log.
      *   On failure, throws an exception or returns a negative error code.
      * </param>
      */
@@ -14962,7 +15354,7 @@ public class YSensor : YFunction
         refValues.Clear();
         // Load function parameters if not yet loaded
         lock (_thisLock) {
-            if (this._scale == 0) {
+            if ((this._scale == 0) || (this._cacheExpiration <= YAPI.GetTickCount())) {
                 if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return YAPI.DEVICE_NOT_FOUND;
                 }

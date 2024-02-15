@@ -57,6 +57,7 @@ public class YSdi12SnoopingRecord
     //--- (generated code: YSdi12SnoopingRecord definitions)
 
     protected int _tim = 0;
+    protected int _pos = 0;
     protected int _dir = 0;
     protected string _msg;
     //--- (end of generated code: YSdi12SnoopingRecord definitions)
@@ -67,10 +68,17 @@ public class YSdi12SnoopingRecord
         //--- (end of generated code: YSdi12SnoopingRecord attributes initialization)
         YAPI.YJSONObject json = new YAPI.YJSONObject(data);
         json.parse();
-        this._tim = json.getInt("t");
-        string m = json.getString("m");
-        this._dir = (m[0] == '<' ? 1 : 0);
-        this._msg = m.Substring(1);
+        if (json.has("t")) {
+            this._tim = json.getInt("t");
+        }
+        if (json.has("p")) {
+            this._pos = json.getInt("p");
+        }
+        if (json.has("m")) {
+            string m = json.getString("m");
+            this._dir = (m[0] == '<' ? 1 : 0);
+            this._msg = m.Substring(1);
+        }
     }
 
   //--- (generated code: YSdi12SnoopingRecord implementation)
@@ -90,6 +98,22 @@ public class YSdi12SnoopingRecord
     public virtual int get_time()
     {
         return this._tim;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the absolute position of the message end.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   the absolute position of the message end.
+     * </returns>
+     */
+    public virtual int get_pos()
+    {
+        return this._pos;
     }
 
 
@@ -157,72 +181,207 @@ public class YSdi12Sensor
 
 
 
+    /**
+     * <summary>
+     *   Returns the sensor address.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   the sensor address.
+     * </returns>
+     */
     public virtual string get_sensorAddress()
     {
         return this._addr;
     }
 
 
+    /**
+     * <summary>
+     *   Returns the compatible SDI-12 version of the sensor.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   the compatible SDI-12 version of the sensor.
+     * </returns>
+     */
     public virtual string get_sensorProtocol()
     {
         return this._proto;
     }
 
 
+    /**
+     * <summary>
+     *   Returns the sensor vendor identification.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   the sensor vendor identification.
+     * </returns>
+     */
     public virtual string get_sensorVendor()
     {
         return this._mfg;
     }
 
 
+    /**
+     * <summary>
+     *   Returns the sensor model number.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   the sensor model number.
+     * </returns>
+     */
     public virtual string get_sensorModel()
     {
         return this._model;
     }
 
 
+    /**
+     * <summary>
+     *   Returns the sensor version.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   the sensor version.
+     * </returns>
+     */
     public virtual string get_sensorVersion()
     {
         return this._ver;
     }
 
 
+    /**
+     * <summary>
+     *   Returns the sensor serial number.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   the sensor serial number.
+     * </returns>
+     */
     public virtual string get_sensorSerial()
     {
         return this._sn;
     }
 
 
+    /**
+     * <summary>
+     *   Returns the number of sensor measurements.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   the number of sensor measurements.
+     * </returns>
+     */
     public virtual int get_measureCount()
     {
         return this._valuesDesc.Count;
     }
 
 
+    /**
+     * <summary>
+     *   Returns the sensor measurement command.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="measureIndex">
+     *   measurement index
+     * </param>
+     * <returns>
+     *   the sensor measurement command.
+     * </returns>
+     */
     public virtual string get_measureCommand(int measureIndex)
     {
         return this._valuesDesc[measureIndex][0];
     }
 
 
+    /**
+     * <summary>
+     *   Returns sensor measurement position.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="measureIndex">
+     *   measurement index
+     * </param>
+     * <returns>
+     *   the sensor measurement command.
+     * </returns>
+     */
     public virtual int get_measurePosition(int measureIndex)
     {
         return YAPI._atoi(this._valuesDesc[measureIndex][2]);
     }
 
 
+    /**
+     * <summary>
+     *   Returns the measured value symbol.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="measureIndex">
+     *   measurement index
+     * </param>
+     * <returns>
+     *   the sensor measurement command.
+     * </returns>
+     */
     public virtual string get_measureSymbol(int measureIndex)
     {
         return this._valuesDesc[measureIndex][3];
     }
 
 
+    /**
+     * <summary>
+     *   Returns the unit of the measured value.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="measureIndex">
+     *   measurement index
+     * </param>
+     * <returns>
+     *   the sensor measurement command.
+     * </returns>
+     */
     public virtual string get_measureUnit(int measureIndex)
     {
         return this._valuesDesc[measureIndex][4];
     }
 
 
+    /**
+     * <summary>
+     *   Returns the description of the measured value.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="measureIndex">
+     *   measurement index
+     * </param>
+     * <returns>
+     *   the sensor measurement command.
+     * </returns>
+     */
     public virtual string get_measureDescription(int measureIndex)
     {
         return this._valuesDesc[measureIndex][5];
@@ -273,8 +432,10 @@ public class YSdi12Sensor
         int i;
         int j;
         List<string> listVal = new List<string>();
+        int size;
 
         k = 0;
+        size = 4;
         while (k < 10) {
             infoNbVal = this._sdi12Port.querySdi12(this._addr, "IM"+Convert.ToString(k), 5000);
             if ((infoNbVal).Length > 1) {
@@ -292,6 +453,9 @@ public class YSdi12Sensor
                         listVal.Add("M"+Convert.ToString(k));
                         listVal.Add((i+1).ToString());
                         j = 0;
+                        while (data.Count < size) {
+                            data.Add("");
+                        }
                         while (j < data.Count) {
                             listVal.Add(data[j]);
                             j = j + 1;

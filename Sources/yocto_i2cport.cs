@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_i2cport.cs 56058 2023-08-15 07:38:35Z mvuilleu $
+ *  $Id: yocto_i2cport.cs 58921 2024-01-12 09:43:57Z seb $
  *
  *  Implements yFindI2cPort(), the high-level API for I2cPort functions
  *
@@ -55,6 +55,7 @@ public class YI2cSnoopingRecord
     //--- (generated code: YI2cSnoopingRecord definitions)
 
     protected int _tim = 0;
+    protected int _pos = 0;
     protected int _dir = 0;
     protected string _msg;
     //--- (end of generated code: YI2cSnoopingRecord definitions)
@@ -65,10 +66,17 @@ public class YI2cSnoopingRecord
         //--- (end of generated code: YI2cSnoopingRecord attributes initialization)
         YAPI.YJSONObject json = new YAPI.YJSONObject(data);
         json.parse();
-        this._tim = json.getInt("t");
-        string m = json.getString("m");
-        this._dir = (m[0] == '<' ? 1 : 0);
-        this._msg = m.Substring(1);
+        if (json.has("t")) {
+            this._tim = json.getInt("t");
+        }
+        if (json.has("p")) {
+            this._pos = json.getInt("p");
+        }
+        if (json.has("m")) {
+            string m = json.getString("m");
+            this._dir = (m[0] == '<' ? 1 : 0);
+            this._msg = m.Substring(1);
+        }
     }
 
   //--- (generated code: YI2cSnoopingRecord implementation)
@@ -88,6 +96,22 @@ public class YI2cSnoopingRecord
     public virtual int get_time()
     {
         return this._tim;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the absolute position of the message end.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   the absolute position of the message end.
+     * </returns>
+     */
+    public virtual int get_pos()
+    {
+        return this._pos;
     }
 
 

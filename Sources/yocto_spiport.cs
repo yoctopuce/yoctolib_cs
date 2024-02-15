@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_spiport.cs 56058 2023-08-15 07:38:35Z mvuilleu $
+ *  $Id: yocto_spiport.cs 58921 2024-01-12 09:43:57Z seb $
  *
  *  Implements yFindSpiPort(), the high-level API for SpiPort functions
  *
@@ -56,6 +56,7 @@ public class YSpiSnoopingRecord
     //--- (generated code: YSpiSnoopingRecord definitions)
 
     protected int _tim = 0;
+    protected int _pos = 0;
     protected int _dir = 0;
     protected string _msg;
     //--- (end of generated code: YSpiSnoopingRecord definitions)
@@ -66,10 +67,17 @@ public class YSpiSnoopingRecord
         //--- (end of generated code: YSpiSnoopingRecord attributes initialization)
         YAPI.YJSONObject json = new YAPI.YJSONObject(data);
         json.parse();
-        this._tim = json.getInt("t");
-        string m = json.getString("m");
-        this._dir = (m[0] == '<' ? 1 : 0);
-        this._msg = m.Substring(1);
+        if (json.has("t")) {
+            this._tim = json.getInt("t");
+        }
+        if (json.has("p")) {
+            this._pos = json.getInt("p");
+        }
+        if (json.has("m")) {
+            string m = json.getString("m");
+            this._dir = (m[0] == '<' ? 1 : 0);
+            this._msg = m.Substring(1);
+        }
     }
 
   //--- (generated code: YSpiSnoopingRecord implementation)
@@ -89,6 +97,22 @@ public class YSpiSnoopingRecord
     public virtual int get_time()
     {
         return this._tim;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the absolute position of the message end.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   the absolute position of the message end.
+     * </returns>
+     */
+    public virtual int get_pos()
+    {
+        return this._pos;
     }
 
 

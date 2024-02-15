@@ -269,6 +269,9 @@
 <Compile Include="..\..\Sources\yocto_temperature.cs">
 <Link>yocto_api\yocto_temperature.cs</Link>
 </Compile>
+<Compile Include="..\..\Sources\yocto_threshold.cs">
+<Link>yocto_api\yocto_threshold.cs</Link>
+</Compile>
 <Compile Include="..\..\Sources\yocto_tilt.cs">
 <Link>yocto_api\yocto_tilt.cs</Link>
 </Compile>

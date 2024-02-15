@@ -1,13 +1,13 @@
 /*********************************************************************
  *
- *  $Id: main.cs 32713 2018-10-19 15:30:53Z seb $
+ *  $Id: main.cs 58233 2023-12-04 10:57:58Z seb $
  *
- *  An example that show how to use a  Yocto-Light
+ *  An example that shows how to use a  Yocto-Light
  *
  *  You can find more information on our web site:
  *   Yocto-Light documentation:
  *      https://www.yoctopuce.com/EN/products/yocto-light/doc.html
- *   C# API Reference:
+ *   C# V2 API Reference:
  *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-cs-EN.html
  *
  *********************************************************************/

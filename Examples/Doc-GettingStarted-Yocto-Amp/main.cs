@@ -1,13 +1,13 @@
 /*********************************************************************
  *
- *  $Id: main.cs 32621 2018-10-10 13:10:25Z seb $
+ *  $Id: main.cs 58233 2023-12-04 10:57:58Z seb $
  *
- *  An example that show how to use a  Yocto-Amp
+ *  An example that shows how to use a  Yocto-Amp
  *
  *  You can find more information on our web site:
  *   Yocto-Amp documentation:
  *      https://www.yoctopuce.com/EN/products/yocto-amp/doc.html
- *   C# API Reference:
+ *   C# V2 API Reference:
  *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-cs-EN.html
  *
  *********************************************************************/
