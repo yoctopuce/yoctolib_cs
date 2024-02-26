@@ -1224,7 +1224,7 @@ public class YSdi12Port : YFunction
 
     /**
      * <summary>
-     *   Retrieves a SDI12 port for a given identifier.
+     *   Retrieves an SDI12 port for a given identifier.
      * <para>
      *   The identifier can be specified using several formats:
      * </para>
@@ -1252,7 +1252,7 @@ public class YSdi12Port : YFunction
      *   it is invoked. The returned object is nevertheless valid.
      *   Use the method <c>YSdi12Port.isOnline()</c> to test if the SDI12 port is
      *   indeed online at a given time. In case of ambiguity when looking for
-     *   a SDI12 port by logical name, no error is notified: the first instance
+     *   an SDI12 port by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
      * </para>
@@ -2597,13 +2597,13 @@ public class YSdi12Port : YFunction
      *   Continues the enumeration of SDI12 ports started using <c>yFirstSdi12Port()</c>.
      * <para>
      *   Caution: You can't make any assumption about the returned SDI12 ports order.
-     *   If you want to find a specific a SDI12 port, use <c>Sdi12Port.findSdi12Port()</c>
+     *   If you want to find a specific an SDI12 port, use <c>Sdi12Port.findSdi12Port()</c>
      *   and a hardwareID or a logical name.
      * </para>
      * </summary>
      * <returns>
      *   a pointer to a <c>YSdi12Port</c> object, corresponding to
-     *   a SDI12 port currently online, or a <c>null</c> pointer
+     *   an SDI12 port currently online, or a <c>null</c> pointer
      *   if there are no more SDI12 ports to enumerate.
      * </returns>
      */

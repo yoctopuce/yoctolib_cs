@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 59222 2024-02-05 15:50:11Z seb $
+ * $Id: yocto_api.cs 59503 2024-02-26 11:04:41Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -3676,7 +3676,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "2.0";
     public const int YOCTO_API_VERSION_BCD = 0x0200;
 
-    public const string YOCTO_API_BUILD_NO = "59414";
+    public const string YOCTO_API_BUILD_NO = "59503";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -14813,7 +14813,7 @@ public class YSensor : YFunction
 
     /**
      * <summary>
-     *   Returns the sensor health state code, which is zero when there is an up-to-date measure
+     *   Returns the sensor state code, which is zero when there is an up-to-date measure
      *   available or a positive code if the sensor is not able to provide a measure right now.
      * <para>
      * </para>
@@ -14821,7 +14821,7 @@ public class YSensor : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the sensor health state code, which is zero when there is an up-to-date measure
+     *   an integer corresponding to the sensor state code, which is zero when there is an up-to-date measure
      *   available or a positive code if the sensor is not able to provide a measure right now
      * </returns>
      * <para>
@@ -15642,7 +15642,7 @@ public class YSensor : YFunction
  *   Recording can happen automatically, without requiring a permanent
  *   connection to a computer.
  *   The <c>YDataLogger</c> class controls the global parameters of the internal data
- *   logger. Recording control (start/stop) as well as data retreival is done at
+ *   logger. Recording control (start/stop) as well as data retrieval is done at
  *   sensor objects level.
  * </para>
  * <para>
