@@ -1,0 +1,16 @@
+{
+    "main": "main.cs",
+    "other_files": [],
+    "ylib": [
+        "yocto_current",
+        "yocto_motor",
+        "yocto_temperature",
+        "yocto_voltage",
+        "yocto_api"
+    ],
+    "skip": true,
+    "xcode": false,
+    "vstudio": true,
+    "gnu": false,
+    "cb": false
+}

@@ -233,14 +233,14 @@ public class YInputCaptureData
         mult3 = 1;
         if (recOfs < this._recOfs) {
             // load optional value multiplier
-            mult1 = this._decodeU16(sdata, this._recOfs);
+            mult1 = this._decodeU16(sdata, recOfs);
             recOfs = recOfs + 2;
             if (this._var2size > 0) {
-                mult2 = this._decodeU16(sdata, this._recOfs);
+                mult2 = this._decodeU16(sdata, recOfs);
                 recOfs = recOfs + 2;
             }
             if (this._var3size > 0) {
-                mult3 = this._decodeU16(sdata, this._recOfs);
+                mult3 = this._decodeU16(sdata, recOfs);
                 recOfs = recOfs + 2;
             }
         }

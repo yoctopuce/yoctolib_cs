@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: main.cs 58233 2023-12-04 10:57:58Z seb $
+ *  $Id: main.cs 60035 2024-03-20 09:56:43Z seb $
  *
  *  An example that shows how to use a  Yocto-SDI12
  *
@@ -59,7 +59,7 @@ namespace ConsoleApplication1
       sdi12Port = YSdi12Port.FindSdi12Port(target + ".sdi12Port");
       if (sdi12Port.isOnline()) {
         sdi12Port.reset();
-        YSdi12Sensor singleSensor = sdi12Port.discoverSingleSensor();
+        YSdi12SensorInfo singleSensor = sdi12Port.discoverSingleSensor();
         Console.WriteLine("Sensor address : " + singleSensor.get_sensorAddress());
         Console.WriteLine("Sensor SDI-12 compatibility : " + singleSensor.get_sensorProtocol());
         Console.WriteLine("Sensor company name : " + singleSensor.get_sensorVendor());

@@ -153,13 +153,14 @@ public class YSdi12SnoopingRecord
 }
 
  #pragma warning disable 1591
-//--- (generated code: YSdi12Sensor class start)
-public class YSdi12Sensor
+//--- (generated code: YSdi12SensorInfo class start)
+public class YSdi12SensorInfo
 {
-//--- (end of generated code: YSdi12Sensor class start)
-    //--- (generated code: YSdi12Sensor definitions)
+//--- (end of generated code: YSdi12SensorInfo class start)
+    //--- (generated code: YSdi12SensorInfo definitions)
 
     protected YSdi12Port _sdi12Port;
+    protected bool _isValid;
     protected string _addr;
     protected string _proto;
     protected string _mfg;
@@ -167,18 +168,39 @@ public class YSdi12Sensor
     protected string _ver;
     protected string _sn;
     protected List<List<string>> _valuesDesc = new List<List<string>>();
-    //--- (end of generated code: YSdi12Sensor definitions)
+    //--- (end of generated code: YSdi12SensorInfo definitions)
 
-    public YSdi12Sensor(YSdi12Port sdi12Port, string infoStr)
+    public YSdi12SensorInfo(YSdi12Port sdi12Port, string infoStr)
     {
-        //--- (generated code: YSdi12Sensor attributes initialization)
-        //--- (end of generated code: YSdi12Sensor attributes initialization)
+        //--- (generated code: YSdi12SensorInfo attributes initialization)
+        //--- (end of generated code: YSdi12SensorInfo attributes initialization)
         this._sdi12Port = sdi12Port;
         this._parseInfoStr(infoStr);
     }
 
-    //--- (generated code: YSdi12Sensor implementation)
+    public virtual void _throw(int errcode, string msg)
+    {
+        this._sdi12Port._throw(errcode,msg);
+    }
 
+    //--- (generated code: YSdi12SensorInfo implementation)
+
+
+
+    /**
+     * <summary>
+     *   Returns the sensor state.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   the sensor state.
+     * </returns>
+     */
+    public virtual bool isValid()
+    {
+        return this._isValid;
+    }
 
 
     /**
@@ -281,6 +303,8 @@ public class YSdi12Sensor
      * <summary>
      *   Returns the number of sensor measurements.
      * <para>
+     *   This function only works if the sensor is in version 1.4 SDI-12
+     *   and supports metadata commands.
      * </para>
      * </summary>
      * <returns>
@@ -297,6 +321,8 @@ public class YSdi12Sensor
      * <summary>
      *   Returns the sensor measurement command.
      * <para>
+     *   This function only works if the sensor is in version 1.4 SDI-12
+     *   and supports metadata commands.
      * </para>
      * </summary>
      * <param name="measureIndex">
@@ -304,10 +330,15 @@ public class YSdi12Sensor
      * </param>
      * <returns>
      *   the sensor measurement command.
+     *   On failure, throws an exception or returns an empty string.
      * </returns>
      */
     public virtual string get_measureCommand(int measureIndex)
     {
+        if (!(measureIndex < this._valuesDesc.Count)) {
+            this._throw(YAPI.INVALID_ARGUMENT, "Invalid measure index");
+            return "";
+        }
         return this._valuesDesc[measureIndex][0];
     }
 
@@ -316,6 +347,8 @@ public class YSdi12Sensor
      * <summary>
      *   Returns sensor measurement position.
      * <para>
+     *   This function only works if the sensor is in version 1.4 SDI-12
+     *   and supports metadata commands.
      * </para>
      * </summary>
      * <param name="measureIndex">
@@ -323,10 +356,15 @@ public class YSdi12Sensor
      * </param>
      * <returns>
      *   the sensor measurement command.
+     *   On failure, throws an exception or returns 0.
      * </returns>
      */
     public virtual int get_measurePosition(int measureIndex)
     {
+        if (!(measureIndex < this._valuesDesc.Count)) {
+            this._throw(YAPI.INVALID_ARGUMENT, "Invalid measure index");
+            return 0;
+        }
         return YAPI._atoi(this._valuesDesc[measureIndex][2]);
     }
 
@@ -335,6 +373,8 @@ public class YSdi12Sensor
      * <summary>
      *   Returns the measured value symbol.
      * <para>
+     *   This function only works if the sensor is in version 1.4 SDI-12
+     *   and supports metadata commands.
      * </para>
      * </summary>
      * <param name="measureIndex">
@@ -342,10 +382,15 @@ public class YSdi12Sensor
      * </param>
      * <returns>
      *   the sensor measurement command.
+     *   On failure, throws an exception or returns an empty string.
      * </returns>
      */
     public virtual string get_measureSymbol(int measureIndex)
     {
+        if (!(measureIndex < this._valuesDesc.Count)) {
+            this._throw(YAPI.INVALID_ARGUMENT, "Invalid measure index");
+            return "";
+        }
         return this._valuesDesc[measureIndex][3];
     }
 
@@ -354,6 +399,8 @@ public class YSdi12Sensor
      * <summary>
      *   Returns the unit of the measured value.
      * <para>
+     *   This function only works if the sensor is in version 1.4 SDI-12
+     *   and supports metadata commands.
      * </para>
      * </summary>
      * <param name="measureIndex">
@@ -361,10 +408,15 @@ public class YSdi12Sensor
      * </param>
      * <returns>
      *   the sensor measurement command.
+     *   On failure, throws an exception or returns an empty string.
      * </returns>
      */
     public virtual string get_measureUnit(int measureIndex)
     {
+        if (!(measureIndex < this._valuesDesc.Count)) {
+            this._throw(YAPI.INVALID_ARGUMENT, "Invalid measure index");
+            return "";
+        }
         return this._valuesDesc[measureIndex][4];
     }
 
@@ -373,6 +425,8 @@ public class YSdi12Sensor
      * <summary>
      *   Returns the description of the measured value.
      * <para>
+     *   This function only works if the sensor is in version 1.4 SDI-12
+     *   and supports metadata commands.
      * </para>
      * </summary>
      * <param name="measureIndex">
@@ -380,10 +434,15 @@ public class YSdi12Sensor
      * </param>
      * <returns>
      *   the sensor measurement command.
+     *   On failure, throws an exception or returns an empty string.
      * </returns>
      */
     public virtual string get_measureDescription(int measureIndex)
     {
+        if (!(measureIndex < this._valuesDesc.Count)) {
+            this._throw(YAPI.INVALID_ARGUMENT, "Invalid measure index");
+            return "";
+        }
         return this._valuesDesc[measureIndex][5];
     }
 
@@ -407,6 +466,7 @@ public class YSdi12Sensor
                 this._model = errmsg;
                 this._ver = errmsg;
                 this._sn = errmsg;
+                this._isValid = false;
             } else {
                 this._addr = (infoStr).Substring( 0, 1);
                 this._proto = (infoStr).Substring( 1, 2);
@@ -414,6 +474,7 @@ public class YSdi12Sensor
                 this._model = (infoStr).Substring( 11, 6);
                 this._ver = (infoStr).Substring( 17, 3);
                 this._sn = (infoStr).Substring( 20, (infoStr).Length-20);
+                this._isValid = true;
             }
         }
     }
@@ -470,7 +531,7 @@ public class YSdi12Sensor
         this._valuesDesc = val;
     }
 
-    //--- (end of generated code: YSdi12Sensor implementation)
+    //--- (end of generated code: YSdi12SensorInfo implementation)
 
 }
 
@@ -2291,19 +2352,19 @@ public class YSdi12Port : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   the reply returned by the sensor, as a YSdi12Sensor object.
+     *   the reply returned by the sensor, as a YSdi12SensorInfo object.
      * </returns>
      * <para>
      *   On failure, throws an exception or returns an empty string.
      * </para>
      */
-    public virtual YSdi12Sensor discoverSingleSensor()
+    public virtual YSdi12SensorInfo discoverSingleSensor()
     {
         string resStr;
 
         resStr = this.querySdi12("?","",5000);
         if (resStr == "") {
-            return new YSdi12Sensor(this, "ERSensor Not Found");
+            return new YSdi12SensorInfo(this, "ERSensor Not Found");
         }
 
         return this.getSensorInformation(resStr);
@@ -2320,15 +2381,15 @@ public class YSdi12Port : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   all the information from every connected sensor, as an array of YSdi12Sensor object.
+     *   all the information from every connected sensor, as an array of YSdi12SensorInfo object.
      * </returns>
      * <para>
      *   On failure, throws an exception or returns an empty string.
      * </para>
      */
-    public virtual List<YSdi12Sensor> discoverAllSensors()
+    public virtual List<YSdi12SensorInfo> discoverAllSensors()
     {
-        List<YSdi12Sensor> sensors = new List<YSdi12Sensor>();
+        List<YSdi12SensorInfo> sensors = new List<YSdi12SensorInfo>();
         List<string> idSens = new List<string>();
         string res;
         int i;
@@ -2441,15 +2502,15 @@ public class YSdi12Port : YFunction
      *   New sensor address, as a string
      * </param>
      * <returns>
-     *   the sensor address and information , as a YSdi12Sensor object.
+     *   the sensor address and information , as a YSdi12SensorInfo object.
      * </returns>
      * <para>
      *   On failure, throws an exception or returns an empty string.
      * </para>
      */
-    public virtual YSdi12Sensor changeAddress(string oldAddress, string newAddress)
+    public virtual YSdi12SensorInfo changeAddress(string oldAddress, string newAddress)
     {
-        YSdi12Sensor addr;
+        YSdi12SensorInfo addr;
 
         this.querySdi12(oldAddress, "A" + newAddress,1000);
         addr = this.getSensorInformation(newAddress);
@@ -2474,16 +2535,16 @@ public class YSdi12Port : YFunction
      *   On failure, throws an exception or returns an empty string.
      * </para>
      */
-    public virtual YSdi12Sensor getSensorInformation(string sensorAddr)
+    public virtual YSdi12SensorInfo getSensorInformation(string sensorAddr)
     {
         string res;
-        YSdi12Sensor sensor;
+        YSdi12SensorInfo sensor;
 
         res = this.querySdi12(sensorAddr,"I",1000);
         if (res == "") {
-            return new YSdi12Sensor(this, "ERSensor Not Found");
+            return new YSdi12SensorInfo(this, "ERSensor Not Found");
         }
-        sensor = new YSdi12Sensor(this, res);
+        sensor = new YSdi12SensorInfo(this, res);
         sensor._queryValueInfo();
         return sensor;
     }
@@ -2558,6 +2619,9 @@ public class YSdi12Port : YFunction
      *   the maximum number of milliseconds to wait for a message if none is found
      *   in the receive buffer.
      * </param>
+     * <param name="maxMsg">
+     *   the maximum number of messages to be returned by the function; up to 254.
+     * </param>
      * <returns>
      *   an array of <c>YSdi12SnoopingRecord</c> objects containing the messages found, if any.
      * </returns>
@@ -2565,7 +2629,7 @@ public class YSdi12Port : YFunction
      *   On failure, throws an exception or returns an empty array.
      * </para>
      */
-    public virtual List<YSdi12SnoopingRecord> snoopMessages(int maxWait)
+    public virtual List<YSdi12SnoopingRecord> snoopMessagesEx(int maxWait, int maxMsg)
     {
         string url;
         byte[] msgbin = new byte[0];
@@ -2574,7 +2638,7 @@ public class YSdi12Port : YFunction
         List<YSdi12SnoopingRecord> res = new List<YSdi12SnoopingRecord>();
         int idx;
 
-        url = "rxmsg.json?pos="+Convert.ToString( this._rxptr)+"&maxw="+Convert.ToString(maxWait)+"&t=0";
+        url = "rxmsg.json?pos="+Convert.ToString( this._rxptr)+"&maxw="+Convert.ToString( maxWait)+"&t=0&len="+Convert.ToString(maxMsg);
         msgbin = this._download(url);
         msgarr = this._json_get_array(msgbin);
         msglen = msgarr.Count;
@@ -2590,6 +2654,33 @@ public class YSdi12Port : YFunction
             idx = idx + 1;
         }
         return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Retrieves messages (both direction) in the SDI12 port buffer, starting at current position.
+     * <para>
+     * </para>
+     * <para>
+     *   If no message is found, the search waits for one up to the specified maximum timeout
+     *   (in milliseconds).
+     * </para>
+     * </summary>
+     * <param name="maxWait">
+     *   the maximum number of milliseconds to wait for a message if none is found
+     *   in the receive buffer.
+     * </param>
+     * <returns>
+     *   an array of <c>YSdi12SnoopingRecord</c> objects containing the messages found, if any.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
+     */
+    public virtual List<YSdi12SnoopingRecord> snoopMessages(int maxWait)
+    {
+        return this.snoopMessagesEx(maxWait, 255);
     }
 
     /**

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_spiport.cs 59503 2024-02-26 11:04:41Z seb $
+ *  $Id: yocto_spiport.cs 59693 2024-03-11 07:31:56Z seb $
  *
  *  Implements yFindSpiPort(), the high-level API for SpiPort functions
  *
@@ -2063,6 +2063,9 @@ public class YSpiPort : YFunction
      *   the maximum number of milliseconds to wait for a message if none is found
      *   in the receive buffer.
      * </param>
+     * <param name="maxMsg">
+     *   the maximum number of messages to be returned by the function; up to 254.
+     * </param>
      * <returns>
      *   an array of <c>YSpiSnoopingRecord</c> objects containing the messages found, if any.
      * </returns>
@@ -2070,7 +2073,7 @@ public class YSpiPort : YFunction
      *   On failure, throws an exception or returns an empty array.
      * </para>
      */
-    public virtual List<YSpiSnoopingRecord> snoopMessages(int maxWait)
+    public virtual List<YSpiSnoopingRecord> snoopMessagesEx(int maxWait, int maxMsg)
     {
         string url;
         byte[] msgbin = new byte[0];
@@ -2079,7 +2082,7 @@ public class YSpiPort : YFunction
         List<YSpiSnoopingRecord> res = new List<YSpiSnoopingRecord>();
         int idx;
 
-        url = "rxmsg.json?pos="+Convert.ToString( this._rxptr)+"&maxw="+Convert.ToString(maxWait)+"&t=0";
+        url = "rxmsg.json?pos="+Convert.ToString( this._rxptr)+"&maxw="+Convert.ToString( maxWait)+"&t=0&len="+Convert.ToString(maxMsg);
         msgbin = this._download(url);
         msgarr = this._json_get_array(msgbin);
         msglen = msgarr.Count;
@@ -2095,6 +2098,33 @@ public class YSpiPort : YFunction
             idx = idx + 1;
         }
         return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Retrieves messages (both direction) in the SPI port buffer, starting at current position.
+     * <para>
+     * </para>
+     * <para>
+     *   If no message is found, the search waits for one up to the specified maximum timeout
+     *   (in milliseconds).
+     * </para>
+     * </summary>
+     * <param name="maxWait">
+     *   the maximum number of milliseconds to wait for a message if none is found
+     *   in the receive buffer.
+     * </param>
+     * <returns>
+     *   an array of <c>YSpiSnoopingRecord</c> objects containing the messages found, if any.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
+     */
+    public virtual List<YSpiSnoopingRecord> snoopMessages(int maxWait)
+    {
+        return this.snoopMessagesEx(maxWait, 255);
     }
 
     /**

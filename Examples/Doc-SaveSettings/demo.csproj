@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -8,8 +8,8 @@
     <ProjectGuid>{1A54F6C6-13D4-4DCA-8A1C-DCCE30A0B2D5}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConsoleApplication1</RootNamespace>
-    <AssemblyName>demo</AssemblyName>
+    <RootNamespace>demo</RootNamespace>
+    <AssemblyName>Doc-SaveSettings</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -79,250 +79,243 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\Sources\yocto_api.cs">
-      <Link>yocto_api\yocto_api.cs</Link>
-    </Compile>
-    
-<Compile Include="..\..\Sources\yocto_accelerometer.cs">
-<Link>yocto_api\yocto_accelerometer.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_altitude.cs">
-<Link>yocto_api\yocto_altitude.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_anbutton.cs">
-<Link>yocto_api\yocto_anbutton.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_arithmeticsensor.cs">
-<Link>yocto_api\yocto_arithmeticsensor.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_audioin.cs">
-<Link>yocto_api\yocto_audioin.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_audioout.cs">
-<Link>yocto_api\yocto_audioout.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_bluetoothlink.cs">
-<Link>yocto_api\yocto_bluetoothlink.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_buzzer.cs">
-<Link>yocto_api\yocto_buzzer.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_carbondioxide.cs">
-<Link>yocto_api\yocto_carbondioxide.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_cellular.cs">
-<Link>yocto_api\yocto_cellular.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_colorled.cs">
-<Link>yocto_api\yocto_colorled.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_colorledcluster.cs">
-<Link>yocto_api\yocto_colorledcluster.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_compass.cs">
-<Link>yocto_api\yocto_compass.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_current.cs">
-<Link>yocto_api\yocto_current.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_currentloopoutput.cs">
-<Link>yocto_api\yocto_currentloopoutput.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_daisychain.cs">
-<Link>yocto_api\yocto_daisychain.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_digitalio.cs">
-<Link>yocto_api\yocto_digitalio.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_display.cs">
-<Link>yocto_api\yocto_display.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_dualpower.cs">
-<Link>yocto_api\yocto_dualpower.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_files.cs">
-<Link>yocto_api\yocto_files.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_genericsensor.cs">
-<Link>yocto_api\yocto_genericsensor.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_gps.cs">
-<Link>yocto_api\yocto_gps.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_groundspeed.cs">
-<Link>yocto_api\yocto_groundspeed.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_gyro.cs">
-<Link>yocto_api\yocto_gyro.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_hubport.cs">
-<Link>yocto_api\yocto_hubport.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_humidity.cs">
-<Link>yocto_api\yocto_humidity.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_i2cport.cs">
-<Link>yocto_api\yocto_i2cport.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_inputcapture.cs">
-<Link>yocto_api\yocto_inputcapture.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_inputchain.cs">
-<Link>yocto_api\yocto_inputchain.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_latitude.cs">
-<Link>yocto_api\yocto_latitude.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_led.cs">
-<Link>yocto_api\yocto_led.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_lightsensor.cs">
-<Link>yocto_api\yocto_lightsensor.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_longitude.cs">
-<Link>yocto_api\yocto_longitude.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_magnetometer.cs">
-<Link>yocto_api\yocto_magnetometer.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_messagebox.cs">
-<Link>yocto_api\yocto_messagebox.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_motor.cs">
-<Link>yocto_api\yocto_motor.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_multiaxiscontroller.cs">
-<Link>yocto_api\yocto_multiaxiscontroller.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_multicellweighscale.cs">
-<Link>yocto_api\yocto_multicellweighscale.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_multisenscontroller.cs">
-<Link>yocto_api\yocto_multisenscontroller.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_network.cs">
-<Link>yocto_api\yocto_network.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_oscontrol.cs">
-<Link>yocto_api\yocto_oscontrol.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_power.cs">
-<Link>yocto_api\yocto_power.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_poweroutput.cs">
-<Link>yocto_api\yocto_poweroutput.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_powersupply.cs">
-<Link>yocto_api\yocto_powersupply.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_pressure.cs">
-<Link>yocto_api\yocto_pressure.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_proximity.cs">
-<Link>yocto_api\yocto_proximity.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_pwminput.cs">
-<Link>yocto_api\yocto_pwminput.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_pwmoutput.cs">
-<Link>yocto_api\yocto_pwmoutput.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_pwmpowersource.cs">
-<Link>yocto_api\yocto_pwmpowersource.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_quadraturedecoder.cs">
-<Link>yocto_api\yocto_quadraturedecoder.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_rangefinder.cs">
-<Link>yocto_api\yocto_rangefinder.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_realtimeclock.cs">
-<Link>yocto_api\yocto_realtimeclock.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_refframe.cs">
-<Link>yocto_api\yocto_refframe.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_relay.cs">
-<Link>yocto_api\yocto_relay.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_rfidreader.cs">
-<Link>yocto_api\yocto_rfidreader.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_sdi12port.cs">
-<Link>yocto_api\yocto_sdi12port.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_segmenteddisplay.cs">
-<Link>yocto_api\yocto_segmenteddisplay.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_serialport.cs">
-<Link>yocto_api\yocto_serialport.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_servo.cs">
-<Link>yocto_api\yocto_servo.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_spiport.cs">
-<Link>yocto_api\yocto_spiport.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_steppermotor.cs">
-<Link>yocto_api\yocto_steppermotor.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_temperature.cs">
-<Link>yocto_api\yocto_temperature.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_threshold.cs">
-<Link>yocto_api\yocto_threshold.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_tilt.cs">
-<Link>yocto_api\yocto_tilt.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_tvoc.cs">
-<Link>yocto_api\yocto_tvoc.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_voc.cs">
-<Link>yocto_api\yocto_voc.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_voltage.cs">
-<Link>yocto_api\yocto_voltage.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_voltageoutput.cs">
-<Link>yocto_api\yocto_voltageoutput.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_wakeupmonitor.cs">
-<Link>yocto_api\yocto_wakeupmonitor.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_wakeupschedule.cs">
-<Link>yocto_api\yocto_wakeupschedule.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_watchdog.cs">
-<Link>yocto_api\yocto_watchdog.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_weighscale.cs">
-<Link>yocto_api\yocto_weighscale.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_wireless.cs">
-<Link>yocto_api\yocto_wireless.cs</Link>
-</Compile>
-
     <Compile Include="main.cs" />
+    <Compile Include="..\..\Sources\yocto_accelerometer.cs">
+      <Link>Yoctopuce\yocto_accelerometer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_altitude.cs">
+      <Link>Yoctopuce\yocto_altitude.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_anbutton.cs">
+      <Link>Yoctopuce\yocto_anbutton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_arithmeticsensor.cs">
+      <Link>Yoctopuce\yocto_arithmeticsensor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_audioin.cs">
+      <Link>Yoctopuce\yocto_audioin.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_audioout.cs">
+      <Link>Yoctopuce\yocto_audioout.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_bluetoothlink.cs">
+      <Link>Yoctopuce\yocto_bluetoothlink.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_buzzer.cs">
+      <Link>Yoctopuce\yocto_buzzer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_carbondioxide.cs">
+      <Link>Yoctopuce\yocto_carbondioxide.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_cellular.cs">
+      <Link>Yoctopuce\yocto_cellular.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_colorled.cs">
+      <Link>Yoctopuce\yocto_colorled.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_colorledcluster.cs">
+      <Link>Yoctopuce\yocto_colorledcluster.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_compass.cs">
+      <Link>Yoctopuce\yocto_compass.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_current.cs">
+      <Link>Yoctopuce\yocto_current.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_currentloopoutput.cs">
+      <Link>Yoctopuce\yocto_currentloopoutput.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_daisychain.cs">
+      <Link>Yoctopuce\yocto_daisychain.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_digitalio.cs">
+      <Link>Yoctopuce\yocto_digitalio.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_display.cs">
+      <Link>Yoctopuce\yocto_display.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_dualpower.cs">
+      <Link>Yoctopuce\yocto_dualpower.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_files.cs">
+      <Link>Yoctopuce\yocto_files.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_genericsensor.cs">
+      <Link>Yoctopuce\yocto_genericsensor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_gps.cs">
+      <Link>Yoctopuce\yocto_gps.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_groundspeed.cs">
+      <Link>Yoctopuce\yocto_groundspeed.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_gyro.cs">
+      <Link>Yoctopuce\yocto_gyro.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_hubport.cs">
+      <Link>Yoctopuce\yocto_hubport.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_humidity.cs">
+      <Link>Yoctopuce\yocto_humidity.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_i2cport.cs">
+      <Link>Yoctopuce\yocto_i2cport.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_inputcapture.cs">
+      <Link>Yoctopuce\yocto_inputcapture.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_inputchain.cs">
+      <Link>Yoctopuce\yocto_inputchain.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_latitude.cs">
+      <Link>Yoctopuce\yocto_latitude.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_led.cs">
+      <Link>Yoctopuce\yocto_led.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_lightsensor.cs">
+      <Link>Yoctopuce\yocto_lightsensor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_longitude.cs">
+      <Link>Yoctopuce\yocto_longitude.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_magnetometer.cs">
+      <Link>Yoctopuce\yocto_magnetometer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_messagebox.cs">
+      <Link>Yoctopuce\yocto_messagebox.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_motor.cs">
+      <Link>Yoctopuce\yocto_motor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_multiaxiscontroller.cs">
+      <Link>Yoctopuce\yocto_multiaxiscontroller.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_multicellweighscale.cs">
+      <Link>Yoctopuce\yocto_multicellweighscale.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_multisenscontroller.cs">
+      <Link>Yoctopuce\yocto_multisenscontroller.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_network.cs">
+      <Link>Yoctopuce\yocto_network.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_oscontrol.cs">
+      <Link>Yoctopuce\yocto_oscontrol.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_power.cs">
+      <Link>Yoctopuce\yocto_power.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_poweroutput.cs">
+      <Link>Yoctopuce\yocto_poweroutput.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_powersupply.cs">
+      <Link>Yoctopuce\yocto_powersupply.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_pressure.cs">
+      <Link>Yoctopuce\yocto_pressure.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_proximity.cs">
+      <Link>Yoctopuce\yocto_proximity.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_pwminput.cs">
+      <Link>Yoctopuce\yocto_pwminput.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_pwmoutput.cs">
+      <Link>Yoctopuce\yocto_pwmoutput.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_pwmpowersource.cs">
+      <Link>Yoctopuce\yocto_pwmpowersource.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_quadraturedecoder.cs">
+      <Link>Yoctopuce\yocto_quadraturedecoder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_rangefinder.cs">
+      <Link>Yoctopuce\yocto_rangefinder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_realtimeclock.cs">
+      <Link>Yoctopuce\yocto_realtimeclock.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_refframe.cs">
+      <Link>Yoctopuce\yocto_refframe.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_relay.cs">
+      <Link>Yoctopuce\yocto_relay.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_rfidreader.cs">
+      <Link>Yoctopuce\yocto_rfidreader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_sdi12port.cs">
+      <Link>Yoctopuce\yocto_sdi12port.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_segmenteddisplay.cs">
+      <Link>Yoctopuce\yocto_segmenteddisplay.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_serialport.cs">
+      <Link>Yoctopuce\yocto_serialport.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_servo.cs">
+      <Link>Yoctopuce\yocto_servo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_spiport.cs">
+      <Link>Yoctopuce\yocto_spiport.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_steppermotor.cs">
+      <Link>Yoctopuce\yocto_steppermotor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_temperature.cs">
+      <Link>Yoctopuce\yocto_temperature.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_threshold.cs">
+      <Link>Yoctopuce\yocto_threshold.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_tilt.cs">
+      <Link>Yoctopuce\yocto_tilt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_tvoc.cs">
+      <Link>Yoctopuce\yocto_tvoc.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_voc.cs">
+      <Link>Yoctopuce\yocto_voc.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_voltage.cs">
+      <Link>Yoctopuce\yocto_voltage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_voltageoutput.cs">
+      <Link>Yoctopuce\yocto_voltageoutput.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_wakeupmonitor.cs">
+      <Link>Yoctopuce\yocto_wakeupmonitor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_wakeupschedule.cs">
+      <Link>Yoctopuce\yocto_wakeupschedule.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_watchdog.cs">
+      <Link>Yoctopuce\yocto_watchdog.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_weighscale.cs">
+      <Link>Yoctopuce\yocto_weighscale.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_wireless.cs">
+      <Link>Yoctopuce\yocto_wireless.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_api.cs">
+      <Link>Yoctopuce\yocto_api.cs</Link>
+    </Compile>
+  
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Content Include="..\..\Sources\dll\amd64\yapi.dll">
+
+        <Content Include="..\..\Sources\dll\amd64\yapi.dll">
       <Link>amd64\yapi.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\Sources\dll\yapi.dll">
       <Link>yapi.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </Content>  
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

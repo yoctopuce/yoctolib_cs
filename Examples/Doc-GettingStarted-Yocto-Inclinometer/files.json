@@ -1,0 +1,16 @@
+{
+    "main": "main.cs",
+    "other_files": [],
+    "ylib": [
+        "yocto_accelerometer",
+        "yocto_refframe",
+        "yocto_temperature",
+        "yocto_tilt",
+        "yocto_api"
+    ],
+    "skip": true,
+    "xcode": false,
+    "vstudio": true,
+    "gnu": false,
+    "cb": false
+}

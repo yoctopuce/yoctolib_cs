@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 59503 2024-02-26 11:04:41Z seb $
+ * $Id: yocto_api.cs 60198 2024-03-25 14:56:46Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -3676,7 +3676,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "2.0";
     public const int YOCTO_API_VERSION_BCD = 0x0200;
 
-    public const string YOCTO_API_BUILD_NO = "59526";
+    public const string YOCTO_API_BUILD_NO = "60327";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -3734,6 +3734,7 @@ public class YAPI
     public const int NO_TRUSTED_CA_CHECK = 1;       // Disables certificate checking
     public const int NO_EXPIRATION_CHECK = 2;       // Disables certificate expiration date checking
     public const int NO_HOSTNAME_CHECK = 4;         // Disable hostname checking
+    public const int LEGACY = 8;                    // Allow non secure connection (similar to v1.10)
 
 //--- (end of generated code: YFunction return codes)
 
@@ -6792,7 +6793,7 @@ public class YAPI
      *   a string containing the certificate. In case of error, returns a string starting with "error:".
      * </returns>
      */
-    public static byte[] DownloadHostCertificate(string url, ulong mstimeout)
+    public static string DownloadHostCertificate(string url, ulong mstimeout)
     {
         if (!_apiInitialized) {
             string errmsg = "";
@@ -7098,7 +7099,7 @@ public class YAPIContext
      *   a string containing the certificate. In case of error, returns a string starting with "error:".
      * </returns>
      */
-    public virtual byte[] DownloadHostCertificate(string url, ulong mstimeout)
+    public virtual string DownloadHostCertificate(string url, ulong mstimeout)
     {
         StringBuilder errmsg = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
         StringBuilder smallbuff = new StringBuilder(4096);
@@ -7124,11 +7125,11 @@ public class YAPIContext
             } else {
                 certifcate = "error:" + errmsg.ToString();
             }
-            return YAPI.DefaultEncoding.GetBytes(certifcate);
+            return certifcate;
         } else {
             certifcate = smallbuff.ToString();
         }
-        return YAPI.DefaultEncoding.GetBytes(certifcate);
+        return certifcate;
     }
 
 

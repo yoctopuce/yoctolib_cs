@@ -1,0 +1,15 @@
+{
+    "main": "main.cs",
+    "other_files": [],
+    "ylib": [
+        "yocto_lightsensor",
+        "yocto_rangefinder",
+        "yocto_temperature",
+        "yocto_api"
+    ],
+    "skip": true,
+    "xcode": false,
+    "vstudio": true,
+    "gnu": false,
+    "cb": false
+}

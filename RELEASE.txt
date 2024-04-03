@@ -1,3 +1,7 @@
-C#V2 v2.0.59526
+C#V2 v2.0.60327
 
-- Fix dependency to GLIBC_2.33 on Linux aarch64 system
+- Fix return type of method DownloadHostCertificate
+- Improve error reporting when remote TLS certificate is invalid
+- Increase the number of detectable hubs to 128
+- Increase then maximum number of connected hub to 128
+- Update Mbed-TLS library to version 3.52

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -8,8 +8,8 @@
     <ProjectGuid>{1A54F6C6-13D4-4DCA-8A1C-DCCE30A0B2D5}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConsoleApplication1</RootNamespace>
-    <AssemblyName>demo</AssemblyName>
+    <RootNamespace>demo</RootNamespace>
+    <AssemblyName>Doc-GettingStarted-Yocto-Display</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -79,43 +79,36 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\Sources\yocto_api.cs">
-      <Link>yocto_api\yocto_api.cs</Link>
-    </Compile>
-    
-<Compile Include="..\..\Sources\yocto_anbutton.cs">
-<Link>yocto_api\yocto_anbutton.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_display.cs">
-<Link>yocto_api\yocto_display.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_files.cs">
-<Link>yocto_api\yocto_files.cs</Link>
-</Compile>
-<Compile Include="..\..\Sources\yocto_quadraturedecoder.cs">
-<Link>yocto_api\yocto_quadraturedecoder.cs</Link>
-</Compile>
-
     <Compile Include="main.cs" />
+    <Compile Include="..\..\Sources\yocto_anbutton.cs">
+      <Link>Yoctopuce\yocto_anbutton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_display.cs">
+      <Link>Yoctopuce\yocto_display.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_files.cs">
+      <Link>Yoctopuce\yocto_files.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_quadraturedecoder.cs">
+      <Link>Yoctopuce\yocto_quadraturedecoder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_api.cs">
+      <Link>Yoctopuce\yocto_api.cs</Link>
+    </Compile>
+  
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Content Include="..\..\Sources\dll\amd64\yapi.dll">
+
+        <Content Include="..\..\Sources\dll\amd64\yapi.dll">
       <Link>amd64\yapi.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\Sources\dll\yapi.dll">
       <Link>yapi.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </Content>  
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

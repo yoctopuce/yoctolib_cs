@@ -1,0 +1,13 @@
+{
+    "main": "main.cs",
+    "other_files": [],
+    "ylib": [
+        "yocto_relay",
+        "yocto_api"
+    ],
+    "skip": true,
+    "xcode": false,
+    "vstudio": true,
+    "gnu": false,
+    "cb": false
+}

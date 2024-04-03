@@ -1,13 +1,13 @@
 /*********************************************************************
  *
- *  $Id: main.cs 58233 2023-12-04 10:57:58Z seb $
+ *  $Id: main.cs 60118 2024-03-22 09:41:25Z seb $
  *
  *  An example that shows how to use a  Yocto-MaxiMicroVolt-Rx
  *
  *  You can find more information on our web site:
  *   Yocto-MaxiMicroVolt-Rx documentation:
  *      https://www.yoctopuce.com/EN/products/yocto-maximicrovolt-rx/doc.html
- *   C# V2 API Reference:
+ *   C# API Reference:
  *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-cs-EN.html
  *
  *********************************************************************/

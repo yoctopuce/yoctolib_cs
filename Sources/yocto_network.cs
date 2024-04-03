@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_network.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_network.cs 60214 2024-03-26 13:01:50Z mvuilleu $
  *
  *  Implements yFindNetwork(), the high-level API for Network functions
  *
@@ -87,6 +87,11 @@ public class YNetwork : YFunction
     public const string ADMINPASSWORD_INVALID = YAPI.INVALID_STRING;
     public const int HTTPPORT_INVALID = YAPI.INVALID_UINT;
     public const int HTTPSPORT_INVALID = YAPI.INVALID_UINT;
+    public const int SECURITYMODE_UNDEFINED = 0;
+    public const int SECURITYMODE_LEGACY = 1;
+    public const int SECURITYMODE_MIXED = 2;
+    public const int SECURITYMODE_SECURE = 3;
+    public const int SECURITYMODE_INVALID = -1;
     public const string DEFAULTPAGE_INVALID = YAPI.INVALID_STRING;
     public const int DISCOVERABLE_FALSE = 0;
     public const int DISCOVERABLE_TRUE = 1;
@@ -134,6 +139,7 @@ public class YNetwork : YFunction
     protected string _adminPassword = ADMINPASSWORD_INVALID;
     protected int _httpPort = HTTPPORT_INVALID;
     protected int _httpsPort = HTTPSPORT_INVALID;
+    protected int _securityMode = SECURITYMODE_INVALID;
     protected string _defaultPage = DEFAULTPAGE_INVALID;
     protected int _discoverable = DISCOVERABLE_INVALID;
     protected int _wwwWatchdogDelay = WWWWATCHDOGDELAY_INVALID;
@@ -217,6 +223,10 @@ public class YNetwork : YFunction
         if (json_val.has("httpsPort"))
         {
             _httpsPort = json_val.getInt("httpsPort");
+        }
+        if (json_val.has("securityMode"))
+        {
+            _securityMode = json_val.getInt("securityMode");
         }
         if (json_val.has("defaultPage"))
         {
@@ -975,6 +985,83 @@ public class YNetwork : YFunction
         lock (_thisLock) {
             rest_val = (newval).ToString();
             return _setAttr("httpsPort", rest_val);
+        }
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the security level chosen to prevent unauthorized access to the server.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among <c>YNetwork.SECURITYMODE_UNDEFINED</c>, <c>YNetwork.SECURITYMODE_LEGACY</c>,
+     *   <c>YNetwork.SECURITYMODE_MIXED</c> and <c>YNetwork.SECURITYMODE_SECURE</c> corresponding to the
+     *   security level chosen to prevent unauthorized access to the server
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YNetwork.SECURITYMODE_INVALID</c>.
+     * </para>
+     */
+    public int get_securityMode()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return SECURITYMODE_INVALID;
+                }
+            }
+            res = this._securityMode;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Changes the security level used to prevent unauthorized access to the server.
+     * <para>
+     *   The value <c>UNDEFINED</c> causes the security configuration wizard to be
+     *   displayed the next time you log on to the Web console.
+     *   The value <c>LEGACY</c> offers unencrypted HTTP access by default, and
+     *   is designed to provide compatibility with legacy applications that do not
+     *   handle password or do not support <c>HTTPS</c>. But it should
+     *   only be used when system security is guaranteed by other means, such as the
+     *   use of a firewall.
+     *   The value <c>MIXED</c> requires the configuration of passwords, and allows
+     *   access via both HTTP (unencrypted) and HTTPS (encrypted), while requiring
+     *   the Yoctopuce API to be tolerant of certificate characteristics.
+     *   The value <c>SECURE</c> requires the configuration of passwords and the
+     *   use of secure communications in all cases.
+     *   When you change this parameter, remember to call the <c>saveToFlash()</c>
+     *   method of the module if the modification must be kept.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a value among <c>YNetwork.SECURITYMODE_UNDEFINED</c>, <c>YNetwork.SECURITYMODE_LEGACY</c>,
+     *   <c>YNetwork.SECURITYMODE_MIXED</c> and <c>YNetwork.SECURITYMODE_SECURE</c> corresponding to the
+     *   security level used to prevent unauthorized access to the server
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_securityMode(int newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = (newval).ToString();
+            return _setAttr("securityMode", rest_val);
         }
     }
 
