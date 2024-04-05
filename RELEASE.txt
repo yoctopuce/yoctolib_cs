@@ -1,7 +1,10 @@
-C#V2 v2.0.60327
+C#V2 v2.0.60394
 
-- Fix return type of method DownloadHostCertificate
-- Improve error reporting when remote TLS certificate is invalid
+- Add support for Yocto-RFID
+- Improve error reporting if remote TLS certificate is invalid
 - Increase the number of detectable hubs to 128
 - Increase then maximum number of connected hub to 128
-- Update Mbed-TLS library to version 3.52
+- Fix incomplete documentation
+- Fix warning about malformed XML comment
+- Fix handling of long strings in many parse situations (including json_get_key)
+- Fix return type of method DownloadHostCertificate
