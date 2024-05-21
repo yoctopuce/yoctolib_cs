@@ -1126,7 +1126,7 @@ public class YRfidStatus
  * <para>
  *   By default, the RfidReader class automatically manages these blocks so that
  *   arbitrary size data  can be manipulated of  without risk and without knowledge of
- *   tag architecture .
+ *   tag architecture.
  * </para>
  * <para>
  * </para>
@@ -1471,9 +1471,9 @@ public class YRfidReader : YFunction
 
     /**
      * <summary>
-     *   Retourne la description des propriétés d'un tag RFID présent.
+     *   Returns a description of the properties of an existing RFID tag.
      * <para>
-     *   Cette fonction peut causer des communications avec le tag.
+     *   This function can cause communications with the tag.
      * </para>
      * <para>
      * </para>
@@ -2124,13 +2124,21 @@ public class YRfidReader : YFunction
      *   Note that only the characters présent  in  the provided string
      *   will be written, there is no notion of string length. If your
      *   string data have variable length, you'll have to encode the
-     *   string length yourself.
+     *   string length yourself, with a terminal zero for instannce.
+     * </para>
+     * <para>
+     *   This function only works with ISO-latin characters, if you wish to
+     *   write strings encoded with alternate character sets, you'll have to
+     *   use tagWriteBin() function.
+     * </para>
+     * <para>
      *   By default firstBlock cannot be a special block, and any special block
      *   encountered in the middle of the write operation will be skipped
      *   automatically. The last data block affected by the operation will
      *   be automatically padded with zeros if neccessary.
      *   If you rather want to rewrite special blocks as well,
-     *   use the <c>EnableRawAccess</c> field from the <c>options</c> parameter.
+     *   use the <c>EnableRawAccess</c> field from the <c>options</c> parameter
+     *   (definitely not recommanded).
      * </para>
      * <para>
      * </para>

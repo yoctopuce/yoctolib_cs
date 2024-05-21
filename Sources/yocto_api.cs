@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 60198 2024-03-25 14:56:46Z seb $
+ * $Id: yocto_api.cs 60510 2024-04-12 09:37:02Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -3640,6 +3640,51 @@ internal static class SafeNativeMethods
                   return _yapiSetHubIntAttrLINAARCH64(hubref, attrname, value);
         }
     }
+    [DllImport("yapi", EntryPoint = "yapiSetTrustedCertificatesList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetTrustedCertificatesListWIN32(StringBuilder certificatePath, StringBuilder errmsg);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiSetTrustedCertificatesList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetTrustedCertificatesListWIN64(StringBuilder certificatePath, StringBuilder errmsg);
+    [DllImport("libyapi32", EntryPoint = "yapiSetTrustedCertificatesList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetTrustedCertificatesListMACOS32(StringBuilder certificatePath, StringBuilder errmsg);
+    [DllImport("libyapi64", EntryPoint = "yapiSetTrustedCertificatesList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetTrustedCertificatesListMACOS64(StringBuilder certificatePath, StringBuilder errmsg);
+    [DllImport("libyapi-amd64", EntryPoint = "yapiSetTrustedCertificatesList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetTrustedCertificatesListLIN64(StringBuilder certificatePath, StringBuilder errmsg);
+    [DllImport("libyapi-i386", EntryPoint = "yapiSetTrustedCertificatesList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetTrustedCertificatesListLIN32(StringBuilder certificatePath, StringBuilder errmsg);
+    [DllImport("libyapi-armhf", EntryPoint = "yapiSetTrustedCertificatesList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetTrustedCertificatesListLINARMHF(StringBuilder certificatePath, StringBuilder errmsg);
+    [DllImport("libyapi-aarch64", EntryPoint = "yapiSetTrustedCertificatesList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static YRETCODE _yapiSetTrustedCertificatesListLINAARCH64(StringBuilder certificatePath, StringBuilder errmsg);
+    internal static YRETCODE _yapiSetTrustedCertificatesList(StringBuilder certificatePath, StringBuilder errmsg)
+    {
+        if  (_dllVersion == YAPIDLL_VERSION.NOT_INIT) {
+            string version = "";
+            string date = "";
+            YAPI.apiGetAPIVersion(ref version, ref date);
+        }
+        switch (_dllVersion) {
+            case YAPIDLL_VERSION.NOT_INIT:
+                throw new YAPI_Exception(YAPI.NOT_INITIALIZED, "API not initialized");
+            default:
+            case YAPIDLL_VERSION.WIN32:
+                  return _yapiSetTrustedCertificatesListWIN32(certificatePath, errmsg);
+            case YAPIDLL_VERSION.WIN64:
+                  return _yapiSetTrustedCertificatesListWIN64(certificatePath, errmsg);
+            case YAPIDLL_VERSION.MACOS32:
+                  return _yapiSetTrustedCertificatesListMACOS32(certificatePath, errmsg);
+            case YAPIDLL_VERSION.MACOS64:
+                  return _yapiSetTrustedCertificatesListMACOS64(certificatePath, errmsg);
+            case YAPIDLL_VERSION.LIN64:
+                  return _yapiSetTrustedCertificatesListLIN64(certificatePath, errmsg);
+            case YAPIDLL_VERSION.LIN32:
+                  return _yapiSetTrustedCertificatesListLIN32(certificatePath, errmsg);
+            case YAPIDLL_VERSION.LINARMHF:
+                  return _yapiSetTrustedCertificatesListLINARMHF(certificatePath, errmsg);
+            case YAPIDLL_VERSION.LINAARCH64:
+                  return _yapiSetTrustedCertificatesListLINAARCH64(certificatePath, errmsg);
+        }
+    }
 //--- (end of generated code: YFunction dlldef)
 }
 
@@ -3676,7 +3721,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "2.0";
     public const int YOCTO_API_VERSION_BCD = 0x0200;
 
-    public const string YOCTO_API_BUILD_NO = "60394";
+    public const string YOCTO_API_BUILD_NO = "61039";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6831,12 +6876,40 @@ public class YAPI
 
     /**
      * <summary>
+     *   Set the path of Certificate Authority file on local filesystem.
+     * <para>
+     *   This method takes as a parameter the path of a file containing all certificates in PEM format.
+     *   For technical reasons, only one file can be specified. So if you need to connect to several Hubs
+     *   instances with self-signed certificates, you'll need to use
+     *   a single file containing all the certificates end-to-end. Passing a empty string will restore the
+     *   default settings. This option is only supported by PHP library.
+     * </para>
+     * </summary>
+     * <param name="certificatePath">
+     *   the path of the file containing all certificates in PEM format.
+     * </param>
+     * <returns>
+     *   an empty string if the certificate has been added correctly.
+     *   In case of error, returns a string starting with "error:".
+     * </returns>
+     */
+    public static string SetTrustedCertificatesList(string certificatePath)
+    {
+        if (!_apiInitialized) {
+            string errmsg = "";
+            InitAPI(0, ref errmsg);
+        }
+        return _yapiContext.SetTrustedCertificatesList(certificatePath);
+    }
+
+    /**
+     * <summary>
      *   Enables or disables certain TLS/SSL certificate checks.
      * <para>
      * </para>
      * </summary>
-     * <param name="options">
-     *   The options: <c>YAPI.NO_TRUSTED_CA_CHECK</c>,
+     * <param name="opts">
+     *   The options are <c>YAPI.NO_TRUSTED_CA_CHECK</c>,
      *   <c>YAPI.NO_EXPIRATION_CHECK</c>, <c>YAPI.NO_HOSTNAME_CHECK</c>.
      * </param>
      * <returns>
@@ -6844,13 +6917,13 @@ public class YAPI
      *   On error, returns a string beginning with "error:".
      * </returns>
      */
-    public static string SetNetworkSecurityOptions(int options)
+    public static string SetNetworkSecurityOptions(int opts)
     {
         if (!_apiInitialized) {
             string errmsg = "";
             InitAPI(0, ref errmsg);
         }
-        return _yapiContext.SetNetworkSecurityOptions(options);
+        return _yapiContext.SetNetworkSecurityOptions(opts);
     }
 
     /**
@@ -7169,12 +7242,44 @@ public class YAPIContext
 
     /**
      * <summary>
+     *   Set the path of Certificate Authority file on local filesystem.
+     * <para>
+     *   This method takes as a parameter the path of a file containing all certificates in PEM format.
+     *   For technical reasons, only one file can be specified. So if you need to connect to several Hubs
+     *   instances with self-signed certificates, you'll need to use
+     *   a single file containing all the certificates end-to-end. Passing a empty string will restore the
+     *   default settings. This option is only supported by PHP library.
+     * </para>
+     * </summary>
+     * <param name="certificatePath">
+     *   the path of the file containing all certificates in PEM format.
+     * </param>
+     * <returns>
+     *   an empty string if the certificate has been added correctly.
+     *   In case of error, returns a string starting with "error:".
+     * </returns>
+     */
+    public virtual string SetTrustedCertificatesList(string certificatePath)
+    {
+        StringBuilder errmsg = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
+        int res;
+        res = SafeNativeMethods._yapiSetTrustedCertificatesList(new StringBuilder(certificatePath), errmsg);
+        if (res < 0) {
+            return errmsg.ToString();
+        } else {
+            return "";
+        }
+    }
+
+
+    /**
+     * <summary>
      *   Enables or disables certain TLS/SSL certificate checks.
      * <para>
      * </para>
      * </summary>
-     * <param name="options">
-     *   The options: <c>YAPI.NO_TRUSTED_CA_CHECK</c>,
+     * <param name="opts">
+     *   The options are <c>YAPI.NO_TRUSTED_CA_CHECK</c>,
      *   <c>YAPI.NO_EXPIRATION_CHECK</c>, <c>YAPI.NO_HOSTNAME_CHECK</c>.
      * </param>
      * <returns>
@@ -7182,11 +7287,11 @@ public class YAPIContext
      *   On error, returns a string beginning with "error:".
      * </returns>
      */
-    public virtual string SetNetworkSecurityOptions(int options)
+    public virtual string SetNetworkSecurityOptions(int opts)
     {
         StringBuilder errmsg = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
         int res;
-        res = SafeNativeMethods._yapiSetNetworkSecurityOptions(options, errmsg);
+        res = SafeNativeMethods._yapiSetNetworkSecurityOptions(opts, errmsg);
         if (res < 0) {
             return errmsg.ToString();
         } else {
