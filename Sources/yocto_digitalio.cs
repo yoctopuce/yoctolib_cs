@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_digitalio.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_digitalio.cs 61494 2024-06-17 08:12:29Z seb $
  *
  *  Implements yFindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -419,17 +419,17 @@ public class YDigitalIO : YFunction
 
     /**
      * <summary>
-     *   Returns the port state diagnostics (Yocto-IO and Yocto-MaxiIO-V2 only).
+     *   Returns the port state diagnostics.
      * <para>
-     *   Bit 0 indicates a shortcut on
-     *   output 0, etc. Bit 8 indicates a power failure, and bit 9 signals overheating (overcurrent).
+     *   Bit 0 indicates a shortcut on output 0, etc.
+     *   Bit 8 indicates a power failure, and bit 9 signals overheating (overcurrent).
      *   During normal use, all diagnostic bits should stay clear.
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the port state diagnostics (Yocto-IO and Yocto-MaxiIO-V2 only)
+     *   an integer corresponding to the port state diagnostics
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YDigitalIO.PORTDIAGS_INVALID</c>.

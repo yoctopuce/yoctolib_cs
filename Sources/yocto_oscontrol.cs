@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_oscontrol.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_oscontrol.cs 61342 2024-06-11 08:30:46Z seb $
  *
  *  Implements yFindOsControl(), the high-level API for OsControl functions
  *
@@ -73,7 +73,7 @@ public class YOsControl : YFunction
     public new delegate void ValueCallback(YOsControl func, string value);
     public new delegate void TimedReportCallback(YOsControl func, YMeasure measure);
 
-    public const int SHUTDOWNCOUNTDOWN_INVALID = YAPI.INVALID_UINT;
+    public const int SHUTDOWNCOUNTDOWN_INVALID = YAPI.INVALID_INT;
     protected int _shutdownCountdown = SHUTDOWNCOUNTDOWN_INVALID;
     protected ValueCallback _valueCallbackOsControl = null;
     //--- (end of YOsControl definitions)
@@ -271,6 +271,28 @@ public class YOsControl : YFunction
     public virtual int shutdown(int secBeforeShutDown)
     {
         return this.set_shutdownCountdown(secBeforeShutDown);
+    }
+
+
+    /**
+     * <summary>
+     *   Schedules an OS reboot after a given number of seconds.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="secBeforeReboot">
+     *   number of seconds before reboot
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int reboot(int secBeforeReboot)
+    {
+        return this.set_shutdownCountdown(0 - secBeforeReboot);
     }
 
     /**
