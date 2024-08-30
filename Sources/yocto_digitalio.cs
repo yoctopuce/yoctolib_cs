@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_digitalio.cs 61494 2024-06-17 08:12:29Z seb $
+ *  $Id: yocto_digitalio.cs 62189 2024-08-19 12:07:40Z seb $
  *
  *  Implements yFindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -59,7 +59,7 @@ using YFUN_DESCR = System.Int32;
  * <summary>
  *   The <c>YDigitalIO</c> class allows you drive a Yoctopuce digital input/output port.
  * <para>
- *   It can be used to setup the direction of each channel, to read the state of each channel
+ *   It can be used to set up the direction of each channel, to read the state of each channel
  *   and to switch the state of each channel configures as an output.
  *   You can work on all channels at once, or one by one. Most functions
  *   use a binary representation for channels where bit 0 matches channel #0 , bit 1 matches channel
@@ -735,7 +735,7 @@ public class YDigitalIO : YFunction
     {
         int portVal;
         portVal = this.get_portState();
-        return ((((portVal) >> (bitno))) & (1));
+        return ((portVal >> bitno) & 1);
     }
 
 
@@ -818,7 +818,7 @@ public class YDigitalIO : YFunction
     {
         int portDir;
         portDir = this.get_portDirection();
-        return ((((portDir) >> (bitno))) & (1));
+        return ((portDir >> bitno) & 1);
     }
 
 
@@ -876,7 +876,7 @@ public class YDigitalIO : YFunction
     {
         int portPol;
         portPol = this.get_portPolarity();
-        return ((((portPol) >> (bitno))) & (1));
+        return ((portPol >> bitno) & 1);
     }
 
 
@@ -937,7 +937,7 @@ public class YDigitalIO : YFunction
     {
         int portOpenDrain;
         portOpenDrain = this.get_portOpenDrain();
-        return ((((portOpenDrain) >> (bitno))) & (1));
+        return ((portOpenDrain >> bitno) & 1);
     }
 
 

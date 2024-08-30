@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_micropython.cs 58154 2023-11-30 13:45:48Z mvuilleu $
+ *  $Id: yocto_micropython.cs 62280 2024-08-26 14:39:58Z seb $
  *
  *  Implements yFindMicroPython(), the high-level API for MicroPython functions
  *
@@ -80,10 +80,14 @@ public class YMicroPython : YFunction
 
 
     public const string LASTMSG_INVALID = YAPI.INVALID_STRING;
+    public const int HEAPUSAGE_INVALID = YAPI.INVALID_UINT;
+    public const int XHEAPUSAGE_INVALID = YAPI.INVALID_UINT;
     public const string CURRENTSCRIPT_INVALID = YAPI.INVALID_STRING;
     public const string STARTUPSCRIPT_INVALID = YAPI.INVALID_STRING;
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected string _lastMsg = LASTMSG_INVALID;
+    protected int _heapUsage = HEAPUSAGE_INVALID;
+    protected int _xheapUsage = XHEAPUSAGE_INVALID;
     protected string _currentScript = CURRENTSCRIPT_INVALID;
     protected string _startupScript = STARTUPSCRIPT_INVALID;
     protected string _command = COMMAND_INVALID;
@@ -110,6 +114,14 @@ public class YMicroPython : YFunction
         if (json_val.has("lastMsg"))
         {
             _lastMsg = json_val.getString("lastMsg");
+        }
+        if (json_val.has("heapUsage"))
+        {
+            _heapUsage = json_val.getInt("heapUsage");
+        }
+        if (json_val.has("xheapUsage"))
+        {
+            _xheapUsage = json_val.getInt("xheapUsage");
         }
         if (json_val.has("currentScript"))
         {
@@ -152,6 +164,70 @@ public class YMicroPython : YFunction
                 }
             }
             res = this._lastMsg;
+        }
+        return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the percentage of micropython main memory in use,
+     *   as observed at the end of the last garbage collection.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the percentage of micropython main memory in use,
+     *   as observed at the end of the last garbage collection
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YMicroPython.HEAPUSAGE_INVALID</c>.
+     * </para>
+     */
+    public int get_heapUsage()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return HEAPUSAGE_INVALID;
+                }
+            }
+            res = this._heapUsage;
+        }
+        return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the percentage of micropython external memory in use,
+     *   as observed at the end of the last garbage collection.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the percentage of micropython external memory in use,
+     *   as observed at the end of the last garbage collection
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YMicroPython.XHEAPUSAGE_INVALID</c>.
+     * </para>
+     */
+    public int get_xheapUsage()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return XHEAPUSAGE_INVALID;
+                }
+            }
+            res = this._xheapUsage;
         }
         return res;
     }
@@ -454,7 +530,7 @@ public class YMicroPython : YFunction
     public virtual int eval(string codeName, string mpyCode)
     {
         string fullname;
-        inr res;
+        int res;
         fullname = "mpy:"+codeName;
         res = this._upload(fullname, YAPI.DefaultEncoding.GetBytes(mpyCode));
         return res;
@@ -513,7 +589,6 @@ public class YMicroPython : YFunction
     {
         byte[] buff = new byte[0];
         int bufflen;
-        int endpos;
         string res;
 
         buff = this._download("mpy.txt");
@@ -557,13 +632,13 @@ public class YMicroPython : YFunction
         if (callback != null) {
             this.registerValueCallback(yInternalEventCallback);
         } else {
-            this.registerValueCallback((YMicroPythonLogCallback) null);
+            this.registerValueCallback((ValueCallback) null);
         }
         return 0;
     }
 
 
-    public virtual YMicroPythonLogCallback_callback get_logCallback()
+    public virtual YMicroPythonLogCallback get_logCallback()
     {
         return this._logCallback;
     }
@@ -584,7 +659,7 @@ public class YMicroPython : YFunction
         string logMsg;
         // detect possible power cycle of the reader to clear event pointer
         cbPos = YAPI._hexStrToInt((cbVal).Substring(1, (cbVal).Length-1));
-        cbDPos = ((cbPos - this._prevCbPos) & (0xfffff));
+        cbDPos = ((cbPos - this._prevCbPos) & 0xfffff);
         this._prevCbPos = cbPos;
         if (cbDPos > 65536) {
             this._logPos = 0;

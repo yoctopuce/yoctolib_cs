@@ -861,7 +861,7 @@ public class YInputChain : YFunction
      * <summary>
      *   Resets the application watchdog countdown.
      * <para>
-     *   If you have setup a non-zero <c>watchdogPeriod</c>, you should
+     *   If you have set up a non-zero <c>watchdogPeriod</c>, you should
      *   call this function on a regular basis to prevent the application
      *   inactivity error to be triggered.
      * </para>
@@ -1055,7 +1055,7 @@ public class YInputChain : YFunction
         while (idx < lenA) {
             digitA = YAPI._hexStrToInt((a).Substring( idx, 1));
             digitB = YAPI._hexStrToInt((b).Substring( idx, 1));
-            res = ""+ res+""+String.Format("{0:x}",((digitA) ^ (digitB)));
+            res = ""+ res+""+String.Format("{0:x}",(digitA ^ digitB));
             idx = idx + 1;
         }
         return res;
@@ -1074,10 +1074,10 @@ public class YInputChain : YFunction
         while (idx > 0) {
             idx = idx - 1;
             digit = YAPI._hexStrToInt((hexstr).Substring( idx, 1));
-            res.Add(((digit) & (1)));
-            res.Add(((((digit) >> (1))) & (1)));
-            res.Add(((((digit) >> (2))) & (1)));
-            res.Add(((((digit) >> (3))) & (1)));
+            res.Add((digit & 1));
+            res.Add(((digit >> 1) & 1));
+            res.Add(((digit >> 2) & 1));
+            res.Add(((digit >> 3) & 1));
         }
         return res;
     }

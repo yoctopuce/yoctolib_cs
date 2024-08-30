@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_wakeupschedule.cs 56252 2023-08-23 10:06:05Z seb $
+ *  $Id: yocto_wakeupschedule.cs 62189 2024-08-19 12:07:40Z seb $
  *
  *  Implements yFindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -727,7 +727,7 @@ public class YWakeUpSchedule : YFunction
         long res;
 
         res = this.get_minutesB();
-        res = ((res) << (30));
+        res = (res << 30);
         res = res + this.get_minutesA();
         return res;
     }
@@ -751,9 +751,9 @@ public class YWakeUpSchedule : YFunction
      */
     public virtual int set_minutes(long bitmap)
     {
-        this.set_minutesA((int)(((bitmap) & (0x3fffffff))));
-        bitmap = ((bitmap) >> (30));
-        return this.set_minutesB((int)(((bitmap) & (0x3fffffff))));
+        this.set_minutesA((int)((bitmap & 0x3fffffff)));
+        bitmap = (bitmap >> 30);
+        return this.set_minutesB((int)((bitmap & 0x3fffffff)));
     }
 
     /**

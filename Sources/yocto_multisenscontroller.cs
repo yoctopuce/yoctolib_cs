@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_multisenscontroller.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_multisenscontroller.cs 61964 2024-07-29 15:54:55Z seb $
  *
  *  Implements yFindMultiSensController(), the high-level API for MultiSensController functions
  *
@@ -57,7 +57,7 @@ using YFUN_DESCR = System.Int32;
 //--- (YMultiSensController class start)
 /**
  * <summary>
- *   The <c>YMultiSensController</c> class allows you to setup a customized
+ *   The <c>YMultiSensController</c> class allows you to set up a customized
  *   sensor chain on devices featuring that functionality.
  * <para>
  * </para>

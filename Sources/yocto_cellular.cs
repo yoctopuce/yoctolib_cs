@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 56107 2023-08-16 09:15:27Z seb $
+ * $Id: yocto_cellular.cs 61964 2024-07-29 15:54:55Z seb $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *
@@ -1338,7 +1338,7 @@ public class YCellular : YFunction
     /**
      * <summary>
      *   Sends a PUK code to unlock the SIM card after three failed PIN code attempts, and
-     *   setup a new PIN into the SIM card.
+     *   set up a new PIN into the SIM card.
      * <para>
      *   Only ten consecutive tentatives are permitted:
      *   after that, the SIM card will be blocked permanently without any mean of recovery

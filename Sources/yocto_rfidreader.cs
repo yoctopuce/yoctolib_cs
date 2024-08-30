@@ -444,16 +444,16 @@ public class YRfidOptions
             opt = 0;
         }
         if (this.ForceMultiBlockAccess) {
-            opt = ((opt) | (2));
+            opt = (opt | 2);
         }
         if (this.EnableRawAccess) {
-            opt = ((opt) | (4));
+            opt = (opt | 4);
         }
         if (this.DisableBoundaryChecks) {
-            opt = ((opt) | (8));
+            opt = (opt | 8);
         }
         if (this.EnableDryRun) {
-            opt = ((opt) | (16));
+            opt = (opt | 16);
         }
         res = "&o="+Convert.ToString(opt);
         if (this.KeyType != 0) {
@@ -1629,8 +1629,8 @@ public class YRfidReader : YFunction
         binRes = YAPI._hexStrToBin(this._json_get_key(json, "bitmap"));
         idx = 0;
         while (idx < nBlocks) {
-            val = binRes[((idx) >> (3))];
-            isLocked = (((val) & (((1) << (((idx) & (7)))))) != 0);
+            val = binRes[(idx >> 3)];
+            isLocked = ((val & (1 << (idx & 7))) != 0);
             res.Add(isLocked);
             idx = idx + 1;
         }
@@ -1696,8 +1696,8 @@ public class YRfidReader : YFunction
         binRes = YAPI._hexStrToBin(this._json_get_key(json, "bitmap"));
         idx = 0;
         while (idx < nBlocks) {
-            val = binRes[((idx) >> (3))];
-            isLocked = (((val) & (((1) << (((idx) & (7)))))) != 0);
+            val = binRes[(idx >> 3)];
+            isLocked = ((val & (1 << (idx & 7))) != 0);
             res.Add(isLocked);
             idx = idx + 1;
         }
@@ -2094,7 +2094,7 @@ public class YRfidReader : YFunction
         int idx;
         int hexb;
         bufflen = (hexString).Length;
-        bufflen = ((bufflen) >> (1));
+        bufflen = (bufflen >> 1);
         if (bufflen <= 16) {
             // short data, use an URL-based command
             optstr = options.imm_getParams();
@@ -2519,8 +2519,8 @@ public class YRfidReader : YFunction
         string evtData;
         // detect possible power cycle of the reader to clear event pointer
         cbPos = YAPI._atoi(cbVal);
-        cbPos = ((cbPos) / (1000));
-        cbDPos = ((cbPos - this._prevCbPos) & (0x7ffff));
+        cbPos = (cbPos / 1000);
+        cbDPos = ((cbPos - this._prevCbPos) & 0x7ffff);
         this._prevCbPos = cbPos;
         if (cbDPos > 16384) {
             this._eventPos = 0;

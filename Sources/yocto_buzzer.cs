@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_buzzer.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_buzzer.cs 62189 2024-08-19 12:07:40Z seb $
  *
  *  Implements yFindBuzzer(), the high-level API for Buzzer functions
  *
@@ -686,7 +686,7 @@ public class YBuzzer : YFunction
             }
             if (ch == 46) {
                 // . (duration modifier)
-                num = ((num * 2) / (3));
+                num = ((num * 2) / 3);
             }
             if (((ch == 32) || (i+1 == notesLen)) && ((note > -99) || (typ != 3))) {
                 if (num == 0) {
@@ -707,7 +707,7 @@ public class YBuzzer : YFunction
                     }
                     pitch = prevPitch + dNote;
                     freq = (int) Math.Round(440 * Math.Exp(pitch * 0.05776226504666));
-                    ms16 = ((ms) >> (4));
+                    ms16 = (ms >> 4);
                     rest = 0;
                     if (typ == 3) {
                         rest = 2 * ms16;

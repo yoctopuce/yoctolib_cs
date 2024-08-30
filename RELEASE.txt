@@ -1,3 +1,7 @@
-C#V2 v2.0.61813
+C#V2 v2.0.62334
 
-- Fix potential never ending loop on HTTP redirection
+- Add support Windows ARM 64 bits
+- Fix YAPI.Testhub("net") that was not returning YAPI.INVALID_ARGUMENT
+- Update MbedTLS lib to 3.6.0
+- Bump project target to .NET framework 4.7.1 /
+- Improve debug logs for network hubs

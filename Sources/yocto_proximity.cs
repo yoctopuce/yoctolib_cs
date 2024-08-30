@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_proximity.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_proximity.cs 61964 2024-07-29 15:54:55Z seb $
  *
  *  Implements yFindProximity(), the high-level API for Proximity functions
  *
@@ -61,7 +61,7 @@ using YFUN_DESCR = System.Int32;
  * <para>
  *   It inherits from <c>YSensor</c> class the core functions to read measurements,
  *   to register callback functions, and to access the autonomous datalogger.
- *   This class adds the ability to setup a detection threshold and to count the
+ *   This class adds the ability to set up a detection threshold and to count the
  *   number of detected state changes.
  * </para>
  * <para>

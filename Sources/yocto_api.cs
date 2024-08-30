@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 60510 2024-04-12 09:37:02Z seb $
+ * $Id: yocto_api.cs 62288 2024-08-27 08:33:14Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -209,6 +209,7 @@ internal static class SafeNativeMethods
         NOT_INIT,
         WIN32,
         WIN64,
+        WINARM64,
         MACOS32,
         MACOS64,
         LIN32,
@@ -295,10 +296,15 @@ internal static class SafeNativeMethods
                     }
                 }
             } else {
-                if (is64) {
-                    _dllVersion = YAPIDLL_VERSION.WIN64;
+                Architecture arch = RuntimeInformation.OSArchitecture;
+                if (arch == Architecture.Arm64) {
+                    _dllVersion = YAPIDLL_VERSION.WINARM64;
                 } else {
-                    _dllVersion = YAPIDLL_VERSION.WIN32;
+                    if (is64) {
+                        _dllVersion = YAPIDLL_VERSION.WIN64;
+                    } else {
+                        _dllVersion = YAPIDLL_VERSION.WIN32;
+                    }
                 }
             }
             Boolean no_alternate_platform = false;
@@ -340,6 +346,9 @@ internal static class SafeNativeMethods
                             break;
                         case YAPIDLL_VERSION.WIN64:
                             dll_path = dir + "amd64" + Path.DirectorySeparatorChar + "yapi.dll";
+                            break;
+                        case YAPIDLL_VERSION.WINARM64:
+                            dll_path = dir + "arm64" + Path.DirectorySeparatorChar + "yapi.dll";
                             break;
                         case YAPIDLL_VERSION.MACOS32:
                             dll_path = dir + "libyapi32.so";
@@ -3721,7 +3730,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "2.0";
     public const int YOCTO_API_VERSION_BCD = 0x0200;
 
-    public const string YOCTO_API_BUILD_NO = "61813";
+    public const string YOCTO_API_BUILD_NO = "62334";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6086,7 +6095,7 @@ public class YAPI
      * <para>
      *   From an operating system standpoint, it is generally not required to call
      *   this function since the OS will automatically free allocated resources
-     *   once your program is completed. However there are two situations when
+     *   once your program is completed. However, there are two situations when
      *   you may really want to use that function:
      * </para>
      * <para>
@@ -6130,7 +6139,7 @@ public class YAPI
 
     /**
      * <summary>
-     *   Setup the Yoctopuce library to use modules connected on a given machine.
+     *   Set up the Yoctopuce library to use modules connected on a given machine.
      * <para>
      *   Idealy this
      *   call will be made once at the begining of your application.  The
@@ -6151,7 +6160,7 @@ public class YAPI
      *   computer, use the IP address 127.0.0.1. If the given IP is unresponsive, <c>yRegisterHub</c>
      *   will not return until a time-out defined by <c>ySetNetworkTimeout</c> has elapsed.
      *   However, it is possible to preventively test a connection  with <c>yTestHub</c>.
-     *   If you cannot afford a network time-out, you can use the non blocking <c>yPregisterHub</c>
+     *   If you cannot afford a network time-out, you can use the non-blocking <c>yPregisterHub</c>
      *   function that will establish the connection as soon as it is available.
      * </para>
      * <para>
@@ -6169,7 +6178,7 @@ public class YAPI
      *   while trying to access the USB modules. In particular, this means
      *   that you must stop the VirtualHub software before starting
      *   an application that uses direct USB access. The workaround
-     *   for this limitation is to setup the library to use the VirtualHub
+     *   for this limitation is to set up the library to use the VirtualHub
      *   rather than direct USB access.
      * </para>
      * <para>
@@ -6315,7 +6324,7 @@ public class YAPI
 
     /**
      * <summary>
-     *   Setup the Yoctopuce library to no more use modules connected on a previously
+     *   Set up the Yoctopuce library to no more use modules connected on a previously
      *   registered machine with RegisterHub.
      * <para>
      * </para>
@@ -6573,7 +6582,7 @@ public class YAPI
      *   Checks if a given string is valid as logical name for a module or a function.
      * <para>
      *   A valid logical name has a maximum of 19 characters, all among
-     *   <c>A..Z</c>, <c>a..z</c>, <c>0..9</c>, <c>_</c>, and <c>-</c>.
+     *   <c>A...Z</c>, <c>a...z</c>, <c>0...9</c>, <c>_</c>, and <c>-</c>.
      *   If you try to configure a logical name with an incorrect string,
      *   the invalid characters are ignored.
      * </para>
@@ -7532,7 +7541,7 @@ public class YFirmwareUpdate
                 return res;
             }
             this._progress_c = res;
-            this._progress = ((this._progress_c * 9) / (10));
+            this._progress = ((this._progress_c * 9) / 10);
             this._progress_msg = errmsg.ToString();
         } else {
             if (((this._settings).Length != 0) && ( this._progress_c != 101)) {
@@ -7849,15 +7858,15 @@ public class YDataStream
         double fRef;
         List<int> iCalib = new List<int>();
         // decode sequence header to extract data
-        this._runNo = encoded[0] + (((encoded[1]) << (16)));
-        this._utcStamp = encoded[2] + (((encoded[3]) << (16)));
+        this._runNo = encoded[0] + ((encoded[1] << 16));
+        this._utcStamp = encoded[2] + ((encoded[3] << 16));
         val = encoded[4];
-        this._isAvg = (((val) & (0x100)) == 0);
-        samplesPerHour = ((val) & (0xff));
-        if (((val) & (0x100)) != 0) {
+        this._isAvg = ((val & 0x100) == 0);
+        samplesPerHour = (val & 0xff);
+        if ((val & 0x100) != 0) {
             samplesPerHour = samplesPerHour * 3600;
         } else {
-            if (((val) & (0x200)) != 0) {
+            if ((val & 0x200) != 0) {
                 samplesPerHour = samplesPerHour * 60;
             }
         }
@@ -7929,9 +7938,9 @@ public class YDataStream
         }
         // decode min/avg/max values for the sequence
         if (this._nRows > 0) {
-            this._avgVal = this._decodeAvg(encoded[8] + (((((encoded[9]) ^ (0x8000))) << (16))), 1);
-            this._minVal = this._decodeVal(encoded[10] + (((encoded[11]) << (16))));
-            this._maxVal = this._decodeVal(encoded[12] + (((encoded[13]) << (16))));
+            this._avgVal = this._decodeAvg(encoded[8] + (((encoded[9] ^ 0x8000) << 16)), 1);
+            this._minVal = this._decodeVal(encoded[10] + ((encoded[11] << 16)));
+            this._maxVal = this._decodeVal(encoded[12] + ((encoded[13] << 16)));
         }
         return 0;
     }
@@ -7961,9 +7970,9 @@ public class YDataStream
                     dat.Add(Double.NaN);
                     dat.Add(Double.NaN);
                 } else {
-                    dat.Add(this._decodeVal(udat[idx + 2] + (((udat[idx + 3]) << (16)))));
-                    dat.Add(this._decodeAvg(udat[idx] + (((((udat[idx + 1]) ^ (0x8000))) << (16))), 1));
-                    dat.Add(this._decodeVal(udat[idx + 4] + (((udat[idx + 5]) << (16)))));
+                    dat.Add(this._decodeVal(udat[idx + 2] + (((udat[idx + 3]) << 16))));
+                    dat.Add(this._decodeAvg(udat[idx] + ((((udat[idx + 1]) ^ 0x8000) << 16)), 1));
+                    dat.Add(this._decodeVal(udat[idx + 4] + (((udat[idx + 5]) << 16))));
                 }
                 idx = idx + 6;
                 this._values.Add(new List<double>(dat));
@@ -7974,7 +7983,7 @@ public class YDataStream
                 if ((udat[idx] == 65535) && (udat[idx + 1] == 65535)) {
                     dat.Add(Double.NaN);
                 } else {
-                    dat.Add(this._decodeAvg(udat[idx] + (((((udat[idx + 1]) ^ (0x8000))) << (16))), 1));
+                    dat.Add(this._decodeAvg(udat[idx] + ((((udat[idx + 1]) ^ 0x8000) << 16)), 1));
                 }
                 this._values.Add(new List<double>(dat));
                 idx = idx + 2;
@@ -9199,7 +9208,7 @@ public class YDataSet
         if (this._progress >= this._streams.Count) {
             return 100;
         }
-        return ((1 + (1 + this._progress) * 98) / ((1 + this._streams.Count)));
+        return ((1 + (1 + this._progress) * 98) / (1 + this._streams.Count));
     }
 
 
@@ -9654,7 +9663,7 @@ public class YConsolidatedDataSet
             s = s + 1;
         }
         if (globprogress > 0) {
-            globprogress = ((globprogress) / (this._nsensors));
+            globprogress = (globprogress / this._nsensors);
             if (globprogress > 99) {
                 globprogress = 99;
             }
@@ -12736,13 +12745,13 @@ public class YModule : YFunction
     public virtual byte[] get_allSettings()
     {
         byte[] settings = new byte[0];
-        byte[] json = new byte[0];
+        byte[] json_bin = new byte[0];
         byte[] res = new byte[0];
         string sep;
         string name;
         string item;
         string t_type;
-        string id;
+        string pageid;
         string url;
         string file_data;
         byte[] file_data_bin = new byte[0];
@@ -12763,11 +12772,11 @@ public class YModule : YFunction
                 url = "api/"+ templist[ii_0]+"/sensorType";
                 t_type = YAPI.DefaultEncoding.GetString(this._download(url));
                 if (t_type == "RES_NTC" || t_type == "RES_LINEAR") {
-                    id = ( templist[ii_0]).Substring( 11, ( templist[ii_0]).Length - 11);
-                    if (id == "") {
-                        id = "1";
+                    pageid = ( templist[ii_0]).Substring( 11, ( templist[ii_0]).Length - 11);
+                    if (pageid == "") {
+                        pageid = "1";
                     }
-                    temp_data_bin = this._download("extra.json?page="+id);
+                    temp_data_bin = this._download("extra.json?page="+pageid);
                     if ((temp_data_bin).Length > 0) {
                         item = ""+ sep+"{\"fid\":\""+  templist[ii_0]+"\", \"json\":"+YAPI.DefaultEncoding.GetString(temp_data_bin)+"}\n";
                         ext_settings = ext_settings + item;
@@ -12778,11 +12787,11 @@ public class YModule : YFunction
         }
         ext_settings = ext_settings + "],\n\"files\":[";
         if (this.hasFunction("files")) {
-            json = this._download("files.json?a=dir&f=");
-            if ((json).Length == 0) {
-                return json;
+            json_bin = this._download("files.json?a=dir&f=");
+            if ((json_bin).Length == 0) {
+                return json_bin;
             }
-            filelist = this._json_get_array(json);
+            filelist = this._json_get_array(json_bin);
             sep = "";
             for (int ii_1 = 0; ii_1 <   filelist.Count; ii_1++) {
                 name = this._json_get_key(YAPI.DefaultEncoding.GetBytes( filelist[ii_1]), "name");
@@ -12869,19 +12878,19 @@ public class YModule : YFunction
     public virtual int set_allSettingsAndFiles(byte[] settings)
     {
         byte[] down = new byte[0];
-        string json;
+        string json_bin;
         string json_api;
         string json_files;
         string json_extra;
         int fuperror;
         int globalres;
         fuperror = 0;
-        json = YAPI.DefaultEncoding.GetString(settings);
-        json_api = this._get_json_path(json, "api");
+        json_bin = YAPI.DefaultEncoding.GetString(settings);
+        json_api = this._get_json_path(json_bin, "api");
         if (json_api == "") {
             return this.set_allSettings(settings);
         }
-        json_extra = this._get_json_path(json, "extras");
+        json_extra = this._get_json_path(json_bin, "extras");
         if (!(json_extra == "")) {
             this.set_extraSettings(json_extra);
         }
@@ -12898,7 +12907,7 @@ public class YModule : YFunction
                 this._throw(YAPI.IO_ERROR, "format failed");
                 return YAPI.IO_ERROR;
             }
-            json_files = this._get_json_path(json, "files");
+            json_files = this._get_json_path(json_bin, "files");
             files = this._json_get_array(YAPI.DefaultEncoding.GetBytes(json_files));
             for (int ii_0 = 0; ii_0 <   files.Count; ii_0++) {
                 name = this._get_json_path( files[ii_0], "name");
@@ -13223,7 +13232,7 @@ public class YModule : YFunction
                 param = (30 + calibType).ToString();
                 i = 0;
                 while (i < calibData.Count) {
-                    if (((i) & (1)) > 0) {
+                    if ((i & 1) > 0) {
                         param = param + ":";
                     } else {
                         param = param + " ";
@@ -13236,7 +13245,7 @@ public class YModule : YFunction
         } else {
             if (funVer >= 1) {
                 // Encode parameters for older devices
-                nPoints = ((calibData.Count) / (2));
+                nPoints = (calibData.Count / 2);
                 param = (nPoints).ToString();
                 i = 0;
                 while (i < 2 * nPoints) {
@@ -13332,7 +13341,6 @@ public class YModule : YFunction
         string value;
         string url;
         string tmp;
-        string new_calib;
         string sensorType;
         string unit_name;
         string newval;
@@ -13409,121 +13417,121 @@ public class YModule : YFunction
             if (fun == "services") {
                 do_update = false;
             }
-            if ((do_update) && (attr == "firmwareRelease")) {
+            if (do_update && (attr == "firmwareRelease")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "usbCurrent")) {
+            if (do_update && (attr == "usbCurrent")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "upTime")) {
+            if (do_update && (attr == "upTime")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "persistentSettings")) {
+            if (do_update && (attr == "persistentSettings")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "adminPassword")) {
+            if (do_update && (attr == "adminPassword")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "userPassword")) {
+            if (do_update && (attr == "userPassword")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "rebootCountdown")) {
+            if (do_update && (attr == "rebootCountdown")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "advertisedValue")) {
+            if (do_update && (attr == "advertisedValue")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "poeCurrent")) {
+            if (do_update && (attr == "poeCurrent")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "readiness")) {
+            if (do_update && (attr == "readiness")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "ipAddress")) {
+            if (do_update && (attr == "ipAddress")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "subnetMask")) {
+            if (do_update && (attr == "subnetMask")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "router")) {
+            if (do_update && (attr == "router")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "linkQuality")) {
+            if (do_update && (attr == "linkQuality")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "ssid")) {
+            if (do_update && (attr == "ssid")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "channel")) {
+            if (do_update && (attr == "channel")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "security")) {
+            if (do_update && (attr == "security")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "message")) {
+            if (do_update && (attr == "message")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "signalValue")) {
+            if (do_update && (attr == "signalValue")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "currentValue")) {
+            if (do_update && (attr == "currentValue")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "currentRawValue")) {
+            if (do_update && (attr == "currentRawValue")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "currentRunIndex")) {
+            if (do_update && (attr == "currentRunIndex")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "pulseTimer")) {
+            if (do_update && (attr == "pulseTimer")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "lastTimePressed")) {
+            if (do_update && (attr == "lastTimePressed")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "lastTimeReleased")) {
+            if (do_update && (attr == "lastTimeReleased")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "filesCount")) {
+            if (do_update && (attr == "filesCount")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "freeSpace")) {
+            if (do_update && (attr == "freeSpace")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "timeUTC")) {
+            if (do_update && (attr == "timeUTC")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "rtcTime")) {
+            if (do_update && (attr == "rtcTime")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "unixTime")) {
+            if (do_update && (attr == "unixTime")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "dateTime")) {
+            if (do_update && (attr == "dateTime")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "rawValue")) {
+            if (do_update && (attr == "rawValue")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "lastMsg")) {
+            if (do_update && (attr == "lastMsg")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "delayedPulseTimer")) {
+            if (do_update && (attr == "delayedPulseTimer")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "rxCount")) {
+            if (do_update && (attr == "rxCount")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "txCount")) {
+            if (do_update && (attr == "txCount")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "msgCount")) {
+            if (do_update && (attr == "msgCount")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "rxMsgCount")) {
+            if (do_update && (attr == "rxMsgCount")) {
                 do_update = false;
             }
-            if ((do_update) && (attr == "txMsgCount")) {
+            if (do_update && (attr == "txMsgCount")) {
                 do_update = false;
             }
             if (do_update) {
@@ -13547,7 +13555,6 @@ public class YModule : YFunction
                     old_calib = "";
                     unit_name = "";
                     sensorType = "";
-                    new_calib = newval;
                     j = 0;
                     found = false;
                     while ((j < old_jpath.Count) && !(found)) {
@@ -14277,7 +14284,7 @@ public class YModule : YFunction
  *   It can be
  *   used to read the current value and unit of any sensor, read the min/max
  *   value, configure autonomous recording frequency and access recorded data.
- *   It also provide a function to register a callback invoked each time the
+ *   It also provides a function to register a callback invoked each time the
  *   observed value changes, or at a predefined interval. Using this class rather
  *   than a specific subclass makes it possible to create generic applications
  *   that work with any Yoctopuce sensor, even those that do not yet exist.
@@ -15091,7 +15098,7 @@ public class YSensor : YFunction
         if ((this._calibrationParam).IndexOf(",") >= 0) {
             // Plain text format
             iCalib = YAPI._decodeFloats(this._calibrationParam);
-            this._caltyp = ((iCalib[0]) / (1000));
+            this._caltyp = (iCalib[0] / 1000);
             if (this._caltyp > 0) {
                 if (this._caltyp < YAPI.YOCTO_CALIB_TYPE_OFS) {
                     // Unknown calibration type: calibrated value will be provided by the device
@@ -15574,7 +15581,7 @@ public class YSensor : YFunction
                 poww = poww * 0x100;
                 i = i + 1;
             }
-            if (((byteVal) & (0x80)) != 0) {
+            if ((byteVal & 0x80) != 0) {
                 avgRaw = avgRaw - poww;
             }
             avgVal = avgRaw / 1000.0;
@@ -15587,7 +15594,7 @@ public class YSensor : YFunction
             maxVal = avgVal;
         } else {
             // averaged report: avg,avg-min,max-avg
-            sublen = 1 + ((report[1]) & (3));
+            sublen = 1 + (report[1] & 3);
             poww = 1;
             avgRaw = 0;
             byteVal = 0;
@@ -15599,10 +15606,10 @@ public class YSensor : YFunction
                 i = i + 1;
                 sublen = sublen - 1;
             }
-            if (((byteVal) & (0x80)) != 0) {
+            if ((byteVal & 0x80) != 0) {
                 avgRaw = avgRaw - poww;
             }
-            sublen = 1 + ((((report[1]) >> (2))) & (3));
+            sublen = 1 + ((report[1] >> 2) & 3);
             poww = 1;
             difRaw = 0;
             while ((sublen > 0) && (i < report.Count)) {
@@ -15613,7 +15620,7 @@ public class YSensor : YFunction
                 sublen = sublen - 1;
             }
             minRaw = avgRaw - difRaw;
-            sublen = 1 + ((((report[1]) >> (4))) & (3));
+            sublen = 1 + ((report[1] >> 4) & 3);
             poww = 1;
             difRaw = 0;
             while ((sublen > 0) && (i < report.Count)) {
@@ -16330,13 +16337,13 @@ public class YDataLogger : YFunction
     }
 
 
-    public virtual List<YDataSet> parse_dataSets(byte[] json)
+    public virtual List<YDataSet> parse_dataSets(byte[] jsonbuff)
     {
         List<string> dslist = new List<string>();
         YDataSet dataset;
         List<YDataSet> res = new List<YDataSet>();
 
-        dslist = this._json_get_array(json);
+        dslist = this._json_get_array(jsonbuff);
         res.Clear();
         for (int ii_0 = 0; ii_0 <  dslist.Count; ii_0++) {
             dataset = new YDataSet(this);

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_steppermotor.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_steppermotor.cs 61964 2024-07-29 15:54:55Z seb $
  *
  *  Implements yFindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -257,7 +257,7 @@ public class YStepperMotor : YFunction
      * <summary>
      *   Changes the current logical motor position, measured in steps.
      * <para>
-     *   This command does not cause any motor move, as its purpose is only to setup
+     *   This command does not cause any motor move, as its purpose is only to set up
      *   the origin of the position counter. The fractional part of the position,
      *   that corresponds to the physical position of the rotor, is not changed.
      *   To trigger a motor move, use methods <c>moveTo()</c> or <c>moveRel()</c>

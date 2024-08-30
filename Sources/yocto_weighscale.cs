@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_weighscale.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_weighscale.cs 62189 2024-08-19 12:07:40Z seb $
  *
  *  Implements yFindWeighScale(), the high-level API for WeighScale functions
  *
@@ -835,7 +835,7 @@ public class YWeighScale : YSensor
         bin_json = this._download("extra.json?page="+Convert.ToString((4*YAPI._atoi(id))+tableIndex));
         paramlist = this._json_get_array(bin_json);
         // convert all values to float and append records
-        siz = ((paramlist.Count) >> (1));
+        siz = (paramlist.Count >> 1);
         tempValues.Clear();
         compValues.Clear();
         idx = 0;

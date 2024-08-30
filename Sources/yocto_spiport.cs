@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_spiport.cs 59693 2024-03-11 07:31:56Z seb $
+ *  $Id: yocto_spiport.cs 62189 2024-08-19 12:07:40Z seb $
  *
  *  Implements yFindSpiPort(), the high-level API for SpiPort functions
  *
@@ -1690,7 +1690,7 @@ public class YSpiPort : YFunction
         if (bufflen < 100) {
             return this.sendCommand("$"+hexString);
         }
-        bufflen = ((bufflen) >> (1));
+        bufflen = (bufflen >> 1);
         buff = new byte[bufflen];
         idx = 0;
         while (idx < bufflen) {

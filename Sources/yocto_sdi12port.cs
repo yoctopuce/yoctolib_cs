@@ -1934,7 +1934,7 @@ public class YSdi12Port : YFunction
         if (bufflen < 100) {
             return this.sendCommand("$"+hexString);
         }
-        bufflen = ((bufflen) >> (1));
+        bufflen = (bufflen >> 1);
         buff = new byte[bufflen];
         idx = 0;
         while (idx < bufflen) {
