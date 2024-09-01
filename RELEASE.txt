@@ -1,4 +1,4 @@
-C#V2 v2.0.62334
+C#V2 v2.0.62367
 
 - Add support Windows ARM 64 bits
 - Fix YAPI.Testhub("net") that was not returning YAPI.INVALID_ARGUMENT
