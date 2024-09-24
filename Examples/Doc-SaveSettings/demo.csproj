@@ -278,6 +278,12 @@
     <Compile Include="..\..\Sources\yocto_servo.cs">
       <Link>Yoctopuce\yocto_servo.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\yocto_spectralchannel.cs">
+      <Link>Yoctopuce\yocto_spectralchannel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_spectralsensor.cs">
+      <Link>Yoctopuce\yocto_spectralsensor.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_spiport.cs">
       <Link>Yoctopuce\yocto_spiport.cs</Link>
     </Compile>
