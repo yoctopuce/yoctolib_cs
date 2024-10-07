@@ -1,3 +1,4 @@
-C#V2 v2.0.62801
+C#V2 v2.0.62875
 
-- Add missing class in NuGet package
+- Fix connection to YoctoHub with very old firmware
+- Fix crash if Network discovery cannot be started correctly
