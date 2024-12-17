@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_weighscale.cs 62189 2024-08-19 12:07:40Z seb $
+ *  $Id: yocto_weighscale.cs 63469 2024-11-25 14:01:08Z seb $
  *
  *  Implements yFindWeighScale(), the high-level API for WeighScale functions
  *
@@ -761,7 +761,7 @@ public class YWeighScale : YSensor
      */
     public virtual int setupSpan(double currWeight, double maxWeight)
     {
-        return this.set_command("S"+Convert.ToString( (int) Math.Round(1000*currWeight))+":"+Convert.ToString((int) Math.Round(1000*maxWeight)));
+        return this.set_command("S"+Convert.ToString((int) Math.Round(1000*currWeight))+":"+Convert.ToString((int) Math.Round(1000*maxWeight)));
     }
 
 
@@ -808,7 +808,7 @@ public class YWeighScale : YSensor
                 idx = idx + 1;
             }
             if (found > 0) {
-                res = this.set_command(""+Convert.ToString( tableIndex)+"m"+Convert.ToString( (int) Math.Round(1000*curr))+":"+Convert.ToString((int) Math.Round(1000*currComp)));
+                res = this.set_command(""+Convert.ToString(tableIndex)+"m"+Convert.ToString((int) Math.Round(1000*curr))+":"+Convert.ToString((int) Math.Round(1000*currComp)));
                 if (!(res==YAPI.SUCCESS)) {
                     this._throw(YAPI.IO_ERROR, "unable to set thermal compensation table");
                     return YAPI.IO_ERROR;
@@ -824,14 +824,14 @@ public class YWeighScale : YSensor
     {
         string id;
         byte[] bin_json = new byte[0];
-        List<string> paramlist = new List<string>();
+        List<byte[]> paramlist = new List<byte[]>();
         int siz;
         int idx;
         double temp;
         double comp;
 
         id = this.get_functionId();
-        id = (id).Substring( 10, (id).Length - 10);
+        id = (id).Substring(10, (id).Length - 10);
         bin_json = this._download("extra.json?page="+Convert.ToString((4*YAPI._atoi(id))+tableIndex));
         paramlist = this._json_get_array(bin_json);
         // convert all values to float and append records
@@ -840,8 +840,8 @@ public class YWeighScale : YSensor
         compValues.Clear();
         idx = 0;
         while (idx < siz) {
-            temp = YAPI._atof(paramlist[2*idx])/1000.0;
-            comp = YAPI._atof(paramlist[2*idx+1])/1000.0;
+            temp = YAPI._atof(YAPI.DefaultEncoding.GetString(paramlist[2*idx]))/1000.0;
+            comp = YAPI._atof(YAPI.DefaultEncoding.GetString(paramlist[2*idx+1]))/1000.0;
             tempValues.Add(temp);
             compValues.Add(comp);
             idx = idx + 1;

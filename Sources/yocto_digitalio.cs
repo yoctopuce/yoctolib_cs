@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_digitalio.cs 62189 2024-08-19 12:07:40Z seb $
+ *  $Id: yocto_digitalio.cs 63324 2024-11-13 09:33:07Z seb $
  *
  *  Implements yFindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -965,7 +965,7 @@ public class YDigitalIO : YFunction
      */
     public virtual int pulse(int bitno, int ms_duration)
     {
-        return this.set_command("Z"+Convert.ToString( bitno)+",0,"+Convert.ToString(ms_duration));
+        return this.set_command("Z"+Convert.ToString(bitno)+",0,"+Convert.ToString(ms_duration));
     }
 
 

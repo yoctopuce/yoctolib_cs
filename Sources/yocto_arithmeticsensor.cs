@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_arithmeticsensor.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_arithmeticsensor.cs 63324 2024-11-13 09:33:07Z seb $
  *
  *  Implements yFindArithmeticSensor(), the high-level API for ArithmeticSensor functions
  *
@@ -379,17 +379,17 @@ public class YArithmeticSensor : YSensor
         string diags;
         double resval;
         id = this.get_functionId();
-        id = (id).Substring( 16, (id).Length - 16);
+        id = (id).Substring(16, (id).Length - 16);
         fname = "arithmExpr"+id+".txt";
 
-        content = "// "+ descr+"\n"+expr;
+        content = "// "+descr+"\n"+expr;
         data = this._uploadEx(fname, YAPI.DefaultEncoding.GetBytes(content));
         diags = YAPI.DefaultEncoding.GetString(data);
         if (!((diags).Substring(0, 8) == "Result: ")) {
             this._throw(YAPI.INVALID_ARGUMENT, diags);
             return YAPI.INVALID_DOUBLE;
         }
-        resval = YAPI._atof((diags).Substring( 8, (diags).Length-8));
+        resval = YAPI._atof((diags).Substring(8, (diags).Length-8));
         return resval;
     }
 
@@ -415,13 +415,13 @@ public class YArithmeticSensor : YSensor
         string content;
         int idx;
         id = this.get_functionId();
-        id = (id).Substring( 16, (id).Length - 16);
+        id = (id).Substring(16, (id).Length - 16);
         fname = "arithmExpr"+id+".txt";
 
         content = YAPI.DefaultEncoding.GetString(this._download(fname));
         idx = (content).IndexOf("\n");
         if (idx > 0) {
-            content = (content).Substring( idx+1, (content).Length-(idx+1));
+            content = (content).Substring(idx+1, (content).Length-(idx+1));
         }
         return content;
     }
@@ -478,7 +478,7 @@ public class YArithmeticSensor : YSensor
         while (idx < siz) {
             inputVal = inputValues[idx];
             outputVal = outputValues[idx];
-            defstr = ""+ defstr+""+YAPI._floatToStr( inputVal)+":"+YAPI._floatToStr(outputVal)+"\n";
+            defstr = ""+defstr+""+YAPI._floatToStr(inputVal)+":"+YAPI._floatToStr(outputVal)+"\n";
             idx = idx + 1;
         }
         fname = "userMap"+name+".txt";

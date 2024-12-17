@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_messagebox.cs 62189 2024-08-19 12:07:40Z seb $
+ * $Id: yocto_messagebox.cs 63469 2024-11-25 14:01:08Z seb $
  *
  * Implements yFindMessageBox(), the high-level API for MessageBox functions
  *
@@ -767,12 +767,12 @@ public class YSms
             i = 0;
             while (i < siz) {
                 byt = addr[ofs+i+1];
-                res = ""+ res+""+String.Format("{0:x}", (byt & 15))+""+String.Format("{0:x}",(byt >> 4));
+                res = ""+res+""+String.Format("{0:x}",(byt & 15))+""+String.Format("{0:x}",(byt >> 4));
                 i = i + 1;
             }
             // remove padding digit if needed
             if (((addr[ofs+siz]) >> 4) == 15) {
-                res = (res).Substring( 0, (res).Length-1);
+                res = (res).Substring(0, (res).Length-1);
             }
             return res;
         }
@@ -817,7 +817,7 @@ public class YSms
         }
         if ((exp).Substring(4, 1) == "-" || (exp).Substring(4, 1) == "/") {
             // ignore century
-            exp = (exp).Substring( 2, explen-2);
+            exp = (exp).Substring(2, explen-2);
             explen = (exp).Length;
         }
         expasc = YAPI.DefaultEncoding.GetBytes(exp);
@@ -897,7 +897,7 @@ public class YSms
         i = 0;
         while ((i < siz) && (i < 6)) {
             byt = exp[ofs+i];
-            res = ""+ res+""+String.Format("{0:x}", (byt & 15))+""+String.Format("{0:x}",(byt >> 4));
+            res = ""+res+""+String.Format("{0:x}",(byt & 15))+""+String.Format("{0:x}",(byt >> 4));
             if (i < 3) {
                 if (i < 2) {
                     res = ""+res+"-";
@@ -927,7 +927,7 @@ public class YSms
             if ((ss).Length<2) {
                 ss = "0"+ss;
             }
-            res = ""+ res+""+ sign+""+ hh+":"+ss;
+            res = ""+res+""+sign+""+hh+":"+ss;
         }
         return res;
     }
@@ -1199,16 +1199,14 @@ public class YSms
             if (i + ielen <= udhlen) {
                 if ((iei == 0) && (ielen == 3)) {
                     // concatenated SMS, 8-bit ref
-                    sig = ""+ this._orig+"-"+ this._dest+"-"+String.Format("{0:x02}",
-                    this._mref)+"-"+String.Format("{0:x02}",this._udh[i]);
+                    sig = ""+this._orig+"-"+this._dest+"-"+String.Format("{0:x02}",this._mref)+"-"+String.Format("{0:x02}",this._udh[i]);
                     this._aggSig = sig;
                     this._aggCnt = this._udh[i+1];
                     this._aggIdx = this._udh[i+2];
                 }
                 if ((iei == 8) && (ielen == 4)) {
                     // concatenated SMS, 16-bit ref
-                    sig = ""+ this._orig+"-"+ this._dest+"-"+String.Format("{0:x02}",
-                    this._mref)+"-"+String.Format("{0:x02}", this._udh[i])+""+String.Format("{0:x02}",this._udh[i+1]);
+                    sig = ""+this._orig+"-"+this._dest+"-"+String.Format("{0:x02}",this._mref)+"-"+String.Format("{0:x02}",this._udh[i])+""+String.Format("{0:x02}",this._udh[i+1]);
                     this._aggSig = sig;
                     this._aggCnt = this._udh[i+2];
                     this._aggIdx = this._udh[i+3];
@@ -1959,19 +1957,19 @@ public class YMessageBox : YFunction
         cmdLen = (cmd).Length;
         chrPos = (cmd).IndexOf("#");
         while (chrPos >= 0) {
-            cmd = ""+ (cmd).Substring( 0, chrPos)+""+((char)( 37)).ToString()+"23"+(cmd).Substring( chrPos+1, cmdLen-chrPos-1);
+            cmd = ""+(cmd).Substring(0, chrPos)+""+((char)(37)).ToString()+"23"+(cmd).Substring(chrPos+1, cmdLen-chrPos-1);
             cmdLen = cmdLen + 2;
             chrPos = (cmd).IndexOf("#");
         }
         chrPos = (cmd).IndexOf("+");
         while (chrPos >= 0) {
-            cmd = ""+ (cmd).Substring( 0, chrPos)+""+((char)( 37)).ToString()+"2B"+(cmd).Substring( chrPos+1, cmdLen-chrPos-1);
+            cmd = ""+(cmd).Substring(0, chrPos)+""+((char)(37)).ToString()+"2B"+(cmd).Substring(chrPos+1, cmdLen-chrPos-1);
             cmdLen = cmdLen + 2;
             chrPos = (cmd).IndexOf("+");
         }
         chrPos = (cmd).IndexOf("=");
         while (chrPos >= 0) {
-            cmd = ""+ (cmd).Substring( 0, chrPos)+""+((char)( 37)).ToString()+"3D"+(cmd).Substring( chrPos+1, cmdLen-chrPos-1);
+            cmd = ""+(cmd).Substring(0, chrPos)+""+((char)(37)).ToString()+"3D"+(cmd).Substring(chrPos+1, cmdLen-chrPos-1);
             cmdLen = cmdLen + 2;
             chrPos = (cmd).IndexOf("=");
         }
@@ -1991,14 +1989,14 @@ public class YMessageBox : YFunction
             if (buff[idx] == 64) {
                 // continuation detected
                 suffixlen = bufflen - idx;
-                cmd = "at.txt?cmd="+(buffstr).Substring( buffstrlen - suffixlen, suffixlen);
-                buffstr = (buffstr).Substring( 0, buffstrlen - suffixlen);
+                cmd = "at.txt?cmd="+(buffstr).Substring(buffstrlen - suffixlen, suffixlen);
+                buffstr = (buffstr).Substring(0, buffstrlen - suffixlen);
                 waitMore = waitMore - 1;
             } else {
                 // request complete
                 waitMore = 0;
             }
-            res = ""+ res+""+buffstr;
+            res = ""+res+""+buffstr;
         }
         return res;
     }
@@ -2007,7 +2005,7 @@ public class YMessageBox : YFunction
     public virtual YSms fetchPdu(int slot)
     {
         byte[] binPdu = new byte[0];
-        List<string> arrPdu = new List<string>();
+        List<byte[]> arrPdu = new List<byte[]>();
         string hexPdu;
         YSms sms;
 

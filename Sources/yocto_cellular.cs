@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 61964 2024-07-29 15:54:55Z seb $
+ * $Id: yocto_cellular.cs 63324 2024-11-13 09:33:07Z seb $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *
@@ -1466,19 +1466,19 @@ public class YCellular : YFunction
         cmdLen = (cmd).Length;
         chrPos = (cmd).IndexOf("#");
         while (chrPos >= 0) {
-            cmd = ""+ (cmd).Substring( 0, chrPos)+""+((char)( 37)).ToString()+"23"+(cmd).Substring( chrPos+1, cmdLen-chrPos-1);
+            cmd = ""+(cmd).Substring(0, chrPos)+""+((char)(37)).ToString()+"23"+(cmd).Substring(chrPos+1, cmdLen-chrPos-1);
             cmdLen = cmdLen + 2;
             chrPos = (cmd).IndexOf("#");
         }
         chrPos = (cmd).IndexOf("+");
         while (chrPos >= 0) {
-            cmd = ""+ (cmd).Substring( 0, chrPos)+""+((char)( 37)).ToString()+"2B"+(cmd).Substring( chrPos+1, cmdLen-chrPos-1);
+            cmd = ""+(cmd).Substring(0, chrPos)+""+((char)(37)).ToString()+"2B"+(cmd).Substring(chrPos+1, cmdLen-chrPos-1);
             cmdLen = cmdLen + 2;
             chrPos = (cmd).IndexOf("+");
         }
         chrPos = (cmd).IndexOf("=");
         while (chrPos >= 0) {
-            cmd = ""+ (cmd).Substring( 0, chrPos)+""+((char)( 37)).ToString()+"3D"+(cmd).Substring( chrPos+1, cmdLen-chrPos-1);
+            cmd = ""+(cmd).Substring(0, chrPos)+""+((char)(37)).ToString()+"3D"+(cmd).Substring(chrPos+1, cmdLen-chrPos-1);
             cmdLen = cmdLen + 2;
             chrPos = (cmd).IndexOf("=");
         }
@@ -1498,14 +1498,14 @@ public class YCellular : YFunction
             if (buff[idx] == 64) {
                 // continuation detected
                 suffixlen = bufflen - idx;
-                cmd = "at.txt?cmd="+(buffstr).Substring( buffstrlen - suffixlen, suffixlen);
-                buffstr = (buffstr).Substring( 0, buffstrlen - suffixlen);
+                cmd = "at.txt?cmd="+(buffstr).Substring(buffstrlen - suffixlen, suffixlen);
+                buffstr = (buffstr).Substring(0, buffstrlen - suffixlen);
                 waitMore = waitMore - 1;
             } else {
                 // request complete
                 waitMore = 0;
             }
-            res = ""+ res+""+buffstr;
+            res = ""+res+""+buffstr;
         }
         return res;
     }
@@ -1538,14 +1538,14 @@ public class YCellular : YFunction
         idx = (cops).IndexOf("(");
         while (idx >= 0) {
             slen = slen - (idx+1);
-            cops = (cops).Substring( idx+1, slen);
+            cops = (cops).Substring(idx+1, slen);
             idx = (cops).IndexOf("\"");
             if (idx > 0) {
                 slen = slen - (idx+1);
-                cops = (cops).Substring( idx+1, slen);
+                cops = (cops).Substring(idx+1, slen);
                 idx = (cops).IndexOf("\"");
                 if (idx > 0) {
-                    res.Add((cops).Substring( 0, idx));
+                    res.Add((cops).Substring(0, idx));
                 }
             }
             idx = (cops).IndexOf("(");
@@ -6136,7 +6136,7 @@ public class YCellular : YFunction
             line = lines[idx];
             cpos = (line).IndexOf(":");
             if (cpos > 0) {
-                profno = YAPI._atoi((line).Substring( 0, cpos));
+                profno = YAPI._atoi((line).Substring(0, cpos));
                 if (profno > 1) {
                     res.Add(line);
                 }

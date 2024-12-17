@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_voltageoutput.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_voltageoutput.cs 63324 2024-11-13 09:33:07Z seb $
  *
  *  Implements yFindVoltageOutput(), the high-level API for VoltageOutput functions
  *
@@ -394,7 +394,7 @@ public class YVoltageOutput : YFunction
         if (V_target > 10.0) {
             V_target = 10.0;
         }
-        newval = ""+Convert.ToString( (int) Math.Round(V_target*65536))+":"+Convert.ToString(ms_duration);
+        newval = ""+Convert.ToString((int) Math.Round(V_target*65536))+":"+Convert.ToString(ms_duration);
 
         return this.set_voltageTransition(newval);
     }

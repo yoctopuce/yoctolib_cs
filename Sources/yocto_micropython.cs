@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_micropython.cs 62280 2024-08-26 14:39:58Z seb $
+ *  $Id: yocto_micropython.cs 63324 2024-11-13 09:33:07Z seb $
  *
  *  Implements yFindMicroPython(), the high-level API for MicroPython functions
  *
@@ -84,12 +84,16 @@ public class YMicroPython : YFunction
     public const int XHEAPUSAGE_INVALID = YAPI.INVALID_UINT;
     public const string CURRENTSCRIPT_INVALID = YAPI.INVALID_STRING;
     public const string STARTUPSCRIPT_INVALID = YAPI.INVALID_STRING;
+    public const int DEBUGMODE_OFF = 0;
+    public const int DEBUGMODE_ON = 1;
+    public const int DEBUGMODE_INVALID = -1;
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected string _lastMsg = LASTMSG_INVALID;
     protected int _heapUsage = HEAPUSAGE_INVALID;
     protected int _xheapUsage = XHEAPUSAGE_INVALID;
     protected string _currentScript = CURRENTSCRIPT_INVALID;
     protected string _startupScript = STARTUPSCRIPT_INVALID;
+    protected int _debugMode = DEBUGMODE_INVALID;
     protected string _command = COMMAND_INVALID;
     protected ValueCallback _valueCallbackMicroPython = null;
     protected YMicroPythonLogCallback _logCallback;
@@ -130,6 +134,10 @@ public class YMicroPython : YFunction
         if (json_val.has("startupScript"))
         {
             _startupScript = json_val.getString("startupScript");
+        }
+        if (json_val.has("debugMode"))
+        {
+            _debugMode = json_val.getInt("debugMode") > 0 ? 1 : 0;
         }
         if (json_val.has("command"))
         {
@@ -353,6 +361,67 @@ public class YMicroPython : YFunction
         lock (_thisLock) {
             rest_val = newval;
             return _setAttr("startupScript", rest_val);
+        }
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the activation state of micropython debugging interface.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   either <c>YMicroPython.DEBUGMODE_OFF</c> or <c>YMicroPython.DEBUGMODE_ON</c>, according to the
+     *   activation state of micropython debugging interface
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YMicroPython.DEBUGMODE_INVALID</c>.
+     * </para>
+     */
+    public int get_debugMode()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return DEBUGMODE_INVALID;
+                }
+            }
+            res = this._debugMode;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Changes the activation state of micropython debugging interface.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   either <c>YMicroPython.DEBUGMODE_OFF</c> or <c>YMicroPython.DEBUGMODE_ON</c>, according to the
+     *   activation state of micropython debugging interface
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_debugMode(int newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("debugMode", rest_val);
         }
     }
 
@@ -596,7 +665,7 @@ public class YMicroPython : YFunction
         while ((bufflen > 0) && (buff[bufflen] != 64)) {
             bufflen = bufflen - 1;
         }
-        res = (YAPI.DefaultEncoding.GetString(buff)).Substring( 0, bufflen);
+        res = (YAPI.DefaultEncoding.GetString(buff)).Substring(0, bufflen);
         return res;
     }
 
@@ -689,7 +758,7 @@ public class YMicroPython : YFunction
             this._throw(YAPI.IO_ERROR, "fail to download micropython logs");
             return YAPI.IO_ERROR;
         }
-        lenStr = (contentStr).Substring( endPos+1, (contentStr).Length-(endPos+1));
+        lenStr = (contentStr).Substring(endPos+1, (contentStr).Length-(endPos+1));
         // update processed event position pointer
         this._logPos = YAPI._atoi(lenStr);
         if (this._isFirstCb) {
@@ -703,11 +772,11 @@ public class YMicroPython : YFunction
             this._throw(YAPI.IO_ERROR, "fail to download micropython logs");
             return YAPI.IO_ERROR;
         }
-        contentStr = (contentStr).Substring( 0, endPos);
+        contentStr = (contentStr).Substring(0, endPos);
         msgArr = new List<string>(contentStr.Split(new Char[] {'\n'}));
         arrLen = msgArr.Count - 1;
         if (arrLen > 0) {
-            logMsg = ""+ this._prevPartialLog+""+msgArr[0];
+            logMsg = ""+this._prevPartialLog+""+msgArr[0];
             if (this._logCallback != null) {
                 this._logCallback(this, logMsg);
             }
@@ -721,7 +790,7 @@ public class YMicroPython : YFunction
                 arrPos = arrPos + 1;
             }
         }
-        this._prevPartialLog = ""+ this._prevPartialLog+""+msgArr[arrLen];
+        this._prevPartialLog = ""+this._prevPartialLog+""+msgArr[arrLen];
         return YAPI.SUCCESS;
     }
 

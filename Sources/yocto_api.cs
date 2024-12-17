@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 62288 2024-08-27 08:33:14Z seb $
+ * $Id: yocto_api.cs 63704 2024-12-16 10:05:02Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -296,10 +296,13 @@ internal static class SafeNativeMethods
                     }
                 }
             } else {
+#if (!NET35) && (!NET40)
                 Architecture arch = RuntimeInformation.OSArchitecture;
                 if (arch == Architecture.Arm64) {
                     _dllVersion = YAPIDLL_VERSION.WINARM64;
-                } else {
+                } else 
+#endif
+                {
                     if (is64) {
                         _dllVersion = YAPIDLL_VERSION.WIN64;
                     } else {
@@ -3730,7 +3733,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "2.0";
     public const int YOCTO_API_VERSION_BCD = 0x0200;
 
-    public const string YOCTO_API_BUILD_NO = "62875";
+    public const string YOCTO_API_BUILD_NO = "63744";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -3918,6 +3921,34 @@ public class YAPI
         return httpcode;
     }
 
+    internal class yMemoryStream : MemoryStream
+    {
+        public yMemoryStream()
+        {
+        }
+
+        public yMemoryStream(int capacity) : base(capacity)
+        { }
+
+        public void Append(char c)
+        {
+            char[] tmp = { c };
+            byte[] bytes = YAPI.DefaultEncoding.GetBytes(tmp);
+            this.Write(bytes, 0, bytes.Length);
+        }
+
+        public void Append(String s)
+        {
+            byte[] bytes = YAPI.DefaultEncoding.GetBytes(s);
+            this.Write(bytes, 0, bytes.Length);
+        }
+
+        public void Append(byte[] bytes)
+        {
+            this.Write(bytes, 0, bytes.Length);
+        }
+
+    }
 
     public abstract class YJSONContent
     {
@@ -4020,7 +4051,7 @@ public class YAPI
             return errmsg + " near " + _data.Substring(ststart, cur_pos - ststart) + _data.Substring(cur_pos, stend - cur_pos);
         }
 
-        public abstract string toJSON();
+        public abstract byte[] toJSON();
     }
 
     internal class YJSONArray : YJSONContent
@@ -4158,20 +4189,20 @@ public class YAPI
             _arrayValue.Add(strobj);
         }
 
-        public override string toJSON()
+        public override byte[] toJSON()
         {
-            StringBuilder res = new StringBuilder();
+            yMemoryStream res = new yMemoryStream();
             res.Append('[');
             string sep = "";
             foreach (YJSONContent yjsonContent in _arrayValue) {
-                string subres = yjsonContent.toJSON();
+                byte[] subres = yjsonContent.toJSON();
                 res.Append(sep);
                 res.Append(subres);
                 sep = ",";
             }
 
             res.Append(']');
-            return res.ToString();
+            return res.ToArray();
         }
 
         public override string ToString()
@@ -4250,9 +4281,9 @@ public class YAPI
             throw new System.Exception(FormatError("unexpected end of data", cur_pos));
         }
 
-        public override string toJSON()
+        public override byte[] toJSON()
         {
-            StringBuilder res = new StringBuilder(_stringValue.Length * 2);
+            yMemoryStream res = new yMemoryStream(_stringValue.Length * 2);
             res.Append('"');
             foreach (char c in _stringValue) {
                 switch (c) {
@@ -4287,7 +4318,7 @@ public class YAPI
             }
 
             res.Append('"');
-            return res.ToString();
+            return res.ToArray();
         }
 
         public string getString()
@@ -4337,33 +4368,37 @@ public class YAPI
                     _intValue = Convert.ToInt64(int_part);
                     _isFloat = true;
                 } else if (sti < '0' || sti > '9') {
-                    string numberpart = _data.Substring(start, cur_pos - start);
-                    if (_isFloat) {
-                        _doubleValue = Convert.ToDouble(numberpart);
-                    } else {
-                        _intValue = Convert.ToInt64(numberpart);
-                    }
-
-                    if (neg) {
-                        _doubleValue = 0 - _doubleValue;
-                        _intValue = 0 - _intValue;
-                    }
-
-                    return cur_pos - _data_start;
+                    return formatNumber(start, cur_pos, neg);
                 }
 
                 cur_pos++;
             }
-
-            throw new System.Exception(FormatError("unexpected end of data", cur_pos));
+            return formatNumber(start, cur_pos, neg);
         }
 
-        public override string toJSON()
+        private int formatNumber(int start, int cur_pos, bool neg)
+        {
+            string numberpart = _data.Substring(start, cur_pos - start);
+            if (_isFloat) {
+                _doubleValue = Convert.ToDouble(numberpart);
+            } else {
+                _intValue = Convert.ToInt64(numberpart);
+            }
+
+            if (neg) {
+                _doubleValue = 0 - _doubleValue;
+                _intValue = 0 - _intValue;
+            }
+
+            return cur_pos - _data_start;
+        }
+
+        public override byte[] toJSON()
         {
             if (_isFloat)
-                return _doubleValue.ToString();
+                return YAPI.DefaultEncoding.GetBytes(_doubleValue.ToString());
             else
-                return _intValue.ToString();
+                return YAPI.DefaultEncoding.GetBytes(_intValue.ToString());
         }
 
         public long getLong()
@@ -4606,14 +4641,14 @@ public class YAPI
             return yint.getDouble();
         }
 
-        public override string toJSON()
+        public override byte[] toJSON()
         {
-            StringBuilder res = new StringBuilder();
+            yMemoryStream res = new yMemoryStream();
             res.Append('{');
             string sep = "";
             foreach (string key in parsed.Keys.ToArray()) {
                 YJSONContent subContent = parsed[key];
-                string subres = subContent.toJSON();
+                byte[] subres = subContent.toJSON();
                 res.Append(sep);
                 res.Append('"');
                 res.Append(key);
@@ -4623,7 +4658,7 @@ public class YAPI
             }
 
             res.Append('}');
-            return res.ToString();
+            return res.ToArray();
         }
 
         public override string ToString()
@@ -6941,7 +6976,7 @@ public class YAPI
      * <para>
      *   This delay impacts only the YoctoHubs and VirtualHub
      *   which are accessible through the network. By default, this delay is of 20000 milliseconds,
-     *   but depending or you network you may want to change this delay,
+     *   but depending on your network you may want to change this delay,
      *   gor example if your network infrastructure is based on a GSM connection.
      * </para>
      * <para>
@@ -6967,7 +7002,7 @@ public class YAPI
      * <para>
      *   This delay impacts only the YoctoHubs and VirtualHub
      *   which are accessible through the network. By default, this delay is of 20000 milliseconds,
-     *   but depending or you network you may want to change this delay,
+     *   but depending on your network you may want to change this delay,
      *   for example if your network infrastructure is based on a GSM connection.
      * </para>
      * </summary>
@@ -7315,7 +7350,7 @@ public class YAPIContext
      * <para>
      *   This delay impacts only the YoctoHubs and VirtualHub
      *   which are accessible through the network. By default, this delay is of 20000 milliseconds,
-     *   but depending or you network you may want to change this delay,
+     *   but depending on your network you may want to change this delay,
      *   gor example if your network infrastructure is based on a GSM connection.
      * </para>
      * <para>
@@ -7338,7 +7373,7 @@ public class YAPIContext
      * <para>
      *   This delay impacts only the YoctoHubs and VirtualHub
      *   which are accessible through the network. By default, this delay is of 20000 milliseconds,
-     *   but depending or you network you may want to change this delay,
+     *   but depending on your network you may want to change this delay,
      *   for example if your network infrastructure is based on a GSM connection.
      * </para>
      * </summary>
@@ -7551,7 +7586,7 @@ public class YFirmwareUpdate
                     return this._progress;
                 }
                 if (this._progress < 95) {
-                    prod_prefix = (m.get_productName()).Substring( 0, 8);
+                    prod_prefix = (m.get_productName()).Substring(0, 8);
                     if (prod_prefix == "YoctoHub") {
                         {string ignore=""; YAPI.Sleep(1000, ref ignore);};
                         this._progress = this._progress + 1;
@@ -7764,7 +7799,7 @@ public class YFirmwareUpdate
         leng = (err).Length;
         if ((leng >= 6) && ("error:" == (err).Substring(0, 6))) {
             this._progress = -1;
-            this._progress_msg = (err).Substring( 6, leng - 6);
+            this._progress_msg = (err).Substring(6, leng - 6);
         } else {
             this._progress = 0;
             this._progress_c = 0;
@@ -8005,8 +8040,7 @@ public class YDataStream
     public virtual string _get_url()
     {
         string url;
-        url = "logger.json?id="+
-        this._functionId+"&run="+Convert.ToString(this._runNo)+"&utc="+Convert.ToString(this._utcStamp);
+        url = "logger.json?id="+this._functionId+"&run="+Convert.ToString(this._runNo)+"&utc="+Convert.ToString(this._utcStamp);
         return url;
     }
 
@@ -8014,8 +8048,7 @@ public class YDataStream
     public virtual string _get_baseurl()
     {
         string url;
-        url = "logger.json?id="+
-        this._functionId+"&run="+Convert.ToString(this._runNo)+"&utc=";
+        url = "logger.json?id="+this._functionId+"&run="+Convert.ToString(this._runNo)+"&utc=";
         return url;
     }
 
@@ -8805,33 +8838,33 @@ public class YDataSet
         summaryStopMs = YAPI.MIN_DOUBLE;
 
         // Parse complete streams
-        for (int ii_0 = 0; ii_0 <   this._streams.Count; ii_0++) {
-            streamStartTimeMs = Math.Round( this._streams[ii_0].get_realStartTimeUTC() * 1000);
-            streamDuration =  this._streams[ii_0].get_realDuration();
+        for (int ii_0 = 0; ii_0 <  this._streams.Count; ii_0++) {
+            streamStartTimeMs = Math.Round(this._streams[ii_0].get_realStartTimeUTC() * 1000);
+            streamDuration = this._streams[ii_0].get_realDuration();
             streamEndTimeMs = streamStartTimeMs + Math.Round(streamDuration * 1000);
             if ((streamStartTimeMs >= this._startTimeMs) && ((this._endTimeMs == 0) || (streamEndTimeMs <= this._endTimeMs))) {
                 // stream that are completely inside the dataset
-                previewMinVal =  this._streams[ii_0].get_minValue();
-                previewAvgVal =  this._streams[ii_0].get_averageValue();
-                previewMaxVal =  this._streams[ii_0].get_maxValue();
+                previewMinVal = this._streams[ii_0].get_minValue();
+                previewAvgVal = this._streams[ii_0].get_averageValue();
+                previewMaxVal = this._streams[ii_0].get_maxValue();
                 previewStartMs = streamStartTimeMs;
                 previewStopMs = streamEndTimeMs;
                 previewDuration = streamDuration;
             } else {
                 // stream that are partially in the dataset
                 // we need to parse data to filter value outside the dataset
-                if (!( this._streams[ii_0]._wasLoaded())) {
-                    url =  this._streams[ii_0]._get_url();
+                if (!(this._streams[ii_0]._wasLoaded())) {
+                    url = this._streams[ii_0]._get_url();
                     data = this._parent._download(url);
                     this._streams[ii_0]._parseStream(data);
                 }
-                dataRows =  this._streams[ii_0].get_dataRows();
+                dataRows = this._streams[ii_0].get_dataRows();
                 if (dataRows.Count == 0) {
                     return this.get_progress();
                 }
                 tim = streamStartTimeMs;
-                fitv = Math.Round( this._streams[ii_0].get_firstDataSamplesInterval() * 1000);
-                itv = Math.Round( this._streams[ii_0].get_dataSamplesInterval() * 1000);
+                fitv = Math.Round(this._streams[ii_0].get_firstDataSamplesInterval() * 1000);
+                itv = Math.Round(this._streams[ii_0].get_dataSamplesInterval() * 1000);
                 nCols = dataRows[0].Count;
                 minCol = 0;
                 if (nCols > 2) {
@@ -8942,9 +8975,8 @@ public class YDataSet
         List<string> suffixes = new List<string>();
         int idx;
         byte[] bulkFile = new byte[0];
-        List<string> streamStr = new List<string>();
         int urlIdx;
-        byte[] streamBin = new byte[0];
+        List<byte[]> streamBin = new List<byte[]>();
 
         if (progress != this._progress) {
             return this._progress;
@@ -9018,14 +9050,13 @@ public class YDataSet
                 idx = idx + 1;
             }
             bulkFile = this._parent._download(url);
-            streamStr = this._parent._json_get_array(bulkFile);
+            streamBin = this._parent._json_get_array(bulkFile);
             urlIdx = 0;
             idx = this._progress;
-            while ((idx < this._streams.Count) && (urlIdx < suffixes.Count) && (urlIdx < streamStr.Count)) {
+            while ((idx < this._streams.Count) && (urlIdx < suffixes.Count) && (urlIdx < streamBin.Count)) {
                 stream = this._streams[idx];
                 if ((stream._get_baseurl() == baseurl) && (stream._get_urlsuffix() == suffixes[urlIdx])) {
-                    streamBin = YAPI.DefaultEncoding.GetBytes(streamStr[urlIdx]);
-                    stream._parseStream(streamBin);
+                    stream._parseStream(streamBin[urlIdx]);
                     urlIdx = urlIdx + 1;
                 }
                 idx = idx + 1;
@@ -9067,7 +9098,7 @@ public class YDataSet
             return this._hardwareId;
         }
         mo = this._parent.get_module();
-        this._hardwareId = ""+ mo.get_serialNumber()+"."+this.get_functionId();
+        this._hardwareId = ""+mo.get_serialNumber()+"."+this.get_functionId();
         return this._hardwareId;
     }
 
@@ -9865,7 +9896,7 @@ public class YHub
      * <para>
      *   The default value is inherited from <c>ySetNetworkTimeout</c>
      *   at the time when the hub is registered, but it can be updated
-     *   afterwards for each specific hub if necessary.
+     *   afterward for each specific hub if necessary.
      * </para>
      * <para>
      * </para>
@@ -9887,7 +9918,7 @@ public class YHub
      * <para>
      *   The default value is inherited from <c>ySetNetworkTimeout</c>
      *   at the time when the hub is registered, but it can be updated
-     *   afterwards for each specific hub if necessary.
+     *   afterward for each specific hub if necessary.
      * </para>
      * </summary>
      * <returns>
@@ -10857,7 +10888,7 @@ public class YFunction
     {
         string url;
         byte[] attrVal = new byte[0];
-        url = "api/"+ this.get_functionId()+"/"+attrName;
+        url = "api/"+this.get_functionId()+"/"+attrName;
         attrVal = this._download(url);
         return YAPI.DefaultEncoding.GetString(attrVal);
     }
@@ -11325,12 +11356,12 @@ public class YFunction
         throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "No key " + key + "in JSON struct");
     }
 
-    public List<string> _json_get_array(byte[] data)
+    public List<byte[]> _json_get_array(byte[] data)
     {
         string debug = YAPI.DefaultEncoding.GetString(data);
         YAPI.YJSONArray array = new YAPI.YJSONArray(debug);
         array.parse();
-        List<string> list = new List<string>();
+        List<byte[]> list = new List<byte[]>();
         int len = array.Length;
         for (int i = 0; i < len; i++) {
             YAPI.YJSONContent o = array.get(i);
@@ -11349,11 +11380,11 @@ public class YFunction
     }
 
 
-    private string get_json_path_struct(YAPI.YJSONObject jsonObject, string[] paths, int ofs)
+    private byte[] get_json_path_struct(YAPI.YJSONObject jsonObject, string[] paths, int ofs)
     {
         string key = paths[ofs];
         if (!jsonObject.has(key)) {
-            return "";
+            return new byte[0];
         }
 
         YAPI.YJSONContent obj = jsonObject.get(key);
@@ -11369,20 +11400,20 @@ public class YFunction
             }
         }
 
-        return "";
+        return new byte[0];
     }
 
-    private string get_json_path_array(YAPI.YJSONArray jsonArray, string[] paths, int ofs)
+    private byte[] get_json_path_array(YAPI.YJSONArray jsonArray, string[] paths, int ofs)
     {
         int key = Convert.ToInt32(paths[ofs]);
         if (jsonArray.Length <= key) {
-            return "";
+            return new byte[0];
         }
 
         YAPI.YJSONContent obj = jsonArray.get(key);
         if (obj != null) {
             if (paths.Length == ofs + 1) {
-                return obj.ToString();
+                return obj.toJSON();
             }
 
             if (obj is YAPI.YJSONArray) {
@@ -11392,24 +11423,32 @@ public class YFunction
             }
         }
 
-        return "";
+        return new byte[0];
     }
 
-    public string _get_json_path(string json, string path)
+    public byte[] _get_json_path(byte[] json, string path)
     {
         YAPI.YJSONObject jsonObject = null;
-        jsonObject = new YAPI.YJSONObject(json);
+        jsonObject = new YAPI.YJSONObject(YAPI.DefaultEncoding.GetString(json));
         jsonObject.parse();
         string[] split = path.Split(new char[] {'\\', '|'});
         return get_json_path_struct(jsonObject, split, 0);
     }
 
-    public string _decode_json_string(string json)
+    public string _decode_json_string(byte[] json)
     {
         int len = json.Length;
         StringBuilder buffer = new StringBuilder(len);
-        int decoded_len = SafeNativeMethods._yapiJsonDecodeString(new StringBuilder(json), buffer);
+        int decoded_len = SafeNativeMethods._yapiJsonDecodeString(new StringBuilder(YAPI.DefaultEncoding.GetString(json)), buffer);
         return buffer.ToString();
+    }
+
+    public int _decode_json_int(byte[] json)
+    {
+        string s = YAPI.DefaultEncoding.GetString(json);
+        YAPI.YJSONNumber obj = new YAPI.YJSONNumber(s, 0, s.Length);
+        obj.parse();
+        return obj.getInt();
     }
 
 
@@ -12391,7 +12430,7 @@ public class YModule : YFunction
         prodname = this.get_productName();
         prodrel = this.get_productRelease();
         if (prodrel > 1) {
-            fullname = ""+ prodname+" rev. "+((char)(64 + prodrel)).ToString();
+            fullname = ""+prodname+" rev. "+((char)(64 + prodrel)).ToString();
         } else {
             fullname = prodname;
         }
@@ -12745,7 +12784,7 @@ public class YModule : YFunction
     public virtual byte[] get_allSettings()
     {
         byte[] settings = new byte[0];
-        byte[] json_bin = new byte[0];
+        byte[] json = new byte[0];
         byte[] res = new byte[0];
         string sep;
         string name;
@@ -12757,7 +12796,7 @@ public class YModule : YFunction
         byte[] file_data_bin = new byte[0];
         byte[] temp_data_bin = new byte[0];
         string ext_settings;
-        List<string> filelist = new List<string>();
+        List<byte[]> filelist = new List<byte[]>();
         List<string> templist = new List<string>();
 
         settings = this._download("api.json");
@@ -12767,18 +12806,18 @@ public class YModule : YFunction
         ext_settings = ", \"extras\":[";
         templist = this.get_functionIds("Temperature");
         sep = "";
-        for (int ii_0 = 0; ii_0 <   templist.Count; ii_0++) {
+        for (int ii_0 = 0; ii_0 <  templist.Count; ii_0++) {
             if (YAPI._atoi(this.get_firmwareRelease()) > 9000) {
-                url = "api/"+ templist[ii_0]+"/sensorType";
+                url = "api/"+templist[ii_0]+"/sensorType";
                 t_type = YAPI.DefaultEncoding.GetString(this._download(url));
                 if (t_type == "RES_NTC" || t_type == "RES_LINEAR") {
-                    pageid = ( templist[ii_0]).Substring( 11, ( templist[ii_0]).Length - 11);
+                    pageid = (templist[ii_0]).Substring(11, (templist[ii_0]).Length - 11);
                     if (pageid == "") {
                         pageid = "1";
                     }
                     temp_data_bin = this._download("extra.json?page="+pageid);
                     if ((temp_data_bin).Length > 0) {
-                        item = ""+ sep+"{\"fid\":\""+  templist[ii_0]+"\", \"json\":"+YAPI.DefaultEncoding.GetString(temp_data_bin)+"}\n";
+                        item = ""+sep+"{\"fid\":\""+templist[ii_0]+"\", \"json\":"+YAPI.DefaultEncoding.GetString(temp_data_bin)+"}\n";
                         ext_settings = ext_settings + item;
                         sep = ",";
                     }
@@ -12787,18 +12826,18 @@ public class YModule : YFunction
         }
         ext_settings = ext_settings + "],\n\"files\":[";
         if (this.hasFunction("files")) {
-            json_bin = this._download("files.json?a=dir&f=");
-            if ((json_bin).Length == 0) {
-                return json_bin;
+            json = this._download("files.json?a=dir&f=");
+            if ((json).Length == 0) {
+                return json;
             }
-            filelist = this._json_get_array(json_bin);
+            filelist = this._json_get_array(json);
             sep = "";
-            for (int ii_1 = 0; ii_1 <   filelist.Count; ii_1++) {
-                name = this._json_get_key(YAPI.DefaultEncoding.GetBytes( filelist[ii_1]), "name");
+            for (int ii_1 = 0; ii_1 <  filelist.Count; ii_1++) {
+                name = this._json_get_key(filelist[ii_1], "name");
                 if (((name).Length > 0) && !(name == "startupConf.json")) {
                     file_data_bin = this._download(this._escapeAttr(name));
                     file_data = YAPI._bytesToHexStr(file_data_bin, 0, file_data_bin.Length);
-                    item = ""+ sep+"{\"name\":\""+ name+"\", \"data\":\""+file_data+"\"}\n";
+                    item = ""+sep+"{\"name\":\""+name+"\", \"data\":\""+file_data+"\"}\n";
                     ext_settings = ext_settings + item;
                     sep = ",";
                 }
@@ -12811,10 +12850,12 @@ public class YModule : YFunction
 
     public virtual int loadThermistorExtra(string funcId, string jsonExtra)
     {
-        List<string> values = new List<string>();
+        List<byte[]> values = new List<byte[]>();
         string url;
         string curr;
+        byte[] binCurr = new byte[0];
         string currTemp;
+        byte[] binCurrTemp = new byte[0];
         int ofs;
         int size;
         url = "api/" + funcId + ".json?command=Z";
@@ -12825,9 +12866,11 @@ public class YModule : YFunction
         ofs = 0;
         size = values.Count;
         while (ofs + 1 < size) {
-            curr = values[ofs];
-            currTemp = values[ofs + 1];
-            url = "api/"+ funcId+".json?command=m"+ curr+":"+currTemp;
+            binCurr = values[ofs];
+            binCurrTemp = values[ofs + 1];
+            curr = this._json_get_string(binCurr);
+            currTemp = this._json_get_string(binCurrTemp);
+            url = "api/"+funcId+".json?command=m"+curr+":"+currTemp;
             this._download(url);
             ofs = ofs + 2;
         }
@@ -12837,16 +12880,17 @@ public class YModule : YFunction
 
     public virtual int set_extraSettings(string jsonExtra)
     {
-        List<string> extras = new List<string>();
+        List<byte[]> extras = new List<byte[]>();
+        byte[] tmp = new byte[0];
         string functionId;
-        string data;
+        byte[] data = new byte[0];
         extras = this._json_get_array(YAPI.DefaultEncoding.GetBytes(jsonExtra));
-        for (int ii_0 = 0; ii_0 <   extras.Count; ii_0++) {
-            functionId = this._get_json_path( extras[ii_0], "fid");
-            functionId = this._decode_json_string(functionId);
-            data = this._get_json_path( extras[ii_0], "json");
+        for (int ii_0 = 0; ii_0 <  extras.Count; ii_0++) {
+            tmp = this._get_json_path(extras[ii_0], "fid");
+            functionId = this._json_get_string(tmp);
+            data = this._get_json_path(extras[ii_0], "json");
             if (this.hasFunction(functionId)) {
-                this.loadThermistorExtra(functionId, data);
+                this.loadThermistorExtra(functionId, YAPI.DefaultEncoding.GetString(data));
             }
         }
         return YAPI.SUCCESS;
@@ -12878,42 +12922,42 @@ public class YModule : YFunction
     public virtual int set_allSettingsAndFiles(byte[] settings)
     {
         byte[] down = new byte[0];
-        string json_bin;
-        string json_api;
-        string json_files;
-        string json_extra;
+        byte[] json_bin = new byte[0];
+        byte[] json_api = new byte[0];
+        byte[] json_files = new byte[0];
+        byte[] json_extra = new byte[0];
         int fuperror;
         int globalres;
         fuperror = 0;
-        json_bin = YAPI.DefaultEncoding.GetString(settings);
-        json_api = this._get_json_path(json_bin, "api");
-        if (json_api == "") {
+        json_api = this._get_json_path(settings, "api");
+        if ((json_api).Length == 0) {
             return this.set_allSettings(settings);
         }
-        json_extra = this._get_json_path(json_bin, "extras");
-        if (!(json_extra == "")) {
-            this.set_extraSettings(json_extra);
+        json_extra = this._get_json_path(settings, "extras");
+        if ((json_extra).Length > 0) {
+            this.set_extraSettings(YAPI.DefaultEncoding.GetString(json_extra));
         }
-        this.set_allSettings(YAPI.DefaultEncoding.GetBytes(json_api));
+        this.set_allSettings(json_api);
         if (this.hasFunction("files")) {
-            List<string> files = new List<string>();
+            List<byte[]> files = new List<byte[]>();
             string res;
+            byte[] tmp = new byte[0];
             string name;
             string data;
             down = this._download("files.json?a=format");
-            res = this._get_json_path(YAPI.DefaultEncoding.GetString(down), "res");
-            res = this._decode_json_string(res);
+            down = this._get_json_path(down, "res");
+            res = this._json_get_string(down);
             if (!(res == "ok")) {
                 this._throw(YAPI.IO_ERROR, "format failed");
                 return YAPI.IO_ERROR;
             }
-            json_files = this._get_json_path(json_bin, "files");
-            files = this._json_get_array(YAPI.DefaultEncoding.GetBytes(json_files));
-            for (int ii_0 = 0; ii_0 <   files.Count; ii_0++) {
-                name = this._get_json_path( files[ii_0], "name");
-                name = this._decode_json_string(name);
-                data = this._get_json_path( files[ii_0], "data");
-                data = this._decode_json_string(data);
+            json_files = this._get_json_path(settings, "files");
+            files = this._json_get_array(json_files);
+            for (int ii_0 = 0; ii_0 <  files.Count; ii_0++) {
+                tmp = this._get_json_path(files[ii_0], "name");
+                name = this._json_get_string(tmp);
+                tmp = this._get_json_path(files[ii_0], "data");
+                data = this._json_get_string(tmp);
                 if (name == "") {
                     fuperror = fuperror + 1;
                 } else {
@@ -12922,7 +12966,7 @@ public class YModule : YFunction
             }
         }
         // Apply settings a second time for file-dependent settings and dynamic sensor nodes
-        globalres = this.set_allSettings(YAPI.DefaultEncoding.GetBytes(json_api));
+        globalres = this.set_allSettings(json_api);
         if (!(fuperror == 0)) {
             this._throw(YAPI.IO_ERROR, "Error during file upload");
             return YAPI.IO_ERROR;
@@ -13318,12 +13362,12 @@ public class YModule : YFunction
     {
         List<string> restoreLast = new List<string>();
         byte[] old_json_flat = new byte[0];
-        List<string> old_dslist = new List<string>();
+        List<byte[]> old_dslist = new List<byte[]>();
         List<string> old_jpath = new List<string>();
         List<int> old_jpath_len = new List<int>();
         List<string> old_val_arr = new List<string>();
         byte[] actualSettings = new byte[0];
-        List<string> new_dslist = new List<string>();
+        List<byte[]> new_dslist = new List<byte[]>();
         List<string> new_jpath = new List<string>();
         List<int> new_jpath_len = new List<int>();
         List<string> new_val_arr = new List<string>();
@@ -13339,8 +13383,11 @@ public class YModule : YFunction
         string fun;
         string attr;
         string value;
+        string old_serial;
+        string new_serial;
         string url;
         string tmp;
+        byte[] binTmp = new byte[0];
         string sensorType;
         string unit_name;
         string newval;
@@ -13350,17 +13397,17 @@ public class YModule : YFunction
         bool do_update;
         bool found;
         res = YAPI.SUCCESS;
-        tmp = YAPI.DefaultEncoding.GetString(settings);
-        tmp = this._get_json_path(tmp, "api");
-        if (!(tmp == "")) {
-            settings = YAPI.DefaultEncoding.GetBytes(tmp);
+        binTmp = this._get_json_path(settings, "api");
+        if ((binTmp).Length > 0) {
+            settings = binTmp;
         }
+        old_serial = "";
         oldval = "";
         newval = "";
         old_json_flat = this._flattenJsonStruct(settings);
         old_dslist = this._json_get_array(old_json_flat);
         for (int ii_0 = 0; ii_0 <  old_dslist.Count; ii_0++) {
-            each_str = this._json_get_string(YAPI.DefaultEncoding.GetBytes(old_dslist[ii_0]));
+            each_str = this._json_get_string(old_dslist[ii_0]);
             // split json path and attr
             leng = (each_str).Length;
             eqpos = (each_str).IndexOf("=");
@@ -13368,12 +13415,15 @@ public class YModule : YFunction
                 this._throw(YAPI.INVALID_ARGUMENT, "Invalid settings");
                 return YAPI.INVALID_ARGUMENT;
             }
-            jpath = (each_str).Substring( 0, eqpos);
+            jpath = (each_str).Substring(0, eqpos);
             eqpos = eqpos + 1;
-            value = (each_str).Substring( eqpos, leng - eqpos);
+            value = (each_str).Substring(eqpos, leng - eqpos);
             old_jpath.Add(jpath);
             old_jpath_len.Add((jpath).Length);
             old_val_arr.Add(value);
+            if (jpath == "module/serialNumber") {
+                old_serial = value;
+            }
         }
 
         try {
@@ -13383,11 +13433,15 @@ public class YModule : YFunction
             {string ignore=""; YAPI.Sleep(500, ref ignore);};
             actualSettings = this._download("api.json");
         }
+        new_serial = this.get_serialNumber();
+        if (old_serial == new_serial || old_serial == "") {
+            old_serial = "_NO_SERIAL_FILTER_";
+        }
         actualSettings = this._flattenJsonStruct(actualSettings);
         new_dslist = this._json_get_array(actualSettings);
         for (int ii_1 = 0; ii_1 <  new_dslist.Count; ii_1++) {
             // remove quotes
-            each_str = this._json_get_string(YAPI.DefaultEncoding.GetBytes(new_dslist[ii_1]));
+            each_str = this._json_get_string(new_dslist[ii_1]);
             // split json path and attr
             leng = (each_str).Length;
             eqpos = (each_str).IndexOf("=");
@@ -13395,9 +13449,9 @@ public class YModule : YFunction
                 this._throw(YAPI.INVALID_ARGUMENT, "Invalid settings");
                 return YAPI.INVALID_ARGUMENT;
             }
-            jpath = (each_str).Substring( 0, eqpos);
+            jpath = (each_str).Substring(0, eqpos);
             eqpos = eqpos + 1;
-            value = (each_str).Substring( eqpos, leng - eqpos);
+            value = (each_str).Substring(eqpos, leng - eqpos);
             new_jpath.Add(jpath);
             new_jpath_len.Add((jpath).Length);
             new_val_arr.Add(value);
@@ -13410,9 +13464,9 @@ public class YModule : YFunction
             if ((cpos < 0) || (leng == 0)) {
                 continue;
             }
-            fun = (njpath).Substring( 0, cpos);
+            fun = (njpath).Substring(0, cpos);
             cpos = cpos + 1;
-            attr = (njpath).Substring( cpos, leng - cpos);
+            attr = (njpath).Substring(cpos, leng - cpos);
             do_update = true;
             if (fun == "services") {
                 do_update = false;
@@ -13536,14 +13590,14 @@ public class YModule : YFunction
             }
             if (do_update) {
                 do_update = false;
-                newval = new_val_arr[i];
                 j = 0;
                 found = false;
+                newval = new_val_arr[i];
                 while ((j < old_jpath.Count) && !(found)) {
                     if ((new_jpath_len[i] == old_jpath_len[j]) && (new_jpath[i] == old_jpath[j])) {
                         found = true;
                         oldval = old_val_arr[j];
-                        if (!(newval == oldval)) {
+                        if (!(newval == oldval) && !(oldval == old_serial)) {
                             do_update = true;
                         }
                     }
@@ -13694,7 +13748,7 @@ public class YModule : YFunction
      *   Returns the icon of the module.
      * <para>
      *   The icon is a PNG image and does not
-     *   exceeds 1536 bytes.
+     *   exceed 1536 bytes.
      * </para>
      * <para>
      * </para>
@@ -15518,7 +15572,7 @@ public class YSensor : YFunction
         res = ""+Convert.ToString(YAPI.YOCTO_CALIB_TYPE_OFS);
         idx = 0;
         while (idx < npt) {
-            res = ""+ res+","+YAPI._floatToStr( rawValues[idx])+","+YAPI._floatToStr(refValues[idx]);
+            res = ""+res+","+YAPI._floatToStr(rawValues[idx])+","+YAPI._floatToStr(refValues[idx]);
             idx = idx + 1;
         }
         return res;
@@ -16339,7 +16393,7 @@ public class YDataLogger : YFunction
 
     public virtual List<YDataSet> parse_dataSets(byte[] jsonbuff)
     {
-        List<string> dslist = new List<string>();
+        List<byte[]> dslist = new List<byte[]>();
         YDataSet dataset;
         List<YDataSet> res = new List<YDataSet>();
 
@@ -16347,7 +16401,7 @@ public class YDataLogger : YFunction
         res.Clear();
         for (int ii_0 = 0; ii_0 <  dslist.Count; ii_0++) {
             dataset = new YDataSet(this);
-            dataset._parse(dslist[ii_0]);
+            dataset._parse(YAPI.DefaultEncoding.GetString(dslist[ii_0]));
             res.Add(dataset);
         }
         return res;

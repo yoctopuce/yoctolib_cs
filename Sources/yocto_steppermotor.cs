@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_steppermotor.cs 61964 2024-07-29 15:54:55Z seb $
+ *  $Id: yocto_steppermotor.cs 63324 2024-11-13 09:33:07Z seb $
  *
  *  Implements yFindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -1021,8 +1021,8 @@ public class YStepperMotor : YFunction
         byte[] retBin = new byte[0];
         int res;
         id = this.get_functionId();
-        id = (id).Substring( 12, 1);
-        url = "cmd.txt?"+ id+"="+command;
+        id = (id).Substring(12, 1);
+        url = "cmd.txt?"+id+"="+command;
         //may throw an exception
         retBin = this._download(url);
         res = retBin[0];

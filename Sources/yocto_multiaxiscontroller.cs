@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_multiaxiscontroller.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_multiaxiscontroller.cs 63324 2024-11-13 09:33:07Z seb $
  *
  *  Implements yFindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -408,7 +408,7 @@ public class YMultiAxisController : YFunction
         cmd = "H"+Convert.ToString((int) Math.Round(1000*speed[0]));
         i = 1;
         while (i < ndim) {
-            cmd = ""+ cmd+","+Convert.ToString((int) Math.Round(1000*speed[i]));
+            cmd = ""+cmd+","+Convert.ToString((int) Math.Round(1000*speed[i]));
             i = i + 1;
         }
         return this.sendCommand(cmd);
@@ -441,7 +441,7 @@ public class YMultiAxisController : YFunction
         cmd = "M"+Convert.ToString((int) Math.Round(16*absPos[0]));
         i = 1;
         while (i < ndim) {
-            cmd = ""+ cmd+","+Convert.ToString((int) Math.Round(16*absPos[i]));
+            cmd = ""+cmd+","+Convert.ToString((int) Math.Round(16*absPos[i]));
             i = i + 1;
         }
         return this.sendCommand(cmd);
@@ -474,7 +474,7 @@ public class YMultiAxisController : YFunction
         cmd = "m"+Convert.ToString((int) Math.Round(16*relPos[0]));
         i = 1;
         while (i < ndim) {
-            cmd = ""+ cmd+","+Convert.ToString((int) Math.Round(16*relPos[i]));
+            cmd = ""+cmd+","+Convert.ToString((int) Math.Round(16*relPos[i]));
             i = i + 1;
         }
         return this.sendCommand(cmd);

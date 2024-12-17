@@ -101,6 +101,13 @@ public class YSpectralChannel : YSensor
 
     /**
      * <summary>
+     *   Retrieves the raw count of data samples.
+     * <para>
+     *   This method returns the current value of rawCount, representing the total number of samples collected
+     *   by the sensor.
+     * </para>
+     * <para>
+     * </para>
      * </summary>
      * <returns>
      *   an integer

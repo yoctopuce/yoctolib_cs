@@ -207,20 +207,20 @@ public class YInputCaptureData
         this._trigUTC = this._trigUTC + (ms / 1000.0);
         recOfs = 24;
         while (sdata[recOfs] >= 32) {
-            this._var1unit = ""+ this._var1unit+""+((char)(sdata[recOfs])).ToString();
+            this._var1unit = ""+this._var1unit+""+((char)(sdata[recOfs])).ToString();
             recOfs = recOfs + 1;
         }
         if (this._var2size > 0) {
             recOfs = recOfs + 1;
             while (sdata[recOfs] >= 32) {
-                this._var2unit = ""+ this._var2unit+""+((char)(sdata[recOfs])).ToString();
+                this._var2unit = ""+this._var2unit+""+((char)(sdata[recOfs])).ToString();
                 recOfs = recOfs + 1;
             }
         }
         if (this._var3size > 0) {
             recOfs = recOfs + 1;
             while (sdata[recOfs] >= 32) {
-                this._var3unit = ""+ this._var3unit+""+((char)(sdata[recOfs])).ToString();
+                this._var3unit = ""+this._var3unit+""+((char)(sdata[recOfs])).ToString();
                 recOfs = recOfs + 1;
             }
         }
@@ -1335,7 +1335,7 @@ public class YInputCapture : YFunction
             msDuration = 1000;
         }
         snapStart = ((-msDuration) / 2);
-        snapUrl = "snap.bin?t="+Convert.ToString( snapStart)+"&d="+Convert.ToString(msDuration);
+        snapUrl = "snap.bin?t="+Convert.ToString(snapStart)+"&d="+Convert.ToString(msDuration);
 
         snapData = this._download(snapUrl);
         return new YInputCaptureData(this, snapData);

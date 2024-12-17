@@ -996,7 +996,7 @@ public class YInputChain : YFunction
         // last element of array is the new position preceeded by '@'
         arrLen = arrLen - 1;
         lenStr = eventArr[arrLen];
-        lenStr = (lenStr).Substring( 1, (lenStr).Length-1);
+        lenStr = (lenStr).Substring(1, (lenStr).Length-1);
         // update processed event position pointer
         this._eventPos = YAPI._atoi(lenStr);
         // now generate callbacks for each event received
@@ -1005,17 +1005,17 @@ public class YInputChain : YFunction
             eventStr = eventArr[arrPos];
             eventLen = (eventStr).Length;
             if (eventLen >= 1) {
-                hexStamp = (eventStr).Substring( 0, 8);
+                hexStamp = (eventStr).Substring(0, 8);
                 evtStamp = YAPI._hexStrToInt(hexStamp);
                 typePos = (eventStr).IndexOf(":")+1;
                 if ((evtStamp >= this._eventStamp) && (typePos > 8)) {
                     this._eventStamp = evtStamp;
                     dataPos = (eventStr).IndexOf("=")+1;
-                    evtType = (eventStr).Substring( typePos, 1);
+                    evtType = (eventStr).Substring(typePos, 1);
                     evtData = "";
                     evtChange = "";
                     if (dataPos > 10) {
-                        evtData = (eventStr).Substring( dataPos, (eventStr).Length-dataPos);
+                        evtData = (eventStr).Substring(dataPos, (eventStr).Length-dataPos);
                         if (("1234567").IndexOf(evtType) >= 0) {
                             chainIdx = YAPI._atoi(evtType) - 1;
                             evtChange = this._strXor(evtData, this._eventChains[chainIdx]);
@@ -1043,19 +1043,19 @@ public class YInputChain : YFunction
         lenA = (a).Length;
         lenB = (b).Length;
         if (lenA > lenB) {
-            res = (a).Substring( 0, lenA-lenB);
-            a = (a).Substring( lenA-lenB, lenB);
+            res = (a).Substring(0, lenA-lenB);
+            a = (a).Substring(lenA-lenB, lenB);
             lenA = lenB;
         } else {
             res = "";
-            b = (b).Substring( lenA-lenB, lenA);
+            b = (b).Substring(lenA-lenB, lenA);
         }
         // scan strings and compare digit by digit
         idx = 0;
         while (idx < lenA) {
-            digitA = YAPI._hexStrToInt((a).Substring( idx, 1));
-            digitB = YAPI._hexStrToInt((b).Substring( idx, 1));
-            res = ""+ res+""+String.Format("{0:x}",(digitA ^ digitB));
+            digitA = YAPI._hexStrToInt((a).Substring(idx, 1));
+            digitB = YAPI._hexStrToInt((b).Substring(idx, 1));
+            res = ""+res+""+String.Format("{0:x}",(digitA ^ digitB));
             idx = idx + 1;
         }
         return res;
@@ -1073,7 +1073,7 @@ public class YInputChain : YFunction
         idx = hexlen;
         while (idx > 0) {
             idx = idx - 1;
-            digit = YAPI._hexStrToInt((hexstr).Substring( idx, 1));
+            digit = YAPI._hexStrToInt((hexstr).Substring(idx, 1));
             res.Add((digit & 1));
             res.Add(((digit >> 1) & 1));
             res.Add(((digit >> 2) & 1));

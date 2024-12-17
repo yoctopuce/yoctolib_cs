@@ -457,7 +457,7 @@ public class YRfidOptions
         }
         res = "&o="+Convert.ToString(opt);
         if (this.KeyType != 0) {
-            res = ""+ res+"&k="+String.Format("{0:x02}", this.KeyType)+":"+this.HexKey;
+            res = ""+res+"&k="+String.Format("{0:x02}",this.KeyType)+":"+this.HexKey;
         }
         return res;
     }
@@ -1069,7 +1069,7 @@ public class YRfidStatus
                 errMsg = "Radio is OFF (refreshRate=0).";
             }
             if (errBlk >= 0) {
-                errMsg = ""+ errMsg+" (block "+Convert.ToString(errBlk)+")";
+                errMsg = ""+errMsg+" (block "+Convert.ToString(errBlk)+")";
             }
         }
         this._tagId = tagId;
@@ -1454,7 +1454,7 @@ public class YRfidReader : YFunction
     public virtual List<string> get_tagIdList()
     {
         byte[] json = new byte[0];
-        List<string> jsonList = new List<string>();
+        List<byte[]> jsonList = new List<byte[]>();
         List<string> taglist = new List<string>();
 
         json = this._download("rfid.json?a=list");
@@ -1462,7 +1462,7 @@ public class YRfidReader : YFunction
         if ((json).Length > 3) {
             jsonList = this._json_get_array(json);
             for (int ii_0 = 0; ii_0 <  jsonList.Count; ii_0++) {
-                taglist.Add(this._json_get_string(YAPI.DefaultEncoding.GetBytes(jsonList[ii_0])));
+                taglist.Add(this._json_get_string(jsonList[ii_0]));
             }
         }
         return taglist;
@@ -2106,7 +2106,7 @@ public class YRfidReader : YFunction
             buff = new byte[bufflen];
             idx = 0;
             while (idx < bufflen) {
-                hexb = YAPI._hexStrToInt((hexString).Substring( 2 * idx, 2));
+                hexb = YAPI._hexStrToInt((hexString).Substring(2 * idx, 2));
                 buff[idx] = (byte)(hexb & 0xff);
                 idx = idx + 1;
             }
@@ -2544,7 +2544,7 @@ public class YRfidReader : YFunction
             // first element of array is the new position preceeded by '@'
             arrPos = 1;
             lenStr = eventArr[0];
-            lenStr = (lenStr).Substring( 1, (lenStr).Length-1);
+            lenStr = (lenStr).Substring(1, (lenStr).Length-1);
             // update processed event position pointer
             this._eventPos = YAPI._atoi(lenStr);
         } else {
@@ -2562,7 +2562,7 @@ public class YRfidReader : YFunction
             arrPos = 0;
             arrLen = arrLen - 1;
             lenStr = eventArr[arrLen];
-            lenStr = (lenStr).Substring( 1, (lenStr).Length-1);
+            lenStr = (lenStr).Substring(1, (lenStr).Length-1);
             // update processed event position pointer
             this._eventPos = YAPI._atoi(lenStr);
         }
@@ -2572,18 +2572,18 @@ public class YRfidReader : YFunction
             eventLen = (eventStr).Length;
             typePos = (eventStr).IndexOf(":")+1;
             if ((eventLen >= 14) && (typePos > 10)) {
-                hexStamp = (eventStr).Substring( 0, 8);
+                hexStamp = (eventStr).Substring(0, 8);
                 intStamp = YAPI._hexStrToInt(hexStamp);
                 if (intStamp >= this._eventStamp) {
                     this._eventStamp = intStamp;
-                    binMStamp = YAPI.DefaultEncoding.GetBytes((eventStr).Substring( 8, 2));
+                    binMStamp = YAPI.DefaultEncoding.GetBytes((eventStr).Substring(8, 2));
                     msStamp = (binMStamp[0]-64) * 32 + binMStamp[1];
                     evtStamp = intStamp + (0.001 * msStamp);
                     dataPos = (eventStr).IndexOf("=")+1;
-                    evtType = (eventStr).Substring( typePos, 1);
+                    evtType = (eventStr).Substring(typePos, 1);
                     evtData = "";
                     if (dataPos > 10) {
-                        evtData = (eventStr).Substring( dataPos, eventLen-dataPos);
+                        evtData = (eventStr).Substring(dataPos, eventLen-dataPos);
                     }
                     if (this._eventCallback != null) {
                         this._eventCallback(this, evtStamp, evtType, evtData);

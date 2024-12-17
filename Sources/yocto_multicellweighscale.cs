@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_multicellweighscale.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_multicellweighscale.cs 63324 2024-11-13 09:33:07Z seb $
  *
  *  Implements yFindMultiCellWeighScale(), the high-level API for MultiCellWeighScale functions
  *
@@ -902,7 +902,7 @@ public class YMultiCellWeighScale : YSensor
      */
     public virtual int setupSpan(double currWeight, double maxWeight)
     {
-        return this.set_command("S"+Convert.ToString( (int) Math.Round(1000*currWeight))+":"+Convert.ToString((int) Math.Round(1000*maxWeight)));
+        return this.set_command("S"+Convert.ToString((int) Math.Round(1000*currWeight))+":"+Convert.ToString((int) Math.Round(1000*maxWeight)));
     }
 
     /**

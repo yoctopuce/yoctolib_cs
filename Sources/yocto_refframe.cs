@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_refframe.cs 62189 2024-08-19 12:07:40Z seb $
+ *  $Id: yocto_refframe.cs 63324 2024-11-13 09:33:07Z seb $
  *
  *  Implements yFindRefFrame(), the high-level API for RefFrame functions
  *
@@ -901,9 +901,7 @@ public class YRefFrame : YFunction
         intpos = (this._calibStage - 1) * this._calibCount;
         this._calibSort(intpos, intpos + this._calibCount);
         intpos = intpos + (this._calibCount / 2);
-        this._calibLogMsg = "Stage "+Convert.ToString( this._calibStage)+": median is "+Convert.ToString(
-        (int) Math.Round(1000*this._calibDataAccX[intpos]))+","+Convert.ToString(
-        (int) Math.Round(1000*this._calibDataAccY[intpos]))+","+Convert.ToString((int) Math.Round(1000*this._calibDataAccZ[intpos]));
+        this._calibLogMsg = "Stage "+Convert.ToString(this._calibStage)+": median is "+Convert.ToString((int) Math.Round(1000*this._calibDataAccX[intpos]))+","+Convert.ToString((int) Math.Round(1000*this._calibDataAccY[intpos]))+","+Convert.ToString((int) Math.Round(1000*this._calibDataAccZ[intpos]));
         // move to next stage
         this._calibStage = this._calibStage + 1;
         if (this._calibStage < 7) {
@@ -1210,7 +1208,7 @@ public class YRefFrame : YFunction
         scaleLo = ((scaleY & 15) << 12) + (scaleX << 2) + scaleExp;
         scaleHi = (scaleZ << 6) + (scaleY >> 4);
         // Save calibration parameters
-        newcalib = "5,"+Convert.ToString( shiftX)+","+Convert.ToString( shiftY)+","+Convert.ToString( shiftZ)+","+Convert.ToString( scaleLo)+","+Convert.ToString(scaleHi);
+        newcalib = "5,"+Convert.ToString(shiftX)+","+Convert.ToString(shiftY)+","+Convert.ToString(shiftZ)+","+Convert.ToString(scaleLo)+","+Convert.ToString(scaleHi);
         this._calibStage = 0;
         return this.set_calibrationParam(newcalib);
     }

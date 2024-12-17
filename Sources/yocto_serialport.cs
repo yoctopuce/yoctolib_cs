@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 62189 2024-08-19 12:07:40Z seb $
+ * $Id: yocto_serialport.cs 63469 2024-11-25 14:01:08Z seb $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
@@ -1060,7 +1060,7 @@ public class YSerialPort : YFunction
     {
         string url;
         byte[] msgbin = new byte[0];
-        List<string> msgarr = new List<string>();
+        List<byte[]> msgarr = new List<byte[]>();
         int msglen;
         string res;
 
@@ -1073,11 +1073,11 @@ public class YSerialPort : YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        this._rxptr = YAPI._atoi(msgarr[msglen]);
+        this._rxptr = this._decode_json_int(msgarr[msglen]);
         if (msglen == 0) {
             return "";
         }
-        res = this._json_get_string(YAPI.DefaultEncoding.GetBytes(msgarr[0]));
+        res = this._json_get_string(msgarr[0]);
         return res;
     }
 
@@ -1118,12 +1118,12 @@ public class YSerialPort : YFunction
     {
         string url;
         byte[] msgbin = new byte[0];
-        List<string> msgarr = new List<string>();
+        List<byte[]> msgarr = new List<byte[]>();
         int msglen;
         List<string> res = new List<string>();
         int idx;
 
-        url = "rxmsg.json?pos="+Convert.ToString( this._rxptr)+"&maxw="+Convert.ToString( maxWait)+"&pat="+pattern;
+        url = "rxmsg.json?pos="+Convert.ToString(this._rxptr)+"&maxw="+Convert.ToString(maxWait)+"&pat="+pattern;
         msgbin = this._download(url);
         msgarr = this._json_get_array(msgbin);
         msglen = msgarr.Count;
@@ -1132,10 +1132,10 @@ public class YSerialPort : YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        this._rxptr = YAPI._atoi(msgarr[msglen]);
+        this._rxptr = this._decode_json_int(msgarr[msglen]);
         idx = 0;
         while (idx < msglen) {
-            res.Add(this._json_get_string(YAPI.DefaultEncoding.GetBytes(msgarr[idx])));
+            res.Add(this._json_get_string(msgarr[idx]));
             idx = idx + 1;
         }
         return res;
@@ -1202,7 +1202,7 @@ public class YSerialPort : YFunction
         databin = this._download("rxcnt.bin?pos="+Convert.ToString(this._rxptr));
         availPosStr = YAPI.DefaultEncoding.GetString(databin);
         atPos = (availPosStr).IndexOf("@");
-        res = YAPI._atoi((availPosStr).Substring( 0, atPos));
+        res = YAPI._atoi((availPosStr).Substring(0, atPos));
         return res;
     }
 
@@ -1217,7 +1217,7 @@ public class YSerialPort : YFunction
         databin = this._download("rxcnt.bin?pos="+Convert.ToString(this._rxptr));
         availPosStr = YAPI.DefaultEncoding.GetString(databin);
         atPos = (availPosStr).IndexOf("@");
-        res = YAPI._atoi((availPosStr).Substring( atPos+1, (availPosStr).Length-atPos-1));
+        res = YAPI._atoi((availPosStr).Substring(atPos+1, (availPosStr).Length-atPos-1));
         return res;
     }
 
@@ -1248,17 +1248,17 @@ public class YSerialPort : YFunction
         int prevpos;
         string url;
         byte[] msgbin = new byte[0];
-        List<string> msgarr = new List<string>();
+        List<byte[]> msgarr = new List<byte[]>();
         int msglen;
         string res;
         if ((query).Length <= 80) {
             // fast query
-            url = "rxmsg.json?len=1&maxw="+Convert.ToString( maxWait)+"&cmd=!"+this._escapeAttr(query);
+            url = "rxmsg.json?len=1&maxw="+Convert.ToString(maxWait)+"&cmd=!"+this._escapeAttr(query);
         } else {
             // long query
             prevpos = this.end_tell();
             this._upload("txdata", YAPI.DefaultEncoding.GetBytes(query + "\r\n"));
-            url = "rxmsg.json?len=1&maxw="+Convert.ToString( maxWait)+"&pos="+Convert.ToString(prevpos);
+            url = "rxmsg.json?len=1&maxw="+Convert.ToString(maxWait)+"&pos="+Convert.ToString(prevpos);
         }
 
         msgbin = this._download(url);
@@ -1269,11 +1269,11 @@ public class YSerialPort : YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        this._rxptr = YAPI._atoi(msgarr[msglen]);
+        this._rxptr = this._decode_json_int(msgarr[msglen]);
         if (msglen == 0) {
             return "";
         }
-        res = this._json_get_string(YAPI.DefaultEncoding.GetBytes(msgarr[0]));
+        res = this._json_get_string(msgarr[0]);
         return res;
     }
 
@@ -1305,17 +1305,17 @@ public class YSerialPort : YFunction
         int prevpos;
         string url;
         byte[] msgbin = new byte[0];
-        List<string> msgarr = new List<string>();
+        List<byte[]> msgarr = new List<byte[]>();
         int msglen;
         string res;
         if ((hexString).Length <= 80) {
             // fast query
-            url = "rxmsg.json?len=1&maxw="+Convert.ToString( maxWait)+"&cmd=$"+hexString;
+            url = "rxmsg.json?len=1&maxw="+Convert.ToString(maxWait)+"&cmd=$"+hexString;
         } else {
             // long query
             prevpos = this.end_tell();
             this._upload("txdata", YAPI._hexStrToBin(hexString));
-            url = "rxmsg.json?len=1&maxw="+Convert.ToString( maxWait)+"&pos="+Convert.ToString(prevpos);
+            url = "rxmsg.json?len=1&maxw="+Convert.ToString(maxWait)+"&pos="+Convert.ToString(prevpos);
         }
 
         msgbin = this._download(url);
@@ -1326,11 +1326,11 @@ public class YSerialPort : YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        this._rxptr = YAPI._atoi(msgarr[msglen]);
+        this._rxptr = this._decode_json_int(msgarr[msglen]);
         if (msglen == 0) {
             return "";
         }
-        res = this._json_get_string(YAPI.DefaultEncoding.GetBytes(msgarr[0]));
+        res = this._json_get_string(msgarr[0]);
         return res;
     }
 
@@ -1572,7 +1572,7 @@ public class YSerialPort : YFunction
         buff = new byte[bufflen];
         idx = 0;
         while (idx < bufflen) {
-            hexb = YAPI._hexStrToInt((hexString).Substring( 2 * idx, 2));
+            hexb = YAPI._hexStrToInt((hexString).Substring(2 * idx, 2));
             buff[idx] = (byte)(hexb & 0xff);
             idx = idx + 1;
         }
@@ -1732,7 +1732,7 @@ public class YSerialPort : YFunction
             nChars = 65535;
         }
 
-        buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nChars));
+        buff = this._download("rxdata.bin?pos="+Convert.ToString(this._rxptr)+"&len="+Convert.ToString(nChars));
         bufflen = (buff).Length - 1;
         endpos = 0;
         mult = 1;
@@ -1742,7 +1742,7 @@ public class YSerialPort : YFunction
             bufflen = bufflen - 1;
         }
         this._rxptr = endpos;
-        res = (YAPI.DefaultEncoding.GetString(buff)).Substring( 0, bufflen);
+        res = (YAPI.DefaultEncoding.GetString(buff)).Substring(0, bufflen);
         return res;
     }
 
@@ -1777,7 +1777,7 @@ public class YSerialPort : YFunction
             nChars = 65535;
         }
 
-        buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nChars));
+        buff = this._download("rxdata.bin?pos="+Convert.ToString(this._rxptr)+"&len="+Convert.ToString(nChars));
         bufflen = (buff).Length - 1;
         endpos = 0;
         mult = 1;
@@ -1828,7 +1828,7 @@ public class YSerialPort : YFunction
             nChars = 65535;
         }
 
-        buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nChars));
+        buff = this._download("rxdata.bin?pos="+Convert.ToString(this._rxptr)+"&len="+Convert.ToString(nChars));
         bufflen = (buff).Length - 1;
         endpos = 0;
         mult = 1;
@@ -1879,7 +1879,7 @@ public class YSerialPort : YFunction
             nBytes = 65535;
         }
 
-        buff = this._download("rxdata.bin?pos="+Convert.ToString( this._rxptr)+"&len="+Convert.ToString(nBytes));
+        buff = this._download("rxdata.bin?pos="+Convert.ToString(this._rxptr)+"&len="+Convert.ToString(nBytes));
         bufflen = (buff).Length - 1;
         endpos = 0;
         mult = 1;
@@ -1892,11 +1892,11 @@ public class YSerialPort : YFunction
         res = "";
         ofs = 0;
         while (ofs + 3 < bufflen) {
-            res = ""+ res+""+String.Format("{0:X02}", buff[ofs])+""+String.Format("{0:X02}", buff[ofs + 1])+""+String.Format("{0:X02}", buff[ofs + 2])+""+String.Format("{0:X02}",buff[ofs + 3]);
+            res = ""+res+""+String.Format("{0:X02}",buff[ofs])+""+String.Format("{0:X02}",buff[ofs + 1])+""+String.Format("{0:X02}",buff[ofs + 2])+""+String.Format("{0:X02}",buff[ofs + 3]);
             ofs = ofs + 4;
         }
         while (ofs < bufflen) {
-            res = ""+ res+""+String.Format("{0:X02}",buff[ofs]);
+            res = ""+res+""+String.Format("{0:X02}",buff[ofs]);
             ofs = ofs + 1;
         }
         return res;
@@ -2020,12 +2020,12 @@ public class YSerialPort : YFunction
     {
         string url;
         byte[] msgbin = new byte[0];
-        List<string> msgarr = new List<string>();
+        List<byte[]> msgarr = new List<byte[]>();
         int msglen;
         List<YSnoopingRecord> res = new List<YSnoopingRecord>();
         int idx;
 
-        url = "rxmsg.json?pos="+Convert.ToString( this._rxptr)+"&maxw="+Convert.ToString( maxWait)+"&t=0&len="+Convert.ToString(maxMsg);
+        url = "rxmsg.json?pos="+Convert.ToString(this._rxptr)+"&maxw="+Convert.ToString(maxWait)+"&t=0&len="+Convert.ToString(maxMsg);
         msgbin = this._download(url);
         msgarr = this._json_get_array(msgbin);
         msglen = msgarr.Count;
@@ -2034,10 +2034,10 @@ public class YSerialPort : YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        this._rxptr = YAPI._atoi(msgarr[msglen]);
+        this._rxptr = this._decode_json_int(msgarr[msglen]);
         idx = 0;
         while (idx < msglen) {
-            res.Add(new YSnoopingRecord(msgarr[idx]));
+            res.Add(new YSnoopingRecord(YAPI.DefaultEncoding.GetString(msgarr[idx])));
             idx = idx + 1;
         }
         return res;
@@ -2114,7 +2114,7 @@ public class YSerialPort : YFunction
     {
         string url;
         byte[] msgbin = new byte[0];
-        List<string> msgarr = new List<string>();
+        List<byte[]> msgarr = new List<byte[]>();
         int msglen;
         int idx;
         if (!(this._eventCallback != null)) {
@@ -2133,13 +2133,13 @@ public class YSerialPort : YFunction
         msglen = msglen - 1;
         if (!(this._eventCallback != null)) {
             // first simulated event, use it only to initialize reference values
-            this._eventPos = YAPI._atoi(msgarr[msglen]);
+            this._eventPos = this._decode_json_int(msgarr[msglen]);
             return YAPI.SUCCESS;
         }
-        this._eventPos = YAPI._atoi(msgarr[msglen]);
+        this._eventPos = this._decode_json_int(msgarr[msglen]);
         idx = 0;
         while (idx < msglen) {
-            this._eventCallback(this, new YSnoopingRecord(msgarr[idx]));
+            this._eventCallback(this, new YSnoopingRecord(YAPI.DefaultEncoding.GetString(msgarr[idx])));
             idx = idx + 1;
         }
         return YAPI.SUCCESS;
@@ -2166,7 +2166,7 @@ public class YSerialPort : YFunction
     public virtual int writeStxEtx(string text)
     {
         byte[] buff = new byte[0];
-        buff = YAPI.DefaultEncoding.GetBytes(""+((char)( 2)).ToString()+""+ text+""+((char)(3)).ToString());
+        buff = YAPI.DefaultEncoding.GetBytes(""+((char)(2)).ToString()+""+text+""+((char)(3)).ToString());
         // send string using file upload
         return this._upload("txdata", buff);
     }
@@ -2228,28 +2228,28 @@ public class YSerialPort : YFunction
         string url;
         string pat;
         byte[] msgs = new byte[0];
-        List<string> reps = new List<string>();
+        List<byte[]> reps = new List<byte[]>();
         string rep;
         List<int> res = new List<int>();
         int replen;
         int hexb;
         funCode = pduBytes[0];
         nib = (funCode >> 4);
-        pat = ""+String.Format("{0:X02}", slaveNo)+"["+String.Format("{0:X}", nib)+""+String.Format("{0:X}", (nib+8))+"]"+String.Format("{0:X}",(funCode & 15))+".*";
-        cmd = ""+String.Format("{0:X02}", slaveNo)+""+String.Format("{0:X02}",funCode);
+        pat = ""+String.Format("{0:X02}",slaveNo)+"["+String.Format("{0:X}",nib)+""+String.Format("{0:X}",(nib+8))+"]"+String.Format("{0:X}",(funCode & 15))+".*";
+        cmd = ""+String.Format("{0:X02}",slaveNo)+""+String.Format("{0:X02}",funCode);
         i = 1;
         while (i < pduBytes.Count) {
-            cmd = ""+ cmd+""+String.Format("{0:X02}",(pduBytes[i] & 0xff));
+            cmd = ""+cmd+""+String.Format("{0:X02}",(pduBytes[i] & 0xff));
             i = i + 1;
         }
         if ((cmd).Length <= 80) {
             // fast query
-            url = "rxmsg.json?cmd=:"+ cmd+"&pat=:"+pat;
+            url = "rxmsg.json?cmd=:"+cmd+"&pat=:"+pat;
         } else {
             // long query
             prevpos = this.end_tell();
             this._upload("txdata:", YAPI._hexStrToBin(cmd));
-            url = "rxmsg.json?pos="+Convert.ToString( prevpos)+"&maxw=2000&pat=:"+pat;
+            url = "rxmsg.json?pos="+Convert.ToString(prevpos)+"&maxw=2000&pat=:"+pat;
         }
 
         msgs = this._download(url);
@@ -2259,7 +2259,7 @@ public class YSerialPort : YFunction
             return res;
         }
         if (reps.Count > 1) {
-            rep = this._json_get_string(YAPI.DefaultEncoding.GetBytes(reps[0]));
+            rep = this._json_get_string(reps[0]);
             replen = (((rep).Length - 3) >> 1);
             i = 0;
             while (i < replen) {

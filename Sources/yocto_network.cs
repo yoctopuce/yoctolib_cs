@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_network.cs 61964 2024-07-29 15:54:55Z seb $
+ *  $Id: yocto_network.cs 63324 2024-11-13 09:33:07Z seb $
  *
  *  Implements yFindNetwork(), the high-level API for Network functions
  *
@@ -2056,7 +2056,7 @@ public class YNetwork : YFunction
      */
     public virtual int useDHCP(string fallbackIpAddr, int fallbackSubnetMaskLen, string fallbackRouter)
     {
-        return this.set_ipConfig("DHCP:"+ fallbackIpAddr+"/"+Convert.ToString( fallbackSubnetMaskLen)+"/"+fallbackRouter);
+        return this.set_ipConfig("DHCP:"+fallbackIpAddr+"/"+Convert.ToString(fallbackSubnetMaskLen)+"/"+fallbackRouter);
     }
 
 
@@ -2108,7 +2108,7 @@ public class YNetwork : YFunction
      */
     public virtual int useStaticIP(string ipAddress, int subnetMaskLen, string router)
     {
-        return this.set_ipConfig("STATIC:"+ ipAddress+"/"+Convert.ToString( subnetMaskLen)+"/"+router);
+        return this.set_ipConfig("STATIC:"+ipAddress+"/"+Convert.ToString(subnetMaskLen)+"/"+router);
     }
 
 
