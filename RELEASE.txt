@@ -1,5 +1,5 @@
-C#V2 v2.0.63744
+C#V2 v2.0.63797
 
-- Fix network discovery for Windows host with only WiFi interface
-- Better logs verbosity of connection to VirtualHub for Web
-- Update Mbed-TLS lib (v3.6.2)
+(C-sharp)- Add Example for Yocto-Spectral //63788
+(Misc)- purepython:now use const() for float as well //63791
+(Misc)- ympy_cross:fix Windows compilation //63792
