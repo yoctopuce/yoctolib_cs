@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_i2cport.cs 63469 2024-11-25 14:01:08Z seb $
+ *  $Id: yocto_i2cport.cs 64096 2025-01-08 10:57:26Z seb $
  *
  *  Implements yFindI2cPort(), the high-level API for I2cPort functions
  *
@@ -1714,8 +1714,7 @@ public class YI2cPort : YFunction
 
     /**
      * <summary>
-     *   Sends a text-encoded I2C code stream to the I2C bus, and terminate
-     *   the message en relâchant le bus.
+     *   Sends a text-encoded I2C code stream to the I2C bus, and release the bus.
      * <para>
      *   An I2C code stream is a string made of hexadecimal data bytes,
      *   but that may also include the I2C state transitions code:

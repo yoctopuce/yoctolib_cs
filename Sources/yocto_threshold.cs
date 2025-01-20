@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YThreshold return codes)
 //--- (end of YThreshold return codes)
+//--- (YThreshold dlldef_core)
+//--- (end of YThreshold dlldef_core)
+//--- (YThreshold dll_core_map)
+//--- (end of YThreshold dll_core_map)
 //--- (YThreshold dlldef)
 //--- (end of YThreshold dlldef)
 //--- (YThreshold yapiwrapper)

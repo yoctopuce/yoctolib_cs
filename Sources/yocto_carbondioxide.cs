@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_carbondioxide.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_carbondioxide.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YCarbonDioxide return codes)
 //--- (end of YCarbonDioxide return codes)
+//--- (YCarbonDioxide dlldef_core)
+//--- (end of YCarbonDioxide dlldef_core)
+//--- (YCarbonDioxide dll_core_map)
+//--- (end of YCarbonDioxide dll_core_map)
 //--- (YCarbonDioxide dlldef)
 //--- (end of YCarbonDioxide dlldef)
 //--- (YCarbonDioxide yapiwrapper)

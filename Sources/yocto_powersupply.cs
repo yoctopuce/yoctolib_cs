@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_powersupply.cs 63324 2024-11-13 09:33:07Z seb $
+ *  $Id: yocto_powersupply.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindPowerSupply(), the high-level API for PowerSupply functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YPowerSupply return codes)
 //--- (end of YPowerSupply return codes)
+//--- (YPowerSupply dlldef_core)
+//--- (end of YPowerSupply dlldef_core)
+//--- (YPowerSupply dll_core_map)
+//--- (end of YPowerSupply dll_core_map)
 //--- (YPowerSupply dlldef)
 //--- (end of YPowerSupply dlldef)
 //--- (YPowerSupply yapiwrapper)

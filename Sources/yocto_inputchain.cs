@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YInputChain return codes)
 //--- (end of YInputChain return codes)
+//--- (YInputChain dlldef_core)
+//--- (end of YInputChain dlldef_core)
+//--- (YInputChain dll_core_map)
+//--- (end of YInputChain dll_core_map)
 //--- (YInputChain dlldef)
 //--- (end of YInputChain dlldef)
 //--- (YInputChain yapiwrapper)

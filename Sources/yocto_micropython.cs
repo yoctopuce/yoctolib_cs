@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_micropython.cs 63324 2024-11-13 09:33:07Z seb $
+ *  $Id: yocto_micropython.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindMicroPython(), the high-level API for MicroPython functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YMicroPython return codes)
 //--- (end of YMicroPython return codes)
+//--- (YMicroPython dlldef_core)
+//--- (end of YMicroPython dlldef_core)
+//--- (YMicroPython dll_core_map)
+//--- (end of YMicroPython dll_core_map)
 //--- (YMicroPython dlldef)
 //--- (end of YMicroPython dlldef)
 //--- (YMicroPython yapiwrapper)

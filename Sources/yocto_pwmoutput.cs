@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_pwmoutput.cs 63324 2024-11-13 09:33:07Z seb $
+ *  $Id: yocto_pwmoutput.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YPwmOutput return codes)
 //--- (end of YPwmOutput return codes)
+//--- (YPwmOutput dlldef_core)
+//--- (end of YPwmOutput dlldef_core)
+//--- (YPwmOutput dll_core_map)
+//--- (end of YPwmOutput dll_core_map)
 //--- (YPwmOutput dlldef)
 //--- (end of YPwmOutput dlldef)
 //--- (YPwmOutput yapiwrapper)

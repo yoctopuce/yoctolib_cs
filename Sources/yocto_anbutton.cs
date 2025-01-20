@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_anbutton.cs 56388 2023-09-04 15:26:27Z web $
+ *  $Id: yocto_anbutton.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindAnButton(), the high-level API for AnButton functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YAnButton return codes)
 //--- (end of YAnButton return codes)
+//--- (YAnButton dlldef_core)
+//--- (end of YAnButton dlldef_core)
+//--- (YAnButton dll_core_map)
+//--- (end of YAnButton dll_core_map)
 //--- (YAnButton dlldef)
 //--- (end of YAnButton dlldef)
 //--- (YAnButton yapiwrapper)

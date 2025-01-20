@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YSpectralChannel return codes)
 //--- (end of YSpectralChannel return codes)
+//--- (YSpectralChannel dlldef_core)
+//--- (end of YSpectralChannel dlldef_core)
+//--- (YSpectralChannel dll_core_map)
+//--- (end of YSpectralChannel dll_core_map)
 //--- (YSpectralChannel dlldef)
 //--- (end of YSpectralChannel dlldef)
 //--- (YSpectralChannel yapiwrapper)

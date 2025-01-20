@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_servo.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_servo.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindServo(), the high-level API for Servo functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YServo return codes)
 //--- (end of YServo return codes)
+//--- (YServo dlldef_core)
+//--- (end of YServo dlldef_core)
+//--- (YServo dll_core_map)
+//--- (end of YServo dll_core_map)
 //--- (YServo dlldef)
 //--- (end of YServo dlldef)
 //--- (YServo yapiwrapper)

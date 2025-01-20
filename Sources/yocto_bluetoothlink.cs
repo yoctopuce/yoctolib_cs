@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_bluetoothlink.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_bluetoothlink.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindBluetoothLink(), the high-level API for BluetoothLink functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YBluetoothLink return codes)
 //--- (end of YBluetoothLink return codes)
+//--- (YBluetoothLink dlldef_core)
+//--- (end of YBluetoothLink dlldef_core)
+//--- (YBluetoothLink dll_core_map)
+//--- (end of YBluetoothLink dll_core_map)
 //--- (YBluetoothLink dlldef)
 //--- (end of YBluetoothLink dlldef)
 //--- (YBluetoothLink yapiwrapper)

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_altitude.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_altitude.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindAltitude(), the high-level API for Altitude functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YAltitude return codes)
 //--- (end of YAltitude return codes)
+//--- (YAltitude dlldef_core)
+//--- (end of YAltitude dlldef_core)
+//--- (YAltitude dll_core_map)
+//--- (end of YAltitude dll_core_map)
 //--- (YAltitude dlldef)
 //--- (end of YAltitude dlldef)
 //--- (YAltitude yapiwrapper)

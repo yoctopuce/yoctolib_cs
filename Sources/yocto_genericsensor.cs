@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_genericsensor.cs 61964 2024-07-29 15:54:55Z seb $
+ *  $Id: yocto_genericsensor.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YGenericSensor return codes)
 //--- (end of YGenericSensor return codes)
+//--- (YGenericSensor dlldef_core)
+//--- (end of YGenericSensor dlldef_core)
+//--- (YGenericSensor dll_core_map)
+//--- (end of YGenericSensor dll_core_map)
 //--- (YGenericSensor dlldef)
 //--- (end of YGenericSensor dlldef)
 //--- (YGenericSensor yapiwrapper)

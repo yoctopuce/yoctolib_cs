@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_oscontrol.cs 61342 2024-06-11 08:30:46Z seb $
+ *  $Id: yocto_oscontrol.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindOsControl(), the high-level API for OsControl functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YOsControl return codes)
 //--- (end of YOsControl return codes)
+//--- (YOsControl dlldef_core)
+//--- (end of YOsControl dlldef_core)
+//--- (YOsControl dll_core_map)
+//--- (end of YOsControl dll_core_map)
 //--- (YOsControl dlldef)
 //--- (end of YOsControl dlldef)
 //--- (YOsControl yapiwrapper)

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_voltageoutput.cs 63324 2024-11-13 09:33:07Z seb $
+ *  $Id: yocto_voltageoutput.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindVoltageOutput(), the high-level API for VoltageOutput functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YVoltageOutput return codes)
 //--- (end of YVoltageOutput return codes)
+//--- (YVoltageOutput dlldef_core)
+//--- (end of YVoltageOutput dlldef_core)
+//--- (YVoltageOutput dll_core_map)
+//--- (end of YVoltageOutput dll_core_map)
 //--- (YVoltageOutput dlldef)
 //--- (end of YVoltageOutput dlldef)
 //--- (YVoltageOutput yapiwrapper)

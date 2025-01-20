@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_tvoc.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_tvoc.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindTvoc(), the high-level API for Tvoc functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YTvoc return codes)
 //--- (end of YTvoc return codes)
+//--- (YTvoc dlldef_core)
+//--- (end of YTvoc dlldef_core)
+//--- (YTvoc dll_core_map)
+//--- (end of YTvoc dll_core_map)
 //--- (YTvoc dlldef)
 //--- (end of YTvoc dlldef)
 //--- (YTvoc yapiwrapper)

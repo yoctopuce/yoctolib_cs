@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_temperature.cs 63469 2024-11-25 14:01:08Z seb $
+ *  $Id: yocto_temperature.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindTemperature(), the high-level API for Temperature functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YTemperature return codes)
 //--- (end of YTemperature return codes)
+//--- (YTemperature dlldef_core)
+//--- (end of YTemperature dlldef_core)
+//--- (YTemperature dll_core_map)
+//--- (end of YTemperature dll_core_map)
 //--- (YTemperature dlldef)
 //--- (end of YTemperature dlldef)
 //--- (YTemperature yapiwrapper)

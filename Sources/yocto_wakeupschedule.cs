@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_wakeupschedule.cs 62189 2024-08-19 12:07:40Z seb $
+ *  $Id: yocto_wakeupschedule.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YWakeUpSchedule return codes)
 //--- (end of YWakeUpSchedule return codes)
+//--- (YWakeUpSchedule dlldef_core)
+//--- (end of YWakeUpSchedule dlldef_core)
+//--- (YWakeUpSchedule dll_core_map)
+//--- (end of YWakeUpSchedule dll_core_map)
 //--- (YWakeUpSchedule dlldef)
 //--- (end of YWakeUpSchedule dlldef)
 //--- (YWakeUpSchedule yapiwrapper)

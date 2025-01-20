@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_pwminput.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_pwminput.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindPwmInput(), the high-level API for PwmInput functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YPwmInput return codes)
 //--- (end of YPwmInput return codes)
+//--- (YPwmInput dlldef_core)
+//--- (end of YPwmInput dlldef_core)
+//--- (YPwmInput dll_core_map)
+//--- (end of YPwmInput dll_core_map)
 //--- (YPwmInput dlldef)
 //--- (end of YPwmInput dlldef)
 //--- (YPwmInput yapiwrapper)

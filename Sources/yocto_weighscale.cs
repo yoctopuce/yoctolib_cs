@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_weighscale.cs 63469 2024-11-25 14:01:08Z seb $
+ *  $Id: yocto_weighscale.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindWeighScale(), the high-level API for WeighScale functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YWeighScale return codes)
 //--- (end of YWeighScale return codes)
+//--- (YWeighScale dlldef_core)
+//--- (end of YWeighScale dlldef_core)
+//--- (YWeighScale dll_core_map)
+//--- (end of YWeighScale dll_core_map)
 //--- (YWeighScale dlldef)
 //--- (end of YWeighScale dlldef)
 //--- (YWeighScale yapiwrapper)

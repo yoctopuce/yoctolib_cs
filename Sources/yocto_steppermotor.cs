@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_steppermotor.cs 63324 2024-11-13 09:33:07Z seb $
+ *  $Id: yocto_steppermotor.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YStepperMotor return codes)
 //--- (end of YStepperMotor return codes)
+//--- (YStepperMotor dlldef_core)
+//--- (end of YStepperMotor dlldef_core)
+//--- (YStepperMotor dll_core_map)
+//--- (end of YStepperMotor dll_core_map)
 //--- (YStepperMotor dlldef)
 //--- (end of YStepperMotor dlldef)
 //--- (YStepperMotor yapiwrapper)

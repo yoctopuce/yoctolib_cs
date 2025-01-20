@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YSpectralSensor return codes)
 //--- (end of YSpectralSensor return codes)
+//--- (YSpectralSensor dlldef_core)
+//--- (end of YSpectralSensor dlldef_core)
+//--- (YSpectralSensor dll_core_map)
+//--- (end of YSpectralSensor dll_core_map)
 //--- (YSpectralSensor dlldef)
 //--- (end of YSpectralSensor dlldef)
 //--- (YSpectralSensor yapiwrapper)
@@ -89,6 +93,7 @@ public class YSpectralSensor : YFunction
     public const string NEARRAL2_INVALID = YAPI.INVALID_STRING;
     public const string NEARRAL3_INVALID = YAPI.INVALID_STRING;
     public const string NEARHTMLCOLOR_INVALID = YAPI.INVALID_STRING;
+    public const string NEARSIMPLECOLOR_INVALID = YAPI.INVALID_STRING;
     public const int LEDCURRENTATPOWERON_INVALID = YAPI.INVALID_INT;
     public const int INTEGRATIONTIMEATPOWERON_INVALID = YAPI.INVALID_INT;
     public const int GAINATPOWERON_INVALID = YAPI.INVALID_INT;
@@ -106,6 +111,7 @@ public class YSpectralSensor : YFunction
     protected string _nearRAL2 = NEARRAL2_INVALID;
     protected string _nearRAL3 = NEARRAL3_INVALID;
     protected string _nearHTMLColor = NEARHTMLCOLOR_INVALID;
+    protected string _nearSimpleColor = NEARSIMPLECOLOR_INVALID;
     protected int _ledCurrentAtPowerOn = LEDCURRENTATPOWERON_INVALID;
     protected int _integrationTimeAtPowerOn = INTEGRATIONTIMEATPOWERON_INVALID;
     protected int _gainAtPowerOn = GAINATPOWERON_INVALID;
@@ -180,6 +186,10 @@ public class YSpectralSensor : YFunction
         {
             _nearHTMLColor = json_val.getString("nearHTMLColor");
         }
+        if (json_val.has("nearSimpleColor"))
+        {
+            _nearSimpleColor = json_val.getString("nearSimpleColor");
+        }
         if (json_val.has("ledCurrentAtPowerOn"))
         {
             _ledCurrentAtPowerOn = json_val.getInt("ledCurrentAtPowerOn");
@@ -232,9 +242,7 @@ public class YSpectralSensor : YFunction
      *   Changes the luminosity of the module leds.
      * <para>
      *   The parameter is a
-     *   value between 0 and 100.
-     *   Remember to call the <c>saveToFlash()</c> method of the module if the
-     *   modification must be kept.
+     *   value between 0 and 254.
      * </para>
      * <para>
      * </para>
@@ -299,7 +307,6 @@ public class YSpectralSensor : YFunction
      * <para>
      *   The resolution corresponds to the numerical precision
      *   of the measures, which is not always the same as the actual precision of the sensor.
-     *   Remember to call the <c>saveToFlash()</c> method of the module if the modification must be kept.
      * </para>
      * <para>
      * </para>
@@ -455,14 +462,15 @@ public class YSpectralSensor : YFunction
 
     /**
      * <summary>
-     *   Return the model for the estimation colors.
+     *   Returns the model for color estimation.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   either <c>YSpectralSensor.ESTIMATIONMODEL_REFLECTION</c> or <c>YSpectralSensor.ESTIMATIONMODEL_EMISSION</c>
+     *   either <c>YSpectralSensor.ESTIMATIONMODEL_REFLECTION</c> or <c>YSpectralSensor.ESTIMATIONMODEL_EMISSION</c>,
+     *   according to the model for color estimation
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YSpectralSensor.ESTIMATIONMODEL_INVALID</c>.
@@ -484,14 +492,16 @@ public class YSpectralSensor : YFunction
 
     /**
      * <summary>
-     *   Change the model for the estimation colors.
+     *   Changes the model for color estimation.
      * <para>
+     *   Remember to call the <c>saveToFlash()</c> method of the module if the modification must be kept.
      * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="newval">
-     *   either <c>YSpectralSensor.ESTIMATIONMODEL_REFLECTION</c> or <c>YSpectralSensor.ESTIMATIONMODEL_EMISSION</c>
+     *   either <c>YSpectralSensor.ESTIMATIONMODEL_REFLECTION</c> or <c>YSpectralSensor.ESTIMATIONMODEL_EMISSION</c>,
+     *   according to the model for color estimation
      * </param>
      * <para>
      * </para>
@@ -545,7 +555,7 @@ public class YSpectralSensor : YFunction
 
     /**
      * <summary>
-     *   Returns the estimated color in RGB format.
+     *   Returns the estimated color in RGB format (0xRRGGBB).
      * <para>
      *   This method retrieves the estimated color values
      *   and returns them as an RGB object or structure.
@@ -554,7 +564,7 @@ public class YSpectralSensor : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the estimated color in RGB format
+     *   an integer corresponding to the estimated color in RGB format (0xRRGGBB)
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YSpectralSensor.ESTIMATEDRGB_INVALID</c>.
@@ -577,7 +587,7 @@ public class YSpectralSensor : YFunction
 
     /**
      * <summary>
-     *   Returns the estimated color in HSL format.
+     *   Returns the estimated color in HSL (Hue, Saturation, Lightness) format.
      * <para>
      *   This method retrieves the estimated color values
      *   and returns them as an HSL object or structure.
@@ -586,7 +596,7 @@ public class YSpectralSensor : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the estimated color in HSL format
+     *   an integer corresponding to the estimated color in HSL (Hue, Saturation, Lightness) format
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YSpectralSensor.ESTIMATEDHSL_INVALID</c>.
@@ -731,6 +741,38 @@ public class YSpectralSensor : YFunction
     }
 
 
+    /**
+     * <summary>
+     *   Returns the estimated color.
+     * <para>
+     *   This method retrieves the estimated color values
+     *   and returns them as the color name.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to the estimated color
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSpectralSensor.NEARSIMPLECOLOR_INVALID</c>.
+     * </para>
+     */
+    public string get_nearSimpleColor()
+    {
+        string res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return NEARSIMPLECOLOR_INVALID;
+                }
+            }
+            res = this._nearSimpleColor;
+        }
+        return res;
+    }
+
+
     public int get_ledCurrentAtPowerOn()
     {
         int res;
@@ -778,22 +820,6 @@ public class YSpectralSensor : YFunction
     }
 
 
-    /**
-     * <summary>
-     *   Retrieves the integration time at power-on.
-     * <para>
-     *   This method updates the power-on integration time value.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <returns>
-     *   an integer
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns <c>YSpectralSensor.INTEGRATIONTIMEATPOWERON_INVALID</c>.
-     * </para>
-     */
     public int get_integrationTimeAtPowerOn()
     {
         int res;

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: main.cs 63788 2024-12-19 08:59:45Z seb $
+ *  $Id: main.cs 63863 2024-12-23 10:33:05Z tiago $
  *
  *  An example that shows how to use a Yocto-Spectral
  *
@@ -61,8 +61,8 @@ namespace ConsoleApplication1
         spectralSensor.set_gain(6);
         spectralSensor.set_integrationTime(150);
         spectralSensor.set_ledCurrent(6);
-
-        Console.WriteLine("Current near estimated HTML color: " + spectralSensor.get_nearHTMLColor());
+        Console.WriteLine("Near color: " + spectralSensor.get_nearSimpleColor());
+        Console.WriteLine("Color HEX : #" + spectralSensor.get_estimatedRGB().ToString("x6"));
       } else {
         Console.WriteLine("Module not connected");
         Console.WriteLine("check identification and USB cable");

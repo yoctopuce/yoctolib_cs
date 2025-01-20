@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_hubport.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_hubport.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindHubPort(), the high-level API for HubPort functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YHubPort return codes)
 //--- (end of YHubPort return codes)
+//--- (YHubPort dlldef_core)
+//--- (end of YHubPort dlldef_core)
+//--- (YHubPort dll_core_map)
+//--- (end of YHubPort dll_core_map)
 //--- (YHubPort dlldef)
 //--- (end of YHubPort dlldef)
 //--- (YHubPort yapiwrapper)

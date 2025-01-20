@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_dualpower.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_dualpower.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindDualPower(), the high-level API for DualPower functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YDualPower return codes)
 //--- (end of YDualPower return codes)
+//--- (YDualPower dlldef_core)
+//--- (end of YDualPower dlldef_core)
+//--- (YDualPower dll_core_map)
+//--- (end of YDualPower dll_core_map)
 //--- (YDualPower dlldef)
 //--- (end of YDualPower dlldef)
 //--- (YDualPower yapiwrapper)

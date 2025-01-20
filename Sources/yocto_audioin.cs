@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_audioin.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_audioin.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindAudioIn(), the high-level API for AudioIn functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YAudioIn return codes)
 //--- (end of YAudioIn return codes)
+//--- (YAudioIn dlldef_core)
+//--- (end of YAudioIn dlldef_core)
+//--- (YAudioIn dll_core_map)
+//--- (end of YAudioIn dll_core_map)
 //--- (YAudioIn dlldef)
 //--- (end of YAudioIn dlldef)
 //--- (YAudioIn yapiwrapper)

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_power.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_power.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindPower(), the high-level API for Power functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YPower return codes)
 //--- (end of YPower return codes)
+//--- (YPower dlldef_core)
+//--- (end of YPower dlldef_core)
+//--- (YPower dll_core_map)
+//--- (end of YPower dll_core_map)
 //--- (YPower dlldef)
 //--- (end of YPower dlldef)
 //--- (YPower yapiwrapper)

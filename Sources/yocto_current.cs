@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_current.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_current.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindCurrent(), the high-level API for Current functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YCurrent return codes)
 //--- (end of YCurrent return codes)
+//--- (YCurrent dlldef_core)
+//--- (end of YCurrent dlldef_core)
+//--- (YCurrent dll_core_map)
+//--- (end of YCurrent dll_core_map)
 //--- (YCurrent dlldef)
 //--- (end of YCurrent dlldef)
 //--- (YCurrent yapiwrapper)

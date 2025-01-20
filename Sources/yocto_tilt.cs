@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_tilt.cs 61964 2024-07-29 15:54:55Z seb $
+ *  $Id: yocto_tilt.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindTilt(), the high-level API for Tilt functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YTilt return codes)
 //--- (end of YTilt return codes)
+//--- (YTilt dlldef_core)
+//--- (end of YTilt dlldef_core)
+//--- (YTilt dll_core_map)
+//--- (end of YTilt dll_core_map)
 //--- (YTilt dlldef)
 //--- (end of YTilt dlldef)
 //--- (YTilt yapiwrapper)

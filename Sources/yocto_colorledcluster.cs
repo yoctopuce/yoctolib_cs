@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_colorledcluster.cs 62189 2024-08-19 12:07:40Z seb $
+ *  $Id: yocto_colorledcluster.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YColorLedCluster return codes)
 //--- (end of YColorLedCluster return codes)
+//--- (YColorLedCluster dlldef_core)
+//--- (end of YColorLedCluster dlldef_core)
+//--- (YColorLedCluster dll_core_map)
+//--- (end of YColorLedCluster dll_core_map)
 //--- (YColorLedCluster dlldef)
 //--- (end of YColorLedCluster dlldef)
 //--- (YColorLedCluster yapiwrapper)
@@ -689,9 +693,9 @@ public class YColorLedCluster : YFunction
      *   autonomous manner.
      * <para>
      *   The transition is performed in the HSL space. In HSL, hue is a circular
-     *   value (0..360°). There are always two paths to perform the transition: by increasing
+     *   value (0..360 deg). There are always two paths to perform the transition: by increasing
      *   or by decreasing the hue. The module selects the shortest transition.
-     *   If the difference is exactly 180°, the module selects the transition which increases
+     *   If the difference is exactly 180 deg, the module selects the transition which increases
      *   the hue.
      * </para>
      * </summary>

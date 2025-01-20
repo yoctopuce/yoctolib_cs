@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_quadraturedecoder.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_quadraturedecoder.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YQuadratureDecoder return codes)
 //--- (end of YQuadratureDecoder return codes)
+//--- (YQuadratureDecoder dlldef_core)
+//--- (end of YQuadratureDecoder dlldef_core)
+//--- (YQuadratureDecoder dll_core_map)
+//--- (end of YQuadratureDecoder dll_core_map)
 //--- (YQuadratureDecoder dlldef)
 //--- (end of YQuadratureDecoder dlldef)
 //--- (YQuadratureDecoder yapiwrapper)

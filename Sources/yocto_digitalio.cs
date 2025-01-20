@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_digitalio.cs 63324 2024-11-13 09:33:07Z seb $
+ *  $Id: yocto_digitalio.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YDigitalIO return codes)
 //--- (end of YDigitalIO return codes)
+//--- (YDigitalIO dlldef_core)
+//--- (end of YDigitalIO dlldef_core)
+//--- (YDigitalIO dll_core_map)
+//--- (end of YDigitalIO dll_core_map)
 //--- (YDigitalIO dlldef)
 //--- (end of YDigitalIO dlldef)
 //--- (YDigitalIO yapiwrapper)

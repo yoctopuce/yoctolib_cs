@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_daisychain.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_daisychain.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindDaisyChain(), the high-level API for DaisyChain functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YDaisyChain return codes)
 //--- (end of YDaisyChain return codes)
+//--- (YDaisyChain dlldef_core)
+//--- (end of YDaisyChain dlldef_core)
+//--- (YDaisyChain dll_core_map)
+//--- (end of YDaisyChain dll_core_map)
 //--- (YDaisyChain dlldef)
 //--- (end of YDaisyChain dlldef)
 //--- (YDaisyChain yapiwrapper)

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_accelerometer.cs 56107 2023-08-16 09:15:27Z seb $
+ *  $Id: yocto_accelerometer.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YAccelerometer return codes)
 //--- (end of YAccelerometer return codes)
+//--- (YAccelerometer dlldef_core)
+//--- (end of YAccelerometer dlldef_core)
+//--- (YAccelerometer dll_core_map)
+//--- (end of YAccelerometer dll_core_map)
 //--- (YAccelerometer dlldef)
 //--- (end of YAccelerometer dlldef)
 //--- (YAccelerometer yapiwrapper)

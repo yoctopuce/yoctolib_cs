@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_magnetometer.cs 61964 2024-07-29 15:54:55Z seb $
+ *  $Id: yocto_magnetometer.cs 64236 2025-01-16 10:17:02Z seb $
  *
  *  Implements yFindMagnetometer(), the high-level API for Magnetometer functions
  *
@@ -50,6 +50,10 @@ using YFUN_DESCR = System.Int32;
 #pragma warning disable 1591
 //--- (YMagnetometer return codes)
 //--- (end of YMagnetometer return codes)
+//--- (YMagnetometer dlldef_core)
+//--- (end of YMagnetometer dlldef_core)
+//--- (YMagnetometer dll_core_map)
+//--- (end of YMagnetometer dll_core_map)
 //--- (YMagnetometer dlldef)
 //--- (end of YMagnetometer dlldef)
 //--- (YMagnetometer yapiwrapper)

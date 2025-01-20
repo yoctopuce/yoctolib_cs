@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 63704 2024-12-16 10:05:02Z seb $
+ * $Id: yocto_api.cs 64241 2025-01-16 10:53:41Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -234,7 +234,13 @@ internal static class SafeNativeMethods
         return (Environment.OSVersion.Platform == PlatformID.Unix && Directory.Exists("/Applications") && Directory.Exists("/System") && Directory.Exists("/Users") && Directory.Exists("/Volumes"));
     }
 
-
+    private static void debugDll(string line)
+    {
+        if (YAPI._debugDllLoad)
+        {
+            Console.WriteLine(line);
+        }
+    }
 
     /*
      * We start with you best guess on the current platform,
@@ -263,6 +269,830 @@ internal static class SafeNativeMethods
      * and finally the current directory..
      */
 
+#if NETCOREAPP3_0_OR_GREATER
+    internal static IntPtr _loadedLibrary=IntPtr.Zero;
+
+    //--- (generated code: YFunction dlldef_core)
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiInitAPIDelegate(int mode, StringBuilder errmsg);
+    private static yapiInitAPIDelegate _yapiInitAPIPtr = null;
+    internal static int _yapiInitAPI(int mode, StringBuilder errmsg)
+    {
+                  return _yapiInitAPIPtr(mode, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void yapiFreeAPIDelegate();
+    private static yapiFreeAPIDelegate _yapiFreeAPIPtr = null;
+    internal static void _yapiFreeAPI()
+    {
+                  _yapiFreeAPIPtr();
+                  return;
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void yapiSetTraceFileDelegate(StringBuilder tracefile);
+    private static yapiSetTraceFileDelegate _yapiSetTraceFilePtr = null;
+    internal static void _yapiSetTraceFile(StringBuilder tracefile)
+    {
+                  _yapiSetTraceFilePtr(tracefile);
+                  return;
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void yapiRegisterLogFunctionDelegate(IntPtr fct);
+    private static yapiRegisterLogFunctionDelegate _yapiRegisterLogFunctionPtr = null;
+    internal static void _yapiRegisterLogFunction(IntPtr fct)
+    {
+                  _yapiRegisterLogFunctionPtr(fct);
+                  return;
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void yapiRegisterDeviceArrivalCallbackDelegate(IntPtr fct);
+    private static yapiRegisterDeviceArrivalCallbackDelegate _yapiRegisterDeviceArrivalCallbackPtr = null;
+    internal static void _yapiRegisterDeviceArrivalCallback(IntPtr fct)
+    {
+                  _yapiRegisterDeviceArrivalCallbackPtr(fct);
+                  return;
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void yapiRegisterDeviceRemovalCallbackDelegate(IntPtr fct);
+    private static yapiRegisterDeviceRemovalCallbackDelegate _yapiRegisterDeviceRemovalCallbackPtr = null;
+    internal static void _yapiRegisterDeviceRemovalCallback(IntPtr fct)
+    {
+                  _yapiRegisterDeviceRemovalCallbackPtr(fct);
+                  return;
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void yapiRegisterDeviceChangeCallbackDelegate(IntPtr fct);
+    private static yapiRegisterDeviceChangeCallbackDelegate _yapiRegisterDeviceChangeCallbackPtr = null;
+    internal static void _yapiRegisterDeviceChangeCallback(IntPtr fct)
+    {
+                  _yapiRegisterDeviceChangeCallbackPtr(fct);
+                  return;
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void yapiRegisterDeviceConfigChangeCallbackDelegate(IntPtr fct);
+    private static yapiRegisterDeviceConfigChangeCallbackDelegate _yapiRegisterDeviceConfigChangeCallbackPtr = null;
+    internal static void _yapiRegisterDeviceConfigChangeCallback(IntPtr fct)
+    {
+                  _yapiRegisterDeviceConfigChangeCallbackPtr(fct);
+                  return;
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void yapiRegisterFunctionUpdateCallbackDelegate(IntPtr fct);
+    private static yapiRegisterFunctionUpdateCallbackDelegate _yapiRegisterFunctionUpdateCallbackPtr = null;
+    internal static void _yapiRegisterFunctionUpdateCallback(IntPtr fct)
+    {
+                  _yapiRegisterFunctionUpdateCallbackPtr(fct);
+                  return;
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void yapiRegisterTimedReportCallbackDelegate(IntPtr fct);
+    private static yapiRegisterTimedReportCallbackDelegate _yapiRegisterTimedReportCallbackPtr = null;
+    internal static void _yapiRegisterTimedReportCallback(IntPtr fct)
+    {
+                  _yapiRegisterTimedReportCallbackPtr(fct);
+                  return;
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiLockDeviceCallBackDelegate(StringBuilder errmsg);
+    private static yapiLockDeviceCallBackDelegate _yapiLockDeviceCallBackPtr = null;
+    internal static int _yapiLockDeviceCallBack(StringBuilder errmsg)
+    {
+                  return _yapiLockDeviceCallBackPtr(errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiUnlockDeviceCallBackDelegate(StringBuilder errmsg);
+    private static yapiUnlockDeviceCallBackDelegate _yapiUnlockDeviceCallBackPtr = null;
+    internal static int _yapiUnlockDeviceCallBack(StringBuilder errmsg)
+    {
+                  return _yapiUnlockDeviceCallBackPtr(errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiLockFunctionCallBackDelegate(StringBuilder errmsg);
+    private static yapiLockFunctionCallBackDelegate _yapiLockFunctionCallBackPtr = null;
+    internal static int _yapiLockFunctionCallBack(StringBuilder errmsg)
+    {
+                  return _yapiLockFunctionCallBackPtr(errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiUnlockFunctionCallBackDelegate(StringBuilder errmsg);
+    private static yapiUnlockFunctionCallBackDelegate _yapiUnlockFunctionCallBackPtr = null;
+    internal static int _yapiUnlockFunctionCallBack(StringBuilder errmsg)
+    {
+                  return _yapiUnlockFunctionCallBackPtr(errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiRegisterHubDelegate(StringBuilder rootUrl, StringBuilder errmsg);
+    private static yapiRegisterHubDelegate _yapiRegisterHubPtr = null;
+    internal static int _yapiRegisterHub(StringBuilder rootUrl, StringBuilder errmsg)
+    {
+                  return _yapiRegisterHubPtr(rootUrl, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiPreregisterHubDelegate(StringBuilder rootUrl, StringBuilder errmsg);
+    private static yapiPreregisterHubDelegate _yapiPreregisterHubPtr = null;
+    internal static int _yapiPreregisterHub(StringBuilder rootUrl, StringBuilder errmsg)
+    {
+                  return _yapiPreregisterHubPtr(rootUrl, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void yapiUnregisterHubDelegate(StringBuilder rootUrl);
+    private static yapiUnregisterHubDelegate _yapiUnregisterHubPtr = null;
+    internal static void _yapiUnregisterHub(StringBuilder rootUrl)
+    {
+                  _yapiUnregisterHubPtr(rootUrl);
+                  return;
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiUpdateDeviceListDelegate(u32 force, StringBuilder errmsg);
+    private static yapiUpdateDeviceListDelegate _yapiUpdateDeviceListPtr = null;
+    internal static int _yapiUpdateDeviceList(u32 force, StringBuilder errmsg)
+    {
+                  return _yapiUpdateDeviceListPtr(force, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiHandleEventsDelegate(StringBuilder errmsg);
+    private static yapiHandleEventsDelegate _yapiHandleEventsPtr = null;
+    internal static int _yapiHandleEvents(StringBuilder errmsg)
+    {
+                  return _yapiHandleEventsPtr(errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate u64 yapiGetTickCountDelegate();
+    private static yapiGetTickCountDelegate _yapiGetTickCountPtr = null;
+    internal static u64 _yapiGetTickCount()
+    {
+                  return _yapiGetTickCountPtr();
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiCheckLogicalNameDelegate(StringBuilder name);
+    private static yapiCheckLogicalNameDelegate _yapiCheckLogicalNamePtr = null;
+    internal static int _yapiCheckLogicalName(StringBuilder name)
+    {
+                  return _yapiCheckLogicalNamePtr(name);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate u16 yapiGetAPIVersionDelegate(ref IntPtr version, ref IntPtr dat_);
+    private static yapiGetAPIVersionDelegate _yapiGetAPIVersionPtr = null;
+    internal static u16 _yapiGetAPIVersion(ref IntPtr version, ref IntPtr dat_)
+    {
+                  return _yapiGetAPIVersionPtr(ref version, ref dat_);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate YDEV_DESCR yapiGetDeviceDelegate(StringBuilder device_str, StringBuilder errmsg);
+    private static yapiGetDeviceDelegate _yapiGetDevicePtr = null;
+    internal static YDEV_DESCR _yapiGetDevice(StringBuilder device_str, StringBuilder errmsg)
+    {
+                  return _yapiGetDevicePtr(device_str, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiGetDeviceInfoDelegate(YDEV_DESCR d, ref yDeviceSt infos, StringBuilder errmsg);
+    private static yapiGetDeviceInfoDelegate _yapiGetDeviceInfoPtr = null;
+    internal static int _yapiGetDeviceInfo(YDEV_DESCR d, ref yDeviceSt infos, StringBuilder errmsg)
+    {
+                  return _yapiGetDeviceInfoPtr(d, ref infos, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate YFUN_DESCR yapiGetFunctionDelegate(StringBuilder class_str, StringBuilder function_str, StringBuilder errmsg);
+    private static yapiGetFunctionDelegate _yapiGetFunctionPtr = null;
+    internal static YFUN_DESCR _yapiGetFunction(StringBuilder class_str, StringBuilder function_str, StringBuilder errmsg)
+    {
+                  return _yapiGetFunctionPtr(class_str, function_str, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiGetFunctionsByClassDelegate(StringBuilder class_str, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+    private static yapiGetFunctionsByClassDelegate _yapiGetFunctionsByClassPtr = null;
+    internal static int _yapiGetFunctionsByClass(StringBuilder class_str, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg)
+    {
+                  return _yapiGetFunctionsByClassPtr(class_str, precFuncDesc, buffer, maxsize, ref neededsize, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiGetFunctionsByDeviceDelegate(YDEV_DESCR device, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+    private static yapiGetFunctionsByDeviceDelegate _yapiGetFunctionsByDevicePtr = null;
+    internal static int _yapiGetFunctionsByDevice(YDEV_DESCR device, YFUN_DESCR precFuncDesc, IntPtr buffer, int maxsize, ref int neededsize, StringBuilder errmsg)
+    {
+                  return _yapiGetFunctionsByDevicePtr(device, precFuncDesc, buffer, maxsize, ref neededsize, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiGetFunctionInfoExDelegate(YFUN_DESCR fundesc, ref YDEV_DESCR devdesc, StringBuilder serial, StringBuilder funcId, StringBuilder baseType, StringBuilder funcName, StringBuilder funcVal, StringBuilder errmsg);
+    private static yapiGetFunctionInfoExDelegate _yapiGetFunctionInfoExPtr = null;
+    internal static int _yapiGetFunctionInfoEx(YFUN_DESCR fundesc, ref YDEV_DESCR devdesc, StringBuilder serial, StringBuilder funcId, StringBuilder baseType, StringBuilder funcName, StringBuilder funcVal, StringBuilder errmsg)
+    {
+                  return _yapiGetFunctionInfoExPtr(fundesc, ref devdesc, serial, funcId, baseType, funcName, funcVal, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiHTTPRequestSyncStartDelegate(ref YIOHDL iohdl, StringBuilder device, StringBuilder request, ref IntPtr reply, ref int replysize, StringBuilder errmsg);
+    private static yapiHTTPRequestSyncStartDelegate _yapiHTTPRequestSyncStartPtr = null;
+    internal static int _yapiHTTPRequestSyncStart(ref YIOHDL iohdl, StringBuilder device, StringBuilder request, ref IntPtr reply, ref int replysize, StringBuilder errmsg)
+    {
+                  return _yapiHTTPRequestSyncStartPtr(ref iohdl, device, request, ref reply, ref replysize, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiHTTPRequestSyncStartExDelegate(ref YIOHDL iohdl, StringBuilder device, IntPtr request, int requestlen, ref IntPtr reply, ref int replysize, StringBuilder errmsg);
+    private static yapiHTTPRequestSyncStartExDelegate _yapiHTTPRequestSyncStartExPtr = null;
+    internal static int _yapiHTTPRequestSyncStartEx(ref YIOHDL iohdl, StringBuilder device, IntPtr request, int requestlen, ref IntPtr reply, ref int replysize, StringBuilder errmsg)
+    {
+                  return _yapiHTTPRequestSyncStartExPtr(ref iohdl, device, request, requestlen, ref reply, ref replysize, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiHTTPRequestSyncDoneDelegate(ref YIOHDL iohdl, StringBuilder errmsg);
+    private static yapiHTTPRequestSyncDoneDelegate _yapiHTTPRequestSyncDonePtr = null;
+    internal static int _yapiHTTPRequestSyncDone(ref YIOHDL iohdl, StringBuilder errmsg)
+    {
+                  return _yapiHTTPRequestSyncDonePtr(ref iohdl, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiHTTPRequestAsyncDelegate(StringBuilder device, IntPtr request, IntPtr callback, IntPtr context, StringBuilder errmsg);
+    private static yapiHTTPRequestAsyncDelegate _yapiHTTPRequestAsyncPtr = null;
+    internal static int _yapiHTTPRequestAsync(StringBuilder device, IntPtr request, IntPtr callback, IntPtr context, StringBuilder errmsg)
+    {
+                  return _yapiHTTPRequestAsyncPtr(device, request, callback, context, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiHTTPRequestAsyncExDelegate(StringBuilder device, IntPtr request, int requestlen, IntPtr callback, IntPtr context, StringBuilder errmsg);
+    private static yapiHTTPRequestAsyncExDelegate _yapiHTTPRequestAsyncExPtr = null;
+    internal static int _yapiHTTPRequestAsyncEx(StringBuilder device, IntPtr request, int requestlen, IntPtr callback, IntPtr context, StringBuilder errmsg)
+    {
+                  return _yapiHTTPRequestAsyncExPtr(device, request, requestlen, callback, context, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiHTTPRequestDelegate(StringBuilder device, StringBuilder url, StringBuilder buffer, int buffsize, ref int fullsize, StringBuilder errmsg);
+    private static yapiHTTPRequestDelegate _yapiHTTPRequestPtr = null;
+    internal static int _yapiHTTPRequest(StringBuilder device, StringBuilder url, StringBuilder buffer, int buffsize, ref int fullsize, StringBuilder errmsg)
+    {
+                  return _yapiHTTPRequestPtr(device, url, buffer, buffsize, ref fullsize, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiGetDevicePathDelegate(int devdesc, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg);
+    private static yapiGetDevicePathDelegate _yapiGetDevicePathPtr = null;
+    internal static int _yapiGetDevicePath(int devdesc, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg)
+    {
+                  return _yapiGetDevicePathPtr(devdesc, rootdevice, path, pathsize, ref neededsize, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiSleepDelegate(int duration_ms, StringBuilder errmsg);
+    private static yapiSleepDelegate _yapiSleepPtr = null;
+    internal static int _yapiSleep(int duration_ms, StringBuilder errmsg)
+    {
+                  return _yapiSleepPtr(duration_ms, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void yapiRegisterHubDiscoveryCallbackDelegate(IntPtr fct);
+    private static yapiRegisterHubDiscoveryCallbackDelegate _yapiRegisterHubDiscoveryCallbackPtr = null;
+    internal static void _yapiRegisterHubDiscoveryCallback(IntPtr fct)
+    {
+                  _yapiRegisterHubDiscoveryCallbackPtr(fct);
+                  return;
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiTriggerHubDiscoveryDelegate(StringBuilder errmsg);
+    private static yapiTriggerHubDiscoveryDelegate _yapiTriggerHubDiscoveryPtr = null;
+    internal static int _yapiTriggerHubDiscovery(StringBuilder errmsg)
+    {
+                  return _yapiTriggerHubDiscoveryPtr(errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void yapiRegisterDeviceLogCallbackDelegate(IntPtr fct);
+    private static yapiRegisterDeviceLogCallbackDelegate _yapiRegisterDeviceLogCallbackPtr = null;
+    internal static void _yapiRegisterDeviceLogCallback(IntPtr fct)
+    {
+                  _yapiRegisterDeviceLogCallbackPtr(fct);
+                  return;
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate YRETCODE yapiGetAllJsonKeysDelegate(StringBuilder jsonbuffer, StringBuilder out_buffer, int out_buffersize, ref int fullsize, StringBuilder errmsg);
+    private static yapiGetAllJsonKeysDelegate _yapiGetAllJsonKeysPtr = null;
+    internal static YRETCODE _yapiGetAllJsonKeys(StringBuilder jsonbuffer, StringBuilder out_buffer, int out_buffersize, ref int fullsize, StringBuilder errmsg)
+    {
+                  return _yapiGetAllJsonKeysPtr(jsonbuffer, out_buffer, out_buffersize, ref fullsize, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate YRETCODE yapiCheckFirmwareDelegate(StringBuilder serial, StringBuilder rev, StringBuilder path, StringBuilder buffer, int buffersize, ref int fullsize, StringBuilder errmsg);
+    private static yapiCheckFirmwareDelegate _yapiCheckFirmwarePtr = null;
+    internal static YRETCODE _yapiCheckFirmware(StringBuilder serial, StringBuilder rev, StringBuilder path, StringBuilder buffer, int buffersize, ref int fullsize, StringBuilder errmsg)
+    {
+                  return _yapiCheckFirmwarePtr(serial, rev, path, buffer, buffersize, ref fullsize, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate YRETCODE yapiGetBootloadersDelegate(StringBuilder buffer, int buffersize, ref int totalSize, StringBuilder errmsg);
+    private static yapiGetBootloadersDelegate _yapiGetBootloadersPtr = null;
+    internal static YRETCODE _yapiGetBootloaders(StringBuilder buffer, int buffersize, ref int totalSize, StringBuilder errmsg)
+    {
+                  return _yapiGetBootloadersPtr(buffer, buffersize, ref totalSize, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate YRETCODE yapiUpdateFirmwareExDelegate(StringBuilder serial, StringBuilder firmwarePath, StringBuilder settings, int force, int startUpdate, StringBuilder errmsg);
+    private static yapiUpdateFirmwareExDelegate _yapiUpdateFirmwareExPtr = null;
+    internal static YRETCODE _yapiUpdateFirmwareEx(StringBuilder serial, StringBuilder firmwarePath, StringBuilder settings, int force, int startUpdate, StringBuilder errmsg)
+    {
+                  return _yapiUpdateFirmwareExPtr(serial, firmwarePath, settings, force, startUpdate, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate YRETCODE yapiHTTPRequestSyncStartOutOfBandDelegate(ref YIOHDL iohdl, int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr reply, ref int replysize, IntPtr progress_cb, IntPtr progress_ctx, StringBuilder errmsg);
+    private static yapiHTTPRequestSyncStartOutOfBandDelegate _yapiHTTPRequestSyncStartOutOfBandPtr = null;
+    internal static YRETCODE _yapiHTTPRequestSyncStartOutOfBand(ref YIOHDL iohdl, int channel, StringBuilder device, StringBuilder request, int requestsize, ref IntPtr reply, ref int replysize, IntPtr progress_cb, IntPtr progress_ctx, StringBuilder errmsg)
+    {
+                  return _yapiHTTPRequestSyncStartOutOfBandPtr(ref iohdl, channel, device, request, requestsize, ref reply, ref replysize, progress_cb, progress_ctx, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate YRETCODE yapiHTTPRequestAsyncOutOfBandDelegate(int channel, StringBuilder device, StringBuilder request, int requestsize, IntPtr callback, IntPtr context, StringBuilder errmsg);
+    private static yapiHTTPRequestAsyncOutOfBandDelegate _yapiHTTPRequestAsyncOutOfBandPtr = null;
+    internal static YRETCODE _yapiHTTPRequestAsyncOutOfBand(int channel, StringBuilder device, StringBuilder request, int requestsize, IntPtr callback, IntPtr context, StringBuilder errmsg)
+    {
+                  return _yapiHTTPRequestAsyncOutOfBandPtr(channel, device, request, requestsize, callback, context, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate YRETCODE yapiTestHubDelegate(StringBuilder url, int mstimeout, StringBuilder errmsg);
+    private static yapiTestHubDelegate _yapiTestHubPtr = null;
+    internal static YRETCODE _yapiTestHub(StringBuilder url, int mstimeout, StringBuilder errmsg)
+    {
+                  return _yapiTestHubPtr(url, mstimeout, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiJsonGetPathDelegate(StringBuilder path, StringBuilder json_data, int json_len, ref IntPtr result, StringBuilder errmsg);
+    private static yapiJsonGetPathDelegate _yapiJsonGetPathPtr = null;
+    internal static int _yapiJsonGetPath(StringBuilder path, StringBuilder json_data, int json_len, ref IntPtr result, StringBuilder errmsg)
+    {
+                  return _yapiJsonGetPathPtr(path, json_data, json_len, ref result, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiJsonDecodeStringDelegate(StringBuilder json_data, StringBuilder output);
+    private static yapiJsonDecodeStringDelegate _yapiJsonDecodeStringPtr = null;
+    internal static int _yapiJsonDecodeString(StringBuilder json_data, StringBuilder output)
+    {
+                  return _yapiJsonDecodeStringPtr(json_data, output);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate YRETCODE yapiGetSubdevicesDelegate(StringBuilder serial, StringBuilder buffer, int buffersize, ref int totalSize, StringBuilder errmsg);
+    private static yapiGetSubdevicesDelegate _yapiGetSubdevicesPtr = null;
+    internal static YRETCODE _yapiGetSubdevices(StringBuilder serial, StringBuilder buffer, int buffersize, ref int totalSize, StringBuilder errmsg)
+    {
+                  return _yapiGetSubdevicesPtr(serial, buffer, buffersize, ref totalSize, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void yapiFreeMemDelegate(IntPtr buffer);
+    private static yapiFreeMemDelegate _yapiFreeMemPtr = null;
+    internal static void _yapiFreeMem(IntPtr buffer)
+    {
+                  _yapiFreeMemPtr(buffer);
+                  return;
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate YRETCODE yapiGetDevicePathExDelegate(StringBuilder serial, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg);
+    private static yapiGetDevicePathExDelegate _yapiGetDevicePathExPtr = null;
+    internal static YRETCODE _yapiGetDevicePathEx(StringBuilder serial, StringBuilder rootdevice, StringBuilder path, int pathsize, ref int neededsize, StringBuilder errmsg)
+    {
+                  return _yapiGetDevicePathExPtr(serial, rootdevice, path, pathsize, ref neededsize, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void yapiSetNetDevListValidityDelegate(int sValidity);
+    private static yapiSetNetDevListValidityDelegate _yapiSetNetDevListValidityPtr = null;
+    internal static void _yapiSetNetDevListValidity(int sValidity)
+    {
+                  _yapiSetNetDevListValidityPtr(sValidity);
+                  return;
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiGetNetDevListValidityDelegate();
+    private static yapiGetNetDevListValidityDelegate _yapiGetNetDevListValidityPtr = null;
+    internal static int _yapiGetNetDevListValidity()
+    {
+                  return _yapiGetNetDevListValidityPtr();
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void yapiRegisterBeaconCallbackDelegate(IntPtr beaconCallback);
+    private static yapiRegisterBeaconCallbackDelegate _yapiRegisterBeaconCallbackPtr = null;
+    internal static void _yapiRegisterBeaconCallback(IntPtr beaconCallback)
+    {
+                  _yapiRegisterBeaconCallbackPtr(beaconCallback);
+                  return;
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void yapiStartStopDeviceLogCallbackDelegate(StringBuilder serial, int start);
+    private static yapiStartStopDeviceLogCallbackDelegate _yapiStartStopDeviceLogCallbackPtr = null;
+    internal static void _yapiStartStopDeviceLogCallback(StringBuilder serial, int start)
+    {
+                  _yapiStartStopDeviceLogCallbackPtr(serial, start);
+                  return;
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiIsModuleWritableDelegate(StringBuilder serial, StringBuilder errmsg);
+    private static yapiIsModuleWritableDelegate _yapiIsModuleWritablePtr = null;
+    internal static int _yapiIsModuleWritable(StringBuilder serial, StringBuilder errmsg)
+    {
+                  return _yapiIsModuleWritablePtr(serial, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate YRETCODE yapiGetDLLPathDelegate(StringBuilder path, int pathsize, StringBuilder errmsg);
+    private static yapiGetDLLPathDelegate _yapiGetDLLPathPtr = null;
+    internal static YRETCODE _yapiGetDLLPath(StringBuilder path, int pathsize, StringBuilder errmsg)
+    {
+                  return _yapiGetDLLPathPtr(path, pathsize, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void yapiSetNetworkTimeoutDelegate(int sValidity);
+    private static yapiSetNetworkTimeoutDelegate _yapiSetNetworkTimeoutPtr = null;
+    internal static void _yapiSetNetworkTimeout(int sValidity)
+    {
+                  _yapiSetNetworkTimeoutPtr(sValidity);
+                  return;
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiGetNetworkTimeoutDelegate();
+    private static yapiGetNetworkTimeoutDelegate _yapiGetNetworkTimeoutPtr = null;
+    internal static int _yapiGetNetworkTimeout()
+    {
+                  return _yapiGetNetworkTimeoutPtr();
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiAddUdevRulesForYoctoDelegate(int force, StringBuilder errmsg);
+    private static yapiAddUdevRulesForYoctoDelegate _yapiAddUdevRulesForYoctoPtr = null;
+    internal static int _yapiAddUdevRulesForYocto(int force, StringBuilder errmsg)
+    {
+                  return _yapiAddUdevRulesForYoctoPtr(force, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate YRETCODE yapiSetSSLCertificateSrvDelegate(StringBuilder certfile, StringBuilder keyfile, StringBuilder errmsg);
+    private static yapiSetSSLCertificateSrvDelegate _yapiSetSSLCertificateSrvPtr = null;
+    internal static YRETCODE _yapiSetSSLCertificateSrv(StringBuilder certfile, StringBuilder keyfile, StringBuilder errmsg)
+    {
+                  return _yapiSetSSLCertificateSrvPtr(certfile, keyfile, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate YRETCODE yapiAddSSLCertificateCliDelegate(StringBuilder cert, int cert_len, StringBuilder errmsg);
+    private static yapiAddSSLCertificateCliDelegate _yapiAddSSLCertificateCliPtr = null;
+    internal static YRETCODE _yapiAddSSLCertificateCli(StringBuilder cert, int cert_len, StringBuilder errmsg)
+    {
+                  return _yapiAddSSLCertificateCliPtr(cert, cert_len, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate YRETCODE yapiSetNetworkSecurityOptionsDelegate(int options, StringBuilder errmsg);
+    private static yapiSetNetworkSecurityOptionsDelegate _yapiSetNetworkSecurityOptionsPtr = null;
+    internal static YRETCODE _yapiSetNetworkSecurityOptions(int options, StringBuilder errmsg)
+    {
+                  return _yapiSetNetworkSecurityOptionsPtr(options, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate YRETCODE yapiGetRemoteCertificateDelegate(StringBuilder rooturl, u64 timeout, StringBuilder buffer, int maxsize, ref int neededsize, StringBuilder errmsg);
+    private static yapiGetRemoteCertificateDelegate _yapiGetRemoteCertificatePtr = null;
+    internal static YRETCODE _yapiGetRemoteCertificate(StringBuilder rooturl, u64 timeout, StringBuilder buffer, int maxsize, ref int neededsize, StringBuilder errmsg)
+    {
+                  return _yapiGetRemoteCertificatePtr(rooturl, timeout, buffer, maxsize, ref neededsize, errmsg);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiGetNextHubRefDelegate(int hubref);
+    private static yapiGetNextHubRefDelegate _yapiGetNextHubRefPtr = null;
+    internal static int _yapiGetNextHubRef(int hubref)
+    {
+                  return _yapiGetNextHubRefPtr(hubref);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiGetHubStrAttrDelegate(int hubref, StringBuilder attrname, StringBuilder attrval, int maxsize, ref int neededsize);
+    private static yapiGetHubStrAttrDelegate _yapiGetHubStrAttrPtr = null;
+    internal static int _yapiGetHubStrAttr(int hubref, StringBuilder attrname, StringBuilder attrval, int maxsize, ref int neededsize)
+    {
+                  return _yapiGetHubStrAttrPtr(hubref, attrname, attrval, maxsize, ref neededsize);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiGetHubIntAttrDelegate(int hubref, StringBuilder attrname);
+    private static yapiGetHubIntAttrDelegate _yapiGetHubIntAttrPtr = null;
+    internal static int _yapiGetHubIntAttr(int hubref, StringBuilder attrname)
+    {
+                  return _yapiGetHubIntAttrPtr(hubref, attrname);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiSetHubIntAttrDelegate(int hubref, StringBuilder attrname, int value);
+    private static yapiSetHubIntAttrDelegate _yapiSetHubIntAttrPtr = null;
+    internal static int _yapiSetHubIntAttr(int hubref, StringBuilder attrname, int value)
+    {
+                  return _yapiSetHubIntAttrPtr(hubref, attrname, value);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate YRETCODE yapiSetTrustedCertificatesListDelegate(StringBuilder certificatePath, StringBuilder errmsg);
+    private static yapiSetTrustedCertificatesListDelegate _yapiSetTrustedCertificatesListPtr = null;
+    internal static YRETCODE _yapiSetTrustedCertificatesList(StringBuilder certificatePath, StringBuilder errmsg)
+    {
+                  return _yapiSetTrustedCertificatesListPtr(certificatePath, errmsg);
+    }
+//--- (end of generated code: YFunction dlldef_core)
+
+    internal static int mapYAPIFunctions()
+    {
+        IntPtr functionPtr;
+        //--- (generated code: YFunction dll_core_map)
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiInitAPI");
+       _yapiInitAPIPtr = Marshal.GetDelegateForFunctionPointer<yapiInitAPIDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiFreeAPI");
+       _yapiFreeAPIPtr = Marshal.GetDelegateForFunctionPointer<yapiFreeAPIDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiSetTraceFile");
+       _yapiSetTraceFilePtr = Marshal.GetDelegateForFunctionPointer<yapiSetTraceFileDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiRegisterLogFunction");
+       _yapiRegisterLogFunctionPtr = Marshal.GetDelegateForFunctionPointer<yapiRegisterLogFunctionDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiRegisterDeviceArrivalCallback");
+       _yapiRegisterDeviceArrivalCallbackPtr = Marshal.GetDelegateForFunctionPointer<yapiRegisterDeviceArrivalCallbackDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiRegisterDeviceRemovalCallback");
+       _yapiRegisterDeviceRemovalCallbackPtr = Marshal.GetDelegateForFunctionPointer<yapiRegisterDeviceRemovalCallbackDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiRegisterDeviceChangeCallback");
+       _yapiRegisterDeviceChangeCallbackPtr = Marshal.GetDelegateForFunctionPointer<yapiRegisterDeviceChangeCallbackDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiRegisterDeviceConfigChangeCallback");
+       _yapiRegisterDeviceConfigChangeCallbackPtr = Marshal.GetDelegateForFunctionPointer<yapiRegisterDeviceConfigChangeCallbackDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiRegisterFunctionUpdateCallback");
+       _yapiRegisterFunctionUpdateCallbackPtr = Marshal.GetDelegateForFunctionPointer<yapiRegisterFunctionUpdateCallbackDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiRegisterTimedReportCallback");
+       _yapiRegisterTimedReportCallbackPtr = Marshal.GetDelegateForFunctionPointer<yapiRegisterTimedReportCallbackDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiLockDeviceCallBack");
+       _yapiLockDeviceCallBackPtr = Marshal.GetDelegateForFunctionPointer<yapiLockDeviceCallBackDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiUnlockDeviceCallBack");
+       _yapiUnlockDeviceCallBackPtr = Marshal.GetDelegateForFunctionPointer<yapiUnlockDeviceCallBackDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiLockFunctionCallBack");
+       _yapiLockFunctionCallBackPtr = Marshal.GetDelegateForFunctionPointer<yapiLockFunctionCallBackDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiUnlockFunctionCallBack");
+       _yapiUnlockFunctionCallBackPtr = Marshal.GetDelegateForFunctionPointer<yapiUnlockFunctionCallBackDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiRegisterHub");
+       _yapiRegisterHubPtr = Marshal.GetDelegateForFunctionPointer<yapiRegisterHubDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiPreregisterHub");
+       _yapiPreregisterHubPtr = Marshal.GetDelegateForFunctionPointer<yapiPreregisterHubDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiUnregisterHub");
+       _yapiUnregisterHubPtr = Marshal.GetDelegateForFunctionPointer<yapiUnregisterHubDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiUpdateDeviceList");
+       _yapiUpdateDeviceListPtr = Marshal.GetDelegateForFunctionPointer<yapiUpdateDeviceListDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiHandleEvents");
+       _yapiHandleEventsPtr = Marshal.GetDelegateForFunctionPointer<yapiHandleEventsDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetTickCount");
+       _yapiGetTickCountPtr = Marshal.GetDelegateForFunctionPointer<yapiGetTickCountDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiCheckLogicalName");
+       _yapiCheckLogicalNamePtr = Marshal.GetDelegateForFunctionPointer<yapiCheckLogicalNameDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetAPIVersion");
+       _yapiGetAPIVersionPtr = Marshal.GetDelegateForFunctionPointer<yapiGetAPIVersionDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetDevice");
+       _yapiGetDevicePtr = Marshal.GetDelegateForFunctionPointer<yapiGetDeviceDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetDeviceInfo");
+       _yapiGetDeviceInfoPtr = Marshal.GetDelegateForFunctionPointer<yapiGetDeviceInfoDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetFunction");
+       _yapiGetFunctionPtr = Marshal.GetDelegateForFunctionPointer<yapiGetFunctionDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetFunctionsByClass");
+       _yapiGetFunctionsByClassPtr = Marshal.GetDelegateForFunctionPointer<yapiGetFunctionsByClassDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetFunctionsByDevice");
+       _yapiGetFunctionsByDevicePtr = Marshal.GetDelegateForFunctionPointer<yapiGetFunctionsByDeviceDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetFunctionInfoEx");
+       _yapiGetFunctionInfoExPtr = Marshal.GetDelegateForFunctionPointer<yapiGetFunctionInfoExDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiHTTPRequestSyncStart");
+       _yapiHTTPRequestSyncStartPtr = Marshal.GetDelegateForFunctionPointer<yapiHTTPRequestSyncStartDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiHTTPRequestSyncStartEx");
+       _yapiHTTPRequestSyncStartExPtr = Marshal.GetDelegateForFunctionPointer<yapiHTTPRequestSyncStartExDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiHTTPRequestSyncDone");
+       _yapiHTTPRequestSyncDonePtr = Marshal.GetDelegateForFunctionPointer<yapiHTTPRequestSyncDoneDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiHTTPRequestAsync");
+       _yapiHTTPRequestAsyncPtr = Marshal.GetDelegateForFunctionPointer<yapiHTTPRequestAsyncDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiHTTPRequestAsyncEx");
+       _yapiHTTPRequestAsyncExPtr = Marshal.GetDelegateForFunctionPointer<yapiHTTPRequestAsyncExDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiHTTPRequest");
+       _yapiHTTPRequestPtr = Marshal.GetDelegateForFunctionPointer<yapiHTTPRequestDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetDevicePath");
+       _yapiGetDevicePathPtr = Marshal.GetDelegateForFunctionPointer<yapiGetDevicePathDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiSleep");
+       _yapiSleepPtr = Marshal.GetDelegateForFunctionPointer<yapiSleepDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiRegisterHubDiscoveryCallback");
+       _yapiRegisterHubDiscoveryCallbackPtr = Marshal.GetDelegateForFunctionPointer<yapiRegisterHubDiscoveryCallbackDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiTriggerHubDiscovery");
+       _yapiTriggerHubDiscoveryPtr = Marshal.GetDelegateForFunctionPointer<yapiTriggerHubDiscoveryDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiRegisterDeviceLogCallback");
+       _yapiRegisterDeviceLogCallbackPtr = Marshal.GetDelegateForFunctionPointer<yapiRegisterDeviceLogCallbackDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetAllJsonKeys");
+       _yapiGetAllJsonKeysPtr = Marshal.GetDelegateForFunctionPointer<yapiGetAllJsonKeysDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiCheckFirmware");
+       _yapiCheckFirmwarePtr = Marshal.GetDelegateForFunctionPointer<yapiCheckFirmwareDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetBootloaders");
+       _yapiGetBootloadersPtr = Marshal.GetDelegateForFunctionPointer<yapiGetBootloadersDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiUpdateFirmwareEx");
+       _yapiUpdateFirmwareExPtr = Marshal.GetDelegateForFunctionPointer<yapiUpdateFirmwareExDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiHTTPRequestSyncStartOutOfBand");
+       _yapiHTTPRequestSyncStartOutOfBandPtr = Marshal.GetDelegateForFunctionPointer<yapiHTTPRequestSyncStartOutOfBandDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiHTTPRequestAsyncOutOfBand");
+       _yapiHTTPRequestAsyncOutOfBandPtr = Marshal.GetDelegateForFunctionPointer<yapiHTTPRequestAsyncOutOfBandDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiTestHub");
+       _yapiTestHubPtr = Marshal.GetDelegateForFunctionPointer<yapiTestHubDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiJsonGetPath");
+       _yapiJsonGetPathPtr = Marshal.GetDelegateForFunctionPointer<yapiJsonGetPathDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiJsonDecodeString");
+       _yapiJsonDecodeStringPtr = Marshal.GetDelegateForFunctionPointer<yapiJsonDecodeStringDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetSubdevices");
+       _yapiGetSubdevicesPtr = Marshal.GetDelegateForFunctionPointer<yapiGetSubdevicesDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiFreeMem");
+       _yapiFreeMemPtr = Marshal.GetDelegateForFunctionPointer<yapiFreeMemDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetDevicePathEx");
+       _yapiGetDevicePathExPtr = Marshal.GetDelegateForFunctionPointer<yapiGetDevicePathExDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiSetNetDevListValidity");
+       _yapiSetNetDevListValidityPtr = Marshal.GetDelegateForFunctionPointer<yapiSetNetDevListValidityDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetNetDevListValidity");
+       _yapiGetNetDevListValidityPtr = Marshal.GetDelegateForFunctionPointer<yapiGetNetDevListValidityDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiRegisterBeaconCallback");
+       _yapiRegisterBeaconCallbackPtr = Marshal.GetDelegateForFunctionPointer<yapiRegisterBeaconCallbackDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiStartStopDeviceLogCallback");
+       _yapiStartStopDeviceLogCallbackPtr = Marshal.GetDelegateForFunctionPointer<yapiStartStopDeviceLogCallbackDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiIsModuleWritable");
+       _yapiIsModuleWritablePtr = Marshal.GetDelegateForFunctionPointer<yapiIsModuleWritableDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetDLLPath");
+       _yapiGetDLLPathPtr = Marshal.GetDelegateForFunctionPointer<yapiGetDLLPathDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiSetNetworkTimeout");
+       _yapiSetNetworkTimeoutPtr = Marshal.GetDelegateForFunctionPointer<yapiSetNetworkTimeoutDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetNetworkTimeout");
+       _yapiGetNetworkTimeoutPtr = Marshal.GetDelegateForFunctionPointer<yapiGetNetworkTimeoutDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiAddUdevRulesForYocto");
+       _yapiAddUdevRulesForYoctoPtr = Marshal.GetDelegateForFunctionPointer<yapiAddUdevRulesForYoctoDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiSetSSLCertificateSrv");
+       _yapiSetSSLCertificateSrvPtr = Marshal.GetDelegateForFunctionPointer<yapiSetSSLCertificateSrvDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiAddSSLCertificateCli");
+       _yapiAddSSLCertificateCliPtr = Marshal.GetDelegateForFunctionPointer<yapiAddSSLCertificateCliDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiSetNetworkSecurityOptions");
+       _yapiSetNetworkSecurityOptionsPtr = Marshal.GetDelegateForFunctionPointer<yapiSetNetworkSecurityOptionsDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetRemoteCertificate");
+       _yapiGetRemoteCertificatePtr = Marshal.GetDelegateForFunctionPointer<yapiGetRemoteCertificateDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetNextHubRef");
+       _yapiGetNextHubRefPtr = Marshal.GetDelegateForFunctionPointer<yapiGetNextHubRefDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetHubStrAttr");
+       _yapiGetHubStrAttrPtr = Marshal.GetDelegateForFunctionPointer<yapiGetHubStrAttrDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiGetHubIntAttr");
+       _yapiGetHubIntAttrPtr = Marshal.GetDelegateForFunctionPointer<yapiGetHubIntAttrDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiSetHubIntAttr");
+       _yapiSetHubIntAttrPtr = Marshal.GetDelegateForFunctionPointer<yapiSetHubIntAttrDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiSetTrustedCertificatesList");
+       _yapiSetTrustedCertificatesListPtr = Marshal.GetDelegateForFunctionPointer<yapiSetTrustedCertificatesListDelegate>(functionPtr);
+//--- (end of generated code: YFunction dll_core_map)
+        return 0;
+    }
+
+    internal static int loadYAPI()
+    {
+        Boolean is64 = IntPtr.Size == 8;
+        YAPIDLL_PRELOAD_TYPE preloadType = YAPIDLL_PRELOAD_TYPE.DEFAULT;
+        Boolean loaded = false;
+        string dll_path = "";
+        List<String> loadlogs = new List<String>();
+        string ErrorCause = "";
+        string ErrorCauseVerbose = "";
+        while (!loaded)
+        {
+            PlatformID platform = Environment.OSVersion.Platform;
+            if (platform == PlatformID.MacOSX) {
+                if (is64) {
+                    _dllVersion = YAPIDLL_VERSION.MACOS64;
+                } else {
+                    _dllVersion = YAPIDLL_VERSION.MACOS32;
+                }
+            } else if (platform == PlatformID.Unix) {
+                if (IsMacOS()) {
+                    if (is64) {
+                        _dllVersion = YAPIDLL_VERSION.MACOS64;
+                    } else {
+                        _dllVersion = YAPIDLL_VERSION.MACOS32;
+                    }
+                } else {
+                    if (is64) {
+                        _dllVersion = YAPIDLL_VERSION.LIN64;
+                    } else {
+                        _dllVersion = YAPIDLL_VERSION.LIN32;
+                    }
+                }
+            } else {
+                Architecture arch = RuntimeInformation.OSArchitecture;
+                if (arch == Architecture.Arm64) {
+                    _dllVersion = YAPIDLL_VERSION.WINARM64;
+                } else {
+                    if (is64) {
+                        _dllVersion = YAPIDLL_VERSION.WIN64;
+                    } else {
+                        _dllVersion = YAPIDLL_VERSION.WIN32;
+                    }
+                }
+            }
+            Boolean no_alternate_platform = false;
+            do
+            {
+                string dir = "";
+                switch (preloadType) {
+                    case YAPIDLL_PRELOAD_TYPE.ASSEMBLY:
+                        System.Reflection.Assembly ass = Assembly.GetEntryAssembly();
+                        if (ass != null) {
+                            dir = Path.GetDirectoryName(ass.Location);
+                            dir += Path.DirectorySeparatorChar;
+                        }
+                        break;
+                    case YAPIDLL_PRELOAD_TYPE.ABS_CURRENT_DIR:
+                        dir = Directory.GetCurrentDirectory();
+                        dir += Path.DirectorySeparatorChar;
+                        break;
+                    default:
+                        break;
+                }
+                switch (_dllVersion)
+                {
+                    default:
+                    case YAPIDLL_VERSION.WIN32:
+                        dll_path = dir + "yapi.dll";
+                        break;
+                    case YAPIDLL_VERSION.WIN64:
+                        dll_path = dir + "amd64" + Path.DirectorySeparatorChar + "yapi.dll";
+                        break;
+                    case YAPIDLL_VERSION.WINARM64:
+                        dll_path = dir + "arm64" + Path.DirectorySeparatorChar + "yapi.dll";
+                        break;
+                    case YAPIDLL_VERSION.MACOS32:
+                        dll_path = dir + "libyapi32.so";
+                        break;
+                    case YAPIDLL_VERSION.MACOS64:
+                        dll_path = dir + "libyapi64.so";
+                        break;
+                    case YAPIDLL_VERSION.LIN64:
+                        dll_path = dir + "libyapi-amd64.so";
+                        break;
+                    case YAPIDLL_VERSION.LIN32:
+                        dll_path = dir + "libyapi-i386.so";
+                        break;
+                    case YAPIDLL_VERSION.LINARMHF:
+                        dll_path = dir + "libyapi-armhf.so";
+                        break;
+                    case YAPIDLL_VERSION.LINAARCH64:
+                        dll_path = dir + "libyapi-aarch64.so";
+                        break;
+                }
+                if (File.Exists(dll_path)) {
+                    try {
+                        debugDll("load library \"" + dll_path + "\" (.Net Core)");
+                        IntPtr loadLibrary = NativeLibrary.Load(dll_path);
+                        if (loadLibrary == IntPtr.Zero) {
+                            ErrorCause = "NULL result";
+                            ErrorCauseVerbose = ErrorCause;
+                        } else {
+                            string msg = "YAPI loaded from \"" + dll_path + "\"";
+                            loadlogs.Add(msg);
+                            debugDll(msg);
+                            _loadedLibrary = loadLibrary;
+                            return mapYAPIFunctions();
+                        }
+                    } catch (System.EntryPointNotFoundException ex) {
+                        ErrorCause = "Entry point not found";
+                        ErrorCauseVerbose = ex.Message;
+                    } catch (System.DllNotFoundException ex) {
+                        ErrorCause = "DLL not found";
+                        ErrorCauseVerbose = ex.Message;
+                    }
+                } else {
+                    debugDll("Lib \"" + dll_path + "\" does not exist");
+                }
+                switch (_dllVersion) {
+                    default:
+                    case YAPIDLL_VERSION.WIN32:
+                        switch (preloadType) {
+                            case YAPIDLL_PRELOAD_TYPE.NONE:
+                            case YAPIDLL_PRELOAD_TYPE.DEFAULT:
+                                preloadType = YAPIDLL_PRELOAD_TYPE.ASSEMBLY;
+                                break;
+                            case YAPIDLL_PRELOAD_TYPE.ASSEMBLY:
+                                preloadType = YAPIDLL_PRELOAD_TYPE.ABS_CURRENT_DIR;
+                                break;
+                            case YAPIDLL_PRELOAD_TYPE.ABS_CURRENT_DIR:
+                                for (int i = 0; i < loadlogs.Count; i++) YAPI.innerLog(loadlogs[i] + "\n");
+                                string err = "Failed to load YAPI dynamic library.";
+                                if (YAPI.ylog == null) {
+                                    err += "Consider using YAPI.RegisterLogFunction()";
+                                } else if (!YAPI._debugDllLoad) {
+                                    err += "Consider using YAPI.logDllLoad() for more logs";
+                                }
+                                throw new System.DllNotFoundException(err);
+                        }
+                        no_alternate_platform = true;
+                        break;
+                    case YAPIDLL_VERSION.WIN64:
+                    case YAPIDLL_VERSION.MACOS32:
+                    case YAPIDLL_VERSION.LINARMHF:
+                    case YAPIDLL_VERSION.LINAARCH64:
+                        _dllVersion = YAPIDLL_VERSION.WIN32;
+                        break;
+                    case YAPIDLL_VERSION.MACOS64:
+                        _dllVersion = YAPIDLL_VERSION.MACOS32;
+                        break;
+                    case YAPIDLL_VERSION.LIN32:
+                        _dllVersion = YAPIDLL_VERSION.LINARMHF;
+                        break;
+                    case YAPIDLL_VERSION.LIN64:
+                        _dllVersion = YAPIDLL_VERSION.LINAARCH64;
+                        break;
+                }
+            } while (!no_alternate_platform);
+        }
+        return 0;
+    }
+
+    internal static u16 tryGetAPIVersion(ref IntPtr version, ref IntPtr dat_)
+    {
+        if (_loadedLibrary == IntPtr.Zero) {
+            loadYAPI();
+        }
+        return _yapiGetAPIVersionPtr(ref version, ref dat_);
+    }
+
+#else
+
     internal static u16 tryGetAPIVersion(ref IntPtr version, ref IntPtr dat_)
     {
         Boolean is64 = IntPtr.Size == 8;
@@ -271,7 +1101,8 @@ internal static class SafeNativeMethods
         String loadDescription = "";
         string dll_path ="";
         List<String> loadlogs = new List<String>();
-        string ErrorCause = "Unable to load YAPI dynamic library.";
+        string ErrorCause = "";
+        string ErrorCauseVerbose = "";
 
         while (!loaded) {
             PlatformID platform = Environment.OSVersion.Platform;
@@ -313,15 +1144,7 @@ internal static class SafeNativeMethods
             Boolean no_alternate_platform = false;
             do
             {
-                debugDll("Try YAPI load with " + _dllVersion + " and " + preloadType);
-                loadDescription = "(" + _dllVersion + " and " + preloadType + ", ";
-                #if NETCOREAPP3_0_OR_GREATER
-                    loadDescription += ".Net Core)";
-                   
-                #else
-                    loadDescription += ".Net Framework)";          
-                #endif
-
+                bool preloadFailed = false;
                 if (preloadType != YAPIDLL_PRELOAD_TYPE.NONE) {
                     string dir = "";
                     switch (preloadType) {
@@ -331,7 +1154,6 @@ internal static class SafeNativeMethods
                                 dir = Path.GetDirectoryName(ass.Location);
                                 dir += Path.DirectorySeparatorChar;
                             }
-
                             break;
                         case YAPIDLL_PRELOAD_TYPE.ABS_CURRENT_DIR:
                             dir = Directory.GetCurrentDirectory();
@@ -340,8 +1162,6 @@ internal static class SafeNativeMethods
                         default:
                             break;
                     }
-
-                   
                     switch (_dllVersion) {
                         default:
                         case YAPIDLL_VERSION.WIN32:
@@ -372,46 +1192,56 @@ internal static class SafeNativeMethods
                             dll_path = dir + "libyapi-aarch64.so";
                             break;
                     }
-
+          
                     try {
                         IntPtr loadLibrary;
-#if NETCOREAPP3_0_OR_GREATER
-                        debugDll("preload library using " + dll_path + " (.Net Core)\n");
-                        loadLibrary = NativeLibrary.Load(dll_path);
-#else
-                        debugDll("preload library with path \""+dll_path+"\" (.Net Framework)\n");
+                        debugDll("preload library \""+dll_path+"\" (.Net Framework)");
                         loadLibrary = NativeMethods.LoadLibrary(dll_path);
-#endif
                         if (loadLibrary == IntPtr.Zero) {
-                            debugDll("Unable to preload dll with \"" + dll_path + "\"\n");
-                            ErrorCause = "NULL rersult";
-                            loadlogs.Add("Tried to load \"" + dll_path + "\" " + loadDescription + " -> result was null.");
+                            ErrorCause = "NULL result";
+                            ErrorCauseVerbose = ErrorCause;
+                            preloadFailed = true;
                         } else {
-                            debugDll("YAPI preloaded from \"" + dll_path + "\"\n");
+                            string msg = "YAPI preloaded from \"" + dll_path + "\"";
+                            loadlogs.Add(msg);
+                            debugDll(msg);
                         }
                     } catch (System.EntryPointNotFoundException ex) {
-                        ErrorCause = ex.Message;
-                        debugDll("Entry point not found :" + ErrorCause + "\n");
-                        loadlogs.Add("Tried to load \"" + dll_path + "\" " + loadDescription + " -> Entry point not found. " + ErrorCause);
+                        ErrorCause = "Entry point not found";
+                        ErrorCauseVerbose = ex.Message;
+                        preloadFailed = true;
                     } catch (System.DllNotFoundException ex) {
-                        ErrorCause = ex.Message;
-                        debugDll("Unable to load dll with : " + ErrorCause + "\n");
-                        loadlogs.Add("Tried to load \"" + dll_path + "\" " + loadDescription + " -> File not found. " + ErrorCause);
+                        ErrorCause = "DLL not found";
+                        ErrorCauseVerbose = ex.Message;
+                        preloadFailed = true;
                      }
                 }
-
-                try {
-                    return _yapiGetAPIVersion(ref version, ref dat_);
-                } catch (System.DllNotFoundException ex) {
-                    debugDll(ex.Message + "\n");
-                    ErrorCause = ex.Message;
-                    loadlogs.Add("Tried to load \"" + dll_path + "\" " + loadDescription + " -> DLL not found. " + ErrorCause);
-                } catch (System.BadImageFormatException ex) {
-                    debugDll(ex.Message + "\n");
-                    ErrorCause = ex.Message;
-                    loadlogs.Add("Tried to load \"" + dll_path + "\" " + loadDescription + " -> Bad architecture. " + ErrorCause);
+                loadDescription = "(" + _dllVersion + ", " + preloadType + ", ";
+                if (preloadType != YAPIDLL_PRELOAD_TYPE.NONE)
+                {
+                    loadDescription += dll_path + ", ";
                 }
-
+                loadDescription += ".Net Framework)";
+                if (!preloadFailed) {
+                    try {
+                        return _yapiGetAPIVersion(ref version, ref dat_);
+                    } catch (System.DllNotFoundException ex) {
+                        string msg = "Tried to load YAPI " + loadDescription + " -> DLL not found";
+                        loadlogs.Add(msg);
+                        debugDll(msg);
+                        debugDll(ex.Message);
+                    } catch (System.BadImageFormatException ex) {
+                        string msg = "Tried to load YAPI " + loadDescription + "-> Bad architecture.";
+                        loadlogs.Add(msg);
+                        debugDll(msg);
+                        debugDll(ex.Message);
+                    }
+                } else {
+                    string msg = "Tried to preload YAPI " + loadDescription + "-> "+ErrorCause+".";
+                    loadlogs.Add(msg);
+                    debugDll(msg);
+                    debugDll(ErrorCauseVerbose);
+                }
                 switch (_dllVersion) {
                     default:
                     case YAPIDLL_VERSION.WIN32:
@@ -426,11 +1256,15 @@ internal static class SafeNativeMethods
                                 preloadType = YAPIDLL_PRELOAD_TYPE.ABS_CURRENT_DIR;
                                 break;
                             case YAPIDLL_PRELOAD_TYPE.ABS_CURRENT_DIR:
-                                for (int i = 0; i < loadlogs.Count; i++) YAPI.innerLog(loadlogs[i]);
-                                YAPI.innerLog("Failed to load YAPI dynamic library.");
-                                throw new System.DllNotFoundException(ErrorCause);
+                                for (int i = 0; i < loadlogs.Count; i++) YAPI.innerLog(loadlogs[i]+"\n");
+                                string err = "Failed to load YAPI dynamic library.";
+                                if (YAPI.ylog == null) {
+                                    err += "Consider using YAPI.RegisterLogFunction()";
+                                } else if (!YAPI._debugDllLoad) {
+                                    err += "Consider using YAPI.logDllLoad() for more logs";
+                                }
+                                throw new System.DllNotFoundException(err);
                         }
-
                         no_alternate_platform = true;
                         break;
                     case YAPIDLL_VERSION.WIN64:
@@ -455,12 +1289,6 @@ internal static class SafeNativeMethods
         return 0;
     }
 
-    private static void debugDll(string line)
-    {
-        if (YAPI._debugDllLoad) {
-            Console.Write(line);
-        }
-    }
 
     //--- (generated code: YFunction dlldef)
     [DllImport("yapi", EntryPoint = "yapiInitAPI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
@@ -3698,6 +4526,8 @@ internal static class SafeNativeMethods
         }
     }
 //--- (end of generated code: YFunction dlldef)
+
+#endif
 }
 
 
@@ -3733,7 +4563,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "2.0";
     public const int YOCTO_API_VERSION_BCD = 0x0200;
 
-    public const string YOCTO_API_BUILD_NO = "63797";
+    public const string YOCTO_API_BUILD_NO = "64286";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -3791,7 +4621,7 @@ public class YAPI
     public const int NO_TRUSTED_CA_CHECK = 1;       // Disables certificate checking
     public const int NO_EXPIRATION_CHECK = 2;       // Disables certificate expiration date checking
     public const int NO_HOSTNAME_CHECK = 4;         // Disable hostname checking
-    public const int LEGACY = 8;                    // Allow non secure connection (similar to v1.10)
+    public const int LEGACY = 8;                    // Allow non-secure connection (similar to v1.10)
 
 //--- (end of generated code: YFunction return codes)
 
@@ -3808,7 +4638,7 @@ public class YAPI
     /*
      * All static variables (reset in YAPI.FreeAPI()
      */
-    private static yLogFunc ylog = null;
+    internal static yLogFunc ylog = null;
     private static yDeviceUpdateFunc yArrival = null;
     private static yDeviceUpdateFunc yRemoval = null;
     private static yDeviceUpdateFunc yChange = null;
@@ -6838,6 +7668,29 @@ public class YAPI
 
     /**
      * <summary>
+     *   Returns the path to the dynamic YAPI library.
+     * <para>
+     *   This function is useful for debugging problems loading the
+     *   dynamic library YAPI. This function is supported by the C#, Python and VB languages. The other
+     *   libraries return an
+     *   empty string.
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string containing the path of the YAPI dynamic library.
+     * </returns>
+     */
+    public static string GetYAPISharedLibraryPath()
+    {
+        if (!_apiInitialized) {
+            string errmsg = "";
+            InitAPI(0, ref errmsg);
+        }
+        return _yapiContext.GetYAPISharedLibraryPath();
+    }
+
+    /**
+     * <summary>
      *   Adds a UDEV rule which authorizes all users to access Yoctopuce modules
      *   connected to the USB ports.
      * <para>
@@ -7155,6 +8008,36 @@ public class YAPIContext
         int res;
         res = SafeNativeMethods._yapiGetNetDevListValidity();
         return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the path to the dynamic YAPI library.
+     * <para>
+     *   This function is useful for debugging problems loading the
+     *   dynamic library YAPI. This function is supported by the C#, Python and VB languages. The other
+     *   libraries return an
+     *   empty string.
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string containing the path of the YAPI dynamic library.
+     * </returns>
+     */
+    public virtual string GetYAPISharedLibraryPath()
+    {
+        StringBuilder errmsg = new StringBuilder(YAPI.YOCTO_ERRMSG_LEN);
+        StringBuilder smallbuff = new StringBuilder(4096);
+        int res;
+        string path;
+        res = SafeNativeMethods._yapiGetDLLPath(smallbuff, 4096, errmsg);
+        if (res < 0) {
+            path = "error:" + errmsg.ToString();
+        } else {
+            path = smallbuff.ToString();
+        }
+        return path;
     }
 
 
