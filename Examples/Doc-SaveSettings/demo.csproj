@@ -134,6 +134,9 @@
     <Compile Include="..\..\Sources\yocto_colorledcluster.cs">
       <Link>Yoctopuce\yocto_colorledcluster.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\yocto_colorsensor.cs">
+      <Link>Yoctopuce\yocto_colorsensor.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_compass.cs">
       <Link>Yoctopuce\yocto_compass.cs</Link>
     </Compile>
@@ -280,9 +283,6 @@
     </Compile>
     <Compile Include="..\..\Sources\yocto_spectralchannel.cs">
       <Link>Yoctopuce\yocto_spectralchannel.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Sources\yocto_spectralsensor.cs">
-      <Link>Yoctopuce\yocto_spectralsensor.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_spiport.cs">
       <Link>Yoctopuce\yocto_spiport.cs</Link>

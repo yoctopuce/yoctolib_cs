@@ -1343,11 +1343,18 @@ public class YInputCapture : YFunction
 
     /**
      * <summary>
-     *   c
+     *   Continues the enumeration of instant snapshot triggers started using <c>yFirstInputCapture()</c>.
      * <para>
-     *   omment from .yc definition
+     *   Caution: You can't make any assumption about the returned instant snapshot triggers order.
+     *   If you want to find a specific an instant snapshot trigger, use <c>InputCapture.findInputCapture()</c>
+     *   and a hardwareID or a logical name.
      * </para>
      * </summary>
+     * <returns>
+     *   a pointer to a <c>YInputCapture</c> object, corresponding to
+     *   an instant snapshot trigger currently online, or a <c>null</c> pointer
+     *   if there are no more instant snapshot triggers to enumerate.
+     * </returns>
      */
     public YInputCapture nextInputCapture()
     {
@@ -1365,11 +1372,17 @@ public class YInputCapture : YFunction
 
     /**
      * <summary>
-     *   c
+     *   Starts the enumeration of instant snapshot triggers currently accessible.
      * <para>
-     *   omment from .yc definition
+     *   Use the method <c>YInputCapture.nextInputCapture()</c> to iterate on
+     *   next instant snapshot triggers.
      * </para>
      * </summary>
+     * <returns>
+     *   a pointer to a <c>YInputCapture</c> object, corresponding to
+     *   the first instant snapshot trigger currently online, or a <c>null</c> pointer
+     *   if there are none.
+     * </returns>
      */
     public static YInputCapture FirstInputCapture()
     {

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_micropython.cs 64236 2025-01-16 10:17:02Z seb $
+ *  $Id: svn_id $
  *
  *  Implements yFindMicroPython(), the high-level API for MicroPython functions
  *

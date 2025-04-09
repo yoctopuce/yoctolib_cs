@@ -2,8 +2,8 @@
     "main": "main.cs",
     "other_files": [],
     "ylib": [
+        "yocto_colorsensor",
         "yocto_spectralchannel",
-        "yocto_spectralsensor",
         "yocto_api"
     ],
     "skip": true,

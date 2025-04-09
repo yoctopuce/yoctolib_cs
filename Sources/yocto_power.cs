@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_power.cs 64236 2025-01-16 10:17:02Z seb $
+ *  $Id: svn_id $
  *
  *  Implements yFindPower(), the high-level API for Power functions
  *

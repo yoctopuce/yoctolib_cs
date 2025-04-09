@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: main.cs 63863 2024-12-23 10:33:05Z tiago $
+ *  $Id: main.cs 65338 2025-03-26 09:50:53Z tiago $
  *
  *  An example that shows how to use a Yocto-Spectral
  *
@@ -36,9 +36,9 @@ namespace ConsoleApplication1
     {
       string errmsg = "";
       string target;
-      YSpectralSensor spectralSensor;
+      YColorSensor colorSensor;
 
-      if (args.Length < 1)
+        if (args.Length < 1)
         usage();
       target = args[0].ToUpper();
 
@@ -48,30 +48,32 @@ namespace ConsoleApplication1
       }
 
       if (target == "ANY") {
-        spectralSensor = YSpectralSensor.FirstSpectralSensor();
-        if (spectralSensor == null) {
+        colorSensor = YColorSensor.FirstColorSensor();
+        if (colorSensor == null) {
           Console.WriteLine("No module connected (check USB cable) ");
           Environment.Exit(0);
         }
-        target = spectralSensor.get_module().get_serialNumber();
+        target = colorSensor.get_module().get_serialNumber();
       }
 
-      spectralSensor = YSpectralSensor.FindSpectralSensor(target + ".spectralSensor");
-      if (spectralSensor.isOnline()) {
-        spectralSensor.set_gain(6);
-        spectralSensor.set_integrationTime(150);
-        spectralSensor.set_ledCurrent(6);
-        Console.WriteLine("Near color: " + spectralSensor.get_nearSimpleColor());
-        Console.WriteLine("Color HEX : #" + spectralSensor.get_estimatedRGB().ToString("x6"));
+      colorSensor = YColorSensor.FindColorSensor(target + ".colorSensor");
+      if (colorSensor.isOnline()) {
+        colorSensor.set_workingMode(0); // Working Mode Auto
+        colorSensor.set_estimationModel(0); // Estimation model Reflexion
+        while (colorSensor.isOnline()) 
+        {
+            Console.WriteLine("Near color: " + colorSensor.get_nearSimpleColor());
+            Console.WriteLine("RGB HEX : #" + colorSensor.get_estimatedRGB().ToString("x6"));
+            Console.WriteLine("---------------------------");
+            // wait 5 sec to show the output
+            YAPI.Sleep(5000, ref errmsg);
+        }
+        
       } else {
         Console.WriteLine("Module not connected");
         Console.WriteLine("check identification and USB cable");
       }
       YAPI.FreeAPI();
-
-      // wait 5 sec to show the output
-      ulong now = YAPI.GetTickCount();
-      while (YAPI.GetTickCount() - now < 5000);
     }
   }
 }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 64241 2025-01-16 10:53:41Z seb $
+ * $Id: yocto_api.cs 65643 2025-04-08 09:37:02Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -4560,10 +4560,10 @@ public class YAPI
     public const int RESEND_MISSING_PKT = 4;
     public const int DETECT_ALL = DETECT_USB | DETECT_NET;
 
-    public const string YOCTO_API_VERSION_STR = "2.0";
-    public const int YOCTO_API_VERSION_BCD = 0x0200;
+    public const string YOCTO_API_VERSION_STR = "2.1";
+    public const int YOCTO_API_VERSION_BCD = 0x0201;
 
-    public const string YOCTO_API_BUILD_NO = "64286";
+    public const string YOCTO_API_BUILD_NO = "65654";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6849,7 +6849,7 @@ public class YAPI
             }
             throw;
         }
-        return YOCTO_API_VERSION_STR + "." + YOCTO_API_BUILD_NO + " (" + version + ")";
+        return  "2.1.654 (" + version + ")";
     }
 
     /**
@@ -13709,7 +13709,7 @@ public class YModule : YFunction
         }
         ext_settings = ext_settings + "],\n\"files\":[";
         if (this.hasFunction("files")) {
-            json = this._download("files.json?a=dir&f=");
+            json = this._download("files.json?a=dir&d=1&f=");
             if ((json).Length == 0) {
                 return json;
             }
@@ -13718,8 +13718,12 @@ public class YModule : YFunction
             for (int ii_1 = 0; ii_1 <  filelist.Count; ii_1++) {
                 name = this._json_get_key(filelist[ii_1], "name");
                 if (((name).Length > 0) && !(name == "startupConf.json")) {
-                    file_data_bin = this._download(this._escapeAttr(name));
-                    file_data = YAPI._bytesToHexStr(file_data_bin, 0, file_data_bin.Length);
+                    if ((name).Substring((name).Length-1, 1) == "/") {
+                        file_data = "";
+                    } else {
+                        file_data_bin = this._download(this._escapeAttr(name));
+                        file_data = YAPI._bytesToHexStr(file_data_bin, 0, file_data_bin.Length);
+                    }
                     item = ""+sep+"{\"name\":\""+name+"\", \"data\":\""+file_data+"\"}\n";
                     ext_settings = ext_settings + item;
                     sep = ",";
