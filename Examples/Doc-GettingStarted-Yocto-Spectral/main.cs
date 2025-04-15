@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: main.cs 65338 2025-03-26 09:50:53Z tiago $
+ *  $Id: main.cs 65680 2025-04-09 07:07:57Z tiago $
  *
  *  An example that shows how to use a Yocto-Spectral
  *
@@ -58,8 +58,8 @@ namespace ConsoleApplication1
 
       colorSensor = YColorSensor.FindColorSensor(target + ".colorSensor");
       if (colorSensor.isOnline()) {
-        colorSensor.set_workingMode(0); // Working Mode Auto
-        colorSensor.set_estimationModel(0); // Estimation model Reflexion
+        colorSensor.set_workingMode(YColorSensor.WORKINGMODE_AUTO); // Working Mode Auto
+        colorSensor.set_estimationModel(YColorSensor.ESTIMATIONMODEL_REFLECTION); // Estimation model Reflexion
         while (colorSensor.isOnline()) 
         {
             Console.WriteLine("Near color: " + colorSensor.get_nearSimpleColor());

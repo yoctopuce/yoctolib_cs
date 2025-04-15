@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 65643 2025-04-08 09:37:02Z seb $
+ * $Id: yocto_api.cs 65865 2025-04-15 06:42:38Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -4561,9 +4561,9 @@ public class YAPI
     public const int DETECT_ALL = DETECT_USB | DETECT_NET;
 
     public const string YOCTO_API_VERSION_STR = "2.1";
-    public const int YOCTO_API_VERSION_BCD = 0x0201;
+    public const int YOCTO_API_VERSION_BCD = 0x0200;
 
-    public const string YOCTO_API_BUILD_NO = "65654";
+    public const string YOCTO_API_BUILD_NO = "65866";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6849,7 +6849,7 @@ public class YAPI
             }
             throw;
         }
-        return  "2.1.654 (" + version + ")";
+        return  "2.1.5866 (" + version + ")";
     }
 
     /**
@@ -6912,8 +6912,8 @@ public class YAPI
             return VERSION_MISMATCH;
         }
 
-        if (api_ver != YOCTO_API_VERSION_BCD) {
-            errmsg = "yapi.dll does does not match the version of the Library (Library=" + YOCTO_API_VERSION_STR + "." + YOCTO_API_BUILD_NO;
+        if (api_ver < YOCTO_API_VERSION_BCD) {
+            errmsg = "yapi.dll does not match the version of the Library (Library=" + YOCTO_API_VERSION_STR + "." + YOCTO_API_BUILD_NO;
             errmsg += " yapi.dll=" + version + ")";
             return VERSION_MISMATCH;
         }
