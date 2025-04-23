@@ -63,7 +63,7 @@ using YFUN_DESCR = System.Int32;
  * <summary>
  *   The <c>YVoltage</c> class allows you to read and configure Yoctopuce voltage sensors.
  * <para>
- *   It inherits from <c>YSensor</c> class the core functions to read measurements,
+ *   It inherits from <c>YSensor</c> class the core functions to read measures,
  *   to register callback functions, and to access the autonomous datalogger.
  * </para>
  * <para>
@@ -139,8 +139,8 @@ public class YVoltage : YSensor
      * <summary>
      *   Changes the activation state of this voltage input.
      * <para>
-     *   When AC measurements are disabled,
-     *   the device will always assume a DC signal, and vice-versa. When both AC and DC measurements
+     *   When AC measures are disabled,
+     *   the device will always assume a DC signal, and vice-versa. When both AC and DC measures
      *   are active, the device switches between AC and DC mode based on the relative amplitude
      *   of variations compared to the average value.
      *   Remember to call the <c>saveToFlash()</c>

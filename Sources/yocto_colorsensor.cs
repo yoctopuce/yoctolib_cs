@@ -243,7 +243,7 @@ public class YColorSensor : YFunction
 
     /**
      * <summary>
-     *   Changes the mpredictive model to be used for color estimation (reflective or emissive).
+     *   Changes the predictive model to be used for color estimation (reflective or emissive).
      * <para>
      *   Remember to call the <c>saveToFlash()</c> method of the module if the modification must be kept.
      * </para>
@@ -252,7 +252,7 @@ public class YColorSensor : YFunction
      * </summary>
      * <param name="newval">
      *   either <c>YColorSensor.ESTIMATIONMODEL_REFLECTION</c> or <c>YColorSensor.ESTIMATIONMODEL_EMISSION</c>,
-     *   according to the mpredictive model to be used for color estimation (reflective or emissive)
+     *   according to the predictive model to be used for color estimation (reflective or emissive)
      * </param>
      * <para>
      * </para>
@@ -341,7 +341,7 @@ public class YColorSensor : YFunction
 
     /**
      * <summary>
-     *   Returns the amount of current sent to the illumination LEDs, for reflection measurements.
+     *   Returns the amount of current sent to the illumination LEDs, for reflection measures.
      * <para>
      *   The value is an integer ranging from 0 (LEDs off) to 254 (LEDs at maximum intensity).
      * </para>
@@ -349,7 +349,7 @@ public class YColorSensor : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the amount of current sent to the illumination LEDs, for reflection measurements
+     *   an integer corresponding to the amount of current sent to the illumination LEDs, for reflection measures
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YColorSensor.LEDCURRENT_INVALID</c>.
@@ -371,7 +371,7 @@ public class YColorSensor : YFunction
 
     /**
      * <summary>
-     *   Changes the amount of current sent to the illumination LEDs, for reflection measurements.
+     *   Changes the amount of current sent to the illumination LEDs, for reflection measures.
      * <para>
      *   The value is an integer ranging from 0 (LEDs off) to 254 (LEDs at maximum intensity).
      * </para>
@@ -379,7 +379,7 @@ public class YColorSensor : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to the amount of current sent to the illumination LEDs, for reflection measurements
+     *   an integer corresponding to the amount of current sent to the illumination LEDs, for reflection measures
      * </param>
      * <para>
      * </para>
@@ -402,14 +402,14 @@ public class YColorSensor : YFunction
 
     /**
      * <summary>
-     *   Returns the current sent to the illumination LEDs during the last calibration.
+     *   Returns the current sent to the illumination LEDs during the latest calibration.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the current sent to the illumination LEDs during the last calibration
+     *   an integer corresponding to the current sent to the illumination LEDs during the latest calibration
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YColorSensor.LEDCALIBRATION_INVALID</c>.
@@ -433,7 +433,7 @@ public class YColorSensor : YFunction
      * <summary>
      *   Remember the LED current sent to the illumination LEDs during a calibration.
      * <para>
-     *   Thanks to this, the device will be able to use the same current during measurements.
+     *   Thanks to this, the device is able to use the same current when taking measures.
      *   Remember to call the <c>saveToFlash()</c> method of the module if the modification must be kept.
      * </para>
      * <para>
@@ -463,16 +463,16 @@ public class YColorSensor : YFunction
 
     /**
      * <summary>
-     *   Returns the current integration time for spectral measurement, in milliseconds.
+     *   Returns the current integration time for spectral measure, in milliseconds.
      * <para>
      *   A longer integration time increase the sensitivity for low light conditions,
-     *   but reduces the measurement rate and may lead to saturation for lighter colors.
+     *   but reduces the measure taking rate and may lead to saturation for lighter colors.
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the current integration time for spectral measurement, in milliseconds
+     *   an integer corresponding to the current integration time for spectral measure, in milliseconds
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YColorSensor.INTEGRATIONTIME_INVALID</c>.
@@ -494,19 +494,19 @@ public class YColorSensor : YFunction
 
     /**
      * <summary>
-     *   Changes the integration time for spectral measurement, in milliseconds.
+     *   Changes the integration time for spectral measure, in milliseconds.
      * <para>
      *   A longer integration time increase the sensitivity for low light conditions,
-     *   but reduces the measurement rate and may lead to saturation for lighter colors.
+     *   but reduces the measure taking rate and may lead to saturation for lighter colors.
      *   This method can only be used when the sensor is configured in expert mode;
-     *   when running in auto mode, the change will be ignored.
+     *   when running in auto mode, the change is ignored.
      *   Remember to call the <c>saveToFlash()</c> method of the module if the modification must be kept.
      * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to the integration time for spectral measurement, in milliseconds
+     *   an integer corresponding to the integration time for spectral measure, in milliseconds
      * </param>
      * <para>
      * </para>
@@ -565,7 +565,7 @@ public class YColorSensor : YFunction
      *   For a value <c>n</c> ranging from 0 to 12, the applied gain is 2^(n-1).
      *   0 corresponds to a gain of 0.5, and 12 corresponds to a gain of 2048.
      *   This method can only be used when the sensor is configured in expert mode;
-     *   when running in auto mode, the change will be ignored.
+     *   when running in auto mode, the change is ignored.
      *   Remember to call the <c>saveToFlash()</c> method of the module if the modification must be kept.
      * </para>
      * <para>
@@ -634,13 +634,13 @@ public class YColorSensor : YFunction
      *   The RGB color model describes each color using a combination of 3 components:
      * </para>
      * <para>
-     *   - Red (R): the intensity of red, in thee range 0...255
+     *   - Red (R): the intensity of red, in the 0...255 range
      * </para>
      * <para>
-     *   - Green (G): the intensity of green, in thee range 0...255
+     *   - Green (G): the intensity of green, in the 0...255 range
      * </para>
      * <para>
-     *   - Blue (B): the intensity of blue, in thee range 0...255
+     *   - Blue (B): the intensity of blue, in the 0...255 range
      * </para>
      * <para>
      * </para>
@@ -753,15 +753,14 @@ public class YColorSensor : YFunction
      *   Returns the estimated color according to the OkLab color model.
      * <para>
      *   OkLab is a perceptual color model that aims to align human color perception with numerical
-     *   values, so that visually near colors are also numerically near. Colors are represented using three components:
+     *   values, so that colors that are visually near are also numerically near. Colors are represented
+     *   using three components:
      * </para>
      * <para>
      *   - L: lightness, a real number between 0 and 1
-     *   -
      * </para>
      * <para>
      *   - a: color variations between green and red, between -0.5 and 0.5
-     *   -
      * </para>
      * <para>
      *   - b: color variations between blue and yellow, between -0.5 and 0.5.
@@ -1126,7 +1125,7 @@ public class YColorSensor : YFunction
 
     /**
      * <summary>
-     *   Turns on the built-in illumination LEDs using the same current as used during last calibration.
+     *   Turns on the built-in illumination LEDs using the same current as used during the latest calibration.
      * <para>
      *   On failure, throws an exception or returns a negative error code.
      * </para>

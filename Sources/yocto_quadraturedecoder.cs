@@ -63,7 +63,7 @@ using YFUN_DESCR = System.Int32;
  * <summary>
  *   The <c>YQuadratureDecoder</c> class allows you to read and configure Yoctopuce quadrature decoders.
  * <para>
- *   It inherits from <c>YSensor</c> class the core functions to read measurements,
+ *   It inherits from <c>YSensor</c> class the core functions to read measures,
  *   to register callback functions, and to access the autonomous datalogger.
  * </para>
  * <para>

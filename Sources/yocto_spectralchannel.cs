@@ -63,7 +63,7 @@ using YFUN_DESCR = System.Int32;
  * <summary>
  *   The <c>YSpectralChannel</c> class allows you to read and configure Yoctopuce spectral analysis channels.
  * <para>
- *   It inherits from <c>YSensor</c> class the core functions to read measurements,
+ *   It inherits from <c>YSensor</c> class the core functions to read measures,
  *   to register callback functions, and to access the autonomous datalogger.
  * </para>
  * <para>
@@ -78,7 +78,11 @@ public class YSpectralChannel : YSensor
     public new delegate void TimedReportCallback(YSpectralChannel func, YMeasure measure);
 
     public const int RAWCOUNT_INVALID = YAPI.INVALID_INT;
+    public const string CHANNELNAME_INVALID = YAPI.INVALID_STRING;
+    public const int PEAKWAVELENGTH_INVALID = YAPI.INVALID_INT;
     protected int _rawCount = RAWCOUNT_INVALID;
+    protected string _channelName = CHANNELNAME_INVALID;
+    protected int _peakWavelength = PEAKWAVELENGTH_INVALID;
     protected ValueCallback _valueCallbackSpectralChannel = null;
     protected TimedReportCallback _timedReportCallbackSpectralChannel = null;
     //--- (end of YSpectralChannel definitions)
@@ -99,13 +103,21 @@ public class YSpectralChannel : YSensor
         {
             _rawCount = json_val.getInt("rawCount");
         }
+        if (json_val.has("channelName"))
+        {
+            _channelName = json_val.getString("channelName");
+        }
+        if (json_val.has("peakWavelength"))
+        {
+            _peakWavelength = json_val.getInt("peakWavelength");
+        }
         base._parseAttr(json_val);
     }
 
 
     /**
      * <summary>
-     *   Retrieves the raw cspectral intensity value as measured by the sensor, without any scaling or calibration.
+     *   Retrieves the raw spectral intensity value as measured by the sensor, without any scaling or calibration.
      * <para>
      * </para>
      * <para>
@@ -128,6 +140,66 @@ public class YSpectralChannel : YSensor
                 }
             }
             res = this._rawCount;
+        }
+        return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the target spectral band name.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to the target spectral band name
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSpectralChannel.CHANNELNAME_INVALID</c>.
+     * </para>
+     */
+    public string get_channelName()
+    {
+        string res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return CHANNELNAME_INVALID;
+                }
+            }
+            res = this._channelName;
+        }
+        return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the target spectral band peak wavelenght, in nm.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the target spectral band peak wavelenght, in nm
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSpectralChannel.PEAKWAVELENGTH_INVALID</c>.
+     * </para>
+     */
+    public int get_peakWavelength()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return PEAKWAVELENGTH_INVALID;
+                }
+            }
+            res = this._peakWavelength;
         }
         return res;
     }

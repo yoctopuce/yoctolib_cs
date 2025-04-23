@@ -63,7 +63,7 @@ using YFUN_DESCR = System.Int32;
  * <summary>
  *   The <c>YProximity</c> class allows you to read and configure Yoctopuce proximity sensors.
  * <para>
- *   It inherits from <c>YSensor</c> class the core functions to read measurements,
+ *   It inherits from <c>YSensor</c> class the core functions to read measures,
  *   to register callback functions, and to access the autonomous datalogger.
  *   This class adds the ability to set up a detection threshold and to count the
  *   number of detected state changes.

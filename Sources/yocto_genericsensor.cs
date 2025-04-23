@@ -64,7 +64,7 @@ using YFUN_DESCR = System.Int32;
  *   The <c>YGenericSensor</c> class allows you to read and configure Yoctopuce signal
  *   transducers.
  * <para>
- *   It inherits from <c>YSensor</c> class the core functions to read measurements,
+ *   It inherits from <c>YSensor</c> class the core functions to read measures,
  *   to register callback functions, to access the autonomous datalogger.
  *   This class adds the ability to configure the automatic conversion between the
  *   measured signal and the corresponding engineering unit.
