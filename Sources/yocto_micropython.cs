@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: svn_id $
+ *  $Id: yocto_micropython.cs 67995 2025-07-24 17:06:13Z mvuilleu $
  *
  *  Implements yFindMicroPython(), the high-level API for MicroPython functions
  *
@@ -48,17 +48,17 @@ using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
 #pragma warning disable 1591
-//--- (YMicroPython return codes)
-//--- (end of YMicroPython return codes)
-//--- (YMicroPython dlldef_core)
-//--- (end of YMicroPython dlldef_core)
-//--- (YMicroPython dll_core_map)
-//--- (end of YMicroPython dll_core_map)
-//--- (YMicroPython dlldef)
-//--- (end of YMicroPython dlldef)
-//--- (YMicroPython yapiwrapper)
-//--- (end of YMicroPython yapiwrapper)
-//--- (YMicroPython class start)
+//--- (generated code: YMicroPython return codes)
+//--- (end of generated code: YMicroPython return codes)
+//--- (generated code: YMicroPython dlldef_core)
+//--- (end of generated code: YMicroPython dlldef_core)
+//--- (generated code: YMicroPython dll_core_map)
+//--- (end of generated code: YMicroPython dll_core_map)
+//--- (generated code: YMicroPython dlldef)
+//--- (end of generated code: YMicroPython dlldef)
+//--- (generated code: YMicroPython yapiwrapper)
+//--- (end of generated code: YMicroPython yapiwrapper)
+//--- (generated code: YMicroPython class start)
 /**
  * <summary>
  *   The <c>YMicroPython</c> class provides control of the MicroPython interpreter
@@ -71,8 +71,8 @@ using YFUN_DESCR = System.Int32;
  */
 public class YMicroPython : YFunction
 {
-//--- (end of YMicroPython class start)
-    //--- (YMicroPython definitions)
+//--- (end of generated code: YMicroPython class start)
+    //--- (generated code: YMicroPython definitions)
     public new delegate void ValueCallback(YMicroPython func, string value);
     public new delegate void TimedReportCallback(YMicroPython func, YMeasure measure);
     public delegate void YMicroPythonLogCallback(YMicroPython obj, string logline);
@@ -85,18 +85,24 @@ public class YMicroPython : YFunction
 
     public const string LASTMSG_INVALID = YAPI.INVALID_STRING;
     public const int HEAPUSAGE_INVALID = YAPI.INVALID_UINT;
+    public const int HEAPFRAG_INVALID = YAPI.INVALID_UINT;
     public const int XHEAPUSAGE_INVALID = YAPI.INVALID_UINT;
+    public const int STACKUSAGE_INVALID = YAPI.INVALID_UINT;
     public const string CURRENTSCRIPT_INVALID = YAPI.INVALID_STRING;
     public const string STARTUPSCRIPT_INVALID = YAPI.INVALID_STRING;
+    public const double STARTUPDELAY_INVALID = YAPI.INVALID_DOUBLE;
     public const int DEBUGMODE_OFF = 0;
     public const int DEBUGMODE_ON = 1;
     public const int DEBUGMODE_INVALID = -1;
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected string _lastMsg = LASTMSG_INVALID;
     protected int _heapUsage = HEAPUSAGE_INVALID;
+    protected int _heapFrag = HEAPFRAG_INVALID;
     protected int _xheapUsage = XHEAPUSAGE_INVALID;
+    protected int _stackUsage = STACKUSAGE_INVALID;
     protected string _currentScript = CURRENTSCRIPT_INVALID;
     protected string _startupScript = STARTUPSCRIPT_INVALID;
+    protected double _startupDelay = STARTUPDELAY_INVALID;
     protected int _debugMode = DEBUGMODE_INVALID;
     protected string _command = COMMAND_INVALID;
     protected ValueCallback _valueCallbackMicroPython = null;
@@ -105,17 +111,17 @@ public class YMicroPython : YFunction
     protected int _prevCbPos = 0;
     protected int _logPos = 0;
     protected string _prevPartialLog;
-    //--- (end of YMicroPython definitions)
+    //--- (end of generated code: YMicroPython definitions)
 
     public YMicroPython(string func)
         : base(func)
     {
         _className = "MicroPython";
-        //--- (YMicroPython attributes initialization)
-        //--- (end of YMicroPython attributes initialization)
+        //--- (generated code: YMicroPython attributes initialization)
+        //--- (end of generated code: YMicroPython attributes initialization)
     }
 
-    //--- (YMicroPython implementation)
+    //--- (generated code: YMicroPython implementation)
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
@@ -127,9 +133,17 @@ public class YMicroPython : YFunction
         {
             _heapUsage = json_val.getInt("heapUsage");
         }
+        if (json_val.has("heapFrag"))
+        {
+            _heapFrag = json_val.getInt("heapFrag");
+        }
         if (json_val.has("xheapUsage"))
         {
             _xheapUsage = json_val.getInt("xheapUsage");
+        }
+        if (json_val.has("stackUsage"))
+        {
+            _stackUsage = json_val.getInt("stackUsage");
         }
         if (json_val.has("currentScript"))
         {
@@ -138,6 +152,10 @@ public class YMicroPython : YFunction
         if (json_val.has("startupScript"))
         {
             _startupScript = json_val.getString("startupScript");
+        }
+        if (json_val.has("startupDelay"))
+        {
+            _startupDelay = Math.Round(json_val.getDouble("startupDelay") / 65.536) / 1000.0;
         }
         if (json_val.has("debugMode"))
         {
@@ -183,7 +201,7 @@ public class YMicroPython : YFunction
 
     /**
      * <summary>
-     *   Returns the percentage of micropython main memory in use,
+     *   Returns the percentage of MicroPython main memory in use,
      *   as observed at the end of the last garbage collection.
      * <para>
      * </para>
@@ -191,7 +209,7 @@ public class YMicroPython : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the percentage of micropython main memory in use,
+     *   an integer corresponding to the percentage of MicroPython main memory in use,
      *   as observed at the end of the last garbage collection
      * </returns>
      * <para>
@@ -215,7 +233,7 @@ public class YMicroPython : YFunction
 
     /**
      * <summary>
-     *   Returns the percentage of micropython external memory in use,
+     *   Returns the fragmentation ratio of MicroPython main memory,
      *   as observed at the end of the last garbage collection.
      * <para>
      * </para>
@@ -223,7 +241,39 @@ public class YMicroPython : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the percentage of micropython external memory in use,
+     *   an integer corresponding to the fragmentation ratio of MicroPython main memory,
+     *   as observed at the end of the last garbage collection
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YMicroPython.HEAPFRAG_INVALID</c>.
+     * </para>
+     */
+    public int get_heapFrag()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return HEAPFRAG_INVALID;
+                }
+            }
+            res = this._heapFrag;
+        }
+        return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the percentage of MicroPython external memory in use,
+     *   as observed at the end of the last garbage collection.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the percentage of MicroPython external memory in use,
      *   as observed at the end of the last garbage collection
      * </returns>
      * <para>
@@ -240,6 +290,38 @@ public class YMicroPython : YFunction
                 }
             }
             res = this._xheapUsage;
+        }
+        return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the maximum percentage of MicroPython call stack in use,
+     *   as observed at the end of the last garbage collection.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the maximum percentage of MicroPython call stack in use,
+     *   as observed at the end of the last garbage collection
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YMicroPython.STACKUSAGE_INVALID</c>.
+     * </para>
+     */
+    public int get_stackUsage()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return STACKUSAGE_INVALID;
+                }
+            }
+            res = this._stackUsage;
         }
         return res;
     }
@@ -368,10 +450,76 @@ public class YMicroPython : YFunction
         }
     }
 
+    /**
+     * <summary>
+     *   Changes the wait time before running the startup script on power on, between 0.
+     * <para>
+     *   1
+     *   second and 25 seconds. Remember to call the <c>saveToFlash()</c> method of the
+     *   module if the modification must be kept.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a floating point number corresponding to the wait time before running the startup script on power
+     *   on, between 0.1
+     *   second and 25 seconds
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_startupDelay(double newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("startupDelay", rest_val);
+        }
+    }
+
 
     /**
      * <summary>
-     *   Returns the activation state of micropython debugging interface.
+     *   Returns the wait time before running the startup script on power on,
+     *   between 0.1 second and 25 seconds.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a floating point number corresponding to the wait time before running the startup script on power on,
+     *   between 0.1 second and 25 seconds
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YMicroPython.STARTUPDELAY_INVALID</c>.
+     * </para>
+     */
+    public double get_startupDelay()
+    {
+        double res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return STARTUPDELAY_INVALID;
+                }
+            }
+            res = this._startupDelay;
+        }
+        return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the activation state of MicroPython debugging interface.
      * <para>
      * </para>
      * <para>
@@ -379,7 +527,7 @@ public class YMicroPython : YFunction
      * </summary>
      * <returns>
      *   either <c>YMicroPython.DEBUGMODE_OFF</c> or <c>YMicroPython.DEBUGMODE_ON</c>, according to the
-     *   activation state of micropython debugging interface
+     *   activation state of MicroPython debugging interface
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YMicroPython.DEBUGMODE_INVALID</c>.
@@ -401,7 +549,7 @@ public class YMicroPython : YFunction
 
     /**
      * <summary>
-     *   Changes the activation state of micropython debugging interface.
+     *   Changes the activation state of MicroPython debugging interface.
      * <para>
      * </para>
      * <para>
@@ -409,7 +557,7 @@ public class YMicroPython : YFunction
      * </summary>
      * <param name="newval">
      *   either <c>YMicroPython.DEBUGMODE_OFF</c> or <c>YMicroPython.DEBUGMODE_ON</c>, according to the
-     *   activation state of micropython debugging interface
+     *   activation state of MicroPython debugging interface
      * </param>
      * <para>
      * </para>
@@ -646,6 +794,28 @@ public class YMicroPython : YFunction
 
     /**
      * <summary>
+     *   Clears MicroPython interpreter console log buffer.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int clearLogs()
+    {
+        int res;
+
+        res = this.set_command("z");
+        return res;
+    }
+
+
+    /**
+     * <summary>
      *   Returns a string with last logs of the MicroPython interpreter.
      * <para>
      *   This method return only logs that are still in the module.
@@ -823,9 +993,9 @@ public class YMicroPython : YFunction
         return FindMicroPython(hwid);
     }
 
-    //--- (end of YMicroPython implementation)
+    //--- (end of generated code: YMicroPython implementation)
 
-    //--- (YMicroPython functions)
+    //--- (generated code: YMicroPython functions)
 
     /**
      * <summary>
@@ -869,7 +1039,7 @@ public class YMicroPython : YFunction
         return FindMicroPython(serial + "." + funcId);
     }
 
-    //--- (end of YMicroPython functions)
+    //--- (end of generated code: YMicroPython functions)
 }
 #pragma warning restore 1591
 

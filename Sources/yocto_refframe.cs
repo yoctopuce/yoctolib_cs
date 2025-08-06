@@ -748,7 +748,7 @@ public class YRefFrame : YFunction
         this._calibStageProgress = 0;
         this._calibProgress = 1;
         this._calibInternalPos = 0;
-        this._calibPrevTick = (int) ((YAPI.GetTickCount()) & 0x7FFFFFFF);
+        this._calibPrevTick = unchecked((int) (YAPI.GetTickCount() & 0x7FFFFFFF));
         this._calibOrient.Clear();
         this._calibDataAccX.Clear();
         this._calibDataAccY.Clear();
@@ -805,7 +805,7 @@ public class YRefFrame : YFunction
             return YAPI.SUCCESS;
         }
         // make sure we leave at least 160 ms between samples
-        currTick =  (int) ((YAPI.GetTickCount()) & 0x7FFFFFFF);
+        currTick =  unchecked((int) (YAPI.GetTickCount() & 0x7FFFFFFF));
         if (((currTick - this._calibPrevTick) & 0x7FFFFFFF) < 160) {
             return YAPI.SUCCESS;
         }
@@ -905,7 +905,7 @@ public class YRefFrame : YFunction
         intpos = (this._calibStage - 1) * this._calibCount;
         this._calibSort(intpos, intpos + this._calibCount);
         intpos = intpos + (this._calibCount / 2);
-        this._calibLogMsg = "Stage "+Convert.ToString(this._calibStage)+": median is "+Convert.ToString((int) Math.Round(1000*this._calibDataAccX[intpos]))+","+Convert.ToString((int) Math.Round(1000*this._calibDataAccY[intpos]))+","+Convert.ToString((int) Math.Round(1000*this._calibDataAccZ[intpos]));
+        this._calibLogMsg = "Stage "+Convert.ToString(this._calibStage)+": median is "+Convert.ToString(unchecked((int) Math.Round(1000*this._calibDataAccX[intpos])))+","+Convert.ToString(unchecked((int) Math.Round(1000*this._calibDataAccY[intpos])))+","+Convert.ToString(unchecked((int) Math.Round(1000*this._calibDataAccZ[intpos])));
         // move to next stage
         this._calibStage = this._calibStage + 1;
         if (this._calibStage < 7) {
@@ -1000,7 +1000,7 @@ public class YRefFrame : YFunction
         }
         // make sure we don't start before previous calibration is cleared
         if (this._calibStage == 1) {
-            currTick = (int) ((YAPI.GetTickCount()) & 0x7FFFFFFF);
+            currTick = unchecked((int) (YAPI.GetTickCount() & 0x7FFFFFFF));
             currTick = ((currTick - this._calibPrevTick) & 0x7FFFFFFF);
             if (currTick < 1600) {
                 this._calibStageHint = "Set down the device on a steady horizontal surface";
@@ -1167,21 +1167,21 @@ public class YRefFrame : YFunction
             return YAPI.INVALID_ARGUMENT;
         }
         // Compute integer values (correction unit is 732ug/count)
-        shiftX = -(int) Math.Round(this._calibAccXOfs / 0.000732);
+        shiftX = -unchecked((int) Math.Round(this._calibAccXOfs / 0.000732));
         if (shiftX < 0) {
             shiftX = shiftX + 65536;
         }
-        shiftY = -(int) Math.Round(this._calibAccYOfs / 0.000732);
+        shiftY = -unchecked((int) Math.Round(this._calibAccYOfs / 0.000732));
         if (shiftY < 0) {
             shiftY = shiftY + 65536;
         }
-        shiftZ = -(int) Math.Round(this._calibAccZOfs / 0.000732);
+        shiftZ = -unchecked((int) Math.Round(this._calibAccZOfs / 0.000732));
         if (shiftZ < 0) {
             shiftZ = shiftZ + 65536;
         }
-        scaleX = (int) Math.Round(2048.0 / this._calibAccXScale) - 2048;
-        scaleY = (int) Math.Round(2048.0 / this._calibAccYScale) - 2048;
-        scaleZ = (int) Math.Round(2048.0 / this._calibAccZScale) - 2048;
+        scaleX = unchecked((int) Math.Round(2048.0 / this._calibAccXScale)) - 2048;
+        scaleY = unchecked((int) Math.Round(2048.0 / this._calibAccYScale)) - 2048;
+        scaleZ = unchecked((int) Math.Round(2048.0 / this._calibAccZScale)) - 2048;
         if (scaleX < -2048 || scaleX >= 2048 || scaleY < -2048 || scaleY >= 2048 || scaleZ < -2048 || scaleZ >= 2048) {
             scaleExp = 3;
         } else {

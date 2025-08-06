@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- *  $Id: main.cs 65680 2025-04-09 07:07:57Z tiago $
+ *  $Id: main.cs 66424 2025-05-09 08:08:29Z seb $
  *
- *  An example that shows how to use a Yocto-Spectral
+ *  An example that shows how to use a  Yocto-Spectral
  *
  *  You can find more information on our web site:
  *   Yocto-Spectral documentation:

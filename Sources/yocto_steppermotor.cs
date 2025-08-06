@@ -1078,7 +1078,7 @@ public class YStepperMotor : YFunction
      */
     public virtual int findHomePosition(double speed)
     {
-        return this.sendCommand("H"+Convert.ToString((int) Math.Round(1000*speed)));
+        return this.sendCommand("H"+Convert.ToString(unchecked((int) Math.Round(1000*speed))));
     }
 
 
@@ -1101,7 +1101,7 @@ public class YStepperMotor : YFunction
      */
     public virtual int changeSpeed(double speed)
     {
-        return this.sendCommand("R"+Convert.ToString((int) Math.Round(1000*speed)));
+        return this.sendCommand("R"+Convert.ToString(unchecked((int) Math.Round(1000*speed))));
     }
 
 
@@ -1124,7 +1124,7 @@ public class YStepperMotor : YFunction
      */
     public virtual int moveTo(double absPos)
     {
-        return this.sendCommand("M"+Convert.ToString((int) Math.Round(16*absPos)));
+        return this.sendCommand("M"+Convert.ToString(unchecked((int) Math.Round(16*absPos))));
     }
 
 
@@ -1147,7 +1147,7 @@ public class YStepperMotor : YFunction
      */
     public virtual int moveRel(double relPos)
     {
-        return this.sendCommand("m"+Convert.ToString((int) Math.Round(16*relPos)));
+        return this.sendCommand("m"+Convert.ToString(unchecked((int) Math.Round(16*relPos))));
     }
 
 
@@ -1173,7 +1173,7 @@ public class YStepperMotor : YFunction
      */
     public virtual int moveRelSlow(double relPos, double maxSpeed)
     {
-        return this.sendCommand("m"+Convert.ToString((int) Math.Round(16*relPos))+"@"+Convert.ToString((int) Math.Round(1000*maxSpeed)));
+        return this.sendCommand("m"+Convert.ToString(unchecked((int) Math.Round(16*relPos)))+"@"+Convert.ToString(unchecked((int) Math.Round(1000*maxSpeed))));
     }
 
 

@@ -63,7 +63,7 @@ using YFUN_DESCR = System.Int32;
  * <summary>
  *   The <c>YPower</c> class allows you to read and configure Yoctopuce electrical power sensors.
  * <para>
- *   It inherits from <c>YSensor</c> class the core functions to read measures,
+ *   It inherits from <c>YSensor</c> class the core functions to read measurements,
  *   to register callback functions, and to access the autonomous datalogger.
  *   This class adds the ability to access the energy counter and the power factor.
  * </para>

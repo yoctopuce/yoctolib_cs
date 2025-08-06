@@ -409,10 +409,10 @@ public class YMultiAxisController : YFunction
         int i;
         int ndim;
         ndim = speed.Count;
-        cmd = "H"+Convert.ToString((int) Math.Round(1000*speed[0]));
+        cmd = "H"+Convert.ToString(unchecked((int) Math.Round(1000*speed[0])));
         i = 1;
         while (i < ndim) {
-            cmd = ""+cmd+","+Convert.ToString((int) Math.Round(1000*speed[i]));
+            cmd = ""+cmd+","+Convert.ToString(unchecked((int) Math.Round(1000*speed[i])));
             i = i + 1;
         }
         return this.sendCommand(cmd);
@@ -442,10 +442,10 @@ public class YMultiAxisController : YFunction
         int i;
         int ndim;
         ndim = absPos.Count;
-        cmd = "M"+Convert.ToString((int) Math.Round(16*absPos[0]));
+        cmd = "M"+Convert.ToString(unchecked((int) Math.Round(16*absPos[0])));
         i = 1;
         while (i < ndim) {
-            cmd = ""+cmd+","+Convert.ToString((int) Math.Round(16*absPos[i]));
+            cmd = ""+cmd+","+Convert.ToString(unchecked((int) Math.Round(16*absPos[i])));
             i = i + 1;
         }
         return this.sendCommand(cmd);
@@ -475,10 +475,10 @@ public class YMultiAxisController : YFunction
         int i;
         int ndim;
         ndim = relPos.Count;
-        cmd = "m"+Convert.ToString((int) Math.Round(16*relPos[0]));
+        cmd = "m"+Convert.ToString(unchecked((int) Math.Round(16*relPos[0])));
         i = 1;
         while (i < ndim) {
-            cmd = ""+cmd+","+Convert.ToString((int) Math.Round(16*relPos[i]));
+            cmd = ""+cmd+","+Convert.ToString(unchecked((int) Math.Round(16*relPos[i])));
             i = i + 1;
         }
         return this.sendCommand(cmd);

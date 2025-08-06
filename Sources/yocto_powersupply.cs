@@ -806,7 +806,7 @@ public class YPowerSupply : YFunction
         if (V_target < 0.0) {
             V_target  = 0.0;
         }
-        newval = ""+Convert.ToString((int) Math.Round(V_target*65536))+":"+Convert.ToString(ms_duration);
+        newval = ""+Convert.ToString(unchecked((int) Math.Round(V_target*65536)))+":"+Convert.ToString(ms_duration);
 
         return this.set_voltageTransition(newval);
     }

@@ -906,7 +906,7 @@ public class YMultiCellWeighScale : YSensor
      */
     public virtual int setupSpan(double currWeight, double maxWeight)
     {
-        return this.set_command("S"+Convert.ToString((int) Math.Round(1000*currWeight))+":"+Convert.ToString((int) Math.Round(1000*maxWeight)));
+        return this.set_command("S"+Convert.ToString(unchecked((int) Math.Round(1000*currWeight)))+":"+Convert.ToString(unchecked((int) Math.Round(1000*maxWeight))));
     }
 
     /**

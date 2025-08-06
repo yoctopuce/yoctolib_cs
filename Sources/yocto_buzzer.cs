@@ -698,7 +698,7 @@ public class YBuzzer : YFunction
                 } else {
                     prevDuration = num;
                 }
-                ms = (int) Math.Round(320000.0 / (tempo * num));
+                ms = unchecked((int) Math.Round(320000.0 / (tempo * num)));
                 if (typ == 0) {
                     this.addPulseToPlaySeq(0, ms);
                 } else {
@@ -710,7 +710,7 @@ public class YBuzzer : YFunction
                         dNote = dNote + 12;
                     }
                     pitch = prevPitch + dNote;
-                    freq = (int) Math.Round(440 * Math.Exp(pitch * 0.05776226504666));
+                    freq = unchecked((int) Math.Round(440 * Math.Exp(pitch * 0.05776226504666)));
                     ms16 = (ms >> 4);
                     rest = 0;
                     if (typ == 3) {

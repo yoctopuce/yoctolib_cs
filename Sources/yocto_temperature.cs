@@ -63,7 +63,7 @@ using YFUN_DESCR = System.Int32;
  * <summary>
  *   The <c>YTemperature</c> class allows you to read and configure Yoctopuce temperature sensors.
  * <para>
- *   It inherits from <c>YSensor</c> class the core functions to read measures,
+ *   It inherits from <c>YSensor</c> class the core functions to read measurements,
  *   to register callback functions, and to access the autonomous datalogger.
  *   This class adds the ability to configure some specific parameters
  *   for some sensors (connection type, temperature mapping table).
@@ -617,7 +617,7 @@ public class YTemperature : YSensor
                 idx = idx + 1;
             }
             if (found > 0) {
-                res = this.set_command("m"+Convert.ToString((int) Math.Round(1000*curr))+":"+Convert.ToString((int) Math.Round(1000*currTemp)));
+                res = this.set_command("m"+Convert.ToString(unchecked((int) Math.Round(1000*curr)))+":"+Convert.ToString(unchecked((int) Math.Round(1000*currTemp))));
                 if (!(res==YAPI.SUCCESS)) {
                     this._throw(YAPI.IO_ERROR, "unable to reset thermistor parameters");
                     return YAPI.IO_ERROR;

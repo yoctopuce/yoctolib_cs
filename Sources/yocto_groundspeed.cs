@@ -63,7 +63,7 @@ using YFUN_DESCR = System.Int32;
  * <summary>
  *   The <c>YGroundSpeed</c> class allows you to read and configure Yoctopuce ground speed sensors.
  * <para>
- *   It inherits from <c>YSensor</c> class the core functions to read measures,
+ *   It inherits from <c>YSensor</c> class the core functions to read measurements,
  *   to register callback functions, and to access the autonomous datalogger.
  * </para>
  * <para>

@@ -63,7 +63,7 @@ using YFUN_DESCR = System.Int32;
  * <summary>
  *   The <c>YCurrent</c> class allows you to read and configure Yoctopuce current sensors.
  * <para>
- *   It inherits from <c>YSensor</c> class the core functions to read measures,
+ *   It inherits from <c>YSensor</c> class the core functions to read measurements,
  *   to register callback functions, and to access the autonomous datalogger.
  * </para>
  * <para>
@@ -139,8 +139,8 @@ public class YCurrent : YSensor
      * <summary>
      *   Changes the activation state of this voltage input.
      * <para>
-     *   When AC measures are disabled,
-     *   the device will always assume a DC signal, and vice-versa. When both AC and DC measures
+     *   When AC measurements are disabled,
+     *   the device will always assume a DC signal, and vice-versa. When both AC and DC measurements
      *   are active, the device switches between AC and DC mode based on the relative amplitude
      *   of variations compared to the average value.
      *   Remember to call the <c>saveToFlash()</c>

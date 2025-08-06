@@ -63,7 +63,7 @@ using YFUN_DESCR = System.Int32;
  * <summary>
  *   The <c>YSpectralChannel</c> class allows you to read and configure Yoctopuce spectral analysis channels.
  * <para>
- *   It inherits from <c>YSensor</c> class the core functions to read measures,
+ *   It inherits from <c>YSensor</c> class the core functions to read measurements,
  *   to register callback functions, and to access the autonomous datalogger.
  * </para>
  * <para>
@@ -177,14 +177,14 @@ public class YSpectralChannel : YSensor
 
     /**
      * <summary>
-     *   Returns the target spectral band peak wavelenght, in nm.
+     *   Returns the target spectral band peak wavelength, in nm.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the target spectral band peak wavelenght, in nm
+     *   an integer corresponding to the target spectral band peak wavelength, in nm
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YSpectralChannel.PEAKWAVELENGTH_INVALID</c>.

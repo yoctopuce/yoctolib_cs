@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 65973 2025-04-22 09:50:13Z seb $
+ * $Id: yocto_api.cs 68027 2025-07-28 10:00:40Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -773,6 +773,13 @@ internal static class SafeNativeMethods
     {
                   return _yapiSetTrustedCertificatesListPtr(certificatePath, errmsg);
     }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate u32 yapiCRC32Delegate(IntPtr data, int ofs, int len);
+    private static yapiCRC32Delegate _yapiCRC32Ptr = null;
+    internal static u32 _yapiCRC32(IntPtr data, int ofs, int len)
+    {
+                  return _yapiCRC32Ptr(data, ofs, len);
+    }
 //--- (end of generated code: YFunction dlldef_core)
 
     internal static int mapYAPIFunctions()
@@ -917,6 +924,8 @@ internal static class SafeNativeMethods
        _yapiSetHubIntAttrPtr = Marshal.GetDelegateForFunctionPointer<yapiSetHubIntAttrDelegate>(functionPtr);
        functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiSetTrustedCertificatesList");
        _yapiSetTrustedCertificatesListPtr = Marshal.GetDelegateForFunctionPointer<yapiSetTrustedCertificatesListDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiCRC32");
+       _yapiCRC32Ptr = Marshal.GetDelegateForFunctionPointer<yapiCRC32Delegate>(functionPtr);
 //--- (end of generated code: YFunction dll_core_map)
         return 0;
     }
@@ -4525,6 +4534,51 @@ internal static class SafeNativeMethods
                   return _yapiSetTrustedCertificatesListLINAARCH64(certificatePath, errmsg);
         }
     }
+    [DllImport("yapi", EntryPoint = "yapiCRC32", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static u32 _yapiCRC32WIN32(IntPtr data, int ofs, int len);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiCRC32", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static u32 _yapiCRC32WIN64(IntPtr data, int ofs, int len);
+    [DllImport("libyapi32", EntryPoint = "yapiCRC32", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static u32 _yapiCRC32MACOS32(IntPtr data, int ofs, int len);
+    [DllImport("libyapi64", EntryPoint = "yapiCRC32", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static u32 _yapiCRC32MACOS64(IntPtr data, int ofs, int len);
+    [DllImport("libyapi-amd64", EntryPoint = "yapiCRC32", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static u32 _yapiCRC32LIN64(IntPtr data, int ofs, int len);
+    [DllImport("libyapi-i386", EntryPoint = "yapiCRC32", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static u32 _yapiCRC32LIN32(IntPtr data, int ofs, int len);
+    [DllImport("libyapi-armhf", EntryPoint = "yapiCRC32", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static u32 _yapiCRC32LINARMHF(IntPtr data, int ofs, int len);
+    [DllImport("libyapi-aarch64", EntryPoint = "yapiCRC32", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static u32 _yapiCRC32LINAARCH64(IntPtr data, int ofs, int len);
+    internal static u32 _yapiCRC32(IntPtr data, int ofs, int len)
+    {
+        if  (_dllVersion == YAPIDLL_VERSION.NOT_INIT) {
+            string version = "";
+            string date = "";
+            YAPI.apiGetAPIVersion(ref version, ref date);
+        }
+        switch (_dllVersion) {
+            case YAPIDLL_VERSION.NOT_INIT:
+                throw new YAPI_Exception(YAPI.NOT_INITIALIZED, "API not initialized");
+            default:
+            case YAPIDLL_VERSION.WIN32:
+                  return _yapiCRC32WIN32(data, ofs, len);
+            case YAPIDLL_VERSION.WIN64:
+                  return _yapiCRC32WIN64(data, ofs, len);
+            case YAPIDLL_VERSION.MACOS32:
+                  return _yapiCRC32MACOS32(data, ofs, len);
+            case YAPIDLL_VERSION.MACOS64:
+                  return _yapiCRC32MACOS64(data, ofs, len);
+            case YAPIDLL_VERSION.LIN64:
+                  return _yapiCRC32LIN64(data, ofs, len);
+            case YAPIDLL_VERSION.LIN32:
+                  return _yapiCRC32LIN32(data, ofs, len);
+            case YAPIDLL_VERSION.LINARMHF:
+                  return _yapiCRC32LINARMHF(data, ofs, len);
+            case YAPIDLL_VERSION.LINAARCH64:
+                  return _yapiCRC32LINAARCH64(data, ofs, len);
+        }
+    }
 //--- (end of generated code: YFunction dlldef)
 
 #endif
@@ -4563,7 +4617,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "2.1";
     public const int YOCTO_API_VERSION_BCD = 0x0200;
 
-    public const string YOCTO_API_BUILD_NO = "66320";
+    public const string YOCTO_API_BUILD_NO = "68173";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -4616,6 +4670,7 @@ public class YAPI
     public const int BUFFER_TOO_SMALL = -18;        // The buffer provided is too small
     public const int DNS_ERROR = -19;               // Error during name resolutions (invalid hostname or dns communication error)
     public const int SSL_UNK_CERT = -20;            // The certificate is not correctly signed by the trusted CA
+    public const int UNCONFIGURED = -21;            // Remote hub is not yet configured
 
     // TLS / SSL definitions
     public const int NO_TRUSTED_CA_CHECK = 1;       // Disables certificate checking
@@ -6849,7 +6904,7 @@ public class YAPI
             }
             throw;
         }
-        return  "2.1.6320 (" + version + ")";
+        return  "2.1.8173 (" + version + ")";
     }
 
     /**
@@ -7939,9 +7994,32 @@ public class YAPI
         }
         return _yapiContext.getYHubObj(hubref);
     }
-//--- (end of generated code: YAPIContext yapiwrapper)
-}
 
+    public static YHub findYHubFromID(string id)
+    {
+        if (!_apiInitialized) {
+            string errmsg = "";
+            InitAPI(0, ref errmsg);
+        }
+        return _yapiContext.findYHubFromID(id);
+    }
+//--- (end of generated code: YAPIContext yapiwrapper)
+
+    public static int _bincrc(byte[] content, int ofs, int len)
+    {
+        u32 res;
+        IntPtr data = Marshal.AllocHGlobal(len);
+        Marshal.Copy(content, ofs, data, len);
+        res = SafeNativeMethods._yapiCRC32(data, 0, len);
+        Marshal.FreeHGlobal(data);
+        if(res > 0x7FFFFFFF) {
+            return (int)(res - 0x100000000);
+        }
+        
+        return (int)res;
+    }
+
+}
 
 //--- (generated code: YAPIContext return codes)
 //--- (end of generated code: YAPIContext return codes)
@@ -8338,6 +8416,23 @@ public class YAPIContext
             }
         }
         return obj;
+    }
+
+
+    public virtual YHub findYHubFromID(string id)
+    {
+        YHub rhub;
+        rhub = this.nextHubInUseInternal(-1);
+        while (!(rhub == null)) {
+            if (rhub.get_serialNumber() == id) {
+                return rhub;
+            }
+            if (rhub.get_registeredUrl() == id) {
+                return rhub;
+            }
+            rhub = rhub.nextHubInUse();
+        }
+        return rhub;
     }
 
     //--- (end of generated code: YAPIContext implementation)
@@ -9054,7 +9149,7 @@ public class YDataStream
      */
     public virtual long get_startTimeUTC()
     {
-        return (int) Math.Round(this._startTime);
+        return unchecked((int) Math.Round(this._startTime));
     }
 
 
@@ -9098,7 +9193,7 @@ public class YDataStream
      */
     public virtual int get_dataSamplesIntervalMs()
     {
-        return (int) Math.Round(this._dataSamplesInterval*1000);
+        return unchecked((int) Math.Round(this._dataSamplesInterval*1000));
     }
 
 
@@ -10594,6 +10689,11 @@ public class YHub
 //--- (end of generated code: YHub class start)
     //--- (generated code: YHub definitions)
 
+    public const int TRYING = 1;
+    public const int CONNECTED = 2;
+    public const int RECONNECTING = 3;
+    public const int ABORTED = 4;
+    public const int UNREGISTERED = 5;
     protected YAPIContext _ctx;
     protected int _hubref = 0;
     protected object _userData = null;
@@ -10707,6 +10807,20 @@ public class YHub
     public virtual string get_connectionUrl()
     {
         return this._getStrAttr("connectionUrl");
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the state of the connection with this hub.
+     * <para>
+     *   (TRYING, CONNECTED, RECONNECTING, ABORTED, UNREGISTERED)
+     * </para>
+     * </summary>
+     */
+    public virtual int get_connectionState()
+    {
+        return this._getIntAttr("connectionState");
     }
 
 
@@ -10912,6 +11026,29 @@ public class YHub
     public static YHub FirstHubInUse()
     {
         return YAPI.nextHubInUseInternal(-1);
+    }
+
+
+    /**
+     * <summary>
+     *   Retrieves hub for a given identifier.
+     * <para>
+     *   The identifier can be the URL or the
+     *   serial of the hub.
+     * </para>
+     * </summary>
+     * <param name="url">
+     *   The url or serial of the hub.
+     * </param>
+     * <returns>
+     *   a pointer to a <c>YHub</c> object, corresponding to
+     *   the first hub currently in use by the API, or a
+     *   <c>null</c> pointer if none has been registered.
+     * </returns>
+     */
+    public static YHub FindHubInUse(string url)
+    {
+        return YAPI.findYHubFromID(url);
     }
 
 
@@ -13809,7 +13946,6 @@ public class YModule : YFunction
     public virtual int set_allSettingsAndFiles(byte[] settings)
     {
         byte[] down = new byte[0];
-        byte[] json_bin = new byte[0];
         byte[] json_api = new byte[0];
         byte[] json_files = new byte[0];
         byte[] json_extra = new byte[0];
@@ -14138,14 +14274,14 @@ public class YModule : YFunction
                     calibData[i] = (calibData[i] - paramOffset) / paramScale;
                 } else {
                     // floating-point decoding
-                    calibData[i] = YAPI._decimalToDouble((int) Math.Round(calibData[i]));
+                    calibData[i] = YAPI._decimalToDouble(unchecked((int) Math.Round(calibData[i])));
                 }
                 i = i + 1;
             }
         } else {
             // Handle latest 32bit parameter format
             iCalib = YAPI._decodeFloats(param);
-            calibType = (int) Math.Round(iCalib[0] / 1000.0);
+            calibType = unchecked((int) Math.Round(iCalib[0] / 1000.0));
             if (calibType >= 30) {
                 calibType = calibType - 30;
             }
@@ -14168,7 +14304,7 @@ public class YModule : YFunction
                     } else {
                         param = param + " ";
                     }
-                    param = param + ((int) Math.Round(calibData[i] * 1000.0 / 1000.0)).ToString();
+                    param = param + (unchecked((int) Math.Round(calibData[i] * 1000.0 / 1000.0))).ToString();
                     i = i + 1;
                 }
                 param = param + ",";
@@ -14181,7 +14317,7 @@ public class YModule : YFunction
                 i = 0;
                 while (i < 2 * nPoints) {
                     if (funScale == 0) {
-                        wordVal = YAPI._doubleToDecimal((int) Math.Round(calibData[i]));
+                        wordVal = YAPI._doubleToDecimal(unchecked((int) Math.Round(calibData[i])));
                     } else {
                         wordVal = calibData[i] * funScale + funOffset;
                     }
@@ -14621,7 +14757,7 @@ public class YModule : YFunction
      *   a binary buffer with the file content
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns  <c>YAPI.INVALID_STRING</c>.
+     *   On failure, throws an exception or returns an empty content.
      * </para>
      */
     public virtual byte[] download(string pathname)
@@ -14635,14 +14771,14 @@ public class YModule : YFunction
      *   Returns the icon of the module.
      * <para>
      *   The icon is a PNG image and does not
-     *   exceed 1536 bytes.
+     *   exceeds 1536 bytes.
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
      *   a binary buffer with module icon, in png format.
-     *   On failure, throws an exception or returns  <c>YAPI.INVALID_STRING</c>.
+     *   On failure, throws an exception or returns an empty content.
      * </returns>
      */
     public virtual byte[] get_icon2d()
@@ -14671,6 +14807,9 @@ public class YModule : YFunction
         byte[] content = new byte[0];
 
         content = this._download("logs.txt");
+        if ((content).Length == 0) {
+            return YAPI.INVALID_STRING;
+        }
         return YAPI.DefaultEncoding.GetString(content);
     }
 
@@ -15379,7 +15518,7 @@ public class YSensor : YFunction
      * <para>
      *   Note that a get_currentValue() call will *not* start a measure in the device, it
      *   will just return the last measure that occurred in the device. Indeed, internally, each Yoctopuce
-     *   devices is continuously making measures at a hardware specific frequency.
+     *   devices is continuously making measurements at a hardware specific frequency.
      * </para>
      * <para>
      *   If continuously calling  get_currentValue() leads you to performances issues, then

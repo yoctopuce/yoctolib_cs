@@ -63,7 +63,7 @@ using YFUN_DESCR = System.Int32;
  * <summary>
  *   The <c>YRangeFinder</c> class allows you to read and configure Yoctopuce range finders.
  * <para>
- *   It inherits from <c>YSensor</c> class the core functions to read measures,
+ *   It inherits from <c>YSensor</c> class the core functions to read measurements,
  *   to register callback functions, and to access the autonomous datalogger.
  *   This class adds the ability to easily perform a one-point linear calibration
  *   to compensate the effect of a glass or filter placed in front of the sensor.
@@ -660,9 +660,9 @@ public class YRangeFinder : YSensor
     {
         int distmm;
         if (this.get_unit() == "\"") {
-            distmm = (int) Math.Round(targetDist * 25.4);
+            distmm = unchecked((int) Math.Round(targetDist * 25.4));
         } else {
-            distmm = (int) Math.Round(targetDist);
+            distmm = unchecked((int) Math.Round(targetDist));
         }
         return this.set_command("O"+Convert.ToString(distmm));
     }
@@ -690,9 +690,9 @@ public class YRangeFinder : YSensor
     {
         int distmm;
         if (this.get_unit() == "\"") {
-            distmm = (int) Math.Round(targetDist * 25.4);
+            distmm = unchecked((int) Math.Round(targetDist * 25.4));
         } else {
-            distmm = (int) Math.Round(targetDist);
+            distmm = unchecked((int) Math.Round(targetDist));
         }
         return this.set_command("X"+Convert.ToString(distmm));
     }

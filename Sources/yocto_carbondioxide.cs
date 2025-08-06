@@ -63,7 +63,7 @@ using YFUN_DESCR = System.Int32;
  * <summary>
  *   The <c>YCarbonDioxide</c> class allows you to read and configure Yoctopuce CO2 sensors.
  * <para>
- *   It inherits from <c>YSensor</c> class the core functions to read measures,
+ *   It inherits from <c>YSensor</c> class the core functions to read measurements,
  *   to register callback functions, and to access the autonomous datalogger.
  *   This class adds the ability to perform manual calibration if required.
  * </para>
@@ -381,7 +381,7 @@ public class YCarbonDioxide : YSensor
      */
     public virtual int triggerForcedCalibration(double refVal)
     {
-        return this.set_command("F"+Convert.ToString((int) Math.Round(1000*refVal))+"C");
+        return this.set_command("F"+Convert.ToString(unchecked((int) Math.Round(1000*refVal)))+"C");
     }
 
 

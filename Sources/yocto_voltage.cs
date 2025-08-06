@@ -63,7 +63,7 @@ using YFUN_DESCR = System.Int32;
  * <summary>
  *   The <c>YVoltage</c> class allows you to read and configure Yoctopuce voltage sensors.
  * <para>
- *   It inherits from <c>YSensor</c> class the core functions to read measures,
+ *   It inherits from <c>YSensor</c> class the core functions to read measurements,
  *   to register callback functions, and to access the autonomous datalogger.
  * </para>
  * <para>
@@ -80,7 +80,9 @@ public class YVoltage : YSensor
     public const int ENABLED_FALSE = 0;
     public const int ENABLED_TRUE = 1;
     public const int ENABLED_INVALID = -1;
+    public const double SIGNALBIAS_INVALID = YAPI.INVALID_DOUBLE;
     protected int _enabled = ENABLED_INVALID;
+    protected double _signalBias = SIGNALBIAS_INVALID;
     protected ValueCallback _valueCallbackVoltage = null;
     protected TimedReportCallback _timedReportCallbackVoltage = null;
     //--- (end of YVoltage definitions)
@@ -100,6 +102,10 @@ public class YVoltage : YSensor
         if (json_val.has("enabled"))
         {
             _enabled = json_val.getInt("enabled") > 0 ? 1 : 0;
+        }
+        if (json_val.has("signalBias"))
+        {
+            _signalBias = Math.Round(json_val.getDouble("signalBias") / 65.536) / 1000.0;
         }
         base._parseAttr(json_val);
     }
@@ -139,8 +145,8 @@ public class YVoltage : YSensor
      * <summary>
      *   Changes the activation state of this voltage input.
      * <para>
-     *   When AC measures are disabled,
-     *   the device will always assume a DC signal, and vice-versa. When both AC and DC measures
+     *   When AC measurements are disabled,
+     *   the device will always assume a DC signal, and vice-versa. When both AC and DC measurements
      *   are active, the device switches between AC and DC mode based on the relative amplitude
      *   of variations compared to the average value.
      *   Remember to call the <c>saveToFlash()</c>
@@ -169,6 +175,71 @@ public class YVoltage : YSensor
             rest_val = (newval > 0 ? "1" : "0");
             return _setAttr("enabled", rest_val);
         }
+    }
+
+    /**
+     * <summary>
+     *   Changes the DC bias configured for zero shift adjustment.
+     * <para>
+     *   If your DC current reads positive when it should be zero, set up
+     *   a positive signalBias of the same value to fix the zero shift.
+     *   Remember to call the <c>saveToFlash()</c>
+     *   method of the module if the modification must be kept.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a floating point number corresponding to the DC bias configured for zero shift adjustment
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_signalBias(double newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = Math.Round(newval * 65536.0).ToString();
+            return _setAttr("signalBias", rest_val);
+        }
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the DC bias configured for zero shift adjustment.
+     * <para>
+     *   A positive bias value is used to correct a positive DC bias,
+     *   while a negative bias value is used to correct a negative DC bias.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a floating point number corresponding to the DC bias configured for zero shift adjustment
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YVoltage.SIGNALBIAS_INVALID</c>.
+     * </para>
+     */
+    public double get_signalBias()
+    {
+        double res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return SIGNALBIAS_INVALID;
+                }
+            }
+            res = this._signalBias;
+        }
+        return res;
     }
 
 
@@ -325,6 +396,39 @@ public class YVoltage : YSensor
             base._invokeTimedReportCallback(value);
         }
         return 0;
+    }
+
+
+    /**
+     * <summary>
+     *   Calibrate the device by adjusting <c>signalBias</c> so that the current
+     *   input voltage is precisely seen as zero.
+     * <para>
+     *   Before calling this method, make
+     *   sure to short the power source inputs as close as possible to the connector, and
+     *   to disconnect the load to ensure the wires don't capture radiated noise.
+     *   Remember to call the <c>saveToFlash()</c>
+     *   method of the module if the modification must be kept.
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int zeroAdjust()
+    {
+        double currSignal;
+        double bias;
+        currSignal = this.get_currentRawValue();
+        bias = this.get_signalBias() + currSignal;
+        if (!((bias > -0.5) && (bias < 0.5))) {
+            this._throw(YAPI.INVALID_ARGUMENT, "suspicious zeroAdjust, please ensure that the power source inputs are shorted");
+            return YAPI.INVALID_ARGUMENT;
+        }
+        return this.set_signalBias(bias);
     }
 
     /**

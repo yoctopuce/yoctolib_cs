@@ -765,7 +765,7 @@ public class YWeighScale : YSensor
      */
     public virtual int setupSpan(double currWeight, double maxWeight)
     {
-        return this.set_command("S"+Convert.ToString((int) Math.Round(1000*currWeight))+":"+Convert.ToString((int) Math.Round(1000*maxWeight)));
+        return this.set_command("S"+Convert.ToString(unchecked((int) Math.Round(1000*currWeight)))+":"+Convert.ToString(unchecked((int) Math.Round(1000*maxWeight))));
     }
 
 
@@ -812,7 +812,7 @@ public class YWeighScale : YSensor
                 idx = idx + 1;
             }
             if (found > 0) {
-                res = this.set_command(""+Convert.ToString(tableIndex)+"m"+Convert.ToString((int) Math.Round(1000*curr))+":"+Convert.ToString((int) Math.Round(1000*currComp)));
+                res = this.set_command(""+Convert.ToString(tableIndex)+"m"+Convert.ToString(unchecked((int) Math.Round(1000*curr)))+":"+Convert.ToString(unchecked((int) Math.Round(1000*currComp))));
                 if (!(res==YAPI.SUCCESS)) {
                     this._throw(YAPI.IO_ERROR, "unable to set thermal compensation table");
                     return YAPI.IO_ERROR;

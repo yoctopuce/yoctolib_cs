@@ -817,7 +817,7 @@ public class YPwmOutput : YFunction
         if (ms_target < 0.0) {
             ms_target = 0.0;
         }
-        newval = ""+Convert.ToString((int) Math.Round(ms_target*65536))+"ms:"+Convert.ToString(ms_duration);
+        newval = ""+Convert.ToString(unchecked((int) Math.Round(ms_target*65536)))+"ms:"+Convert.ToString(ms_duration);
         return this.set_pwmTransition(newval);
     }
 
@@ -852,7 +852,7 @@ public class YPwmOutput : YFunction
         if (target > 100.0) {
             target = 100.0;
         }
-        newval = ""+Convert.ToString((int) Math.Round(target*65536))+":"+Convert.ToString(ms_duration);
+        newval = ""+Convert.ToString(unchecked((int) Math.Round(target*65536)))+":"+Convert.ToString(ms_duration);
         return this.set_pwmTransition(newval);
     }
 
@@ -947,7 +947,7 @@ public class YPwmOutput : YFunction
         if (ms_target < 0.0) {
             ms_target = 0.0;
         }
-        newval = ""+Convert.ToString((int) Math.Round(ms_target*65536))+"ms*"+Convert.ToString(n_pulses);
+        newval = ""+Convert.ToString(unchecked((int) Math.Round(ms_target*65536)))+"ms*"+Convert.ToString(n_pulses);
         return this.set_pwmTransition(newval);
     }
 
@@ -982,7 +982,7 @@ public class YPwmOutput : YFunction
         if (target > 100.0) {
             target = 100.0;
         }
-        newval = ""+Convert.ToString((int) Math.Round(target*65536))+"*"+Convert.ToString(n_pulses);
+        newval = ""+Convert.ToString(unchecked((int) Math.Round(target*65536)))+"*"+Convert.ToString(n_pulses);
         return this.set_pwmTransition(newval);
     }
 

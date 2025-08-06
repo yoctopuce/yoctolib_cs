@@ -445,7 +445,7 @@ public class YCurrentLoopOutput : YFunction
         if (mA_target > 21.0) {
             mA_target = 21.0;
         }
-        newval = ""+Convert.ToString((int) Math.Round(mA_target*65536))+":"+Convert.ToString(ms_duration);
+        newval = ""+Convert.ToString(unchecked((int) Math.Round(mA_target*65536)))+":"+Convert.ToString(ms_duration);
 
         return this.set_currentTransition(newval);
     }

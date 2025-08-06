@@ -873,7 +873,7 @@ public class YMotor : YFunction
      */
     public virtual int drivingForceMove(double targetPower, int delay)
     {
-        return this.set_command("P"+Convert.ToString((int) Math.Round(targetPower*10))+","+Convert.ToString(delay));
+        return this.set_command("P"+Convert.ToString(unchecked((int) Math.Round(targetPower*10)))+","+Convert.ToString(delay));
     }
 
 
@@ -898,7 +898,7 @@ public class YMotor : YFunction
      */
     public virtual int brakingForceMove(double targetPower, int delay)
     {
-        return this.set_command("B"+Convert.ToString((int) Math.Round(targetPower*10))+","+Convert.ToString(delay));
+        return this.set_command("B"+Convert.ToString(unchecked((int) Math.Round(targetPower*10)))+","+Convert.ToString(delay));
     }
 
     /**

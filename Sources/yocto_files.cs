@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs 63469 2024-11-25 14:01:08Z seb $
+ * $Id: yocto_files.cs 67413 2025-06-12 09:12:41Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -159,6 +159,7 @@ public class YFiles : YFunction
     protected int _filesCount = FILESCOUNT_INVALID;
     protected int _freeSpace = FREESPACE_INVALID;
     protected ValueCallback _valueCallbackFiles = null;
+    protected int _ver = 0;
     //--- (end of generated code: YFiles definitions)
 
     public YFiles(string func)
@@ -368,6 +369,24 @@ public class YFiles : YFunction
     }
 
 
+    public virtual int _getVersion()
+    {
+        byte[] json = new byte[0];
+        if (this._ver > 0) {
+            return this._ver;
+        }
+        //may throw an exception
+        json = this.sendCommand("info");
+        if (json[0] != 123) {
+            // ascii code for '{'
+            this._ver = 30;
+        } else {
+            this._ver = YAPI._atoi(this._json_get_key(json, "ver"));
+        }
+        return this._ver;
+    }
+
+
     /**
      * <summary>
      *   Reinitialize the filesystem to its clean, unfragmented, empty state.
@@ -433,15 +452,15 @@ public class YFiles : YFunction
 
     /**
      * <summary>
-     *   Test if a file exist on the filesystem of the module.
+     *   Tests if a file exists on the filesystem of the module.
      * <para>
      * </para>
      * </summary>
      * <param name="filename">
-     *   the file name to test.
+     *   the filename to test.
      * </param>
      * <returns>
-     *   a true if the file exist, false otherwise.
+     *   true if the file exists, false otherwise.
      * </returns>
      * <para>
      *   On failure, throws an exception.
@@ -543,6 +562,65 @@ public class YFiles : YFunction
             return YAPI.IO_ERROR;
         }
         return YAPI.SUCCESS;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the expected file CRC for a given content.
+     * <para>
+     *   Note that the CRC value may vary depending on the version
+     *   of the filesystem used by the hub, so it is important to
+     *   use this method if a reference value needs to be computed.
+     * </para>
+     * </summary>
+     * <param name="content">
+     *   a buffer representing a file content
+     * </param>
+     * <returns>
+     *   the 32-bit CRC summarizing the file content, as it would
+     *   be returned by the <c>get_crc()</c> method of
+     *   <c>YFileRecord</c> objects returned by <c>get_list()</c>.
+     * </returns>
+     */
+    public virtual int get_content_crc(byte[] content)
+    {
+        int fsver;
+        int sz;
+        int blkcnt;
+        byte[] meta = new byte[0];
+        int blkidx;
+        int blksz;
+        int part;
+        int res;
+        sz = (content).Length;
+        if (sz == 0) {
+            res = YAPI._bincrc(content, 0, 0);
+            return res;
+        }
+
+        fsver = this._getVersion();
+        if (fsver < 40) {
+            res = YAPI._bincrc(content, 0, sz);
+            return res;
+        }
+        blkcnt = ((sz + 255) / 256);
+        meta = new byte[4 * blkcnt];
+        blkidx = 0;
+        while (blkidx < blkcnt) {
+            blksz = sz - blkidx * 256;
+            if (blksz > 256) {
+                blksz = 256;
+            }
+            part = (YAPI._bincrc(content, blkidx * 256, blksz) ^ unchecked((int) 0xffffffff));
+            meta[4 * blkidx] = (byte)((part & 255) & 0xff);
+            meta[4 * blkidx + 1] = (byte)(((part >> 8) & 255) & 0xff);
+            meta[4 * blkidx + 2] = (byte)(((part >> 16) & 255) & 0xff);
+            meta[4 * blkidx + 3] = (byte)(((part >> 24) & 255) & 0xff);
+            blkidx = blkidx + 1;
+        }
+        res = (YAPI._bincrc(meta, 0, 4 * blkcnt) ^ unchecked((int) 0xffffffff));
+        return res;
     }
 
     /**
