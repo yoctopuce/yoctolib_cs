@@ -1461,7 +1461,7 @@ public class YRfidReader : YFunction
         taglist.Clear();
         if ((json).Length > 3) {
             jsonList = this._json_get_array(json);
-            for (int ii_0 = 0; ii_0 <  jsonList.Count; ii_0++) {
+            for (int ii_0 = 0; ii_0 < jsonList.Count; ii_0++) {
                 taglist.Add(this._json_get_string(jsonList[ii_0]));
             }
         }

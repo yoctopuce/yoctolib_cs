@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs 67413 2025-06-12 09:12:41Z seb $
+ * $Id: yocto_files.cs 68466 2025-08-19 17:31:45Z mvuilleu $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -443,7 +443,7 @@ public class YFiles : YFunction
         json = this.sendCommand("dir&f="+pattern);
         filelist = this._json_get_array(json);
         res.Clear();
-        for (int ii_0 = 0; ii_0 <  filelist.Count; ii_0++) {
+        for (int ii_0 = 0; ii_0 < filelist.Count; ii_0++) {
             res.Add(new YFileRecord(YAPI.DefaultEncoding.GetString(filelist[ii_0])));
         }
         return res;

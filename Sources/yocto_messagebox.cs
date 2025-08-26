@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_messagebox.cs 63469 2024-11-25 14:01:08Z seb $
+ * $Id: yocto_messagebox.cs 68482 2025-08-21 10:07:30Z mvuilleu $
  *
  * Implements yFindMessageBox(), the high-level API for MessageBox functions
  *
@@ -2456,6 +2456,7 @@ public class YMessageBox : YFunction
         }
         this._pdus = newArr;
         // append complete concatenated messages
+        newAgg.Clear();
         i = 0;
         while (i < nsig) {
             sig = signatures[i];

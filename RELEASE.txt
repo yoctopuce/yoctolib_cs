@@ -1,7 +1,4 @@
-C#V2 v2.1.8173
+C#V2 v2.1.8518
 
-- Fix NuGet package that was not working correctly with command "dotnet pusblish"
-- Fix Yocto-SDI12 example
-- Fix Timeout on invalid credential with HTTP protocol
-- Fix potential short write on socket
-- Improve error message when RegisterHub on non configured Hubs
+- Fix YModule.get_friendlyName()
+- Fix macOS support

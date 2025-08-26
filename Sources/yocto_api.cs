@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 68027 2025-07-28 10:00:40Z seb $
+ * $Id: yocto_api.cs 68518 2025-08-25 13:07:30Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -945,15 +945,11 @@ internal static class SafeNativeMethods
             if (platform == PlatformID.MacOSX) {
                 if (is64) {
                     _dllVersion = YAPIDLL_VERSION.MACOS64;
-                } else {
-                    _dllVersion = YAPIDLL_VERSION.MACOS32;
                 }
             } else if (platform == PlatformID.Unix) {
                 if (IsMacOS()) {
                     if (is64) {
                         _dllVersion = YAPIDLL_VERSION.MACOS64;
-                    } else {
-                        _dllVersion = YAPIDLL_VERSION.MACOS32;
                     }
                 } else {
                     if (is64) {
@@ -1005,11 +1001,8 @@ internal static class SafeNativeMethods
                     case YAPIDLL_VERSION.WINARM64:
                         dll_path = dir + "arm64" + Path.DirectorySeparatorChar + "yapi.dll";
                         break;
-                    case YAPIDLL_VERSION.MACOS32:
-                        dll_path = dir + "libyapi32.so";
-                        break;
                     case YAPIDLL_VERSION.MACOS64:
-                        dll_path = dir + "libyapi64.so";
+                        dll_path = dir + "libyapi.dylib";
                         break;
                     case YAPIDLL_VERSION.LIN64:
                         dll_path = dir + "libyapi-amd64.so";
@@ -1036,12 +1029,17 @@ internal static class SafeNativeMethods
                             loadlogs.Add(msg);
                             debugDll(msg);
                             _loadedLibrary = loadLibrary;
-                            return mapYAPIFunctions();
+                            debugDll("Try to map function to shared lib");
+                            mapYAPIFunctions();
+                            debugDll("Function mapped to shared lib");
+                            return 0;
                         }
                     } catch (System.EntryPointNotFoundException ex) {
+                        debugDll(ex.StackTrace);
                         ErrorCause = "Entry point not found";
                         ErrorCauseVerbose = ex.Message;
                     } catch (System.DllNotFoundException ex) {
+                        debugDll(ex.StackTrace);
                         ErrorCause = "DLL not found";
                         ErrorCauseVerbose = ex.Message;
                     }
@@ -1072,13 +1070,9 @@ internal static class SafeNativeMethods
                         no_alternate_platform = true;
                         break;
                     case YAPIDLL_VERSION.WIN64:
-                    case YAPIDLL_VERSION.MACOS32:
                     case YAPIDLL_VERSION.LINARMHF:
                     case YAPIDLL_VERSION.LINAARCH64:
                         _dllVersion = YAPIDLL_VERSION.WIN32;
-                        break;
-                    case YAPIDLL_VERSION.MACOS64:
-                        _dllVersion = YAPIDLL_VERSION.MACOS32;
                         break;
                     case YAPIDLL_VERSION.LIN32:
                         _dllVersion = YAPIDLL_VERSION.LINARMHF;
@@ -4617,7 +4611,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "2.1";
     public const int YOCTO_API_VERSION_BCD = 0x0200;
 
-    public const string YOCTO_API_BUILD_NO = "68173";
+    public const string YOCTO_API_BUILD_NO = "68518";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6904,7 +6898,7 @@ public class YAPI
             }
             throw;
         }
-        return  "2.1.8173 (" + version + ")";
+        return  "2.1.8518 (" + version + ")";
     }
 
     /**
@@ -9816,7 +9810,7 @@ public class YDataSet
         summaryStopMs = YAPI.MIN_DOUBLE;
 
         // Parse complete streams
-        for (int ii_0 = 0; ii_0 <  this._streams.Count; ii_0++) {
+        for (int ii_0 = 0; ii_0 < this._streams.Count; ii_0++) {
             streamStartTimeMs = Math.Round(this._streams[ii_0].get_realStartTimeUTC() * 1000);
             streamDuration = this._streams[ii_0].get_realDuration();
             streamEndTimeMs = streamStartTimeMs + Math.Round(streamDuration * 1000);
@@ -9994,7 +9988,7 @@ public class YDataSet
         }
 
         firstMeasure = true;
-        for (int ii_0 = 0; ii_0 <  dataRows.Count; ii_0++) {
+        for (int ii_0 = 0; ii_0 < dataRows.Count; ii_0++) {
             if (firstMeasure) {
                 end_ = tim + fitv;
                 firstMeasure = false;
@@ -10371,7 +10365,7 @@ public class YDataSet
 
         startUtcMs = measure.get_startTimeUTC() * 1000;
         stream = null;
-        for (int ii_0 = 0; ii_0 <  this._streams.Count; ii_0++) {
+        for (int ii_0 = 0; ii_0 < this._streams.Count; ii_0++) {
             if (Math.Round(this._streams[ii_0].get_realStartTimeUTC() *1000) == startUtcMs) {
                 stream = this._streams[ii_0];
             }
@@ -10401,7 +10395,7 @@ public class YDataSet
             maxCol = 0;
         }
 
-        for (int ii_1 = 0; ii_1 <  dataRows.Count; ii_1++) {
+        for (int ii_1 = 0; ii_1 < dataRows.Count; ii_1++) {
             end_ = tim + itv;
             if ((end_ > this._startTimeMs) && ((this._endTimeMs == 0) || (tim < this._endTimeMs))) {
                 measures.Add(new YMeasure(tim / 1000.0, end_ / 1000.0, dataRows[ii_1][minCol], dataRows[ii_1][avgCol], dataRows[ii_1][maxCol]));
@@ -11061,7 +11055,7 @@ public class YHub
      * </summary>
      * <returns>
      *   a pointer to a <c>YHub</c> object, corresponding to
-     *   the next hub currenlty in use, or a <c>null</c> pointer
+     *   the next hub currently in use, or a <c>null</c> pointer
      *   if there are no more hubs to enumerate.
      * </returns>
      */
@@ -13826,7 +13820,7 @@ public class YModule : YFunction
         ext_settings = ", \"extras\":[";
         templist = this.get_functionIds("Temperature");
         sep = "";
-        for (int ii_0 = 0; ii_0 <  templist.Count; ii_0++) {
+        for (int ii_0 = 0; ii_0 < templist.Count; ii_0++) {
             if (YAPI._atoi(this.get_firmwareRelease()) > 9000) {
                 url = "api/"+templist[ii_0]+"/sensorType";
                 t_type = YAPI.DefaultEncoding.GetString(this._download(url));
@@ -13852,7 +13846,7 @@ public class YModule : YFunction
             }
             filelist = this._json_get_array(json);
             sep = "";
-            for (int ii_1 = 0; ii_1 <  filelist.Count; ii_1++) {
+            for (int ii_1 = 0; ii_1 < filelist.Count; ii_1++) {
                 name = this._json_get_key(filelist[ii_1], "name");
                 if (((name).Length > 0) && !(name == "startupConf.json")) {
                     if ((name).Substring((name).Length-1, 1) == "/") {
@@ -13909,7 +13903,7 @@ public class YModule : YFunction
         string functionId;
         byte[] data = new byte[0];
         extras = this._json_get_array(YAPI.DefaultEncoding.GetBytes(jsonExtra));
-        for (int ii_0 = 0; ii_0 <  extras.Count; ii_0++) {
+        for (int ii_0 = 0; ii_0 < extras.Count; ii_0++) {
             tmp = this._get_json_path(extras[ii_0], "fid");
             functionId = this._json_get_string(tmp);
             data = this._get_json_path(extras[ii_0], "json");
@@ -13976,7 +13970,7 @@ public class YModule : YFunction
             }
             json_files = this._get_json_path(settings, "files");
             files = this._json_get_array(json_files);
-            for (int ii_0 = 0; ii_0 <  files.Count; ii_0++) {
+            for (int ii_0 = 0; ii_0 < files.Count; ii_0++) {
                 tmp = this._get_json_path(files[ii_0], "name");
                 name = this._json_get_string(tmp);
                 tmp = this._get_json_path(files[ii_0], "data");
@@ -14238,7 +14232,7 @@ public class YModule : YFunction
             } else {
                 if (paramVer == 1) {
                     words_str = new List<string>(param.Split(new Char[] {','}));
-                    for (int ii_0 = 0; ii_0 <  words_str.Count; ii_0++) {
+                    for (int ii_0 = 0; ii_0 < words_str.Count; ii_0++) {
                         words.Add(YAPI._atoi(words_str[ii_0]));
                     }
                     if (param == "" || (words[0] > 10)) {
@@ -14429,7 +14423,7 @@ public class YModule : YFunction
         newval = "";
         old_json_flat = this._flattenJsonStruct(settings);
         old_dslist = this._json_get_array(old_json_flat);
-        for (int ii_0 = 0; ii_0 <  old_dslist.Count; ii_0++) {
+        for (int ii_0 = 0; ii_0 < old_dslist.Count; ii_0++) {
             each_str = this._json_get_string(old_dslist[ii_0]);
             // split json path and attr
             leng = (each_str).Length;
@@ -14462,7 +14456,7 @@ public class YModule : YFunction
         }
         actualSettings = this._flattenJsonStruct(actualSettings);
         new_dslist = this._json_get_array(actualSettings);
-        for (int ii_1 = 0; ii_1 <  new_dslist.Count; ii_1++) {
+        for (int ii_1 = 0; ii_1 < new_dslist.Count; ii_1++) {
             // remove quotes
             each_str = this._json_get_string(new_dslist[ii_1]);
             // split json path and attr
@@ -14681,7 +14675,7 @@ public class YModule : YFunction
             }
             i = i + 1;
         }
-        for (int ii_2 = 0; ii_2 <  restoreLast.Count; ii_2++) {
+        for (int ii_2 = 0; ii_2 < restoreLast.Count; ii_2++) {
             subres = this._tryExec(restoreLast[ii_2]);
             if ((res == YAPI.SUCCESS) && (subres != YAPI.SUCCESS)) {
                 res = subres;
@@ -15023,10 +15017,10 @@ public class YModule : YFunction
             }
 
             if (funcName != "") {
-                return funcName;
+                return funcName + ".module";
             }
 
-            return snum;
+            return snum + ".module";
         }
     }
 
@@ -16558,10 +16552,10 @@ public class YSensor : YFunction
             }
             rawValues.Clear();
             refValues.Clear();
-            for (int ii_0 = 0; ii_0 <  this._calraw.Count; ii_0++) {
+            for (int ii_0 = 0; ii_0 < this._calraw.Count; ii_0++) {
                 rawValues.Add(this._calraw[ii_0]);
             }
-            for (int ii_1 = 0; ii_1 <  this._calref.Count; ii_1++) {
+            for (int ii_1 = 0; ii_1 < this._calref.Count; ii_1++) {
                 refValues.Add(this._calref[ii_1]);
             }
         }
@@ -17425,7 +17419,7 @@ public class YDataLogger : YFunction
 
         dslist = this._json_get_array(jsonbuff);
         res.Clear();
-        for (int ii_0 = 0; ii_0 <  dslist.Count; ii_0++) {
+        for (int ii_0 = 0; ii_0 < dslist.Count; ii_0++) {
             dataset = new YDataSet(this);
             dataset._parse(YAPI.DefaultEncoding.GetString(dslist[ii_0]));
             res.Add(dataset);

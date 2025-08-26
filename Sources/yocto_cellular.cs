@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 64863 2025-03-05 14:06:40Z mvuilleu $
+ * $Id: yocto_cellular.cs 68466 2025-08-19 17:31:45Z mvuilleu $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *
@@ -1606,7 +1606,7 @@ public class YCellular : YFunction
         recs = new List<string>(moni.Split(new Char[] {'#'}));
         // process each line in turn
         res.Clear();
-        for (int ii_0 = 0; ii_0 <  recs.Count; ii_0++) {
+        for (int ii_0 = 0; ii_0 < recs.Count; ii_0++) {
             llen = (recs[ii_0]).Length - 2;
             if (llen >= 44) {
                 if ((recs[ii_0]).Substring(41, 3) == "dbm") {
