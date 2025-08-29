@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Prog_MAUI.MainPage">
+
+
+    <Grid
+        RowDefinitions="100,auto,auto,*"
+        ColumnDefinitions=".25*,.75*"
+        Padding="10"
+        RowSpacing="20"
+        ColumnSpacing="20">
+        <Image Source="logo.png" />
+        <Label
+            VerticalTextAlignment="Center"
+            Grid.Column="1"
+            FontSize="42">
+            Yoctopuce Inventory in Maui
+        </Label>
+        <Label
+            x:Name="Version"
+            Grid.Row="1"
+            Grid.Column="2"
+            FontSize="16" />
+        <Button
+            Clicked="OnUpdateClicked"
+            Grid.Row="2"
+            Text="Perform Inventory" />
+        <Entry            
+            x:Name="TargetURL"
+            BindingContext=""
+            Grid.Row="2"
+            Grid.Column="1"
+            Placeholder="Hub URL" />
+
+        <CollectionView Grid.Row="3" Grid.ColumnSpan="2" ItemsSource="{Binding Inventory}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="0,5">
+                        <Border Padding="5">
+                            <Label Text="{Binding .}"></Label>
+                        </Border>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+
+</ContentPage>

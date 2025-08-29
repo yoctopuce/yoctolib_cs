@@ -80,6 +80,7 @@ public class YColorSensor : YFunction
     public const int ESTIMATIONMODEL_INVALID = -1;
     public const int WORKINGMODE_AUTO = 0;
     public const int WORKINGMODE_EXPERT = 1;
+    public const int WORKINGMODE_AUTOGAIN = 2;
     public const int WORKINGMODE_INVALID = -1;
     public const int LEDCURRENT_INVALID = YAPI.INVALID_UINT;
     public const int LEDCALIBRATION_INVALID = YAPI.INVALID_UINT;
@@ -284,8 +285,8 @@ public class YColorSensor : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   either <c>YColorSensor.WORKINGMODE_AUTO</c> or <c>YColorSensor.WORKINGMODE_EXPERT</c>, according to
-     *   the sensor working mode
+     *   a value among <c>YColorSensor.WORKINGMODE_AUTO</c>, <c>YColorSensor.WORKINGMODE_EXPERT</c> and
+     *   <c>YColorSensor.WORKINGMODE_AUTOGAIN</c> corresponding to the sensor working mode
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YColorSensor.WORKINGMODE_INVALID</c>.
@@ -317,8 +318,8 @@ public class YColorSensor : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   either <c>YColorSensor.WORKINGMODE_AUTO</c> or <c>YColorSensor.WORKINGMODE_EXPERT</c>, according to
-     *   the sensor working mode
+     *   a value among <c>YColorSensor.WORKINGMODE_AUTO</c>, <c>YColorSensor.WORKINGMODE_EXPERT</c> and
+     *   <c>YColorSensor.WORKINGMODE_AUTOGAIN</c> corresponding to the sensor working mode
      * </param>
      * <para>
      * </para>

@@ -1,4 +1,4 @@
-C#V2 v2.1.8518
+C#V2 v2.1.8604
 
+- Add Prog-MAUI example
 - Fix YModule.get_friendlyName()
-- Fix macOS support
