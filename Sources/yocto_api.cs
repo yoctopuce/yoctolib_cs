@@ -4611,7 +4611,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "2.1";
     public const int YOCTO_API_VERSION_BCD = 0x0200;
 
-    public const string YOCTO_API_BUILD_NO = "68604";
+    public const string YOCTO_API_BUILD_NO = "68689";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6898,7 +6898,7 @@ public class YAPI
             }
             throw;
         }
-        return  "2.1.8604 (" + version + ")";
+        return  "2.1.8689 (" + version + ")";
     }
 
     /**
