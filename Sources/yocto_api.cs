@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 68518 2025-08-25 13:07:30Z seb $
+ * $Id: yocto_api.cs 68749 2025-09-03 10:03:04Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1035,12 +1035,14 @@ internal static class SafeNativeMethods
                             return 0;
                         }
                     } catch (System.EntryPointNotFoundException ex) {
-                        debugDll(ex.StackTrace);
                         ErrorCause = "Entry point not found";
+                        debugDll(ErrorCause);
+                        debugDll(ex.StackTrace);
                         ErrorCauseVerbose = ex.Message;
                     } catch (System.DllNotFoundException ex) {
-                        debugDll(ex.StackTrace);
                         ErrorCause = "DLL not found";
+                        debugDll(ErrorCause);
+                        debugDll(ex.StackTrace);
                         ErrorCauseVerbose = ex.Message;
                     }
                 } else {
@@ -4611,7 +4613,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "2.1";
     public const int YOCTO_API_VERSION_BCD = 0x0200;
 
-    public const string YOCTO_API_BUILD_NO = "68689";
+    public const string YOCTO_API_BUILD_NO = "69018";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6898,7 +6900,7 @@ public class YAPI
             }
             throw;
         }
-        return  "2.1.8689 (" + version + ")";
+        return  "2.1.9018 (" + version + ")";
     }
 
     /**
