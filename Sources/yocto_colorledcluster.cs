@@ -1501,7 +1501,7 @@ public class YColorLedCluster : YFunction
      */
     public virtual byte[] get_rgbColorBuffer(int ledIndex, int count)
     {
-        return this._download("rgb.bin?typ=0&pos="+Convert.ToString(3*ledIndex)+"&len="+Convert.ToString(3*count));
+        return this._download("rgb.bin?typ="+Convert.ToString(0)+"&pos="+Convert.ToString(3*ledIndex)+"&len="+Convert.ToString(3*count));
     }
 
 
@@ -1536,7 +1536,7 @@ public class YColorLedCluster : YFunction
         int g;
         int b;
 
-        buff = this._download("rgb.bin?typ=0&pos="+Convert.ToString(3*ledIndex)+"&len="+Convert.ToString(3*count));
+        buff = this._download("rgb.bin?typ="+Convert.ToString(0)+"&pos="+Convert.ToString(3*ledIndex)+"&len="+Convert.ToString(3*count));
         res.Clear();
         idx = 0;
         while (idx < count) {
@@ -1580,7 +1580,7 @@ public class YColorLedCluster : YFunction
         int g;
         int b;
 
-        buff = this._download("rgb.bin?typ=4&pos="+Convert.ToString(3*ledIndex)+"&len="+Convert.ToString(3*count));
+        buff = this._download("rgb.bin?typ="+Convert.ToString(4)+"&pos="+Convert.ToString(3*ledIndex)+"&len="+Convert.ToString(3*count));
         res.Clear();
         idx = 0;
         while (idx < count) {
@@ -1623,7 +1623,7 @@ public class YColorLedCluster : YFunction
         int idx;
         int seq;
 
-        buff = this._download("rgb.bin?typ=1&pos="+Convert.ToString(ledIndex)+"&len="+Convert.ToString(count));
+        buff = this._download("rgb.bin?typ="+Convert.ToString(1)+"&pos="+Convert.ToString(ledIndex)+"&len="+Convert.ToString(count));
         res.Clear();
         idx = 0;
         while (idx < count) {
@@ -1666,7 +1666,7 @@ public class YColorLedCluster : YFunction
         int lh;
         int ll;
 
-        buff = this._download("rgb.bin?typ=2&pos="+Convert.ToString(4*seqIndex)+"&len="+Convert.ToString(4*count));
+        buff = this._download("rgb.bin?typ="+Convert.ToString(2)+"&pos="+Convert.ToString(4*seqIndex)+"&len="+Convert.ToString(4*count));
         res.Clear();
         idx = 0;
         while (idx < count) {
@@ -1708,7 +1708,7 @@ public class YColorLedCluster : YFunction
         int lh;
         int ll;
 
-        buff = this._download("rgb.bin?typ=6&pos="+Convert.ToString(seqIndex)+"&len="+Convert.ToString(count));
+        buff = this._download("rgb.bin?typ="+Convert.ToString(6)+"&pos="+Convert.ToString(seqIndex)+"&len="+Convert.ToString(count));
         res.Clear();
         idx = 0;
         while (idx < count) {
@@ -1747,7 +1747,7 @@ public class YColorLedCluster : YFunction
         int idx;
         int started;
 
-        buff = this._download("rgb.bin?typ=5&pos="+Convert.ToString(seqIndex)+"&len="+Convert.ToString(count));
+        buff = this._download("rgb.bin?typ="+Convert.ToString(5)+"&pos="+Convert.ToString(seqIndex)+"&len="+Convert.ToString(count));
         res.Clear();
         idx = 0;
         while (idx < count) {
@@ -1785,7 +1785,7 @@ public class YColorLedCluster : YFunction
         int idx;
         int started;
 
-        buff = this._download("rgb.bin?typ=3&pos="+Convert.ToString(seqIndex)+"&len="+Convert.ToString(count));
+        buff = this._download("rgb.bin?typ="+Convert.ToString(3)+"&pos="+Convert.ToString(seqIndex)+"&len="+Convert.ToString(count));
         res.Clear();
         idx = 0;
         while (idx < count) {
@@ -1834,39 +1834,29 @@ public class YColorLedCluster : YFunction
         if (L<=127) {
             temp2 = L * (255 + S);
         } else {
-            temp2 = (L+S) * 255 - L*S;
+            temp2 = (L + S) * 255 - L * S;
         }
         temp1 = 510 * L - temp2;
         // R
-        temp3 = (H + 85);
-        if (temp3 > 255) {
-            temp3 = temp3-255;
-        }
+        temp3 = ((H + 85) & 0xff);
         R = this.hsl2rgbInt(temp1, temp2, temp3);
         // G
-        temp3 = H;
-        if (temp3 > 255) {
-            temp3 = temp3-255;
-        }
+        temp3 = (H & 0xff);
         G = this.hsl2rgbInt(temp1, temp2, temp3);
         // B
-        if (H >= 85) {
-            temp3 = H - 85 ;
-        } else {
-            temp3 = H + 170;
-        }
+        temp3 = ((H + 170) & 0xff);
         B = this.hsl2rgbInt(temp1, temp2, temp3);
         // just in case
-        if (R>255) {
-            R=255;
+        if (R > 255) {
+            R = 255;
         }
-        if (G>255) {
-            G=255;
+        if (G > 255) {
+            G = 255;
         }
-        if (B>255) {
-            B=255;
+        if (B > 255) {
+            B = 255;
         }
-        res = (R << 16)+(G << 8)+B;
+        res = (R << 16) + (G << 8) + B;
         return res;
     }
 

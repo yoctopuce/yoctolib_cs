@@ -783,9 +783,8 @@ public class YNetwork : YFunction
     public int set_userPassword(string newval)
     {
         string rest_val;
-        if (newval.Length > YAPI.HASH_BUF_SIZE)
+        if (!_is_valid_pass(newval))
         {
-            _throw(YAPI.INVALID_ARGUMENT, "Password too long :" + newval);
             return YAPI.INVALID_ARGUMENT;
         }
         lock (_thisLock) {
@@ -854,9 +853,8 @@ public class YNetwork : YFunction
     public int set_adminPassword(string newval)
     {
         string rest_val;
-        if (newval.Length > YAPI.HASH_BUF_SIZE)
+        if (!_is_valid_pass(newval))
         {
-            _throw(YAPI.INVALID_ARGUMENT, "Password too long :" + newval);
             return YAPI.INVALID_ARGUMENT;
         }
         lock (_thisLock) {

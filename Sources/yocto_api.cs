@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 68749 2025-09-03 10:03:04Z seb $
+ * $Id: yocto_api.cs 70666 2025-12-09 10:26:00Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -1132,17 +1132,23 @@ internal static class SafeNativeMethods
                     }
                 }
             } else {
-#if (!NET35) && (!NET40)
-                Architecture arch = RuntimeInformation.OSArchitecture;
-                if (arch == Architecture.Arm64) {
-                    _dllVersion = YAPIDLL_VERSION.WINARM64;
-                } else 
-#endif
-                {
-                    if (is64) {
-                        _dllVersion = YAPIDLL_VERSION.WIN64;
-                    } else {
-                        _dllVersion = YAPIDLL_VERSION.WIN32;
+                if (is64) {
+                    _dllVersion = YAPIDLL_VERSION.WIN64;
+                } else {
+                    _dllVersion = YAPIDLL_VERSION.WIN32;
+                }
+                // check if we are running on Arm64 using reflection to work framework 3.5
+                var runtimeInfoType = Type.GetType("System.Runtime.InteropServices.RuntimeInformation, System.Runtime.InteropServices.RuntimeInformation");
+                if (runtimeInfoType == null) {
+                    runtimeInfoType = Type.GetType("System.Runtime.InteropServices.RuntimeInformation");
+                }
+                if (runtimeInfoType != null) {
+                    var osArchProperty = runtimeInfoType.GetProperty("OSArchitecture");
+                    if (osArchProperty != null) {
+                        var arch = osArchProperty.GetValue(null, null);
+                        if (arch.ToString() == "Arm64") {
+                            _dllVersion = YAPIDLL_VERSION.WINARM64;
+                        }
                     }
                 }
             }
@@ -4613,7 +4619,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "2.1";
     public const int YOCTO_API_VERSION_BCD = 0x0200;
 
-    public const string YOCTO_API_BUILD_NO = "69018";
+    public const string YOCTO_API_BUILD_NO = "70736";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6900,7 +6906,7 @@ public class YAPI
             }
             throw;
         }
-        return  "2.1.9018 (" + version + ")";
+        return  "2.1.10736 (" + version + ")";
     }
 
     /**
@@ -8786,6 +8792,38 @@ public class YFirmwareUpdate
 }
 
 
+
+public class YCalibCtx
+{
+    public string src;
+    public int typ;
+    public List<int> par;
+    public List<double> raw;
+    public List<double> cal;
+    public YAPI.yCalibrationHandler hdl;
+
+    public YCalibCtx()
+    {
+        this.src = "";
+        this.hdl = null;
+        this.typ = 0;
+        this.par = new List<int>();
+        this.raw = new List<double>();
+        this.cal = new List<double>();
+
+    }
+
+    public YCalibCtx(string src, YAPI.yCalibrationHandler hdl, int typ, List<int> par, List<double> raw, List<double> cal)
+    {
+        this.src = src;
+        this.hdl = hdl;
+        this.typ = typ;
+        this.par = par;
+        this.raw = raw;
+        this.cal = cal;
+    }
+}
+
 //--- (generated code: YDataStream class start)
 /**
  * <c>DataStream</c> objects represent bare recorded measure sequences,
@@ -8808,6 +8846,7 @@ public class YDataStream
     public const double DATA_INVALID = YAPI.INVALID_DOUBLE;
     public const int DURATION_INVALID = -1;
 
+    protected YCalibCtx _cal;
     //--- (generated code: YDataStream definitions)
 
     protected YFunction _parent;
@@ -8826,10 +8865,6 @@ public class YDataStream
     protected double _minVal = 0;
     protected double _avgVal = 0;
     protected double _maxVal = 0;
-    protected int _caltyp = 0;
-    protected List<int> _calpar = new List<int>();
-    protected List<double> _calraw = new List<double>();
-    protected List<double> _calref = new List<double>();
     protected List<List<double>> _values = new List<List<double>>();
     protected bool _isLoaded;
     //--- (end of generated code: YDataStream definitions)
@@ -8856,15 +8891,60 @@ public class YDataStream
 
 
 
+    public virtual int _parseCalibArr(List<int> iCalib)
+    {
+        int caltyp;
+        YAPI.yCalibrationHandler calhdl = null;
+        int maxpos;
+        int position;
+        List<int> calpar = new List<int>();
+        List<double> calraw = new List<double>();
+        List<double> calref = new List<double>();
+        double fRaw;
+        double fRef;
+        caltyp = (iCalib[0] / 1000);
+        if (caltyp < YAPI.YOCTO_CALIB_TYPE_OFS) {
+            // Unknown calibration type: calibrated value will be provided by the device
+            this._cal = null;
+            return YAPI.SUCCESS;
+        }
+        calhdl = YAPI._getCalibrationHandler(caltyp);
+        if (!(calhdl != null)) {
+            // Unknown calibration type: calibrated value will be provided by the device
+            this._cal = null;
+            return YAPI.SUCCESS;
+        }
+        // New 32 bits text format
+        maxpos = iCalib.Count;
+        calpar.Clear();
+        position = 1;
+        while (position < maxpos) {
+            calpar.Add(iCalib[position]);
+            position = position + 1;
+        }
+        calraw.Clear();
+        calref.Clear();
+        position = 1;
+        while (position + 1 < maxpos) {
+            fRaw = iCalib[position];
+            fRaw = fRaw / 1000.0;
+            fRef = iCalib[position + 1];
+            fRef = fRef / 1000.0;
+            calraw.Add(fRaw);
+            calref.Add(fRef);
+            position = position + 2;
+        }
+        this._cal = new YCalibCtx("", calhdl, caltyp, calpar, calraw, calref);
+        return YAPI.SUCCESS;
+    }
+
+
     public int _initFromDataSet(YDataSet dataset, List<int> encoded)
     {
         int val;
-        int i;
-        int maxpos;
         int ms_offset;
         int samplesPerHour;
-        double fRaw;
-        double fRef;
+        int caltyp;
         List<int> iCalib = new List<int>();
         // decode sequence header to extract data
         this._runNo = encoded[0] + ((encoded[1] << 16));
@@ -8909,28 +8989,11 @@ public class YDataStream
         }
         // precompute decoding parameters
         iCalib = dataset._get_calibration();
-        this._caltyp = iCalib[0];
-        if (this._caltyp != 0) {
-            this._calhdl = YAPI._getCalibrationHandler(this._caltyp);
-            maxpos = iCalib.Count;
-            this._calpar.Clear();
-            this._calraw.Clear();
-            this._calref.Clear();
-            i = 1;
-            while (i < maxpos) {
-                this._calpar.Add(iCalib[i]);
-                i = i + 1;
-            }
-            i = 1;
-            while (i + 1 < maxpos) {
-                fRaw = iCalib[i];
-                fRaw = fRaw / 1000.0;
-                fRef = iCalib[i + 1];
-                fRef = fRef / 1000.0;
-                this._calraw.Add(fRaw);
-                this._calref.Add(fRef);
-                i = i + 2;
-            }
+        caltyp = iCalib[0];
+        if (caltyp == 0) {
+            this._cal = null;
+        } else {
+            this._parseCalibArr(iCalib);
         }
         // preload column names for backward-compatibility
         this._functionId = dataset.get_functionId();
@@ -9044,12 +9107,9 @@ public class YDataStream
     public double _decodeVal(int w)
     {
         double val;
-        val = w;
-        val = val / 1000.0;
-        if (this._caltyp != 0) {
-            if (this._calhdl != null) {
-                val = this._calhdl(val, this._caltyp, this._calpar, this._calraw, this._calref);
-            }
+        val = (w) / 1000.0;
+        if (!(this._cal == null)) {
+            val = this._cal.hdl(val, this._cal.typ, this._cal.par, this._cal.raw, this._cal.cal);
         }
         return val;
     }
@@ -9058,12 +9118,9 @@ public class YDataStream
     public double _decodeAvg(int dw, int count)
     {
         double val;
-        val = dw;
-        val = val / 1000.0;
-        if (this._caltyp != 0) {
-            if (this._calhdl != null) {
-                val = this._calhdl(val, this._caltyp, this._calpar, this._calraw, this._calref);
-            }
+        val = (dw) / 1000.0;
+        if (!(this._cal == null)) {
+            val = this._cal.hdl(val, this._cal.typ, this._cal.par, this._cal.raw, this._cal.cal);
         }
         return val;
     }
@@ -9145,7 +9202,7 @@ public class YDataStream
      */
     public virtual long get_startTimeUTC()
     {
-        return unchecked((int) Math.Round(this._startTime));
+        return (long) Math.Round(this._startTime);
     }
 
 
@@ -11602,6 +11659,7 @@ public class YFunction
     }
 
 
+
     //--- (generated code: YFunction implementation)
 
     protected virtual void _parseAttr(YAPI.YJSONObject json_val)
@@ -11966,6 +12024,26 @@ public class YFunction
     public virtual int _parserHelper()
     {
         return 0;
+    }
+
+
+    public virtual bool _is_valid_pass(string passwd)
+    {
+        string tmp;
+        if ((passwd).Length > YAPI.HASH_BUF_SIZE) {
+            tmp = "Password too long (max "+Convert.ToString(YAPI.HASH_BUF_SIZE)+" chars) :"+passwd;
+            this._throw(YAPI.INVALID_ARGUMENT, tmp);
+            return false;
+        }
+        if ((passwd).IndexOf("@") >=0) {
+            this._throw(YAPI.INVALID_ARGUMENT, "Character @ is not allowed in password");
+            return false;
+        }
+        if ((passwd).IndexOf("/") >=0) {
+            this._throw(YAPI.INVALID_ARGUMENT, "Character / is not allowed in password");
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -15374,6 +15452,7 @@ public class YModule : YFunction
 public class YSensor : YFunction
 {
 //--- (end of generated code: YSensor class start)
+    protected YCalibCtx _cal = null;
     //--- (generated code: YSensor definitions)
     public new delegate void ValueCallback(YSensor func, string value);
     public new delegate void TimedReportCallback(YSensor func, YMeasure measure);
@@ -15406,16 +15485,8 @@ public class YSensor : YFunction
     protected int _sensorState = SENSORSTATE_INVALID;
     protected ValueCallback _valueCallbackSensor = null;
     protected TimedReportCallback _timedReportCallbackSensor = null;
-    protected double _prevTimedReport = 0;
+    protected double _prevTR = 0;
     protected double _iresol = 0;
-    protected double _offset = 0;
-    protected double _scale = 0;
-    protected double _decexp = 0;
-    protected int _caltyp = 0;
-    protected List<int> _calpar = new List<int>();
-    protected List<double> _calraw = new List<double>();
-    protected List<double> _calref = new List<double>();
-    protected YAPI.yCalibrationHandler _calhdl = null;
     //--- (end of generated code: YSensor definitions)
 
     public YSensor(string func) : base(func)
@@ -15541,12 +15612,15 @@ public class YSensor : YFunction
                     return CURRENTVALUE_INVALID;
                 }
             }
-            res = this._applyCalibration(this._currentRawValue);
-            if (res == CURRENTVALUE_INVALID) {
+            if (this._cal == null) {
                 res = this._currentValue;
+            } else {
+                res = this._applyCalibration(this._currentRawValue);
             }
-            res = res * this._iresol;
-            res = Math.Round(res) / this._iresol;
+            if (res == CURRENTVALUE_INVALID) {
+                return res;
+            }
+            res = Math.Round(res * this._iresol) / this._iresol;
         }
         return res;
     }
@@ -15608,8 +15682,7 @@ public class YSensor : YFunction
                     return LOWESTVALUE_INVALID;
                 }
             }
-            res = this._lowestValue * this._iresol;
-            res = Math.Round(res) / this._iresol;
+            res = Math.Round(this._lowestValue * this._iresol) / this._iresol;
         }
         return res;
     }
@@ -15671,8 +15744,7 @@ public class YSensor : YFunction
                     return HIGHESTVALUE_INVALID;
                 }
             }
-            res = this._highestValue * this._iresol;
-            res = Math.Round(res) / this._iresol;
+            res = Math.Round(this._highestValue * this._iresol) / this._iresol;
         }
         return res;
     }
@@ -16147,120 +16219,22 @@ public class YSensor : YFunction
 
     public override int _parserHelper()
     {
-        int position;
-        int maxpos;
-        List<int> iCalib = new List<int>();
-        int iRaw;
-        int iRef;
-        double fRaw;
-        double fRef;
-        this._caltyp = -1;
-        this._scale = -1;
-        this._calpar.Clear();
-        this._calraw.Clear();
-        this._calref.Clear();
+        string calibStr;
         // Store inverted resolution, to provide better rounding
         if (this._resolution > 0) {
             this._iresol = Math.Round(1.0 / this._resolution);
         } else {
             this._iresol = 10000;
-            this._resolution = 0.0001;
         }
-        // Old format: supported when there is no calibration
-        if (this._calibrationParam == "" || this._calibrationParam == "0") {
-            this._caltyp = 0;
+        // Shortcut when there is no calibration parameter
+        calibStr = this._calibrationParam;
+        if (calibStr == "0," || calibStr == "" || calibStr == "0") {
+            this._cal = null;
             return 0;
         }
-        if ((this._calibrationParam).IndexOf(",") >= 0) {
-            // Plain text format
-            iCalib = YAPI._decodeFloats(this._calibrationParam);
-            this._caltyp = (iCalib[0] / 1000);
-            if (this._caltyp > 0) {
-                if (this._caltyp < YAPI.YOCTO_CALIB_TYPE_OFS) {
-                    // Unknown calibration type: calibrated value will be provided by the device
-                    this._caltyp = -1;
-                    return 0;
-                }
-                this._calhdl = YAPI._getCalibrationHandler(this._caltyp);
-                if (!(this._calhdl != null)) {
-                    // Unknown calibration type: calibrated value will be provided by the device
-                    this._caltyp = -1;
-                    return 0;
-                }
-            }
-            // New 32 bits text format
-            this._offset = 0;
-            this._scale = 1000;
-            maxpos = iCalib.Count;
-            this._calpar.Clear();
-            position = 1;
-            while (position < maxpos) {
-                this._calpar.Add(iCalib[position]);
-                position = position + 1;
-            }
-            this._calraw.Clear();
-            this._calref.Clear();
-            position = 1;
-            while (position + 1 < maxpos) {
-                fRaw = iCalib[position];
-                fRaw = fRaw / 1000.0;
-                fRef = iCalib[position + 1];
-                fRef = fRef / 1000.0;
-                this._calraw.Add(fRaw);
-                this._calref.Add(fRef);
-                position = position + 2;
-            }
-        } else {
-            // Recorder-encoded format, including encoding
-            iCalib = YAPI._decodeWords(this._calibrationParam);
-            // In case of unknown format, calibrated value will be provided by the device
-            if (iCalib.Count < 2) {
-                this._caltyp = -1;
-                return 0;
-            }
-            // Save variable format (scale for scalar, or decimal exponent)
-            this._offset = 0;
-            this._scale = 1;
-            this._decexp = 1.0;
-            position = iCalib[0];
-            while (position > 0) {
-                this._decexp = this._decexp * 10;
-                position = position - 1;
-            }
-            // Shortcut when there is no calibration parameter
-            if (iCalib.Count == 2) {
-                this._caltyp = 0;
-                return 0;
-            }
-            this._caltyp = iCalib[2];
-            this._calhdl = YAPI._getCalibrationHandler(this._caltyp);
-            // parse calibration points
-            if (this._caltyp <= 10) {
-                maxpos = this._caltyp;
-            } else {
-                if (this._caltyp <= 20) {
-                    maxpos = this._caltyp - 10;
-                } else {
-                    maxpos = 5;
-                }
-            }
-            maxpos = 3 + 2 * maxpos;
-            if (maxpos > iCalib.Count) {
-                maxpos = iCalib.Count;
-            }
-            this._calpar.Clear();
-            this._calraw.Clear();
-            this._calref.Clear();
-            position = 3;
-            while (position + 1 < maxpos) {
-                iRaw = iCalib[position];
-                iRef = iCalib[position + 1];
-                this._calpar.Add(iRaw);
-                this._calpar.Add(iRef);
-                this._calraw.Add(YAPI._decimalToDouble(iRaw));
-                this._calref.Add(YAPI._decimalToDouble(iRef));
-                position = position + 2;
-            }
+        // Parse calibration parameters only if they have changed
+        if (this._cal == null || !(this._cal.src == calibStr)) {
+            this._parseCalibStr(calibStr);
         }
         return 0;
     }
@@ -16283,10 +16257,11 @@ public class YSensor : YFunction
      */
     public virtual bool isSensorReady()
     {
-        if (!(this.isOnline())) {
-            return false;
-        }
-        if (!(this._sensorState == 0)) {
+        try {
+            if (this.get_sensorState() != 0) {
+                return false;
+            }
+        } catch {
             return false;
         }
         return true;
@@ -16323,6 +16298,102 @@ public class YSensor : YFunction
         hwid = serial + ".dataLogger";
         logger = YDataLogger.FindDataLogger(hwid);
         return logger;
+    }
+
+
+    public virtual int _parseCalibStr(string calibStr)
+    {
+        List<int> iCalib = new List<int>();
+        int caltyp;
+        YAPI.yCalibrationHandler calhdl = null;
+        int maxpos;
+        int position;
+        List<int> calpar = new List<int>();
+        List<double> calraw = new List<double>();
+        List<double> calref = new List<double>();
+        double fRaw;
+        double fRef;
+        int iRaw;
+        int iRef;
+        if ((calibStr).IndexOf(",") >= 0) {
+            // Plain text format
+            iCalib = YAPI._decodeFloats(calibStr);
+            caltyp = (iCalib[0] / 1000);
+            if (caltyp < YAPI.YOCTO_CALIB_TYPE_OFS) {
+                // Unknown calibration type: calibrated value will be provided by the device
+                this._cal = null;
+                return YAPI.SUCCESS;
+            }
+            calhdl = YAPI._getCalibrationHandler(caltyp);
+            if (!(calhdl != null)) {
+                // Unknown calibration type: calibrated value will be provided by the device
+                this._cal = null;
+                return YAPI.SUCCESS;
+            }
+            // New 32 bits text format
+            maxpos = iCalib.Count;
+            calpar.Clear();
+            position = 1;
+            while (position < maxpos) {
+                calpar.Add(iCalib[position]);
+                position = position + 1;
+            }
+            calraw.Clear();
+            calref.Clear();
+            position = 1;
+            while (position + 1 < maxpos) {
+                fRaw = iCalib[position];
+                fRaw = fRaw / 1000.0;
+                fRef = iCalib[position + 1];
+                fRef = fRef / 1000.0;
+                calraw.Add(fRaw);
+                calref.Add(fRef);
+                position = position + 2;
+            }
+        } else {
+            // Old recorder-encoded format, including encoding
+            iCalib = YAPI._decodeWords(calibStr);
+            if (iCalib.Count <= 2) {
+                // Unknown calibration type: calibrated value will be provided by the device
+                this._cal = null;
+                return YAPI.SUCCESS;
+            }
+            caltyp = iCalib[2];
+            calhdl = YAPI._getCalibrationHandler(caltyp);
+            if (!(calhdl != null)) {
+                // Unknown calibration type: calibrated value will be provided by the device
+                this._cal = null;
+                return YAPI.SUCCESS;
+            }
+            if (caltyp <= 10) {
+                maxpos = caltyp;
+            } else {
+                if (caltyp <= 20) {
+                    maxpos = caltyp - 10;
+                } else {
+                    maxpos = 5;
+                }
+            }
+            maxpos = 3 + 2 * maxpos;
+            if (maxpos > iCalib.Count) {
+                maxpos = iCalib.Count;
+            }
+            calpar.Clear();
+            calraw.Clear();
+            calref.Clear();
+            position = 3;
+            while (position + 1 < maxpos) {
+                iRaw = iCalib[position];
+                iRef = iCalib[position + 1];
+                calpar.Add(iRaw);
+                calpar.Add(iRef);
+                calraw.Add(YAPI._decimalToDouble(iRaw));
+                calref.Add(YAPI._decimalToDouble(iRef));
+                position = position + 2;
+            }
+        }
+        this._cal = new YCalibCtx(calibStr, calhdl, caltyp, calpar, calraw, calref);
+        return YAPI.SUCCESS;
     }
 
 
@@ -16543,22 +16614,21 @@ public class YSensor : YFunction
         refValues.Clear();
         // Load function parameters if not yet loaded
         lock (_thisLock) {
-            if ((this._scale == 0) || (this._cacheExpiration <= YAPI.GetTickCount())) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
                 if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
                     return YAPI.DEVICE_NOT_FOUND;
                 }
             }
-            if (this._caltyp < 0) {
-                this._throw(YAPI.NOT_SUPPORTED, "Calibration parameters format mismatch. Please upgrade your library or firmware.");
-                return YAPI.NOT_SUPPORTED;
+            if (this._cal == null) {
+                return YAPI.SUCCESS;
             }
             rawValues.Clear();
             refValues.Clear();
-            for (int ii_0 = 0; ii_0 < this._calraw.Count; ii_0++) {
-                rawValues.Add(this._calraw[ii_0]);
+            for (int ii_0 = 0; ii_0 < this._cal.raw.Count; ii_0++) {
+                rawValues.Add(this._cal.raw[ii_0]);
             }
-            for (int ii_1 = 0; ii_1 < this._calref.Count; ii_1++) {
-                refValues.Add(this._calref[ii_1]);
+            for (int ii_1 = 0; ii_1 < this._cal.cal.Count; ii_1++) {
+                refValues.Add(this._cal.cal[ii_1]);
             }
         }
         return YAPI.SUCCESS;
@@ -16579,18 +16649,7 @@ public class YSensor : YFunction
         if (npt == 0) {
             return "0";
         }
-        // Load function parameters if not yet loaded
-        if (this._scale == 0) {
-            if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
-                return YAPI.INVALID_STRING;
-            }
-        }
-        // Detect old firmware
-        if ((this._caltyp < 0) || (this._scale < 0)) {
-            this._throw(YAPI.NOT_SUPPORTED, "Calibration parameters format mismatch. Please upgrade your library or firmware.");
-            return "0";
-        }
-        // 32-bit fixed-point encoding
+        // Encode using newer 32-bit fixed-point method
         res = ""+Convert.ToString(YAPI.YOCTO_CALIB_TYPE_OFS);
         idx = 0;
         while (idx < npt) {
@@ -16603,19 +16662,13 @@ public class YSensor : YFunction
 
     public virtual double _applyCalibration(double rawValue)
     {
+        if (this._cal == null) {
+            return rawValue;
+        }
         if (rawValue == CURRENTVALUE_INVALID) {
             return CURRENTVALUE_INVALID;
         }
-        if (this._caltyp == 0) {
-            return rawValue;
-        }
-        if (this._caltyp < 0) {
-            return CURRENTVALUE_INVALID;
-        }
-        if (!(this._calhdl != null)) {
-            return CURRENTVALUE_INVALID;
-        }
-        return this._calhdl(rawValue, this._caltyp, this._calpar, this._calraw, this._calref);
+        return this._cal.hdl(rawValue, this._cal.typ, this._cal.par, this._cal.raw, this._cal.cal);
     }
 
 
@@ -16637,10 +16690,10 @@ public class YSensor : YFunction
         if (duration > 0) {
             startTime = timestamp - duration;
         } else {
-            startTime = this._prevTimedReport;
+            startTime = this._prevTR;
         }
         endTime = timestamp;
-        this._prevTimedReport = endTime;
+        this._prevTR = endTime;
         if (startTime == 0) {
             startTime = endTime;
         }
@@ -16661,10 +16714,8 @@ public class YSensor : YFunction
                 avgRaw = avgRaw - poww;
             }
             avgVal = avgRaw / 1000.0;
-            if (this._caltyp != 0) {
-                if (this._calhdl != null) {
-                    avgVal = this._calhdl(avgVal, this._caltyp, this._calpar, this._calraw, this._calref);
-                }
+            if (!(this._cal == null)) {
+                avgVal = this._cal.hdl(avgVal, this._cal.typ, this._cal.par, this._cal.raw, this._cal.cal);
             }
             minVal = avgVal;
             maxVal = avgVal;
@@ -16710,12 +16761,10 @@ public class YSensor : YFunction
             avgVal = avgRaw / 1000.0;
             minVal = minRaw / 1000.0;
             maxVal = maxRaw / 1000.0;
-            if (this._caltyp != 0) {
-                if (this._calhdl != null) {
-                    avgVal = this._calhdl(avgVal, this._caltyp, this._calpar, this._calraw, this._calref);
-                    minVal = this._calhdl(minVal, this._caltyp, this._calpar, this._calraw, this._calref);
-                    maxVal = this._calhdl(maxVal, this._caltyp, this._calpar, this._calraw, this._calref);
-                }
+            if (!(this._cal == null)) {
+                avgVal = this._cal.hdl(avgVal, this._cal.typ, this._cal.par, this._cal.raw, this._cal.cal);
+                minVal = this._cal.hdl(minVal, this._cal.typ, this._cal.par, this._cal.raw, this._cal.cal);
+                maxVal = this._cal.hdl(maxVal, this._cal.typ, this._cal.par, this._cal.raw, this._cal.cal);
             }
         }
         return new YMeasure(startTime, endTime, minVal, avgVal, maxVal);
@@ -16726,10 +16775,8 @@ public class YSensor : YFunction
     {
         double val;
         val = w;
-        if (this._caltyp != 0) {
-            if (this._calhdl != null) {
-                val = this._calhdl(val, this._caltyp, this._calpar, this._calraw, this._calref);
-            }
+        if (!(this._cal == null)) {
+            val = this._cal.hdl(val, this._cal.typ, this._cal.par, this._cal.raw, this._cal.cal);
         }
         return val;
     }
@@ -16739,10 +16786,8 @@ public class YSensor : YFunction
     {
         double val;
         val = dw;
-        if (this._caltyp != 0) {
-            if (this._calhdl != null) {
-                val = this._calhdl(val, this._caltyp, this._calpar, this._calraw, this._calref);
-            }
+        if (!(this._cal == null)) {
+            val = this._cal.hdl(val, this._cal.typ, this._cal.par, this._cal.raw, this._cal.cal);
         }
         return val;
     }

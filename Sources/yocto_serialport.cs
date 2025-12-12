@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 63469 2024-11-25 14:01:08Z seb $
+ * $Id: yocto_serialport.cs 70736 2025-12-12 07:53:30Z mvuilleu $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
@@ -1663,7 +1663,8 @@ public class YSerialPort : YFunction
         reqlen = 1024;
         buff = this.readBin(reqlen);
         bufflen = (buff).Length;
-        if (this._rxptr == currpos+bufflen) {
+        if ((bufflen > 0) && (this._rxptr == currpos+bufflen)) {
+            // up to 1024 bytes in buffer, all in direction Rx
             res = buff[0];
             this._rxptr = currpos+1;
             this._rxbuffptr = currpos;
@@ -1675,7 +1676,8 @@ public class YSerialPort : YFunction
         reqlen = 16;
         buff = this.readBin(reqlen);
         bufflen = (buff).Length;
-        if (this._rxptr == currpos+bufflen) {
+        if ((bufflen > 0) && (this._rxptr == currpos+bufflen)) {
+            // up to 16 bytes in buffer, all in direction Rx
             res = buff[0];
             this._rxptr = currpos+1;
             this._rxbuffptr = currpos;

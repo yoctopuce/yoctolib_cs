@@ -86,6 +86,7 @@ public class YColorSensor : YFunction
     public const int LEDCALIBRATION_INVALID = YAPI.INVALID_UINT;
     public const int INTEGRATIONTIME_INVALID = YAPI.INVALID_UINT;
     public const int GAIN_INVALID = YAPI.INVALID_UINT;
+    public const string AUTOGAIN_INVALID = YAPI.INVALID_STRING;
     public const int SATURATION_INVALID = YAPI.INVALID_UINT;
     public const int ESTIMATEDRGB_INVALID = YAPI.INVALID_UINT;
     public const int ESTIMATEDHSL_INVALID = YAPI.INVALID_UINT;
@@ -114,6 +115,7 @@ public class YColorSensor : YFunction
     protected int _ledCalibration = LEDCALIBRATION_INVALID;
     protected int _integrationTime = INTEGRATIONTIME_INVALID;
     protected int _gain = GAIN_INVALID;
+    protected string _autoGain = AUTOGAIN_INVALID;
     protected int _saturation = SATURATION_INVALID;
     protected int _estimatedRGB = ESTIMATEDRGB_INVALID;
     protected int _estimatedHSL = ESTIMATEDHSL_INVALID;
@@ -163,6 +165,10 @@ public class YColorSensor : YFunction
         if (json_val.has("gain"))
         {
             _gain = json_val.getInt("gain");
+        }
+        if (json_val.has("autoGain"))
+        {
+            _autoGain = json_val.getString("autoGain");
         }
         if (json_val.has("saturation"))
         {
@@ -590,6 +596,66 @@ public class YColorSensor : YFunction
         lock (_thisLock) {
             rest_val = (newval).ToString();
             return _setAttr("gain", rest_val);
+        }
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the current autogain parameters of the sensor as a character string.
+     * <para>
+     *   The returned parameter format is: "Min &lt; Channel &lt; Max:Saturation".
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string corresponding to the current autogain parameters of the sensor as a character string
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YColorSensor.AUTOGAIN_INVALID</c>.
+     * </para>
+     */
+    public string get_autoGain()
+    {
+        string res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return AUTOGAIN_INVALID;
+                }
+            }
+            res = this._autoGain;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Remember to call the <c>saveToFlash()</c> method of the module if the modification must be kept.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a string
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_autoGain(string newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("autoGain", rest_val);
         }
     }
 
@@ -1121,6 +1187,45 @@ public class YColorSensor : YFunction
             base._invokeValueCallback(value);
         }
         return 0;
+    }
+
+
+    /**
+     * <summary>
+     *   Changes the sensor automatic gain control settings.
+     * <para>
+     *   Remember to call the <c>saveToFlash()</c> method of the module if the modification must be kept.
+     * </para>
+     * </summary>
+     * <param name="channel">
+     *   reference channel to use for automated gain control.
+     * </param>
+     * <param name="minRaw">
+     *   lower threshold for the measured raw value, below which the gain is
+     *   automatically increased as long as possible.
+     * </param>
+     * <param name="maxRaw">
+     *   high threshold for the measured raw value, over which the gain is
+     *   automatically decreased as long as possible.
+     * </param>
+     * <param name="noSatur">
+     *   enables gain reduction in case of sensor saturation.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the operation completes successfully.
+     *   On failure, throws an exception or returns a negative error code.
+     * </returns>
+     */
+    public virtual int configureAutoGain(string channel, int minRaw, int maxRaw, bool noSatur)
+    {
+        string opt;
+        if (noSatur) {
+            opt = "nosat";
+        } else {
+            opt = "";
+        }
+
+        return this.set_autoGain(""+Convert.ToString(minRaw)+" < "+channel+" < "+Convert.ToString(maxRaw)+":"+opt);
     }
 
 

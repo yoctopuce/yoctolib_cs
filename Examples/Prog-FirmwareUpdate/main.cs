@@ -81,7 +81,7 @@ namespace ConsoleApplication1
           shield.Add(serial);
         } else if (product.StartsWith("YoctoHub")) {
           hubs.Add(serial);
-        } else if (product != "VirtualHub") {
+        } else if (!product.StartsWith("VirtualHub")) {
           devices.Add(serial);
         }
         module = module.nextModule();
