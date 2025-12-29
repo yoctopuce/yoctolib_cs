@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 56107 2023-08-16 09:15:27Z seb $
+ * $Id: yocto_display.cs 70932 2025-12-22 09:11:53Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -978,6 +978,7 @@ public class YDisplay : YFunction
     public const int DISPLAYTYPE_MONO = 0;
     public const int DISPLAYTYPE_GRAY = 1;
     public const int DISPLAYTYPE_RGB = 2;
+    public const int DISPLAYTYPE_EPAPER = 3;
     public const int DISPLAYTYPE_INVALID = -1;
     public const int LAYERWIDTH_INVALID = YAPI.INVALID_UINT;
     public const int LAYERHEIGHT_INVALID = YAPI.INVALID_UINT;
@@ -1375,8 +1376,9 @@ public class YDisplay : YFunction
      * </para>
      * </summary>
      * <returns>
-     *   a value among <c>YDisplay.DISPLAYTYPE_MONO</c>, <c>YDisplay.DISPLAYTYPE_GRAY</c> and
-     *   <c>YDisplay.DISPLAYTYPE_RGB</c> corresponding to the display type: monochrome, gray levels or full color
+     *   a value among <c>YDisplay.DISPLAYTYPE_MONO</c>, <c>YDisplay.DISPLAYTYPE_GRAY</c>,
+     *   <c>YDisplay.DISPLAYTYPE_RGB</c> and <c>YDisplay.DISPLAYTYPE_EPAPER</c> corresponding to the display
+     *   type: monochrome, gray levels or full color
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YDisplay.DISPLAYTYPE_INVALID</c>.

@@ -1,9 +1,8 @@
-C#V2 v2.1.10736
+C#V2 v2.1.11132
 
-- Improve error reporting if DLL is not found
+- Update Mbed-TLS lib to 4.0
+- Improve error reporting if dll is not found
 - Add support for old .NET framework (3.5)
-- Prevent setting passwords with unsupported characters (@ and /)
-- Fix behavior of YSerialPort.readByte when there is no data available
-- Fix Prog-FirmwareUpdate example to properly handle VirtualHub-4web and VirtualHub-V2
-- Fix possible incorrect timeout values in YAPI::PreregisterHub
-- Fix redirection handling with IPv6 address
+- Fix some timeout with YAPI::PreregisterHub
+- Fix redirection handling with IpV6 address
+- Fix rare deadlock when network connection is very unstable
