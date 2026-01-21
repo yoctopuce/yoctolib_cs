@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 70666 2025-12-09 10:26:00Z seb $
+ * $Id: yocto_api.cs 71269 2026-01-12 10:54:29Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -4619,7 +4619,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "2.1";
     public const int YOCTO_API_VERSION_BCD = 0x0200;
 
-    public const string YOCTO_API_BUILD_NO = "71132";
+    public const string YOCTO_API_BUILD_NO = "71416";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6854,6 +6854,8 @@ public class YAPI
                 return "Win32";
             case SafeNativeMethods.YAPIDLL_VERSION.WIN64:
                 return "Win64";
+            case SafeNativeMethods.YAPIDLL_VERSION.WINARM64:
+                return "WinArm64";
             case SafeNativeMethods.YAPIDLL_VERSION.MACOS32:
                 return "MacOs32";
             case SafeNativeMethods.YAPIDLL_VERSION.MACOS64:
@@ -6906,7 +6908,7 @@ public class YAPI
             }
             throw;
         }
-        return  "2.1.11132 (" + version + ")";
+        return  "2.1.11416 (" + version + ")";
     }
 
     /**

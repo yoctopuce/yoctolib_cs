@@ -1,8 +1,9 @@
-C#V2 v2.1.11132
+C#V2 v2.1.11416
 
 - Update Mbed-TLS lib to 4.0
-- Improve error reporting if dll is not found
 - Add support for old .NET framework (3.5)
+- Improve error reporting if dll is not found
+- Fix return value for GetDllArchitecture on Windows ARM
 - Fix some timeout with YAPI::PreregisterHub
 - Fix redirection handling with IpV6 address
 - Fix rare deadlock when network connection is very unstable
