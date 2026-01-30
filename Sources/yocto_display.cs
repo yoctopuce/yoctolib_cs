@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 71207 2026-01-07 18:17:59Z mvuilleu $
+ * $Id: yocto_display.cs 71629 2026-01-29 15:08:26Z mvuilleu $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -93,6 +93,11 @@ public class YDisplayLayer
         BASELINE_RIGHT = 14,
         BOTTOM_RIGHT = 15
     };
+    public const int NO_INK = -1;
+    public const int BG_INK = -2;
+    public const int FG_INK = -3;
+    protected int _polyPrevX = 0;
+    protected int _polyPrevY = 0;
     //--- (end of generated code: YDisplayLayer definitions)
 
     public YDisplayLayer(YDisplay parent, int id)
@@ -154,9 +159,11 @@ public class YDisplayLayer
 
     /**
      * <summary>
-     *   Selects the pen color for all subsequent drawing functions,
-     *   including text drawing.
+     *   Selects the color to be used for all subsequent drawing functions,
+     *   for filling as well as for line and text drawing.
      * <para>
+     *   To select a different fill and outline color, use
+     *   <c>selectFillColor</c> and <c>selectLineColor</c>.
      *   The pen color is provided as an RGB value.
      *   For grayscale or monochrome displays, the value is
      *   automatically converted to the proper range.
@@ -181,8 +188,10 @@ public class YDisplayLayer
     /**
      * <summary>
      *   Selects the pen gray level for all subsequent drawing functions,
-     *   including text drawing.
+     *   for filling as well as for line and text drawing.
      * <para>
+     *   To select a different fill and outline color, use
+     *   <c>selectFillColor</c> and <c>selectLineColor</c>.
      *   The gray level is provided as a number between
      *   0 (black) and 255 (white, or whichever the lightest color is).
      *   For monochrome displays (without gray levels), any value
@@ -231,19 +240,21 @@ public class YDisplayLayer
 
     /**
      * <summary>
-     *   Enables or disables anti-aliasing for drawing oblique lines and circles.
+     *   Selects the color to be used for filling rectangular bars,
+     *   discs and polygons.
      * <para>
-     *   Anti-aliasing provides a smoother aspect when looked from far enough,
-     *   but it can add fuzziness when the display is looked from very close.
-     *   At the end of the day, it is your personal choice.
-     *   Anti-aliasing is enabled by default on grayscale and color displays,
-     *   but you can disable it if you prefer. This setting has no effect
-     *   on monochrome displays.
+     *   The color is provided as an RGB value.
+     *   For grayscale or monochrome displays, the value is
+     *   automatically converted to the proper range.
+     *   You can also use the constants <c>FG_INK</c> to use the
+     *   default drawing colour, <c>BG_INK</c> to use the default
+     *   background colour, and <c>NO_INK</c> to disable filling.
      * </para>
      * </summary>
-     * <param name="mode">
-     *   <c>true</c> to enable anti-aliasing, <c>false</c> to
-     *   disable it.
+     * <param name="color">
+     *   the desired drawing color, as a 24-bit RGB value,
+     *   or one of the constants <c>NO_INK</c>, <c>FG_INK</c>
+     *   or <c>BG_INK</c>
      * </param>
      * <returns>
      *   <c>YAPI.SUCCESS</c> if the call succeeds.
@@ -252,6 +263,96 @@ public class YDisplayLayer
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
+    public virtual int selectFillColor(int color)
+    {
+        int r;
+        int g;
+        int b;
+        if (color==-1) {
+            return this.command_push("f_");
+        }
+        if (color==-2) {
+            return this.command_push("f-");
+        }
+        if (color==-3) {
+            return this.command_push("f.");
+        }
+        r = ((color >> 20) & 15);
+        g = ((color >> 12) & 15);
+        b = ((color >> 4) & 15);
+        return this.command_push("f"+String.Format("{0:x}",r)+""+String.Format("{0:x}",g)+""+String.Format("{0:x}",b));
+    }
+
+
+    /**
+     * <summary>
+     *   Selects the color to be used for drawing the outline of rectangular
+     *   bars, discs and polygons, as well as for drawing lines and text.
+     * <para>
+     *   The color is provided as an RGB value.
+     *   For grayscale or monochrome displays, the value is
+     *   automatically converted to the proper range.
+     *   You can also use the constants <c>FG_INK</c> to use the
+     *   default drawing colour, <c>BG_INK</c> to use the default
+     *   background colour, and <c>NO_INK</c> to disable outline drawing.
+     * </para>
+     * </summary>
+     * <param name="color">
+     *   the desired drawing color, as a 24-bit RGB value,
+     *   or one of the constants <c>NO_INK</c>, <c>FG_INK</c>
+     *   or <c>BG_INK</c>
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int selectLineColor(int color)
+    {
+        int r;
+        int g;
+        int b;
+        if (color==-1) {
+            return this.command_push("l_");
+        }
+        if (color==-2) {
+            return this.command_push("l-");
+        }
+        if (color==-3) {
+            return this.command_push("l*");
+        }
+        r = ((color >> 20) & 15);
+        g = ((color >> 12) & 15);
+        b = ((color >> 4) & 15);
+        return this.command_push("l"+String.Format("{0:x}",r)+""+String.Format("{0:x}",g)+""+String.Format("{0:x}",b));
+    }
+
+
+    /**
+     * <summary>
+     *   Selects the line width for drawing the outline of rectangular
+     *   bars, discs and polygons, as well as for drawing lines.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="width">
+     *   the desired line width, in pixels
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int selectLineWidth(int width)
+    {
+        return this.command_push("t"+Convert.ToString(width));
+    }
+
+
     public virtual int setAntialiasingMode(bool mode)
     {
         return this.command_push("a"+(mode?"1":"0"));
@@ -473,12 +574,11 @@ public class YDisplayLayer
 
     /**
      * <summary>
-     *   Draws a GIF image at the specified position.
+     *   Draws an image previously uploaded to the device filesystem, at the specified position.
      * <para>
-     *   The GIF image must have been previously
-     *   uploaded to the device built-in memory. If you experience problems using an image
-     *   file, check the device logs for any error message such as missing image file or bad
-     *   image file format.
+     *   At present time, GIF images are the only supported image format. If you experience
+     *   problems using an image file, check the device logs for any error message such as
+     *   missing image file or bad image file format.
      * </para>
      * </summary>
      * <param name="x">
@@ -549,6 +649,38 @@ public class YDisplayLayer
 
     /**
      * <summary>
+     *   Draws a GIF image provided as a binary buffer at the specified position.
+     * <para>
+     *   If the image drawing must be included in an animation sequence, save it
+     *   in the device filesystem first and use <c>drawImage</c> instead.
+     * </para>
+     * </summary>
+     * <param name="x">
+     *   the distance from left of layer to the left of the image, in pixels
+     * </param>
+     * <param name="y">
+     *   the distance from top of layer to the top of the image, in pixels
+     * </param>
+     * <param name="gifimage">
+     *   a binary object with the content of a GIF file
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int drawGIF(int x, int y, byte[] gifimage)
+    {
+        string destname;
+        destname = "layer"+Convert.ToString(this._id)+":G,-1@"+Convert.ToString(x)+","+Convert.ToString(y);
+        return this._display.upload(destname,gifimage);
+    }
+
+
+    /**
+     * <summary>
      *   Moves the drawing pointer of this layer to the specified position.
      * <para>
      * </para>
@@ -596,6 +728,85 @@ public class YDisplayLayer
     public virtual int lineTo(int x, int y)
     {
         return this.command_flush("-"+Convert.ToString(x)+","+Convert.ToString(y));
+    }
+
+
+    /**
+     * <summary>
+     *   Starts drawing a polygon with the first corner at the specified position.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="x">
+     *   the distance from left of layer, in pixels
+     * </param>
+     * <param name="y">
+     *   the distance from top of layer, in pixels
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int polygonStart(int x, int y)
+    {
+        this._polyPrevX = x;
+        this._polyPrevY = y;
+        return this.command_push("["+Convert.ToString(x)+","+Convert.ToString(y));
+    }
+
+
+    /**
+     * <summary>
+     *   Adds a point to the currently open polygon, previously opened using
+     *   <c>polygonStart</c>.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="x">
+     *   the distance from left of layer to the new point, in pixels
+     * </param>
+     * <param name="y">
+     *   the distance from top of layer to the new point, in pixels
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int polygonAdd(int x, int y)
+    {
+        int dx;
+        int dy;
+        dx = x - this._polyPrevX;
+        dy = y - this._polyPrevY;
+        this._polyPrevX = x;
+        this._polyPrevY = y;
+        return this.command_flush(";"+Convert.ToString(dx)+","+Convert.ToString(dy));
+    }
+
+
+    /**
+     * <summary>
+     *   Close the currently open polygon, fill its content the fill color currently
+     *   selected for the layer, and draw its outline using the selected line color.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int polygonEnd()
+    {
+        return this.command_flush("]");
     }
 
 
@@ -1840,7 +2051,7 @@ public class YDisplay : YFunction
      */
     public virtual int postponeRefresh(int duration)
     {
-        return this.sendCommand("t"+Convert.ToString(duration));
+        return this.sendCommand("H"+Convert.ToString(duration));
     }
 
 
@@ -1862,7 +2073,7 @@ public class YDisplay : YFunction
      */
     public virtual int triggerRefresh()
     {
-        return this.sendCommand("t0");
+        return this.sendCommand("H0");
     }
 
 
