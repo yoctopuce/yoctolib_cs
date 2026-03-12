@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 71629 2026-01-29 15:08:26Z mvuilleu $
+ * $Id: yocto_display.cs 72057 2026-02-17 09:44:53Z mvuilleu $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -1189,9 +1189,9 @@ public class YDisplay : YFunction
     public const int DISPLAYWIDTH_INVALID = YAPI.INVALID_UINT;
     public const int DISPLAYHEIGHT_INVALID = YAPI.INVALID_UINT;
     public const int DISPLAYTYPE_MONO = 0;
-    public const int DISPLAYTYPE_GRAY = 1;
-    public const int DISPLAYTYPE_RGB = 2;
-    public const int DISPLAYTYPE_EPAPER = 3;
+    public const int DISPLAYTYPE_EPAPER_BW = 1;
+    public const int DISPLAYTYPE_EPAPER_BWR = 2;
+    public const int DISPLAYTYPE_EPAPER_BWRY = 3;
     public const int DISPLAYTYPE_INVALID = -1;
     public const int LAYERWIDTH_INVALID = YAPI.INVALID_UINT;
     public const int LAYERHEIGHT_INVALID = YAPI.INVALID_UINT;
@@ -1724,16 +1724,16 @@ public class YDisplay : YFunction
 
     /**
      * <summary>
-     *   Returns the display type: monochrome, gray levels or full color.
+     *   Returns the display type: monochrome OLED, black and white ePaper, color ePaper, etc.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   a value among <c>YDisplay.DISPLAYTYPE_MONO</c>, <c>YDisplay.DISPLAYTYPE_GRAY</c>,
-     *   <c>YDisplay.DISPLAYTYPE_RGB</c> and <c>YDisplay.DISPLAYTYPE_EPAPER</c> corresponding to the display
-     *   type: monochrome, gray levels or full color
+     *   a value among <c>YDisplay.DISPLAYTYPE_MONO</c>, <c>YDisplay.DISPLAYTYPE_EPAPER_BW</c>,
+     *   <c>YDisplay.DISPLAYTYPE_EPAPER_BWR</c> and <c>YDisplay.DISPLAYTYPE_EPAPER_BWRY</c> corresponding to
+     *   the display type: monochrome OLED, black and white ePaper, color ePaper, etc
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YDisplay.DISPLAYTYPE_INVALID</c>.
@@ -1936,9 +1936,11 @@ public class YDisplay : YFunction
      * <summary>
      *   Registers the callback function that is invoked on every change of advertised value.
      * <para>
-     *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
-     *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
-     *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
+     *   The callback is then invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
+     *   This provides control over the time when the callback is triggered. For good responsiveness,
+     *   remember to call one of these two functions periodically. The callback is called once juste after beeing
+     *   registered, passing the current advertised value  of the function, provided that it is not an empty string.
+     *   To unregister a callback, pass a null pointer as argument.
      * </para>
      * <para>
      * </para>
@@ -2403,7 +2405,6 @@ public class YDisplay : YFunction
         int srcx;
         int srcy;
         int srci;
-        int incx;
         byte[] pixmap = new byte[0];
         int pixcount;
         int pixval;
@@ -2502,7 +2503,6 @@ public class YDisplay : YFunction
         pixmap = new byte[pixcount];
         srcx = 0;
         srcy = 0;
-        incx = (8 / zipbits);
         srcval = 0;
         while (srcpos < zipsize) {
             // load next compression pattern byte
@@ -2514,11 +2514,15 @@ public class YDisplay : YFunction
                 if ((srcpat & 128) != 0) {
                     srcval = zipmap[srcpos];
                     srcpos = srcpos + 1;
+                    if (zipbits > 1) {
+                        srcval = (srcval << 8) + zipmap[srcpos];
+                        srcpos = srcpos + 1;
+                    }
                 }
                 srcpat = (srcpat << 1);
                 pixpos = srcy * zipwidth + srcx;
-                // produce 8 pixels (or 4, if bitmap uses 2 bits per pixel)
-                srci = 8 - zipbits;
+                // produce 8 pixels
+                srci = 7 * zipbits;
                 while (srci >= 0) {
                     pixval = ((srcval >> srci) & zipmask);
                     pixmap[pixpos] = (byte)(pixval & 0xff);
@@ -2528,7 +2532,7 @@ public class YDisplay : YFunction
                 srcy = srcy + 1;
                 if (srcy >= zipheight) {
                     srcy = 0;
-                    srcx = srcx + incx;
+                    srcx = srcx + 8;
                     // drop last bytes if image is not a multiple of 8
                     if (srcx >= zipwidth) {
                         srcbit = 0;

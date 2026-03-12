@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_messagebox.cs 68482 2025-08-21 10:07:30Z mvuilleu $
+ * $Id: yocto_messagebox.cs 72410 2026-03-11 07:18:41Z mvuilleu $
  *
  * Implements yFindMessageBox(), the high-level API for MessageBox functions
  *
@@ -73,6 +73,7 @@ public class YSms
     protected YMessageBox _mbox;
     protected int _slot = 0;
     protected bool _deliv;
+    protected bool _isnew;
     protected string _smsc = "";
     protected int _mref = 0;
     protected string _orig = "";
@@ -120,9 +121,9 @@ public class YSms
     }
 
 
-    public virtual string get_sender()
+    public virtual int get_protocolId()
     {
-        return this._orig;
+        return this._pid;
     }
 
 
@@ -132,9 +133,9 @@ public class YSms
     }
 
 
-    public virtual int get_protocolId()
+    public virtual bool isNew()
     {
-        return this._pid;
+        return this._isnew;
     }
 
 
@@ -161,13 +162,7 @@ public class YSms
 
     public virtual int get_dcs()
     {
-        return (this._mclass | ((this._alphab << 2)));
-    }
-
-
-    public virtual string get_timestamp()
-    {
-        return this._stamp;
+        return (this._mclass | (this._alphab << 2));
     }
 
 
@@ -185,9 +180,57 @@ public class YSms
 
     /**
      * <summary>
-     *   Returns the content of the message.
+     *   Returns true iff the message is a "Flash" SMS (class 0 message).
+     * <para>
+     *   Flash messages
+     *   are displayed on the handset immediately and usually not saved on the SIM card.
+     * </para>
+     * </summary>
+     * <returns>
+     *   a boolean.
+     * </returns>
+     */
+    public virtual bool isFlashMessage()
+    {
+        return this.get_msgClass() == 0;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the reported message timestamp.
      * <para>
      * </para>
+     * </summary>
+     * <returns>
+     *   the timestamp as a text string.
+     * </returns>
+     */
+    public virtual string get_timestamp()
+    {
+        return this._stamp;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the reported message sender.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a text string.
+     * </returns>
+     */
+    public virtual string get_sender()
+    {
+        return this._orig;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the content of the message as a text string.
      * <para>
      * </para>
      * </summary>
@@ -220,6 +263,16 @@ public class YSms
     }
 
 
+    /**
+     * <summary>
+     *   Returns the content of the message, as a list of integer unicode values.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a list of integers.
+     * </returns>
+     */
     public virtual List<int> get_unicodeData()
     {
         List<int> res = new List<int>();
@@ -322,6 +375,13 @@ public class YSms
     }
 
 
+    public virtual int set_new(bool val)
+    {
+        this._isnew = val;
+        return YAPI.SUCCESS;
+    }
+
+
     public virtual int set_smsc(string val)
     {
         this._smsc = val;
@@ -384,7 +444,7 @@ public class YSms
 
     public virtual int set_dcs(int val)
     {
-        this._alphab = (((val >> 2)) & 3);
+        this._alphab = ((val >> 2) & 3);
         this._mclass = (val & (16+3));
         this._npdu = 0;
         return YAPI.SUCCESS;
@@ -446,7 +506,7 @@ public class YSms
 
     /**
      * <summary>
-     *   Add a regular text to the SMS.
+     *   Adds regular text to the SMS.
      * <para>
      *   This function support messages
      *   of more than 160 characters. ISO-latin accented characters
@@ -523,7 +583,7 @@ public class YSms
 
     /**
      * <summary>
-     *   Add a unicode text to the SMS.
+     *   Adds unicode characters to the SMS.
      * <para>
      *   This function support messages
      *   of more than 160 characters, using SMS concatenation.
@@ -532,7 +592,7 @@ public class YSms
      * </para>
      * </summary>
      * <param name="val">
-     *   an array of special unicode characters
+     *   a list of unicode characters provided as integers
      * </param>
      * <returns>
      *   <c>YAPI.SUCCESS</c> when the call succeeds.
@@ -574,11 +634,11 @@ public class YSms
             uni = val[i];
             if (uni >= 65536) {
                 surrogate = uni - 65536;
-                uni = (((surrogate >> 10) & 1023)) + 55296;
+                uni = ((surrogate >> 10) & 1023) + 55296;
                 udata[udatalen] = (byte)((uni >> 8) & 0xff);
                 udata[udatalen+1] = (byte)((uni & 255) & 0xff);
                 udatalen = udatalen + 2;
-                uni = ((surrogate & 1023)) + 56320;
+                uni = (surrogate & 1023) + 56320;
             }
             udata[udatalen] = (byte)((uni >> 8) & 0xff);
             udata[udatalen+1] = (byte)((uni & 255) & 0xff);
@@ -751,7 +811,7 @@ public class YSms
                 } else {
                     byt = addr[ofs+rpos];
                     rpos = rpos + 1;
-                    gsm7[i] = (byte)((carry | (((byt << nbits)) & 127)) & 0xff);
+                    gsm7[i] = (byte)((carry | ((byt << nbits) & 127)) & 0xff);
                     carry = (byt >> (7 - nbits));
                     nbits = nbits + 1;
                 }
@@ -1007,7 +1067,7 @@ public class YSms
                     nbits = 7;
                 } else {
                     thi_b = this._udata[i];
-                    res[wpos] = (byte)((carry | (((thi_b << nbits)) & 255)) & 0xff);
+                    res[wpos] = (byte)((carry | ((thi_b << nbits) & 255)) & 0xff);
                     wpos = wpos + 1;
                     nbits = nbits - 1;
                     carry = (thi_b >> (7 - nbits));
@@ -1253,8 +1313,8 @@ public class YSms
             rpos = rpos + 1;
             this._dest = this.decodeAddress(pdu, rpos, addrlen);
             this._orig = "";
-            if (((pdutyp & 16)) != 0) {
-                if (((pdutyp & 8)) != 0) {
+            if ((pdutyp & 16) != 0) {
+                if ((pdutyp & 8) != 0) {
                     tslen = 7;
                 } else {
                     tslen= 1;
@@ -1263,12 +1323,12 @@ public class YSms
                 tslen = 0;
             }
         }
-        rpos = rpos + (((addrlen+3) >> 1));
+        rpos = rpos + ((addrlen+3) >> 1);
         this._pid = pdu[rpos];
         rpos = rpos + 1;
         dcs = pdu[rpos];
         rpos = rpos + 1;
-        this._alphab = (((dcs >> 2)) & 3);
+        this._alphab = ((dcs >> 2) & 3);
         this._mclass = (dcs & (16+3));
         this._stamp = this.decodeTimeStamp(pdu, rpos, tslen);
         rpos = rpos + tslen;
@@ -1318,7 +1378,7 @@ public class YSms
                 } else {
                     thi_b = pdu[rpos];
                     rpos = rpos + 1;
-                    this._udata[i] = (byte)((carry | (((thi_b << nbits)) & 127)) & 0xff);
+                    this._udata[i] = (byte)((carry | ((thi_b << nbits) & 127)) & 0xff);
                     carry = (thi_b >> (7 - nbits));
                     nbits = nbits + 1;
                 }
@@ -1364,20 +1424,37 @@ public class YSms
         if (this._npdu == 0) {
             this.generatePdu();
         }
-        if (this._npdu == 1) {
-            return this._mbox._upload("sendSMS", this._pdu);
+        if (this._npdu > 1) {
+            // send multiple PDUs using recursive call
+            retcode = YAPI.SUCCESS;
+            i = 0;
+            while ((i < this._npdu) && (retcode == YAPI.SUCCESS)) {
+                pdu = this._parts[i];
+                retcode= pdu.send();
+                i = i + 1;
+            }
+            return retcode;
         }
-        retcode = YAPI.SUCCESS;
-        i = 0;
-        while ((i < this._npdu) && (retcode == YAPI.SUCCESS)) {
-            pdu = this._parts[i];
-            retcode= pdu.send();
-            i = i + 1;
-        }
-        return retcode;
+        // send a single PDU
+        return this._mbox.sendPDU(this._pdu);
     }
 
 
+    /**
+     * <summary>
+     *   Delete the SMS from the SIM card.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
     public virtual int deleteFromSIM()
     {
         int i;
@@ -1423,6 +1500,13 @@ public class YMessageBox : YFunction
     //--- (generated code: YMessageBox definitions)
     public new delegate void ValueCallback(YMessageBox func, string value);
     public new delegate void TimedReportCallback(YMessageBox func, YMeasure measure);
+    public delegate void YSmsCallback(YMessageBox obj, YSms sms);
+
+    protected static void yInternalEventCallback(YMessageBox obj, String value)
+    {
+        obj._internalEventHandler(value);
+    }
+
 
     public const int SLOTSINUSE_INVALID = YAPI.INVALID_UINT;
     public const int SLOTSCOUNT_INVALID = YAPI.INVALID_UINT;
@@ -1439,6 +1523,7 @@ public class YMessageBox : YFunction
     protected string _obey = OBEY_INVALID;
     protected string _command = COMMAND_INVALID;
     protected ValueCallback _valueCallbackMessageBox = null;
+    protected YSmsCallback _smsCallback;
     protected int _nextMsgRef = 0;
     protected string _prevBitmapStr = "";
     protected List<YSms> _pdus = new List<YSms>();
@@ -1851,9 +1936,11 @@ public class YMessageBox : YFunction
      * <summary>
      *   Registers the callback function that is invoked on every change of advertised value.
      * <para>
-     *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
-     *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
-     *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
+     *   The callback is then invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
+     *   This provides control over the time when the callback is triggered. For good responsiveness,
+     *   remember to call one of these two functions periodically. The callback is called once juste after beeing
+     *   registered, passing the current advertised value  of the function, provided that it is not an empty string.
+     *   To unregister a callback, pass a null pointer as argument.
      * </para>
      * <para>
      * </para>
@@ -1907,7 +1994,6 @@ public class YMessageBox : YFunction
     {
         int retry;
         int idx;
-        string res;
         string bitmapStr;
         int int_res;
         byte[] newBitmap = new byte[0];
@@ -1920,8 +2006,8 @@ public class YMessageBox : YFunction
             newBitmap = YAPI._hexStrToBin(bitmapStr);
             idx = (slot >> 3);
             if (idx < (newBitmap).Length) {
-                bitVal = (1 << ((slot & 7)));
-                if (((newBitmap[idx] & bitVal)) != 0) {
+                bitVal = (1 << (slot & 7));
+                if ((newBitmap[idx] & bitVal) != 0) {
                     this._prevBitmapStr = "";
                     int_res = this.set_command("DS"+Convert.ToString(slot));
                     if (int_res < 0) {
@@ -1933,72 +2019,59 @@ public class YMessageBox : YFunction
             } else {
                 return YAPI.INVALID_ARGUMENT;
             }
-            res = this._AT("");
+            this._download("at.txt?cmd=");
             retry = retry - 1;
         }
         return YAPI.IO_ERROR;
     }
 
 
-    public virtual string _AT(string cmd)
+    public virtual int sendPDU(byte[] pdu)
     {
-        int chrPos;
-        int cmdLen;
-        int waitMore;
-        string res;
+        int i;
         byte[] buff = new byte[0];
         int bufflen;
         string buffstr;
-        int buffstrlen;
-        int idx;
-        int suffixlen;
-        // copied form the YCellular class
-        // quote dangerous characters used in AT commands
-        cmdLen = (cmd).Length;
-        chrPos = (cmd).IndexOf("#");
-        while (chrPos >= 0) {
-            cmd = ""+(cmd).Substring(0, chrPos)+""+((char)(37)).ToString()+"23"+(cmd).Substring(chrPos+1, cmdLen-chrPos-1);
-            cmdLen = cmdLen + 2;
-            chrPos = (cmd).IndexOf("#");
+        string res;
+        int waitMore;
+        string cmd;
+
+        buff = this._uploadEx("sendSMS", pdu);
+        if ((buff).Length < 2) {
+            return YAPI.SUCCESS;
         }
-        chrPos = (cmd).IndexOf("+");
-        while (chrPos >= 0) {
-            cmd = ""+(cmd).Substring(0, chrPos)+""+((char)(37)).ToString()+"2B"+(cmd).Substring(chrPos+1, cmdLen-chrPos-1);
-            cmdLen = cmdLen + 2;
-            chrPos = (cmd).IndexOf("+");
+        if (buff[0] != 64) {
+            return YAPI.SUCCESS;
         }
-        chrPos = (cmd).IndexOf("=");
-        while (chrPos >= 0) {
-            cmd = ""+(cmd).Substring(0, chrPos)+""+((char)(37)).ToString()+"3D"+(cmd).Substring(chrPos+1, cmdLen-chrPos-1);
-            cmdLen = cmdLen + 2;
-            chrPos = (cmd).IndexOf("=");
-        }
-        cmd = "at.txt?cmd="+cmd;
+        // new firmware provides a way to check result of SMS send command
         res = "";
-        // max 2 minutes (each iteration may take up to 5 seconds if waiting)
-        waitMore = 24;
+        bufflen = (buff).Length;
+        buffstr = YAPI.DefaultEncoding.GetString(buff);
+        i = 0;
+        waitMore = 10;
         while (waitMore > 0) {
+            cmd = "at.txt?cmd="+(buffstr).Substring(i, bufflen - i);
             buff = this._download(cmd);
             bufflen = (buff).Length;
             buffstr = YAPI.DefaultEncoding.GetString(buff);
-            buffstrlen = (buffstr).Length;
-            idx = bufflen - 1;
-            while ((idx > 0) && (buff[idx] != 64) && (buff[idx] != 10) && (buff[idx] != 13)) {
-                idx = idx - 1;
+            i = bufflen - 1;
+            while ((i > 0) && (buff[i] != 64) && (buff[i] != 10) && (buff[i] != 13)) {
+                i = i - 1;
             }
-            if (buff[idx] == 64) {
+            if ((i >= 0) && (buff[i] == 64)) {
                 // continuation detected
-                suffixlen = bufflen - idx;
-                cmd = "at.txt?cmd="+(buffstr).Substring(buffstrlen - suffixlen, suffixlen);
-                buffstr = (buffstr).Substring(0, buffstrlen - suffixlen);
                 waitMore = waitMore - 1;
             } else {
                 // request complete
                 waitMore = 0;
             }
-            res = ""+res+""+buffstr;
+            res = ""+res+""+(buffstr).Substring(0, i);
         }
-        return res;
+        if (!((res).IndexOf("OK") >= 0)) {
+            this._throw(YAPI.NOT_SUPPORTED, "Failed to send SMS");
+            return YAPI.NOT_SUPPORTED;
+        }
+        return YAPI.SUCCESS;
     }
 
 
@@ -2008,12 +2081,21 @@ public class YMessageBox : YFunction
         List<byte[]> arrPdu = new List<byte[]>();
         string hexPdu;
         YSms sms;
-
-        binPdu = this._download("sms.json?pos="+Convert.ToString(slot)+"&len=1");
-        arrPdu = this._json_get_array(binPdu);
-        hexPdu = this._decode_json_string(arrPdu[0]);
         sms = new YSms(this);
         sms.set_slot(slot);
+
+        binPdu = this._download("sms.json?pos="+Convert.ToString(slot)+"&len=1");
+        if ((binPdu).Length<8) {
+            // Retry in case SIM was busy
+            {string ignore=""; YAPI.Sleep(250, ref ignore);};
+            binPdu = this._download("sms.json?pos="+Convert.ToString(slot)+"&len=1");
+            if (!((binPdu).Length>=8)) {
+                this._throw(YAPI.IO_ERROR, "unable to retrieve SMS");
+                return sms;
+            }
+        }
+        arrPdu = this._json_get_array(binPdu);
+        hexPdu = this._decode_json_string(arrPdu[0]);
         sms.parsePdu(YAPI._hexStrToBin(hexPdu));
         return sms;
     }
@@ -2361,18 +2443,17 @@ public class YMessageBox : YFunction
     public virtual int checkNewMessages()
     {
         string bitmapStr;
-        byte[] prevBitmap = new byte[0];
         byte[] newBitmap = new byte[0];
         int slot;
         int nslots;
         int pduIdx;
         int idx;
         int bitVal;
-        int prevBit;
         int i;
         int nsig;
         int cnt;
         string sig;
+        bool isnew;
         List<YSms> newArr = new List<YSms>();
         List<YSms> newMsg = new List<YSms>();
         List<YSms> newAgg = new List<YSms>();
@@ -2383,9 +2464,8 @@ public class YMessageBox : YFunction
         if (bitmapStr == this._prevBitmapStr) {
             return YAPI.SUCCESS;
         }
-        prevBitmap = YAPI._hexStrToBin(this._prevBitmapStr);
-        newBitmap = YAPI._hexStrToBin(bitmapStr);
         this._prevBitmapStr = bitmapStr;
+        newBitmap = YAPI._hexStrToBin(bitmapStr);
         nslots = 8*(newBitmap).Length;
         newArr.Clear();
         newMsg.Clear();
@@ -2398,8 +2478,10 @@ public class YMessageBox : YFunction
             slot = sms.get_slot();
             idx = (slot >> 3);
             if (idx < (newBitmap).Length) {
-                bitVal = (1 << ((slot & 7)));
-                if (((newBitmap[idx] & bitVal)) != 0) {
+                bitVal = (1 << (slot & 7));
+                if ((newBitmap[idx] & bitVal) != 0) {
+                    newBitmap[idx] = (byte)((newBitmap[idx] ^ bitVal) & 0xff);
+                    sms.set_new(false);
                     newArr.Add(sms);
                     if (sms.get_concatCount() == 0) {
                         newMsg.Add(sms);
@@ -2425,30 +2507,25 @@ public class YMessageBox : YFunction
         slot = 0;
         while (slot < nslots) {
             idx = (slot >> 3);
-            bitVal = (1 << ((slot & 7)));
-            prevBit = 0;
-            if (idx < (prevBitmap).Length) {
-                prevBit = (prevBitmap[idx] & bitVal);
-            }
-            if (((newBitmap[idx] & bitVal)) != 0) {
-                if (prevBit == 0) {
-                    sms = this.fetchPdu(slot);
-                    newArr.Add(sms);
-                    if (sms.get_concatCount() == 0) {
-                        newMsg.Add(sms);
-                    } else {
-                        sig = sms.get_concatSignature();
-                        i = 0;
-                        while ((i < nsig) && ((sig).Length > 0)) {
-                            if (signatures[i] == sig) {
-                                sig = "";
-                            }
-                            i = i + 1;
+            bitVal = (1 << (slot & 7));
+            if ((newBitmap[idx] & bitVal) != 0) {
+                sms = this.fetchPdu(slot);
+                sms.set_new(true);
+                newArr.Add(sms);
+                if (sms.get_concatCount() == 0) {
+                    newMsg.Add(sms);
+                } else {
+                    sig = sms.get_concatSignature();
+                    i = 0;
+                    while ((i < nsig) && ((sig).Length > 0)) {
+                        if (signatures[i] == sig) {
+                            sig = "";
                         }
-                        if ((sig).Length > 0) {
-                            signatures.Add(sig);
-                            nsig = nsig + 1;
-                        }
+                        i = i + 1;
+                    }
+                    if ((sig).Length > 0) {
+                        signatures.Add(sig);
+                        nsig = nsig + 1;
                     }
                 }
             }
@@ -2462,6 +2539,7 @@ public class YMessageBox : YFunction
             sig = signatures[i];
             cnt = 0;
             pduIdx = 0;
+            isnew = true;
             while (pduIdx < this._pdus.Count) {
                 sms = this._pdus[pduIdx];
                 if (sms.get_concatCount() > 0) {
@@ -2470,6 +2548,7 @@ public class YMessageBox : YFunction
                             cnt = sms.get_concatCount();
                             newAgg.Clear();
                         }
+                        isnew = sms.isNew();
                         newAgg.Add(sms);
                     }
                 }
@@ -2478,6 +2557,7 @@ public class YMessageBox : YFunction
             if ((cnt > 0) && (newAgg.Count == cnt)) {
                 sms = new YSms(this);
                 sms.set_parts(newAgg);
+                sms.set_new(isnew);
                 newMsg.Add(sms);
             }
             i = i + 1;
@@ -2639,6 +2719,63 @@ public class YMessageBox : YFunction
     {
         this.checkNewMessages();
         return this._messages;
+    }
+
+
+    /**
+     * <summary>
+     *   Registers a callback function to be called each time that a new SMS is received.
+     * <para>
+     *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
+     *   This provides control over the time when the callback is triggered.
+     *   For good responsiveness, remember to call one of these two functions periodically.
+     *   To unregister a callback, pass a null pointer as argument.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="callback">
+     *   the callback function to call, or a null pointer.
+     *   The callback function should take four arguments:
+     *   the <c>YMessageBox</c> object that emitted the event, and
+     *   the <c>YSms</c> object containing the received message.
+     *   On failure, throws an exception or returns a negative error code.
+     * </param>
+     */
+    public virtual int registerSmsCallback(YSmsCallback callback)
+    {
+        this._smsCallback = (YSmsCallback) null;
+        if (callback != null) {
+            this.registerValueCallback(yInternalEventCallback);
+        } else {
+            this.registerValueCallback((ValueCallback) null);
+        }
+        this._smsCallback = callback;
+        return 0;
+    }
+
+
+    public virtual int _internalEventHandler(string cbVal)
+    {
+        int arrLen;
+        int arrPos;
+        List<YSms> messages = new List<YSms>();
+        YSms sms;
+
+        messages = this.get_messages();
+        // invoke callback for all new messages
+        arrLen = messages.Count;
+        arrPos = 0;
+        while (arrPos < arrLen) {
+            sms = messages[arrPos];
+            if (sms.isNew()) {
+                if (this._smsCallback != null) {
+                    this._smsCallback(this, sms);
+                }
+            }
+            arrPos = arrPos + 1;
+        }
+        return YAPI.SUCCESS;
     }
 
     /**

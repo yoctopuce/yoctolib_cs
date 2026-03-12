@@ -107,6 +107,9 @@
     <Compile Include="..\..\Sources\yocto_anbutton.cs">
       <Link>Yoctopuce\yocto_anbutton.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\yocto_angularspeed.cs">
+      <Link>Yoctopuce\yocto_angularspeed.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_arithmeticsensor.cs">
       <Link>Yoctopuce\yocto_arithmeticsensor.cs</Link>
     </Compile>
@@ -139,6 +142,9 @@
     </Compile>
     <Compile Include="..\..\Sources\yocto_compass.cs">
       <Link>Yoctopuce\yocto_compass.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_counter.cs">
+      <Link>Yoctopuce\yocto_counter.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_current.cs">
       <Link>Yoctopuce\yocto_current.cs</Link>
@@ -224,6 +230,9 @@
     <Compile Include="..\..\Sources\yocto_network.cs">
       <Link>Yoctopuce\yocto_network.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\yocto_orientation.cs">
+      <Link>Yoctopuce\yocto_orientation.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_oscontrol.cs">
       <Link>Yoctopuce\yocto_oscontrol.cs</Link>
     </Compile>
@@ -280,6 +289,12 @@
     </Compile>
     <Compile Include="..\..\Sources\yocto_servo.cs">
       <Link>Yoctopuce\yocto_servo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_soundlevel.cs">
+      <Link>Yoctopuce\yocto_soundlevel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Sources\yocto_soundspectrum.cs">
+      <Link>Yoctopuce\yocto_soundspectrum.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_spectralchannel.cs">
       <Link>Yoctopuce\yocto_spectralchannel.cs</Link>

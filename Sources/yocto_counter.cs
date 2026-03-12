@@ -77,6 +77,8 @@ public class YCounter : YSensor
     public new delegate void ValueCallback(YCounter func, string value);
     public new delegate void TimedReportCallback(YCounter func, YMeasure measure);
 
+    public const string COMMAND_INVALID = YAPI.INVALID_STRING;
+    protected string _command = COMMAND_INVALID;
     protected ValueCallback _valueCallbackCounter = null;
     protected TimedReportCallback _timedReportCallbackCounter = null;
     //--- (end of YCounter definitions)
@@ -93,7 +95,35 @@ public class YCounter : YSensor
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
+        if (json_val.has("command"))
+        {
+            _command = json_val.getString("command");
+        }
         base._parseAttr(json_val);
+    }
+
+
+    public string get_command()
+    {
+        string res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
+            }
+            res = this._command;
+        }
+        return res;
+    }
+
+    public int set_command(string newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = newval;
+            return _setAttr("command", rest_val);
+        }
     }
 
 
@@ -165,9 +195,11 @@ public class YCounter : YSensor
      * <summary>
      *   Registers the callback function that is invoked on every change of advertised value.
      * <para>
-     *   The callback is invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
-     *   This provides control over the time when the callback is triggered. For good responsiveness, remember to call
-     *   one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
+     *   The callback is then invoked only during the execution of <c>ySleep</c> or <c>yHandleEvents</c>.
+     *   This provides control over the time when the callback is triggered. For good responsiveness,
+     *   remember to call one of these two functions periodically. The callback is called once juste after beeing
+     *   registered, passing the current advertised value  of the function, provided that it is not an empty string.
+     *   To unregister a callback, pass a null pointer as argument.
      * </para>
      * <para>
      * </para>
@@ -250,6 +282,31 @@ public class YCounter : YSensor
             base._invokeTimedReportCallback(value);
         }
         return 0;
+    }
+
+
+    public virtual int sendCommand(string command)
+    {
+        return this.set_command(command);
+    }
+
+
+    /**
+     * <summary>
+     *   Reset the counter to zero.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int zero()
+    {
+        return this.sendCommand("Z");
     }
 
     /**
