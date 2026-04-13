@@ -77,8 +77,12 @@ public class YOrientation : YSensor
     public new delegate void ValueCallback(YOrientation func, string value);
     public new delegate void TimedReportCallback(YOrientation func, YMeasure measure);
 
+    public const int COUNTERCLOCKWISE_FALSE = 0;
+    public const int COUNTERCLOCKWISE_TRUE = 1;
+    public const int COUNTERCLOCKWISE_INVALID = -1;
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     public const double ZEROOFFSET_INVALID = YAPI.INVALID_DOUBLE;
+    protected int _counterClockwise = COUNTERCLOCKWISE_INVALID;
     protected string _command = COMMAND_INVALID;
     protected double _zeroOffset = ZEROOFFSET_INVALID;
     protected ValueCallback _valueCallbackOrientation = null;
@@ -97,6 +101,10 @@ public class YOrientation : YSensor
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
+        if (json_val.has("counterClockwise"))
+        {
+            _counterClockwise = json_val.getInt("counterClockwise") > 0 ? 1 : 0;
+        }
         if (json_val.has("command"))
         {
             _command = json_val.getString("command");
@@ -106,6 +114,68 @@ public class YOrientation : YSensor
             _zeroOffset = Math.Round(json_val.getDouble("zeroOffset") / 65.536) / 1000.0;
         }
         base._parseAttr(json_val);
+    }
+
+
+    /**
+     * <summary>
+     *   Returns a value indicating whether the sensor is operating in a counterclockwise direction.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   either <c>YOrientation.COUNTERCLOCKWISE_FALSE</c> or <c>YOrientation.COUNTERCLOCKWISE_TRUE</c>,
+     *   according to a value indicating whether the sensor is operating in a counterclockwise direction
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YOrientation.COUNTERCLOCKWISE_INVALID</c>.
+     * </para>
+     */
+    public int get_counterClockwise()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return COUNTERCLOCKWISE_INVALID;
+                }
+            }
+            res = this._counterClockwise;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Defines the operating direction of the sensor.
+     * <para>
+     *   Remember to call the <c>saveToFlash()</c> method of the module if the
+     *   modification must be kept.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   either <c>YOrientation.COUNTERCLOCKWISE_FALSE</c> or <c>YOrientation.COUNTERCLOCKWISE_TRUE</c>
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_counterClockwise(int newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("counterClockwise", rest_val);
+        }
     }
 
 
@@ -140,7 +210,6 @@ public class YOrientation : YSensor
      *   can typically be used  to compensate for mechanical offset. This offset can also be set
      *   automatically using the zero() method.
      *   Remember to call the <c>saveToFlash()</c> method of the module if the modification must be kept.
-     *   On failure, throws an exception or returns a negative error code.
      * </para>
      * <para>
      * </para>
@@ -371,10 +440,8 @@ public class YOrientation : YSensor
      * </summary>
      * <returns>
      *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
      *   On failure, throws an exception or returns a negative error code.
-     * </para>
+     * </returns>
      */
     public virtual int zero()
     {

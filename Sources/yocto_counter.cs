@@ -77,7 +77,11 @@ public class YCounter : YSensor
     public new delegate void ValueCallback(YCounter func, string value);
     public new delegate void TimedReportCallback(YCounter func, YMeasure measure);
 
+    public const int DECIMALMODE_FALSE = 0;
+    public const int DECIMALMODE_TRUE = 1;
+    public const int DECIMALMODE_INVALID = -1;
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
+    protected int _decimalMode = DECIMALMODE_INVALID;
     protected string _command = COMMAND_INVALID;
     protected ValueCallback _valueCallbackCounter = null;
     protected TimedReportCallback _timedReportCallbackCounter = null;
@@ -95,11 +99,77 @@ public class YCounter : YSensor
 
     protected override void _parseAttr(YAPI.YJSONObject json_val)
     {
+        if (json_val.has("decimalMode"))
+        {
+            _decimalMode = json_val.getInt("decimalMode") > 0 ? 1 : 0;
+        }
         if (json_val.has("command"))
         {
             _command = json_val.getString("command");
         }
         base._parseAttr(json_val);
+    }
+
+
+    /**
+     * <summary>
+     *   Returns a value indicating if the senseur compute whole or fractional values.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   either <c>YCounter.DECIMALMODE_FALSE</c> or <c>YCounter.DECIMALMODE_TRUE</c>, according to a value
+     *   indicating if the senseur compute whole or fractional values
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YCounter.DECIMALMODE_INVALID</c>.
+     * </para>
+     */
+    public int get_decimalMode()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return DECIMALMODE_INVALID;
+                }
+            }
+            res = this._decimalMode;
+        }
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Changes the sensor's operating mode so that it computes integer or decimal values.
+     * <para>
+     *   Remember to call the <c>saveToFlash()</c> method of the module if the modification must be kept.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   either <c>YCounter.DECIMALMODE_FALSE</c> or <c>YCounter.DECIMALMODE_TRUE</c>, according to the
+     *   sensor's operating mode so that it computes integer or decimal values
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public int set_decimalMode(int newval)
+    {
+        string rest_val;
+        lock (_thisLock) {
+            rest_val = (newval > 0 ? "1" : "0");
+            return _setAttr("decimalMode", rest_val);
+        }
     }
 
 
@@ -298,7 +368,10 @@ public class YCounter : YSensor
      * </para>
      * </summary>
      * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     *   <c>YAPI.SUCCESS</c> if the call succeeds. Please note that this function only resets
+     *   the integer part of the counter. In <c>CONTINUOUS</c> mode, the decimal part is calculated
+     *   from the angle measured by the sensor. To set the decimal part of the sensor to zero,
+     *   the origin of the sensor must be changed with the <c>YOrientation.zero()</c>.
      * </returns>
      * <para>
      *   On failure, throws an exception or returns a negative error code.
