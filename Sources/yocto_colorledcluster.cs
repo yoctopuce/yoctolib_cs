@@ -728,6 +728,102 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
+     *   Changes the color displayed by the last LED and shifts all currently displayed colors
+     *   toward the beginning of the RGB LED string.
+     * <para>
+     *   The new color is encoded as follows: 0xRRGGBB.
+     * </para>
+     * </summary>
+     * <param name="rgbValue">
+     *   new color.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int shl_rgb(int rgbValue)
+    {
+        return this.sendCommand("<R"+String.Format("{0:x}",rgbValue));
+    }
+
+
+    /**
+     * <summary>
+     *   Changes the color displayed by the first LED and shifts all currently displayed colors
+     *   toward the end of the RGB LED string.
+     * <para>
+     *   The new color is encoded as follows: 0xRRGGBB.
+     * </para>
+     * </summary>
+     * <param name="rgbValue">
+     *   new color.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int shr_rgb(int rgbValue)
+    {
+        return this.sendCommand(">R"+String.Format("{0:x}",rgbValue));
+    }
+
+
+    /**
+     * <summary>
+     *   Changes the color displayed by the last LED and shifts all currently displayed colors
+     *   toward the beginning of the RGB LED string.
+     * <para>
+     *   The new color is encoded as follows: 0xHHSSLL.
+     * </para>
+     * </summary>
+     * <param name="hslValue">
+     *   new color.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int shl_hsl(int hslValue)
+    {
+        return this.sendCommand("<H"+String.Format("{0:x}",hslValue));
+    }
+
+
+    /**
+     * <summary>
+     *   Changes the color displayed by the first LED and shifts all currently displayed colors
+     *   toward the end of the RGB LED string.
+     * <para>
+     *   The new color is encoded as follows: 0xHHSSLL.
+     * </para>
+     * </summary>
+     * <param name="hslValue">
+     *   new color.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int shr_hsl(int hslValue)
+    {
+        return this.sendCommand(">H"+String.Format("{0:x}",hslValue));
+    }
+
+
+    /**
+     * <summary>
      *   Adds an RGB transition to a sequence.
      * <para>
      *   A sequence is a transition list, which can

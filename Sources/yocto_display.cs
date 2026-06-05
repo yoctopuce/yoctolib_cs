@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 72057 2026-02-17 09:44:53Z mvuilleu $
+ * $Id: yocto_display.cs 74504 2026-06-01 14:50:23Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -69,8 +69,6 @@ public class YDisplayLayer
 
     private YDisplay _display  = null;
     private int      _id = -1;
-    private string   _cmdbuff  = "";
-    private bool     _hidden = false;
 
     //--- (generated code: YDisplayLayer definitions)
 
@@ -96,6 +94,8 @@ public class YDisplayLayer
     public const int NO_INK = -1;
     public const int BG_INK = -2;
     public const int FG_INK = -3;
+    protected string _cmdbuff = "";
+    protected bool _hidden = false;
     protected int _polyPrevX = 0;
     protected int _polyPrevY = 0;
     //--- (end of generated code: YDisplayLayer definitions)
@@ -110,6 +110,63 @@ public class YDisplayLayer
 
     //--- (generated code: YDisplayLayer implementation)
 
+
+
+    public virtual bool must_be_flushed()
+    {
+        return (this._cmdbuff).Length > 0;
+    }
+
+
+    public virtual int resetHiddenFlag()
+    {
+        this._hidden = false;
+        return YAPI.SUCCESS;
+    }
+
+
+    public virtual int flush_now()
+    {
+        int res;
+        res = YAPI.SUCCESS;
+        if ((this._cmdbuff).Length > 0) {
+            res = this._display.sendCommand(this._cmdbuff);
+            this._cmdbuff = "";
+        }
+        return res;
+    }
+
+
+    public virtual int command_push(string cmd)
+    {
+        int res;
+        res = YAPI.SUCCESS;
+        if ((this._cmdbuff).Length + (cmd).Length >= 100) {
+            // force flush before, to prevent overflow
+            this.flush_now();
+        }
+        if ((this._cmdbuff).Length == 0) {
+            // always prepend layer ID first
+            this._cmdbuff = (this._id).ToString();
+        }
+        this._cmdbuff = this._cmdbuff + cmd;
+        return res;
+    }
+
+
+    public virtual int command_flush(string cmd)
+    {
+        int res;
+
+        res = this.command_push(cmd);
+        if (this._hidden) {
+            return res;
+        }
+        if (this._display.isFrozen()) {
+            return res;
+        }
+        return this.flush_now();
+    }
 
 
     /**
@@ -1103,45 +1160,10 @@ public class YDisplayLayer
         return this._display.get_layerHeight();
     }
 
-
-    public virtual int resetHiddenFlag()
-    {
-        this._hidden = false;
-        return YAPI.SUCCESS;
-    }
-
     //--- (end of generated code: YDisplayLayer implementation)
 
-  // internal function to flush any pending command for this layer
-  public int flush_now()
-    { int  res =YAPI.SUCCESS;
-      if (_cmdbuff!="")
-      {
-        res = _display.sendCommand(_cmdbuff);
-         _cmdbuff = "";
-       }
-      return res;
-    }
 
-  // internal function to buffer a command for this layer
-  int  command_push(string cmd)
-  { int res = YAPI.SUCCESS;
-    if (_cmdbuff.Length + cmd.Length >=100)  res=flush_now();
-    if (_cmdbuff=="")  _cmdbuff = _id.ToString();
-    _cmdbuff = _cmdbuff + cmd;
-    return YAPI.SUCCESS ;
-  }
-
-  // internal function to send a command for this layer
-  int command_flush(string cmd)
-  {
-    int res = command_push(cmd);
-    if (!_hidden) res = flush_now();
-    return res;
-  }
-
-
-  //--- (generated code: YDisplayLayer functions)
+    //--- (generated code: YDisplayLayer functions)
 
     //--- (end of generated code: YDisplayLayer functions)
 }
@@ -1174,6 +1196,14 @@ public class YDisplay : YFunction
     public new delegate void ValueCallback(YDisplay func, string value);
     public new delegate void TimedReportCallback(YDisplay func, YMeasure measure);
 
+    public enum DISPLAYSTATE
+    {
+        FAILURE = 0,
+        OFF = 1,
+        POWERING = 2,
+        IDLE = 3,
+        REFRESHING = 4
+    };
     public const int ENABLED_FALSE = 0;
     public const int ENABLED_TRUE = 1;
     public const int ENABLED_INVALID = -1;
@@ -1212,6 +1242,9 @@ public class YDisplay : YFunction
     protected string _command = COMMAND_INVALID;
     protected ValueCallback _valueCallbackDisplay = null;
     protected List<YDisplayLayer> _allDisplayLayers = new List<YDisplayLayer>();
+    protected ulong _frozenUntil = 0;
+    protected bool _recording;
+    protected string _sequence;
     //--- (end of generated code: YDisplay definitions)
 
     public YDisplay(string func)
@@ -1983,6 +2016,49 @@ public class YDisplay : YFunction
     }
 
 
+    public virtual int sendCommand(string cmd)
+    {
+        if (!(this._recording)) {
+            return this.set_command(cmd);
+        }
+        this._sequence = ""+this._sequence+""+cmd+"\n";
+        return YAPI.SUCCESS;
+    }
+
+
+    public virtual int flushLayers()
+    {
+        for (int ii_0 = 0; ii_0 < this._allDisplayLayers.Count; ii_0++) {
+            if (this._allDisplayLayers[ii_0].must_be_flushed()) {
+                this._allDisplayLayers[ii_0].flush_now();
+            }
+        }
+        return YAPI.SUCCESS;
+    }
+
+
+    public virtual int resetHiddenLayerFlags()
+    {
+        for (int ii_0 = 0; ii_0 < this._allDisplayLayers.Count; ii_0++) {
+            this._allDisplayLayers[ii_0].resetHiddenFlag();
+        }
+        return YAPI.SUCCESS;
+    }
+
+
+    public virtual bool isFrozen()
+    {
+        if (this._frozenUntil == 0) {
+            return false;
+        }
+        if (this._frozenUntil <= YAPI.GetTickCount()) {
+            this._frozenUntil = 0;
+            return false;
+        }
+        return true;
+    }
+
+
     /**
      * <summary>
      *   Clears the display screen and resets all display layers to their default state.
@@ -2034,6 +2110,64 @@ public class YDisplay : YFunction
 
     /**
      * <summary>
+     *   Returns the current state of an ePaper display, specifically to
+     *   determine whether an update is in progress or whether a
+     *   configuration issue has been detected.
+     * <para>
+     *   If a display configuration
+     *   error has been detected, the error message can be retrieved.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="errmsg">
+     *   a string passed by reference to receive the error message.
+     * </param>
+     * <returns>
+     *   a value among the enumeration <c>YDisplay.DISPLAYSTATE</c>
+     *   (<c>YDisplay.DISPLAYSTATE.FAILURE</c>, <c>YDisplay.DISPLAYSTATE.OFF</c>,
+     *   <c>YDisplay.DISPLAYSTATE.POWERING</c>, <c>YDisplay.DISPLAYSTATE.IDLE</c>,
+     *   <c>YDisplay.DISPLAYSTATE.REFRESHING</c>)
+     *   corresponding to the current display state.
+     * </returns>
+     */
+    public virtual DISPLAYSTATE get_ePaperState(ref string errmsg)
+    {
+        byte[] json = new byte[0];
+        string dispError;
+        int dispState;
+
+        if (this.get_displayType() == DISPLAYTYPE_MONO) {
+            errmsg = "Not an ePaper display";
+            return (DISPLAYSTATE) 0;
+        }
+        json = this._download("disp.json");
+        if ((json).Length == 0) {
+            errmsg = this.get_errorMessage();
+            return (DISPLAYSTATE) 0;
+        } else {
+            dispError = this._json_get_string(this._get_json_path(json, "err"));
+            errmsg = dispError;
+            if ((dispError).Length > 0) {
+                return (DISPLAYSTATE) 0;
+            }
+            dispState = YAPI._atoi(this._json_get_key(json, "state"));
+            if (dispState > 10) {
+                return (DISPLAYSTATE) 4;
+            }
+            if (dispState == 10) {
+                return (DISPLAYSTATE) 3;
+            }
+            if (dispState > 0) {
+                return (DISPLAYSTATE) 2;
+            }
+        }
+        return (DISPLAYSTATE) 1;
+    }
+
+
+    /**
+     * <summary>
      *   Disables screen refresh for a short period of time.
      * <para>
      *   The combination of
@@ -2053,6 +2187,7 @@ public class YDisplay : YFunction
      */
     public virtual int postponeRefresh(int duration)
     {
+        this._frozenUntil = YAPI.GetTickCount() + (ulong)(duration);
         return this.sendCommand("H"+Convert.ToString(duration));
     }
 
@@ -2075,6 +2210,8 @@ public class YDisplay : YFunction
      */
     public virtual int triggerRefresh()
     {
+        this._frozenUntil = 0;
+        this.flushLayers();
         return this.sendCommand("H0");
     }
 
@@ -2258,6 +2395,7 @@ public class YDisplay : YFunction
      */
     public virtual int upload(string pathname, byte[] content)
     {
+        this.flushLayers();
         return this._upload(pathname, content);
     }
 
@@ -2605,40 +2743,6 @@ public class YDisplay : YFunction
     }
 
     //--- (end of generated code: YDisplay implementation)
-
-    private bool _recording;
-    private string _sequence;
-
-    int flushLayers()
-    {
-      int i;
-      if (_allDisplayLayers != null) {
-          for (i = 0; i < _allDisplayLayers.Count; i++) {
-              _allDisplayLayers[i].flush_now();
-          }
-      }
-      return YAPI.SUCCESS;
-    }
-
-    // internal method to clear all hidden flags in the API
-    void resetHiddenLayerFlags()
-    {
-      int i;
-      if (this._allDisplayLayers.Count > 0) {
-          for (i = 0; i < _allDisplayLayers.Count; i++) {
-              _allDisplayLayers[i].resetHiddenFlag();
-          }
-      }
-    }
-
-    public int sendCommand(string cmd )
-    {
-      if (!_recording) {
-         return this.set_command(cmd);
-      }
-      _sequence = _sequence + cmd + "\n";
-      return YAPI.SUCCESS;
-    }
 
     //--- (generated code: YDisplay functions)
 

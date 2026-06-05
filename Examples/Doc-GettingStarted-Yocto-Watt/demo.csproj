@@ -101,6 +101,9 @@
     <Compile Include="..\..\Sources\yocto_current.cs">
       <Link>Yoctopuce\yocto_current.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\yocto_inputcapture.cs">
+      <Link>Yoctopuce\yocto_inputcapture.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_power.cs">
       <Link>Yoctopuce\yocto_power.cs</Link>
     </Compile>
