@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_messagebox.cs 72410 2026-03-11 07:18:41Z mvuilleu $
+ * $Id: yocto_messagebox.cs 74843 2026-06-23 10:35:16Z seb $
  *
  * Implements yFindMessageBox(), the high-level API for MessageBox functions
  *
@@ -48,12 +48,11 @@ using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
 
-
 #pragma warning disable 1591
 
-    //--- (generated code: YSms return codes)
+//--- (generated code: YSms return codes)
 //--- (end of generated code: YSms return codes)
-    //--- (generated code: YMessageBox return codes)
+//--- (generated code: YMessageBox return codes)
 //--- (end of generated code: YMessageBox return codes)
 
 //--- (generated code: YSms dlldef)

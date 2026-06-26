@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 72057 2026-02-17 09:44:53Z mvuilleu $
+ * $Id: yocto_cellular.cs 74843 2026-06-23 10:35:16Z seb $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *
@@ -49,9 +49,9 @@ using YFUN_DESCR = System.Int32;
 
 #pragma warning disable 1591
 
-    //--- (generated code: YCellRecord return codes)
+//--- (generated code: YCellRecord return codes)
 //--- (end of generated code: YCellRecord return codes)
-    //--- (generated code: YCellular return codes)
+//--- (generated code: YCellular return codes)
 //--- (end of generated code: YCellular return codes)
 
 //--- (generated code: YCellRecord dlldef)

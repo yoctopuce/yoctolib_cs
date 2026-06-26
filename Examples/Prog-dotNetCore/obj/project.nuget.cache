@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "3ANexxAs8/YBMmWyi8Q4374J6AeyxTYzNsAfT2UXunb1NUYMTB5M0wxxuS3N7P1bD6eqFNMqBXR5C7qh96IWCg==",
+  "success": true,
+  "projectFilePath": "c:\\tmp\\tmp_build\\yoctoprod\\yoctolib\\v2.0\\Public\\C-sharp\\Examples\\Prog-dotNetCore\\Prog-dotNetCore.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\yocto\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.21\\microsoft.netcore.app.ref.6.0.21.nupkg.sha512",
+    "C:\\Users\\yocto\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\6.0.21\\microsoft.windowsdesktop.app.ref.6.0.21.nupkg.sha512",
+    "C:\\Users\\yocto\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\6.0.21\\microsoft.aspnetcore.app.ref.6.0.21.nupkg.sha512",
+    "C:\\Users\\yocto\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\6.0.21\\microsoft.netcore.app.host.win-x64.6.0.21.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -48,8 +48,7 @@ using System.Text;
 using YDEV_DESCR = System.Int32;
 using YFUN_DESCR = System.Int32;
 
-
- #pragma warning disable 1591
+#pragma warning disable 1591
 //--- (generated code: YSdi12SnoopingRecord class start)
 public class YSdi12SnoopingRecord
 {
