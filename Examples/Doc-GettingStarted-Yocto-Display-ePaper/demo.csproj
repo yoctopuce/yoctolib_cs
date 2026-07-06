@@ -9,7 +9,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>demo</RootNamespace>
-    <AssemblyName>Doc-GettingStarted-Yocto-VOC</AssemblyName>
+    <AssemblyName>Doc-GettingStarted-Yocto-Display-ePaper</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <TargetFrameworkProfile></TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -98,20 +98,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="main.cs" />
-    <Compile Include="..\..\Sources\yocto_airquality.cs">
-      <Link>Yoctopuce\yocto_airquality.cs</Link>
+    <Compile Include="..\..\Sources\yocto_display.cs">
+      <Link>Yoctopuce\yocto_display.cs</Link>
     </Compile>
-    <Compile Include="..\..\Sources\yocto_humidity.cs">
-      <Link>Yoctopuce\yocto_humidity.cs</Link>
+    <Compile Include="..\..\Sources\yocto_files.cs">
+      <Link>Yoctopuce\yocto_files.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_temperature.cs">
       <Link>Yoctopuce\yocto_temperature.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Sources\yocto_tvoc.cs">
-      <Link>Yoctopuce\yocto_tvoc.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Sources\yocto_voc.cs">
-      <Link>Yoctopuce\yocto_voc.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\yocto_api.cs">
       <Link>Yoctopuce\yocto_api.cs</Link>

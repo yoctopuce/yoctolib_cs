@@ -101,6 +101,9 @@
     <Compile Include="..\..\Sources\yocto_accelerometer.cs">
       <Link>Yoctopuce\yocto_accelerometer.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\yocto_airquality.cs">
+      <Link>Yoctopuce\yocto_airquality.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\yocto_altitude.cs">
       <Link>Yoctopuce\yocto_altitude.cs</Link>
     </Compile>

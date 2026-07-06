@@ -86,6 +86,7 @@ public class YRfidTagInfo
     protected string _tagId;
     protected int _tagType = 0;
     protected string _typeStr;
+    protected int _nfcType = 0;
     protected int _size = 0;
     protected int _usable = 0;
     protected int _blksize = 0;
@@ -149,6 +150,23 @@ public class YRfidTagInfo
     public virtual string get_tagTypeStr()
     {
         return this._typeStr;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the type of NFC type usable on the RFID tag, between 1 and 5.
+     * <para>
+     *   If no known NFC type is know for the RFID tag, returns zero.
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the RFID tag type
+     * </returns>
+     */
+    public virtual int get_tagNFCtype()
+    {
+        return this._nfcType;
     }
 
 
@@ -243,6 +261,7 @@ public class YRfidTagInfo
     public virtual void imm_init(string tagId, int tagType, int size, int usable, int blksize, int fblk, int lblk)
     {
         string typeStr;
+        int nfcType;
         typeStr = "unknown";
         if (tagType == IEC_15693) {
             typeStr = "IEC 15693";
@@ -292,9 +311,19 @@ public class YRfidTagInfo
         if (tagType == IEC_15693_ICODE_SLI) {
             typeStr = "ICODE SLI";
         }
-
+        nfcType = 0;
+        if ((tagType == IEC_14443_MIFARE_ULTRALIGHT) || (tagType == IEC_14443_MIFARE_CLASSIC1K) || (tagType == IEC_14443_MIFARE_CLASSIC4K) || (tagType == IEC_14443_NTAG_213) || (tagType == IEC_14443_NTAG_215) || (tagType == IEC_14443_NTAG_216) || (tagType == IEC_14443_NTAG_424_DNA)) {
+            nfcType = 2;
+        }
+        if (tagType == IEC_14443_MIFARE_DESFIRE) {
+            nfcType = 4;
+        }
+        if ((tagType == IEC_15693) || (tagType == IEC_15693_ST25DV) || (tagType == IEC_15693_ST25TV) || (tagType == IEC_15693_TAGIT_HFI) || (tagType == IEC_15693_MB89R) || (tagType == IEC_15693_ICODE_DNA) || (tagType == IEC_15693_ICODE_SLI)) {
+            nfcType = 5;
+        }
         this._tagId = tagId;
         this._tagType = tagType;
+        this._nfcType = nfcType;
         this._typeStr = typeStr;
         this._size = size;
         this._usable = usable;
@@ -2247,6 +2276,342 @@ public class YRfidReader : YFunction
         buff = YAPI.DefaultEncoding.GetBytes(text);
 
         return this.tagWriteBin(tagId, firstBlock, buff, options, ref status);
+    }
+
+
+    /**
+     * <summary>
+     *   Writes data provided as a binary object to an RFID tag, using NFC
+     *   compatible encoding.
+     * <para>
+     *   The function will automatically create a NFC Capability Container,
+     *   and encapsulate the content with the required NDEF header corresponding
+     *   to the given content type.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="tagId">
+     *   identifier of the tag to use
+     * </param>
+     * <param name="ndefType">
+     *   the content type, either "U" for a URL, or a
+     *   generic MIME type like "text/vcard"
+     * </param>
+     * <param name="payload">
+     *   the payload of the NDEF record
+     * </param>
+     * <param name="options">
+     *   an <c>YRfidOptions</c> object with the optional
+     *   command execution parameters, such as security key
+     *   if required
+     * </param>
+     * <param name="status">
+     *   an <c>RfidStatus</c> object that will contain
+     *   the detailled status of the operation
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code. When it
+     *   happens, you can get more information from the <c>status</c> object.
+     * </para>
+     */
+    public virtual int tagWriteBinNFC(string tagId, string ndefType, byte[] payload, YRfidOptions options, ref YRfidStatus status)
+    {
+        YRfidTagInfo tagInfo;
+        int nfcType;
+        int usableSize;
+        int nfcBlocks;
+        int ccLen;
+        int typeLen;
+        int payloadLen;
+        int srBit;
+        int ndefLen;
+        int tlvHdrLen;
+        int totalLen;
+        int absPos;
+        int idx;
+        byte[] binType = new byte[0];
+        byte[] buff = new byte[0];
+
+        tagInfo = this.get_tagInfo(tagId, ref status);
+        // for now, we only allow NFC Type 5 (T5T)
+        nfcType = tagInfo.get_tagNFCtype();
+        if (!(nfcType == 5)) {
+            this._throw(YAPI.INVALID_ARGUMENT, "no NFC support for this tag");
+            return YAPI.INVALID_ARGUMENT;
+        }
+        usableSize = tagInfo.get_tagUsableSize();
+        ccLen = 4;
+        nfcBlocks = ((usableSize - ccLen) / 8);
+        if (nfcBlocks > 255) {
+            if (nfcType == 5) {
+                ccLen = 8;
+                nfcBlocks = ((usableSize - ccLen) / 8);
+            } else {
+                nfcBlocks = 255;
+            }
+        }
+        binType = YAPI.DefaultEncoding.GetBytes(ndefType);
+        typeLen = (binType).Length;
+        payloadLen = (payload).Length;
+        // compute the total length of the NDEF record
+        ndefLen = 3 + typeLen + payloadLen;
+        srBit = 0x10;
+        if (payloadLen > 255) {
+            ndefLen = ndefLen + 3;
+            srBit = 0;
+        }
+        // compute the total length of the TLV record
+        tlvHdrLen = 2;
+        if (ndefLen > 254) {
+            tlvHdrLen = 4;
+        }
+        // make sure the content fits on the tag
+        if (!((tlvHdrLen + ndefLen + 1) <= (8 * nfcBlocks))) {
+            this._throw(YAPI.INVALID_ARGUMENT, "content is too large");
+            return YAPI.INVALID_ARGUMENT;
+        }
+        totalLen = ccLen + tlvHdrLen + ndefLen + 1;
+        buff = new byte[totalLen];
+        // CC header
+        if (ccLen == 4) {
+            buff[0] = (byte)(0xE1 & 0xff);
+            if (nfcType == 5) {
+                buff[1] = (byte)(0x40 & 0xff);
+            } else {
+                buff[1] = (byte)(0x10 & 0xff);
+            }
+            buff[2] = (byte)(nfcBlocks & 0xff);
+            buff[3] = (byte)(0x00 & 0xff);
+        } else {
+            buff[0] = (byte)(0xE2 & 0xff);
+            buff[1] = (byte)(0x40 & 0xff);
+            buff[2] = (byte)(0x00 & 0xff);
+            buff[3] = (byte)(0x01 & 0xff);
+            buff[4] = (byte)(0x00 & 0xff);
+            buff[5] = (byte)(0x00 & 0xff);
+            buff[6] = (byte)((nfcBlocks / 256) & 0xff);
+            buff[7] = (byte)((nfcBlocks & 255) & 0xff);
+        }
+        // TLV header
+        buff[ccLen] = (byte)(3 & 0xff);
+        if (tlvHdrLen == 2) {
+            buff[ccLen + 1] = (byte)(ndefLen & 0xff);
+        } else {
+            buff[ccLen + 1] = (byte)(0xff & 0xff);
+            buff[ccLen + 2] = (byte)((ndefLen / 256) & 0xff);
+            buff[ccLen + 3] = (byte)((ndefLen & 255) & 0xff);
+        }
+        absPos = ccLen + tlvHdrLen;
+        // NDEF record
+        if (typeLen <= 3) {
+            // NFC Forum type
+            buff[absPos] = (byte)(0xC1 + srBit & 0xff);
+        } else {
+            // MIME type
+            buff[absPos] = (byte)(0xC2 + srBit & 0xff);
+        }
+        if (srBit > 0) {
+            buff[absPos + 1] = (byte)(typeLen & 0xff);
+            buff[absPos + 2] = (byte)(payloadLen & 0xff);
+            absPos = absPos + 3;
+        } else {
+            buff[absPos + 1] = (byte)(typeLen & 0xff);
+            buff[absPos + 2] = (byte)(0 & 0xff);
+            buff[absPos + 3] = (byte)(0 & 0xff);
+            buff[absPos + 4] = (byte)((payloadLen / 256) & 0xff);
+            buff[absPos + 5] = (byte)((payloadLen & 255) & 0xff);
+            absPos = absPos + 6;
+        }
+        idx = 0;
+        while (idx < typeLen) {
+            buff[absPos + idx] = (byte)(binType[idx] & 0xff);
+            idx = idx + 1;
+        }
+        absPos = absPos + typeLen;
+        idx = 0;
+        while (idx < payloadLen) {
+            buff[absPos + idx] = (byte)(payload[idx] & 0xff);
+            idx = idx + 1;
+        }
+        absPos = absPos + payloadLen;
+        // TLV trailer
+        buff[absPos] = (byte)(0xfe & 0xff);
+        idx = tagInfo.get_tagFirstBlock();
+        return this.tagWriteBin(tagId, idx, buff, options, ref status);
+    }
+
+
+    /**
+     * <summary>
+     *   Writes an URL to an RFID tag using NFC compatible encoding, so that
+     *   mobile phones with NFC support automatically offer to open
+     *   the URL when reading the tag.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="tagId">
+     *   identifier of the tag to use
+     * </param>
+     * <param name="url">
+     *   the URL to write on the tag
+     * </param>
+     * <param name="options">
+     *   an <c>YRfidOptions</c> object with the optional
+     *   command execution parameters, such as security key
+     *   if required
+     * </param>
+     * <param name="status">
+     *   an <c>RfidStatus</c> object that will contain
+     *   the detailled status of the operation
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code. When it
+     *   happens, you can get more information from the <c>status</c> object.
+     * </para>
+     */
+    public virtual int tagWriteUrlNFC(string tagId, string url, YRfidOptions options, ref YRfidStatus status)
+    {
+        int prefix;
+        byte[] binUrl = new byte[0];
+        prefix = 0;
+        if ((url).Substring(0, 8) == "https://") {
+            prefix = 4;
+            url = (url).Substring(8, (url).Length - 8);
+        } else {
+            if ((url).Substring(0, 8) == "http://") {
+                prefix = 3;
+                url = (url).Substring(7, (url).Length - 7);
+            }
+        }
+        if ((url).Substring(0, 8) == "www.") {
+            prefix = prefix - 2;
+            url = (url).Substring(4, (url).Length - 4);
+        }
+        binUrl = YAPI.DefaultEncoding.GetBytes("_" + url);
+        binUrl[0] = (byte)(prefix & 0xff);
+        return this.tagWriteBinNFC(tagId, "U", binUrl, options, ref status);
+    }
+
+
+    /**
+     * <summary>
+     *   Writes WiFi settings to an RFID tag using NFC compatible encoding, so that
+     *   mobile phones with NFC support automatically offer to connect to this WiFi
+     *   network.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="tagId">
+     *   identifier of the tag to use
+     * </param>
+     * <param name="ssid">
+     *   the SSID of the WiFi network to connect to
+     * </param>
+     * <param name="auth">
+     *   the network authentication type (currently always "WPA2")
+     * </param>
+     * <param name="secret">
+     *   the network password
+     * </param>
+     * <param name="options">
+     *   an <c>YRfidOptions</c> object with the optional
+     *   command execution parameters, such as security key
+     *   if required
+     * </param>
+     * <param name="status">
+     *   an <c>RfidStatus</c> object that will contain
+     *   the detailled status of the operation
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code. When it
+     *   happens, you can get more information from the <c>status</c> object.
+     * </para>
+     */
+    public virtual int tagWriteWifiConfigNFC(string tagId, string ssid, string auth, string secret, YRfidOptions options, ref YRfidStatus status)
+    {
+        byte[] ssidBin = new byte[0];
+        int ssidLen;
+        byte[] secretBin = new byte[0];
+        int secretLen;
+        int payloadLen;
+        byte[] payload = new byte[0];
+        int idx;
+        ssidBin = YAPI.DefaultEncoding.GetBytes(ssid);
+        ssidLen = (ssidBin).Length;
+        secretBin = YAPI.DefaultEncoding.GetBytes(secret);
+        secretLen = (secretBin).Length;
+        payloadLen = ssidLen + secretLen + 39;
+        payload = new byte[payloadLen];
+        // Credential header
+        payload[0] = (byte)(0x10 & 0xff);
+        payload[1] = (byte)(0x0e & 0xff);
+        payload[2] = (byte)(0 & 0xff);
+        payload[3] = (byte)(payloadLen - 4 & 0xff);
+        // Network index
+        payload[4] = (byte)(0x10 & 0xff);
+        payload[5] = (byte)(0x26 & 0xff);
+        payload[6] = (byte)(0 & 0xff);
+        payload[7] = (byte)(1 & 0xff);
+        payload[8] = (byte)(1 & 0xff);
+        // SSID
+        payload[9] = (byte)(0x10 & 0xff);
+        payload[10] = (byte)(0x45 & 0xff);
+        payload[11] = (byte)(0 & 0xff);
+        payload[12] = (byte)(ssidLen & 0xff);
+        idx = 0;
+        while (idx < ssidLen) {
+            payload[13 + idx] = (byte)(ssidBin[idx] & 0xff);
+            idx = idx + 1;
+        }
+        // Auth: WPA2-Personal
+        payload[13 + ssidLen] = (byte)(0x10 & 0xff);
+        payload[14 + ssidLen] = (byte)(0x03 & 0xff);
+        payload[15 + ssidLen] = (byte)(0 & 0xff);
+        payload[16 + ssidLen] = (byte)(2 & 0xff);
+        payload[17 + ssidLen] = (byte)(0 & 0xff);
+        payload[18 + ssidLen] = (byte)(32 & 0xff);
+        // Encryption: AES
+        payload[19 + ssidLen] = (byte)(0x10 & 0xff);
+        payload[20 + ssidLen] = (byte)(0x0f & 0xff);
+        payload[21 + ssidLen] = (byte)(0 & 0xff);
+        payload[22 + ssidLen] = (byte)(2 & 0xff);
+        payload[23 + ssidLen] = (byte)(0 & 0xff);
+        payload[24 + ssidLen] = (byte)(8 & 0xff);
+        // Network key
+        payload[25 + ssidLen] = (byte)(0x10 & 0xff);
+        payload[26 + ssidLen] = (byte)(0x27 & 0xff);
+        payload[27 + ssidLen] = (byte)(0 & 0xff);
+        payload[28 + ssidLen] = (byte)(secretLen & 0xff);
+        idx = 0;
+        while (idx < secretLen) {
+            payload[29 + ssidLen + idx] = (byte)(secretBin[idx] & 0xff);
+            idx = idx + 1;
+        }
+        // MAC broadcast
+        payload[29 + ssidLen + secretLen] = (byte)(0x10 & 0xff);
+        payload[30 + ssidLen + secretLen] = (byte)(0x20 & 0xff);
+        payload[31 + ssidLen + secretLen] = (byte)(0 & 0xff);
+        payload[32 + ssidLen + secretLen] = (byte)(6 & 0xff);
+        idx = 0;
+        while (idx < 6) {
+            payload[33 + ssidLen + secretLen + idx] = (byte)(0xff & 0xff);
+            idx = idx + 1;
+        }
+        return this.tagWriteBinNFC(tagId, "application/vnd.wfa.wsc", payload, options, ref status);
     }
 
 
