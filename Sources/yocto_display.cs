@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 74843 2026-06-23 10:35:16Z seb $
+ * $Id: yocto_display.cs 75359 2026-08-03 12:30:08Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -848,7 +848,7 @@ public class YDisplayLayer
 
     /**
      * <summary>
-     *   Close the currently open polygon, fill its content the fill color currently
+     *   Closes the currently open polygon, fill its content the fill color currently
      *   selected for the layer, and draw its outline using the selected line color.
      * <para>
      * </para>
@@ -1406,7 +1406,7 @@ public class YDisplay : YFunction
 
     /**
      * <summary>
-     *   Changes the name of the sequence to play when the displayed is powered on.
+     *   Changes the name of the sequence to play when the display is powered on.
      * <para>
      *   Remember to call the <c>saveToFlash()</c> method of the module if the
      *   modification must be kept.
@@ -1415,7 +1415,7 @@ public class YDisplay : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   a string corresponding to the name of the sequence to play when the displayed is powered on
+     *   a string corresponding to the name of the sequence to play when the display is powered on
      * </param>
      * <para>
      * </para>
@@ -1626,7 +1626,9 @@ public class YDisplay : YFunction
         string rest_val;
         lock (_thisLock) {
             rest_val = (newval).ToString();
-            return _setAttr("orientation", rest_val);
+            int res = _setAttr("orientation", rest_val);
+            _clearLazyCache();
+            return res;
         }
     }
 
@@ -1689,7 +1691,9 @@ public class YDisplay : YFunction
         string rest_val;
         lock (_thisLock) {
             rest_val = newval;
-            return _setAttr("displayPanel", rest_val);
+            int res = _setAttr("displayPanel", rest_val);
+            _clearLazyCache();
+            return res;
         }
     }
 
@@ -1756,7 +1760,7 @@ public class YDisplay : YFunction
 
     /**
      * <summary>
-     *   Returns the display type: monochrome OLED, black and white ePaper, color ePaper, etc.
+     *   Returns the display type: monochrome OLED, black and white ePaper, color ePaper, and so on.
      * <para>
      * </para>
      * <para>
@@ -1765,7 +1769,7 @@ public class YDisplay : YFunction
      * <returns>
      *   a value among <c>YDisplay.DISPLAYTYPE_MONO</c>, <c>YDisplay.DISPLAYTYPE_EPAPER_BW</c>,
      *   <c>YDisplay.DISPLAYTYPE_EPAPER_BWR</c> and <c>YDisplay.DISPLAYTYPE_EPAPER_BWRY</c> corresponding to
-     *   the display type: monochrome OLED, black and white ePaper, color ePaper, etc
+     *   the display type: monochrome OLED, black and white ePaper, color ePaper, and so on
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YDisplay.DISPLAYTYPE_INVALID</c>.
@@ -2062,7 +2066,7 @@ public class YDisplay : YFunction
      * <summary>
      *   Clears the display screen and resets all display layers to their default state.
      * <para>
-     *   Using this function in a sequence will kill the sequence play-back. Don't use that
+     *   Using this function in a sequence will kill the sequence play-back. Do not use that
      *   function to reset the display at sequence start-up.
      * </para>
      * <para>
@@ -2193,7 +2197,7 @@ public class YDisplay : YFunction
 
     /**
      * <summary>
-     *   Trigger an immediate screen refresh.
+     *   Triggers an immediate screen refresh.
      * <para>
      *   The combination of
      *   <c>postponeRefresh</c> and <c>triggerRefresh</c> can be used as an

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 74843 2026-06-23 10:35:16Z seb $
+ * $Id: yocto_api.cs 75351 2026-08-02 19:45:07Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -4619,7 +4619,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "2.1";
     public const int YOCTO_API_VERSION_BCD = 0x0200;
 
-    public const string YOCTO_API_BUILD_NO = "75129";
+    public const string YOCTO_API_BUILD_NO = "75391";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6908,7 +6908,7 @@ public class YAPI
             }
             throw;
         }
-        return  "2.1.15129 (" + version + ")";
+        return  "2.1.15391 (" + version + ")";
     }
 
     /**
@@ -12673,6 +12673,14 @@ public class YFunction
     }
 
 
+    // Internal method to force reloading even lazy attributes (eg. displayWidth, etc)
+    public void _clearLazyCache()
+    {
+        clearCache();
+        _cacheExpiration = 0;
+    }
+
+
     /**
      * <summary>
      *   Gets the <c>YModule</c> object for the device on which the function is located.
@@ -13575,7 +13583,15 @@ public class YModule : YFunction
      */
     public virtual int revertFromFlash()
     {
-        return this.set_persistentSettings(PERSISTENTSETTINGS_LOADED);
+        int res;
+
+        res = this.set_persistentSettings(PERSISTENTSETTINGS_LOADED);
+        if (!(res==YAPI.SUCCESS)) {
+            this._throw(res, "unable to trigger revert settings");
+            return res;
+        }
+        this._clearLazyCache();
+        return res;
     }
 
 

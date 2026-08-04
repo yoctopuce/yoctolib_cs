@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_serialport.cs 74843 2026-06-23 10:35:16Z seb $
+ * $Id: yocto_serialport.cs 75305 2026-07-29 07:31:17Z seb $
  *
  * Implements yFindSerialPort(), the high-level API for SerialPort functions
  *
@@ -2124,22 +2124,27 @@ public class YSerialPort : YFunction
             // first simulated event, use it only to initialize reference values
             this._eventPos = 0;
         }
-
-        url = "rxmsg.json?pos="+Convert.ToString(this._eventPos)+"&maxw=0&t=0";
-        msgbin = this._download(url);
-        msgarr = this._json_get_array(msgbin);
-        msglen = msgarr.Count;
-        if (msglen == 0) {
-            return YAPI.SUCCESS;
-        }
-        // last element of array is the new position
-        msglen = msglen - 1;
-        if (!(this._eventCallback != null)) {
-            // first simulated event, use it only to initialize reference values
+        msglen = 0;
+        try {
+            url = "rxmsg.json?pos="+Convert.ToString(this._eventPos)+"&maxw=0&t=0";
+            msgbin = this._download(url);
+            msgarr = this._json_get_array(msgbin);
+            msglen = msgarr.Count;
+            if (msglen == 0) {
+                return YAPI.SUCCESS;
+            }
+            // last element of array is the new position
+            msglen = msglen - 1;
+            if (!(this._eventCallback != null)) {
+                // first simulated event, use it only to initialize reference values
+                this._eventPos = this._decode_json_int(msgarr[msglen]);
+                return YAPI.SUCCESS;
+            }
             this._eventPos = this._decode_json_int(msgarr[msglen]);
-            return YAPI.SUCCESS;
+        } catch {
+            return YAPI.IO_ERROR;
         }
-        this._eventPos = this._decode_json_int(msgarr[msglen]);
+
         idx = 0;
         while (idx < msglen) {
             this._eventCallback(this, new YSnoopingRecord(YAPI.DefaultEncoding.GetString(msgarr[idx])));
