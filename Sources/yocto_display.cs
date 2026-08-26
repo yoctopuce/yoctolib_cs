@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_display.cs 75359 2026-08-03 12:30:08Z seb $
+ * $Id: yocto_display.cs 75637 2026-08-20 16:54:40Z mvuilleu $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -140,7 +140,7 @@ public class YDisplayLayer
     {
         int res;
         res = YAPI.SUCCESS;
-        if ((this._cmdbuff).Length + (cmd).Length >= 100) {
+        if ((this._cmdbuff).Length + (cmd).Length >= 64) {
             // force flush before, to prevent overflow
             this.flush_now();
         }
@@ -624,6 +624,18 @@ public class YDisplayLayer
      */
     public virtual int drawText(int x, int y, ALIGN anchor, string text)
     {
+        int textlen;
+        string destname;
+        textlen = (text).Length;
+        if (textlen > 60) {
+            if (textlen > 1000) {
+                this._display._throw(YAPI.INVALID_ARGUMENT, "text too large (max 1000 characters)");
+                return YAPI.INVALID_ARGUMENT;
+            }
+            this._display.flushLayers();
+            destname = "layer"+Convert.ToString(this._id)+":T"+Convert.ToString(x)+","+Convert.ToString(y)+","+((int)(anchor)).ToString()+",";
+            return this._display.upload(destname,YAPI.DefaultEncoding.GetBytes(text));
+        }
         return this.command_flush("T"+Convert.ToString(x)+","+Convert.ToString(y)+","+((int)(anchor)).ToString()+","+text+""+((char)(27)).ToString());
     }
 
@@ -661,50 +673,6 @@ public class YDisplayLayer
 
     /**
      * <summary>
-     *   Draws a bitmap at the specified position.
-     * <para>
-     *   The bitmap is provided as a binary object,
-     *   where each pixel maps to a bit, from left to right and from top to bottom.
-     *   The most significant bit of each byte maps to the leftmost pixel, and the least
-     *   significant bit maps to the rightmost pixel. Bits set to 1 are drawn using the
-     *   layer selected pen color. Bits set to 0 are drawn using the specified background
-     *   gray level, unless -1 is specified, in which case they are not drawn at all
-     *   (as if transparent).
-     * </para>
-     * </summary>
-     * <param name="x">
-     *   the distance from left of layer to the left of the bitmap, in pixels
-     * </param>
-     * <param name="y">
-     *   the distance from top of layer to the top of the bitmap, in pixels
-     * </param>
-     * <param name="w">
-     *   the width of the bitmap, in pixels
-     * </param>
-     * <param name="bitmap">
-     *   a binary object
-     * </param>
-     * <param name="bgcol">
-     *   the background gray level to use for zero bits (0 = black,
-     *   255 = white), or -1 to leave the pixels unchanged
-     * </param>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public virtual int drawBitmap(int x, int y, int w, byte[] bitmap, int bgcol)
-    {
-        string destname;
-        destname = "layer"+Convert.ToString(this._id)+":"+Convert.ToString(w)+","+Convert.ToString(bgcol)+"@"+Convert.ToString(x)+","+Convert.ToString(y);
-        return this._display.upload(destname,bitmap);
-    }
-
-
-    /**
-     * <summary>
      *   Draws a GIF image provided as a binary buffer at the specified position.
      * <para>
      *   If the image drawing must be included in an animation sequence, save it
@@ -730,8 +698,123 @@ public class YDisplayLayer
     public virtual int drawGIF(int x, int y, byte[] gifimage)
     {
         string destname;
+        this._display.flushLayers();
         destname = "layer"+Convert.ToString(this._id)+":G,-1@"+Convert.ToString(x)+","+Convert.ToString(y);
         return this._display.upload(destname,gifimage);
+    }
+
+
+    /**
+     * <summary>
+     *   Draws a bitmap at the specified position.
+     * <para>
+     *   The bitmap is provided as a binary object,
+     *   where each pixel maps to a bit, from left to right and from top to bottom.
+     *   The most significant bit of each byte maps to the leftmost pixel, and the least
+     *   significant bit maps to the rightmost pixel. Bits set to 1 are drawn using the
+     *   layer selected pen color. Bits set to 0 are drawn using the specified background
+     *   color, unless <c>NO_INK</c> (-1) is specified, in which case they are not
+     *   drawn at all (as if transparent).
+     * </para>
+     * </summary>
+     * <param name="x">
+     *   the distance from left of layer to the left of the bitmap, in pixels
+     * </param>
+     * <param name="y">
+     *   the distance from top of layer to the top of the bitmap, in pixels
+     * </param>
+     * <param name="w">
+     *   the width of the bitmap, in pixels
+     * </param>
+     * <param name="bitmap">
+     *   a binary object
+     * </param>
+     * <param name="bgcol">
+     *   the RGB background color to use for zero bits, as a 24-bit RGB value,
+     *   or one of the constants <c>NO_INK</c>, <c>FG_INK</c> or <c>BG_INK</c>
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int drawBitmap(int x, int y, int w, byte[] bitmap, int bgcol)
+    {
+        string destname;
+        int r;
+        int g;
+        int b;
+        string rgbcol;
+        if ((w < 0) || (w > 512)) {
+            this._display._throw(YAPI.INVALID_ARGUMENT, "bitmap width must be in range 1..512");
+            return YAPI.INVALID_ARGUMENT;
+        }
+        this._display.flushLayers();
+        if (bgcol <= 255) {
+            if (bgcol >= -1) {
+                // backward-compatible behaviour (gray level)
+                rgbcol = ""+Convert.ToString(bgcol);
+            } else {
+                // background color or foreground color
+                if (bgcol <= -3) {
+                    rgbcol = "#.";
+                } else {
+                    rgbcol = "#-";
+                }
+            }
+        } else {
+            // RGB color
+            r = ((bgcol >> 20) & 15);
+            g = ((bgcol >> 12) & 15);
+            b = ((bgcol >> 4) & 15);
+            rgbcol = "#"+String.Format("{0:x}",r)+""+String.Format("{0:x}",g)+""+String.Format("{0:x}",b);
+        }
+        destname = "layer"+Convert.ToString(this._id)+":"+Convert.ToString(w)+","+rgbcol+"@"+Convert.ToString(x)+","+Convert.ToString(y);
+        return this._display.upload(destname,bitmap);
+    }
+
+
+    /**
+     * <summary>
+     *   Draws a color pixmap at the specified position.
+     * <para>
+     *   The pixmap is provided as a binary
+     *   object, where each byte maps to one pixel. The 24 bit RGB value corresponding to each
+     *   byte value is defined in the palette provided as extra argument.
+     *   The palette maximal size is 8, and it is recommended to use the smallest possible
+     *   palette size to optimize the size of data to be sent to the display.
+     *   The height of the pixmap is implicitely given by the pixmap buffer size.
+     * </para>
+     * </summary>
+     * <param name="x">
+     *   the distance from left of layer to the left of the pixmap, in pixels
+     * </param>
+     * <param name="y">
+     *   the distance from top of layer to the top of the pixmap, in pixels
+     * </param>
+     * <param name="w">
+     *   the width of the pixmap, in pixels
+     * </param>
+     * <param name="pixmap">
+     *   a binary buffer where each byte maps to one pixel
+     * </param>
+     * <param name="palette">
+     *   an array of 24-bit RGB values, defining the color for each byte value in pixmap
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int drawPixmap(int x, int y, int w, byte[] pixmap, List<int> palette)
+    {
+        byte[] gifimage = new byte[0];
+        gifimage = this._display.gifEncode(pixmap, palette, w, false);
+        return this.drawGIF(x, y, gifimage);
     }
 
 
@@ -888,6 +971,18 @@ public class YDisplayLayer
      */
     public virtual int consoleOut(string text)
     {
+        int textlen;
+        string destname;
+        textlen = (text).Length;
+        if (textlen > 60) {
+            if (textlen > 1000) {
+                this._display._throw(YAPI.INVALID_ARGUMENT, "text too large (max 1000 characters)");
+                return YAPI.INVALID_ARGUMENT;
+            }
+            this._display.flushLayers();
+            destname = "layer"+Convert.ToString(this._id)+":!";
+            return this._display.upload(destname,YAPI.DefaultEncoding.GetBytes(text));
+        }
         return this.command_flush("!"+text+""+((char)(27)).ToString());
     }
 
@@ -1195,13 +1290,51 @@ public class YDisplay : YFunction
     public new delegate void ValueCallback(YDisplay func, string value);
     public new delegate void TimedReportCallback(YDisplay func, YMeasure measure);
 
+    public enum FASTREFRESH
+    {
+        WHENEVER_POSSIBLE = 0,
+        WHENEVER_SUPPORTED = 1,
+        NEVER = 2,
+        INVALID = 3
+    };
+    public enum REGENERATE
+    {
+        ON_REQUEST_ONLY = 0,
+        EVERY_DAY = 1,
+        EVERY_12H = 2,
+        EVERY_6H = 3,
+        EVERY_3H = 4,
+        EVERY_2H = 5,
+        EVERY_HOUR = 6,
+        EVERY_30MIN = 7,
+        EVERY_15MIN = 8,
+        EVERY_480 = 9,
+        EVERY_432 = 10,
+        EVERY_360 = 11,
+        EVERY_288 = 12,
+        EVERY_240 = 13,
+        EVERY_192 = 14,
+        EVERY_144 = 15,
+        EVERY_96 = 16,
+        EVERY_48 = 17,
+        EVERY_36 = 18,
+        EVERY_24 = 19,
+        EVERY_12 = 20,
+        EVERY_10 = 21,
+        EVERY_8 = 22,
+        EVERY_6 = 23,
+        EVERY_4 = 24,
+        ALWAYS = 25,
+        INVALID = 26
+    };
     public enum DISPLAYSTATE
     {
         FAILURE = 0,
         OFF = 1,
         POWERING = 2,
         IDLE = 3,
-        REFRESHING = 4
+        REFRESHING = 4,
+        INVALID = 5
     };
     public const int ENABLED_FALSE = 0;
     public const int ENABLED_TRUE = 1;
@@ -1571,6 +1704,9 @@ public class YDisplay : YFunction
      * <summary>
      *   Returns the currently selected display orientation.
      * <para>
+     *   The orientation is defined as the side of the screen where the
+     *   USB connector (for OLED displays) or the ribbon cable (for ePaper panels) is located when the
+     *   display is up straight.
      * </para>
      * <para>
      * </para>
@@ -1602,7 +1738,9 @@ public class YDisplay : YFunction
      * <summary>
      *   Changes the display orientation.
      * <para>
-     *   Remember to call the <c>saveToFlash()</c>
+     *   he orientation is defined as the side of the screen where the
+     *   USB connector (for OLED displays) or the ribbon cable (for ePaper panels) is located when the
+     *   display is up straight. Remember to call the <c>saveToFlash()</c>
      *   method of the module if the modification must be kept.
      * </para>
      * <para>
@@ -1667,8 +1805,7 @@ public class YDisplay : YFunction
      *   Changes the model of display to match the connected display panel.
      * <para>
      *   This function has no effect if the module does not support the selected
-     *   display panel.
-     *   Remember to call the <c>saveToFlash()</c>
+     *   display panel. Remember to call the <c>saveToFlash()</c>
      *   method of the module if the modification must be kept.
      * </para>
      * <para>
@@ -2059,6 +2196,154 @@ public class YDisplay : YFunction
             return false;
         }
         return true;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the fast refresh usage policy in use (ePaper displays only).
+     * <para>
+     *   This setting is combined with the regenerate policy to determine when the screen
+     *   should be updated using a fast update versus or regenerated using a slower,
+     *   flickering full refresh.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among the <c>YDisplay.FASTREFRESH</c> enumeration
+     *   (<c>YDisplay.FASTREFRESH_WHENEVER_POSSIBLE</c>,
+     *   <c>YDisplay.FASTREFRESH_WHENEVER_SUPPORTED</c>,
+     *   <c>YDisplay.FASTREFRESH_NEVER</c>).
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YDisplay.FASTREFRESH_INVALID</c>.
+     * </para>
+     */
+    public virtual FASTREFRESH get_fastRefreshPolicy()
+    {
+        int combined;
+        int fmod;
+        combined = this.get_brightness();
+        if (combined < 0) {
+            return FASTREFRESH.INVALID;
+        }
+        fmod = (combined / 25);
+        if (fmod >= 2) {
+            fmod = fmod - 2;
+        }
+        return (FASTREFRESH) fmod;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the display regeneration minimal frequency (ePaper displays only).
+     * <para>
+     *   This setting is combined with the fast refresh usage policy to determine
+     *   when the screen should be updated using a fast update versus or regenerated
+     *   using a slower, flickering full refresh. To change the display regeneration minimal
+     *   frequency, use methode <c>set_fastRefreshPolicy()</c>.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among the <c>YDisplay.REGENERATE</c> enumeration
+     *   (<c>YDisplay.REGENERATE_ON_REQUEST_ONLY</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_DAY</c>, <c>YDisplay.REGENERATE_EVERY_12H</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_6H</c>, <c>YDisplay.REGENERATE_EVERY_3H</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_2H</c>, <c>YDisplay.REGENERATE_EVERY_HOUR</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_30MIN</c>, <c>YDisplay.REGENERATE_EVERY_15MIN</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_480</c>, <c>YDisplay.REGENERATE_EVERY_432</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_360</c>, <c>YDisplay.REGENERATE_EVERY_288</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_240</c>, <c>YDisplay.REGENERATE_EVERY_192</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_144</c>, <c>YDisplay.REGENERATE_EVERY_96</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_48</c>, <c>YDisplay.REGENERATE_EVERY_36</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_24</c>, <c>YDisplay.REGENERATE_EVERY_12</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_10</c>, <c>YDisplay.REGENERATE_EVERY_8</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_6</c>, <c>YDisplay.REGENERATE_EVERY_4</c>,
+     *   <c>YDisplay.REGENERATE_ALWAYS</c>).
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YDisplay.REGENERATE_INVALID</c>.
+     * </para>
+     */
+    public virtual REGENERATE get_regeneratePolicy()
+    {
+        int combined;
+        int fval;
+        combined= this.get_brightness();
+        if (combined < 0) {
+            return REGENERATE.INVALID;
+        }
+        if (combined >= 100) {
+            fval = 25;
+        } else {
+            fval = (combined % 25);
+        }
+        return (REGENERATE) fval;
+    }
+
+
+    /**
+     * <summary>
+     *   Changes the fast refresh usage policy and display regeneration minimal frequency
+     *   (ePaper displays only).
+     * <para>
+     *   These settings jointly determine when the screen should be
+     *   updated using a fast update versus or regenerated using a slower, flickering full
+     *   refresh.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="fastRefresh">
+     *   a value among the <c>YDisplay.FASTREFRESH</c> enumeration
+     *   (<c>YDisplay.FASTREFRESH_WHENEVER_POSSIBLE</c>,
+     *   <c>YDisplay.FASTREFRESH_WHENEVER_SUPPORTED</c>,
+     *   <c>YDisplay.FASTREFRESH_NEVER</c>),
+     *   corresponding to the policy for using fast refresh.
+     * </param>
+     * <param name="regenerate">
+     *   a value among the enumeration <c>YRefFrame.REGENERATE</c>
+     *   (<c>YDisplay.REGENERATE_ON_REQUEST_ONLY</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_DAY</c>, <c>YDisplay.REGENERATE_EVERY_12H</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_6H</c>, <c>YDisplay.REGENERATE_EVERY_3H</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_2H</c>, <c>YDisplay.REGENERATE_EVERY_HOUR</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_30MIN</c>, <c>YDisplay.REGENERATE_EVERY_15MIN</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_480</c>, <c>YDisplay.REGENERATE_EVERY_432</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_360</c>, <c>YDisplay.REGENERATE_EVERY_288</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_240</c>, <c>YDisplay.REGENERATE_EVERY_192</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_144</c>, <c>YDisplay.REGENERATE_EVERY_96</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_48</c>, <c>YDisplay.REGENERATE_EVERY_36</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_24</c>, <c>YDisplay.REGENERATE_EVERY_12</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_10</c>, <c>YDisplay.REGENERATE_EVERY_8</c>,
+     *   <c>YDisplay.REGENERATE_EVERY_6</c>, <c>YDisplay.REGENERATE_EVERY_4</c>,
+     *   <c>YDisplay.REGENERATE_ALWAYS</c>),
+     *   corresponding to the display minimal regeneration frequency.
+     * </param>
+     * <para>
+     *   Remember to call the <c>saveToFlash()</c>
+     *   method of the module if the modification must be kept.
+     * </para>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int set_fastRefreshPolicy(FASTREFRESH fastRefresh, REGENERATE regenerate)
+    {
+        int combined;
+        int fmod;
+        int fval;
+        fmod = (int)fastRefresh;
+        fval = (int)regenerate;
+        if ((fval == 25) || (fmod == 2)) {
+            combined = 100;
+        } else {
+            combined = 50 + fmod * 25 + fval;
+        }
+        return this.set_brightness(combined);
     }
 
 
@@ -2718,6 +3003,209 @@ public class YDisplay : YFunction
             srcpos = srcpos + 1;
         }
         return rotmap;
+    }
+
+
+    public virtual byte[] gifEncode(byte[] pixmap, List<int> palette, int w, bool shortHdr)
+    {
+        int minCodeSize;
+        int LZW_CLRCODE;
+        int LZW_ENDCODE;
+        int LZW_1STCODE;
+        int codeSize;
+        int maxCode;
+        List<int> codes = new List<int>();
+        int nCodes;
+        int pixmapSize;
+        byte[] dataStream = new byte[0];
+        int blockStart;
+        int blockEnd;
+        int prevCode;
+        int pixPos;
+        int wrBits;
+        int wrBitCnt;
+        int outPos;
+        int nextVal;
+        int i;
+        int hdrSize;
+        byte[] res = new byte[0];
+        int h;
+
+        if (palette.Count > 8) {
+            this._throw(YAPI.INVALID_ARGUMENT, "Palette should have no more than 8 colors");
+            res = new byte[0];
+            return res;
+        }
+        if (palette.Count <= 4) {
+            minCodeSize = 2;
+        } else {
+            minCodeSize = 3;
+        }
+        LZW_CLRCODE = (1 << minCodeSize);
+        LZW_ENDCODE = LZW_CLRCODE + 1;
+        LZW_1STCODE = LZW_ENDCODE + 1;
+        codeSize = minCodeSize + 1;
+        maxCode = (1 << codeSize) - 1 - LZW_1STCODE;
+        codes.Clear();
+        nCodes = 0;
+        pixmapSize = (pixmap).Length;
+        dataStream = new byte[((2 * pixmapSize) / 3) + 8];
+        outPos = 0;
+        wrBits = LZW_CLRCODE;
+        wrBitCnt = 3;
+        // prefetch first byte
+        prevCode = pixmap[0];
+        pixPos = 1;
+        while (pixPos < pixmapSize + 3) {
+            blockStart = outPos;
+            outPos = blockStart + 1;
+            blockEnd = blockStart + 256;
+            // flush any carry-over output byte from previous data sub-block
+            while (wrBitCnt >= 8) {
+                dataStream[outPos] = (byte)((wrBits & 0xff) & 0xff);
+                outPos = outPos + 1;
+                wrBits = (wrBits >> 8);
+                wrBitCnt = wrBitCnt - 8;
+            }
+            while ((outPos < blockEnd) && (pixPos < pixmapSize)) {
+                // search for an existing code matching the running input segment
+                // printf("[%d] ", rdBits >> 12);
+                nextVal = (prevCode | (pixmap[pixPos] << 12));
+                pixPos = pixPos + 1;
+                if (prevCode < LZW_1STCODE) {
+                    i = 0;
+                } else {
+                    i = prevCode - LZW_ENDCODE;
+                }
+                while ((i < nCodes) && (codes[i] != nextVal)) {
+                    i = i + 1;
+                }
+                if (i >= nCodes) {
+                    // not found, emit prevCode and create new code
+                    wrBits = (wrBits | (prevCode << wrBitCnt));
+                    wrBitCnt = wrBitCnt + codeSize;
+                    if (nCodes <= maxCode) {
+                        //fprintf(stderr, "#%d: #%d + %d\n", nextCode, nextVal & 63, nextVal >> 6);
+                        codes.Add(nextVal);
+                        nCodes = nCodes + 1;
+                    } else {
+                        codeSize = codeSize + 1;
+                        if (codeSize <= 12) {
+                            //fprintf(stderr, "#%d: #%d + %d\n", nextCode, nextVal & 63, nextVal >> 6);
+                            codes.Add(nextVal);
+                            nCodes = nCodes + 1;
+                        } else {
+                            wrBits = (wrBits | (LZW_CLRCODE << wrBitCnt));
+                            wrBitCnt = wrBitCnt + codeSize;
+                            codes.Clear();
+                            nCodes = 0;
+                            codeSize = minCodeSize + 1;
+                        }
+                        maxCode = (1 << codeSize) - 1 - LZW_1STCODE;
+                    }
+                    // flush one (or two) codes to output stream
+                    while ((wrBitCnt >= 8) && (outPos < blockEnd)) {
+                        dataStream[outPos] = (byte)((wrBits & 0xff) & 0xff);
+                        outPos = outPos + 1;
+                        wrBits = (wrBits >> 8);
+                        wrBitCnt = wrBitCnt - 8;
+                    }
+                    prevCode = (nextVal >> 12);
+                } else {
+                    prevCode = i + LZW_1STCODE;
+                }
+            }
+            if (pixPos >= pixmapSize) {
+                if ((outPos < blockEnd) && (pixPos == pixmapSize)) {
+                    // append code for last run
+                    wrBits = (wrBits | (prevCode << wrBitCnt));
+                    wrBitCnt = wrBitCnt + codeSize;
+                    while ((wrBitCnt >= 8) && (outPos < blockEnd)) {
+                        dataStream[outPos] = (byte)((wrBits & 0xff) & 0xff);
+                        outPos = outPos + 1;
+                        wrBits = (wrBits >> 8);
+                        wrBitCnt = wrBitCnt - 8;
+                    }
+                    pixPos = pixPos + 1;
+                }
+                if ((outPos < blockEnd) && (pixPos == pixmapSize + 1)) {
+                    // append end code
+                    wrBits = (wrBits | (LZW_ENDCODE << wrBitCnt));
+                    wrBitCnt = wrBitCnt + codeSize;
+                    while ((wrBitCnt >= 8) && (outPos < blockEnd)) {
+                        dataStream[outPos] = (byte)((wrBits & 0xff) & 0xff);
+                        outPos = outPos + 1;
+                        wrBits = (wrBits >> 8);
+                        wrBitCnt = wrBitCnt - 8;
+                    }
+                    pixPos = pixPos + 1;
+                }
+                if ((outPos < blockEnd) && (pixPos == pixmapSize + 2)) {
+                    // flush last 0-7 bits
+                    if (wrBitCnt > 0) {
+                        dataStream[outPos] = (byte)((wrBits & 0xff) & 0xff);
+                        outPos = outPos + 1;
+                        wrBitCnt = 0;
+                    }
+                    pixPos = pixPos + 1;
+                }
+            }
+            dataStream[blockStart] = (byte)(outPos - (blockStart + 1) & 0xff);
+        }
+        blockEnd = outPos;
+        // Now write final buffer
+        hdrSize = 24 + LZW_CLRCODE * 3;
+        res = new byte[hdrSize + outPos + 2];
+        // GIF89a header
+        res[0x00] = (byte)(0x47 & 0xff);
+        res[0x01] = (byte)(0x49 & 0xff);
+        res[0x02] = (byte)(0x46 & 0xff);
+        res[0x03] = (byte)(0x38 & 0xff);
+        res[0x04] = (byte)(0x39 & 0xff);
+        res[0x05] = (byte)(0x61 & 0xff);
+        // Logical screen descriptor
+        h = (((pixmap).Length) / w);
+        res[0x06] = (byte)((w & 0xff) & 0xff);
+        res[0x07] = (byte)((w >> 8) & 0xff);
+        res[0x08] = (byte)((h & 0xff) & 0xff);
+        res[0x09] = (byte)((h >> 8) & 0xff);
+        res[0x0a] = (byte)(0xf0 + minCodeSize - 1 & 0xff);
+        res[0x0b] = (byte)(0 & 0xff);
+        res[0x0c] = (byte)(0 & 0xff);
+        // Palette
+        outPos = 0x0d;
+        i = 0;
+        while (i < LZW_CLRCODE) {
+            if (i < palette.Count) {
+                wrBits = palette[i];
+                res[outPos] = (byte)(((wrBits >> 16) & 0xff) & 0xff);
+                res[outPos + 1] = (byte)(((wrBits >> 8) & 0xff) & 0xff);
+                res[outPos + 2] = (byte)((wrBits & 0xff) & 0xff);
+            }
+            outPos = outPos + 3;
+            i = i + 1;
+        }
+        // Image descriptor
+        res[outPos] = (byte)(0x2c & 0xff);
+        res[outPos + 5] = (byte)((w & 0xff) & 0xff);
+        res[outPos + 6] = (byte)((w >> 8) & 0xff);
+        res[outPos + 7] = (byte)((h & 0xff) & 0xff);
+        res[outPos + 8] = (byte)((h >> 8) & 0xff);
+        outPos = outPos + 10;
+        // Prepare to append Image data
+        res[outPos] = (byte)(minCodeSize & 0xff);
+        i = 0;
+        while (i < blockEnd) {
+            outPos = outPos + 1;
+            res[outPos] = (byte)(dataStream[i] & 0xff);
+            i = i + 1;
+        }
+        // Append zero-block and trailer
+        outPos = outPos + 1;
+        res[outPos] = (byte)(0 & 0xff);
+        outPos = outPos + 1;
+        res[outPos] = (byte)(0x3b & 0xff);
+        return res;
     }
 
     /**

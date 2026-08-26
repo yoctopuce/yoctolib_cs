@@ -78,7 +78,7 @@ public class YCarbonDioxide : YSensor
     public new delegate void ValueCallback(YCarbonDioxide func, string value);
     public new delegate void TimedReportCallback(YCarbonDioxide func, YMeasure measure);
 
-    public const int ABCPERIOD_INVALID = YAPI.INVALID_UINT;
+    public const int ABCPERIOD_INVALID = YAPI.INVALID_INT;
     public const string COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _abcPeriod = ABCPERIOD_INVALID;
     protected string _command = COMMAND_INVALID;
@@ -383,7 +383,7 @@ public class YCarbonDioxide : YSensor
      */
     public virtual int triggerForcedCalibration(double refVal)
     {
-        return this.set_command("F"+Convert.ToString(unchecked((int) Math.Round(1000*refVal)))+"C");
+        return this.set_command("F"+Convert.ToString(unchecked((int) Math.Round(refVal)))+"C");
     }
 
 
