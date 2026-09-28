@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs 75351 2026-08-02 19:45:07Z mvuilleu $
+ * $Id: yocto_api.cs version 2.1.16087 (build 76087) $
  *
  * High-level programming interface, common to all modules
  *
@@ -4619,7 +4619,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "2.1";
     public const int YOCTO_API_VERSION_BCD = 0x0200;
 
-    public const string YOCTO_API_BUILD_NO = "75681";
+    public const string YOCTO_API_BUILD_NO = "76087";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6908,7 +6908,7 @@ public class YAPI
             }
             throw;
         }
-        return  "2.1.15681 (" + version + ")";
+        return  "2.1.16087 (" + version + ")";
     }
 
     /**

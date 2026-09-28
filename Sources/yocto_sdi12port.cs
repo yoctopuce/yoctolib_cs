@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_Sdi12port.cs 52943 2023-01-26 15:46:47Z mvuilleu $
+ *  $Id: yocto_sdi12port.cs version 2.1.16087 (build 76087) $
  *
  *  Implements yFindSdi12Port(), the high-level API for Sdi12Port functions
  *

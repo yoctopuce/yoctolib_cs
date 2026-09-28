@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs 74843 2026-06-23 10:35:16Z seb $
+ * $Id: yocto_files.cs version 2.1.16087 (build 76087) $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *

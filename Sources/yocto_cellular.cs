@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_cellular.cs 74843 2026-06-23 10:35:16Z seb $
+ * $Id: yocto_cellular.cs version 2.1.16087 (build 76087) $
  *
  * Implements yFindCellular(), the high-level API for Cellular functions
  *

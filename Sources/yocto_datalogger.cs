@@ -1,6 +1,6 @@
 /********************************************************************
  *
- * $Id: yocto_datalogger.cs 28120 2017-07-25 07:06:32Z seb $
+ * $Id: yocto_datalogger.cs version 2.1.16087 (build 76087) $
  *
  * High-level programming interface, common to all modules
  *

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_i2cport.cs 74843 2026-06-23 10:35:16Z seb $
+ *  $Id: yocto_i2cport.cs version 2.1.16087 (build 76087) $
  *
  *  Implements yFindI2cPort(), the high-level API for I2cPort functions
  *

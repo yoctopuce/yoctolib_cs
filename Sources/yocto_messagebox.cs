@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_messagebox.cs 74843 2026-06-23 10:35:16Z seb $
+ * $Id: yocto_messagebox.cs version 2.1.16087 (build 76087) $
  *
  * Implements yFindMessageBox(), the high-level API for MessageBox functions
  *

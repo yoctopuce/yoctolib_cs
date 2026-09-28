@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_micropython.cs 74843 2026-06-23 10:35:16Z seb $
+ *  $Id: yocto_micropython.cs version 2.1.16087 (build 76087) $
  *
  *  Implements yFindMicroPython(), the high-level API for MicroPython functions
  *
