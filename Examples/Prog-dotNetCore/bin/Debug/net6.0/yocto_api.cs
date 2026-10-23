@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_api.cs version 2.1.16087 (build 76087) $
+ * $Id:yocto_api.cs version 2.1.16635 (build 76635) $
  *
  * High-level programming interface, common to all modules
  *
@@ -767,6 +767,13 @@ internal static class SafeNativeMethods
                   return _yapiSetHubIntAttrPtr(hubref, attrname, value);
     }
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int yapiUtf8DecodeDelegate(StringBuilder utf8_buffer, int inputPos, int inputLen, StringBuilder output);
+    private static yapiUtf8DecodeDelegate _yapiUtf8DecodePtr = null;
+    internal static int _yapiUtf8Decode(StringBuilder utf8_buffer, int inputPos, int inputLen, StringBuilder output)
+    {
+                  return _yapiUtf8DecodePtr(utf8_buffer, inputPos, inputLen, output);
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate YRETCODE yapiSetTrustedCertificatesListDelegate(StringBuilder certificatePath, StringBuilder errmsg);
     private static yapiSetTrustedCertificatesListDelegate _yapiSetTrustedCertificatesListPtr = null;
     internal static YRETCODE _yapiSetTrustedCertificatesList(StringBuilder certificatePath, StringBuilder errmsg)
@@ -922,6 +929,8 @@ internal static class SafeNativeMethods
        _yapiGetHubIntAttrPtr = Marshal.GetDelegateForFunctionPointer<yapiGetHubIntAttrDelegate>(functionPtr);
        functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiSetHubIntAttr");
        _yapiSetHubIntAttrPtr = Marshal.GetDelegateForFunctionPointer<yapiSetHubIntAttrDelegate>(functionPtr);
+       functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiUtf8Decode");
+       _yapiUtf8DecodePtr = Marshal.GetDelegateForFunctionPointer<yapiUtf8DecodeDelegate>(functionPtr);
        functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiSetTrustedCertificatesList");
        _yapiSetTrustedCertificatesListPtr = Marshal.GetDelegateForFunctionPointer<yapiSetTrustedCertificatesListDelegate>(functionPtr);
        functionPtr = NativeLibrary.GetExport(_loadedLibrary, "yapiCRC32");
@@ -4491,6 +4500,51 @@ internal static class SafeNativeMethods
                   return _yapiSetHubIntAttrLINAARCH64(hubref, attrname, value);
         }
     }
+    [DllImport("yapi", EntryPoint = "yapiUtf8Decode", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static int _yapiUtf8DecodeWIN32(StringBuilder utf8_buffer, int inputPos, int inputLen, StringBuilder output);
+    [DllImport("amd64\\yapi.dll", EntryPoint = "yapiUtf8Decode", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static int _yapiUtf8DecodeWIN64(StringBuilder utf8_buffer, int inputPos, int inputLen, StringBuilder output);
+    [DllImport("libyapi32", EntryPoint = "yapiUtf8Decode", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static int _yapiUtf8DecodeMACOS32(StringBuilder utf8_buffer, int inputPos, int inputLen, StringBuilder output);
+    [DllImport("libyapi64", EntryPoint = "yapiUtf8Decode", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static int _yapiUtf8DecodeMACOS64(StringBuilder utf8_buffer, int inputPos, int inputLen, StringBuilder output);
+    [DllImport("libyapi-amd64", EntryPoint = "yapiUtf8Decode", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static int _yapiUtf8DecodeLIN64(StringBuilder utf8_buffer, int inputPos, int inputLen, StringBuilder output);
+    [DllImport("libyapi-i386", EntryPoint = "yapiUtf8Decode", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static int _yapiUtf8DecodeLIN32(StringBuilder utf8_buffer, int inputPos, int inputLen, StringBuilder output);
+    [DllImport("libyapi-armhf", EntryPoint = "yapiUtf8Decode", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static int _yapiUtf8DecodeLINARMHF(StringBuilder utf8_buffer, int inputPos, int inputLen, StringBuilder output);
+    [DllImport("libyapi-aarch64", EntryPoint = "yapiUtf8Decode", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+    private extern static int _yapiUtf8DecodeLINAARCH64(StringBuilder utf8_buffer, int inputPos, int inputLen, StringBuilder output);
+    internal static int _yapiUtf8Decode(StringBuilder utf8_buffer, int inputPos, int inputLen, StringBuilder output)
+    {
+        if  (_dllVersion == YAPIDLL_VERSION.NOT_INIT) {
+            string version = "";
+            string date = "";
+            YAPI.apiGetAPIVersion(ref version, ref date);
+        }
+        switch (_dllVersion) {
+            case YAPIDLL_VERSION.NOT_INIT:
+                throw new YAPI_Exception(YAPI.NOT_INITIALIZED, "API not initialized");
+            default:
+            case YAPIDLL_VERSION.WIN32:
+                  return _yapiUtf8DecodeWIN32(utf8_buffer, inputPos, inputLen, output);
+            case YAPIDLL_VERSION.WIN64:
+                  return _yapiUtf8DecodeWIN64(utf8_buffer, inputPos, inputLen, output);
+            case YAPIDLL_VERSION.MACOS32:
+                  return _yapiUtf8DecodeMACOS32(utf8_buffer, inputPos, inputLen, output);
+            case YAPIDLL_VERSION.MACOS64:
+                  return _yapiUtf8DecodeMACOS64(utf8_buffer, inputPos, inputLen, output);
+            case YAPIDLL_VERSION.LIN64:
+                  return _yapiUtf8DecodeLIN64(utf8_buffer, inputPos, inputLen, output);
+            case YAPIDLL_VERSION.LIN32:
+                  return _yapiUtf8DecodeLIN32(utf8_buffer, inputPos, inputLen, output);
+            case YAPIDLL_VERSION.LINARMHF:
+                  return _yapiUtf8DecodeLINARMHF(utf8_buffer, inputPos, inputLen, output);
+            case YAPIDLL_VERSION.LINAARCH64:
+                  return _yapiUtf8DecodeLINAARCH64(utf8_buffer, inputPos, inputLen, output);
+        }
+    }
     [DllImport("yapi", EntryPoint = "yapiSetTrustedCertificatesList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private extern static YRETCODE _yapiSetTrustedCertificatesListWIN32(StringBuilder certificatePath, StringBuilder errmsg);
     [DllImport("amd64\\yapi.dll", EntryPoint = "yapiSetTrustedCertificatesList", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
@@ -4619,7 +4673,7 @@ public class YAPI
     public const string YOCTO_API_VERSION_STR = "2.1";
     public const int YOCTO_API_VERSION_BCD = 0x0200;
 
-    public const string YOCTO_API_BUILD_NO = "76087";
+    public const string YOCTO_API_BUILD_NO = "76635";
     public const int YOCTO_DEFAULT_PORT = 4444;
     public const int YOCTO_VENDORID = 0x24e0;
     public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -6908,7 +6962,7 @@ public class YAPI
             }
             throw;
         }
-        return  "2.1.16087 (" + version + ")";
+        return  "2.1.16635 (" + version + ")";
     }
 
     /**
@@ -7729,10 +7783,9 @@ public class YAPI
      * <summary>
      *   Returns the path to the dynamic YAPI library.
      * <para>
-     *   This function is useful for debugging problems loading the
-     *   dynamic library YAPI. This function is supported by the C#, Python and VB languages. The other
-     *   libraries return an
-     *   empty string.
+     *   This function is useful for debugging
+     *   problems loading the dynamic library YAPI. This function is supported by the C#,
+     *   Python and VB languages. The other libraries return an empty string.
      * </para>
      * </summary>
      * <returns>
@@ -8097,10 +8150,9 @@ public class YAPIContext
      * <summary>
      *   Returns the path to the dynamic YAPI library.
      * <para>
-     *   This function is useful for debugging problems loading the
-     *   dynamic library YAPI. This function is supported by the C#, Python and VB languages. The other
-     *   libraries return an
-     *   empty string.
+     *   This function is useful for debugging
+     *   problems loading the dynamic library YAPI. This function is supported by the C#,
+     *   Python and VB languages. The other libraries return an empty string.
      * </para>
      * </summary>
      * <returns>
@@ -12438,7 +12490,7 @@ public class YFunction
     }
 
 
-    protected string _json_get_key(byte[] data, string key)
+    public string _json_get_key(byte[] data, string key)
     {
         YAPI.YJSONObject obj = new YAPI.YJSONObject(YAPI.DefaultEncoding.GetString(data));
         obj.parse();
@@ -13950,7 +14002,7 @@ public class YModule : YFunction
             sep = "";
             for (int ii_1 = 0; ii_1 < filelist.Count; ii_1++) {
                 name = this._json_get_key(filelist[ii_1], "name");
-                if (((name).Length > 0) && !(name == "startupConf.json")) {
+                if (((name).Length > 0) && !(name == "startupConf.json") && !((name).Substring(0, 1) == ".")) {
                     if ((name).Substring((name).Length-1, 1) == "/") {
                         file_data = "";
                     } else {

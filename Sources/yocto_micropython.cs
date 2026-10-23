@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_micropython.cs version 2.1.16087 (build 76087) $
+ *  $Id:yocto_micropython.cs version 2.1.16635 (build 76635) $
  *
  *  Implements yFindMicroPython(), the high-level API for MicroPython functions
  *
@@ -88,6 +88,14 @@ public class YMicroPython : YFunction
     public const int HEAPFRAG_INVALID = YAPI.INVALID_UINT;
     public const int XHEAPUSAGE_INVALID = YAPI.INVALID_UINT;
     public const int STACKUSAGE_INVALID = YAPI.INVALID_UINT;
+    public const int VMSTATE_UNAVAILABLE = 0;
+    public const int VMSTATE_RESET = 1;
+    public const int VMSTATE_PENDING = 2;
+    public const int VMSTATE_RUNNING = 3;
+    public const int VMSTATE_PAUSED = 4;
+    public const int VMSTATE_IDLE = 5;
+    public const int VMSTATE_ERROR = 6;
+    public const int VMSTATE_INVALID = -1;
     public const string CURRENTSCRIPT_INVALID = YAPI.INVALID_STRING;
     public const string STARTUPSCRIPT_INVALID = YAPI.INVALID_STRING;
     public const double STARTUPDELAY_INVALID = YAPI.INVALID_DOUBLE;
@@ -100,6 +108,7 @@ public class YMicroPython : YFunction
     protected int _heapFrag = HEAPFRAG_INVALID;
     protected int _xheapUsage = XHEAPUSAGE_INVALID;
     protected int _stackUsage = STACKUSAGE_INVALID;
+    protected int _vmState = VMSTATE_INVALID;
     protected string _currentScript = CURRENTSCRIPT_INVALID;
     protected string _startupScript = STARTUPSCRIPT_INVALID;
     protected double _startupDelay = STARTUPDELAY_INVALID;
@@ -144,6 +153,10 @@ public class YMicroPython : YFunction
         if (json_val.has("stackUsage"))
         {
             _stackUsage = json_val.getInt("stackUsage");
+        }
+        if (json_val.has("vmState"))
+        {
+            _vmState = json_val.getInt("vmState");
         }
         if (json_val.has("currentScript"))
         {
@@ -322,6 +335,39 @@ public class YMicroPython : YFunction
                 }
             }
             res = this._stackUsage;
+        }
+        return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns the current state of the virtual machine.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among <c>YMicroPython.VMSTATE_UNAVAILABLE</c>, <c>YMicroPython.VMSTATE_RESET</c>,
+     *   <c>YMicroPython.VMSTATE_PENDING</c>, <c>YMicroPython.VMSTATE_RUNNING</c>,
+     *   <c>YMicroPython.VMSTATE_PAUSED</c>, <c>YMicroPython.VMSTATE_IDLE</c> and
+     *   <c>YMicroPython.VMSTATE_ERROR</c> corresponding to the current state of the virtual machine
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YMicroPython.VMSTATE_INVALID</c>.
+     * </para>
+     */
+    public int get_vmState()
+    {
+        int res;
+        lock (_thisLock) {
+            if (this._cacheExpiration <= YAPI.GetTickCount()) {
+                if (this.load(YAPI._yapiContext.GetCacheValidity()) != YAPI.SUCCESS) {
+                    return VMSTATE_INVALID;
+                }
+            }
+            res = this._vmState;
         }
         return res;
     }
@@ -719,11 +765,108 @@ public class YMicroPython : YFunction
 
     /**
      * <summary>
-     *   Submit MicroPython code for execution in the interpreter.
+     *   Submit a short expression to MicroPython interpreter, and return
+     *   the output produced by its evaluation.
+     * <para>
+     * </para>
+     * <para>
+     *   There is no implicit reset of the MicroPython virtual machine
+     *   with this function: all global symbols defined by code that
+     *   has run since last reset can be accessed freely. But if the
+     *   interpreter is not at rest when the function is invoked, the
+     *   call will fail.
+     * </para>
+     * <para>
+     *   Use method <c>reset()</c> if you need to start
+     *   from a fresh environment before starting the evaluation.
+     * </para>
+     * <para>
+     *   The expression is limited to about 120 ASCII characters.
+     *   If you need to evaluate more complex code, use the <c>exec()</c>
+     *   method to define it as a function, check for exec completion
+     *   using <c>get_vmState()</c> and then use <c>eval()</c>
+     *   actually run that function and capture its output.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="pythonExpr">
+     *   Short Python expression to be evaluated
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual string eval(string pythonExpr)
+    {
+        string state;
+        byte[] content = new byte[0];
+        int endPos;
+        int lenLen;
+        string lenStr;
+        int res;
+        string url;
+        string contentStr;
+        // Make sure the VM is ready to handle the evaluation
+
+        state = (this.get_advertisedValue()).Substring(0, 1);
+        if (!(("zix").IndexOf(state) >= 0)) {
+            this._throw(YAPI.DEVICE_BUSY, "MicroPython VM is not at rest");
+            return "";
+        }
+        // Retrieve current MicroPython console position (avoid transmitting current content if possible)
+        content = this._download("mpy.txt?pos=2111222333");
+        endPos = (content).Length - 1;
+        while ((endPos >= 0) && (content[endPos] != 64)) {
+            endPos = endPos - 1;
+        }
+        if (!(endPos > 0)) {
+            this._throw(YAPI.IO_ERROR, "failed to download MicroPython logs");
+            return "";
+        }
+        lenLen = (content).Length - endPos - 1;
+        lenStr = System.Text.Encoding.UTF8.GetString(content, endPos + 1, lenLen);
+        // trigger the evaluation
+        res = this.set_command("?"+pythonExpr);
+        if (!(res == YAPI.SUCCESS)) {
+            this._throw(res, "failed to trigger evaluation");
+            return "";
+        }
+        // wait for the evaluation to complete
+        state = (this.get_advertisedValue()).Substring(0, 1);
+        while (("ix").IndexOf(state) < 0) {
+            {string ignore=""; YAPI.Sleep(50, ref ignore);};
+            state = (this.get_advertisedValue()).Substring(0, 1);
+        }
+        // download the logs after the evaluation
+        url = "mpy.txt?pos="+lenStr;
+        content = this._download(url);
+        endPos = (content).Length - 1;
+        while ((endPos >= 0) && (content[endPos] != 64)) {
+            endPos = endPos - 1;
+        }
+        if (!(endPos > 0)) {
+            this._throw(YAPI.IO_ERROR, "failed to download MicroPython logs");
+            return "";
+        }
+        contentStr = System.Text.Encoding.UTF8.GetString(content, 0, endPos - 1);
+        return contentStr;
+    }
+
+
+    /**
+     * <summary>
+     *   Submit Python code for execution in the MicroPython interpreter.
      * <para>
      *   If the MicroPython interpreter is busy, this function will
      *   block until it becomes available. The code is then uploaded,
-     *   compiled and executed on the fly, without beeing stored on the device filesystem.
+     *   compiled unless it is already a MicroPython precompiled file,
+     *   and executed on the fly, without beeing stored on the device
+     *   filesystem. This method does not wait for the completion
+     *   if the code execution.
      * </para>
      * <para>
      *   There is no implicit reset of the MicroPython interpreter with
@@ -738,10 +881,11 @@ public class YMicroPython : YFunction
      * </para>
      * </summary>
      * <param name="codeName">
-     *   name of the code file (used for error reporting only)
+     *   name of the code buffer, with a <c>.py</c> extension
+     *   for source code and a <c>.mpy</c> extension for a precompiled file.
      * </param>
      * <param name="mpyCode">
-     *   MicroPython code to compile and execute
+     *   binary buffer containing MicroPython code to execute
      * </param>
      * <returns>
      *   <c>YAPI.SUCCESS</c> if the call succeeds.
@@ -750,12 +894,12 @@ public class YMicroPython : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual int eval(string codeName, string mpyCode)
+    public virtual int exec(string codeName, byte[] mpyCode)
     {
         string fullname;
         int res;
         fullname = "mpy:"+codeName;
-        res = this._upload(fullname, YAPI.DefaultEncoding.GetBytes(mpyCode));
+        res = this._upload(fullname, mpyCode);
         return res;
     }
 
@@ -791,6 +935,37 @@ public class YMicroPython : YFunction
             state = (this.get_advertisedValue()).Substring(0, 1);
         }
         return YAPI.SUCCESS;
+    }
+
+
+    /**
+     * <summary>
+     *   Reset the MicroPython interpreter to its initial state, and start the specified
+     *   program, which must have been previously uploaded to the device.
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="codeFileName">
+     *   filename of the MicroPython code to run
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual int run(string codeFileName)
+    {
+        string currentScript;
+
+        currentScript = this.get_currentScript();
+        if (currentScript == codeFileName) {
+            // set_currentScript does nothing when the script name is unchanged,
+            // so in this case we need to force a VM reset
+            this.set_command("Z");
+        }
+        return this.set_currentScript(codeFileName);
     }
 
 
@@ -834,15 +1009,13 @@ public class YMicroPython : YFunction
     {
         byte[] buff = new byte[0];
         int bufflen;
-        string res;
 
         buff = this._download("mpy.txt");
         bufflen = (buff).Length - 1;
         while ((bufflen > 0) && (buff[bufflen] != 64)) {
             bufflen = bufflen - 1;
         }
-        res = (YAPI.DefaultEncoding.GetString(buff)).Substring(0, bufflen);
-        return res;
+        return System.Text.Encoding.UTF8.GetString(buff, 0, bufflen);
     }
 
 
@@ -896,11 +1069,10 @@ public class YMicroPython : YFunction
         string url;
         byte[] content = new byte[0];
         int endPos;
-        string contentStr;
-        List<string> msgArr = new List<string>();
-        int arrLen;
+        int lenLen;
         string lenStr;
-        int arrPos;
+        int msgPos;
+        int msgEnd;
         string logMsg;
         // detect possible power cycle of the reader to clear event pointer
         cbPos = YAPI._hexStrToInt((cbVal).Substring(1, (cbVal).Length-1));
@@ -924,17 +1096,17 @@ public class YMicroPython : YFunction
         }
 
         content = this._download(url);
-        contentStr = YAPI.DefaultEncoding.GetString(content);
         // look for new position indicator at end of logs
         endPos = (content).Length - 1;
         while ((endPos >= 0) && (content[endPos] != 64)) {
             endPos = endPos - 1;
         }
         if (!(endPos > 0)) {
-            this._throw(YAPI.IO_ERROR, "fail to download micropython logs");
+            this._throw(YAPI.IO_ERROR, "fail to download MicroPython logs");
             return YAPI.IO_ERROR;
         }
-        lenStr = (contentStr).Substring(endPos+1, (contentStr).Length-(endPos+1));
+        lenLen = (content).Length - endPos - 1;
+        lenStr = System.Text.Encoding.UTF8.GetString(content, endPos + 1, lenLen);
         // update processed event position pointer
         this._logPos = YAPI._atoi(lenStr);
         if (this._isFirstCb) {
@@ -942,31 +1114,44 @@ public class YMicroPython : YFunction
             this._isFirstCb = false;
             return YAPI.SUCCESS;
         }
-        // now generate callbacks for each complete log line
         endPos = endPos - 1;
         if (!(content[endPos] == 10)) {
-            this._throw(YAPI.IO_ERROR, "fail to download micropython logs");
+            this._throw(YAPI.IO_ERROR, "fail to download MicroPython logs");
             return YAPI.IO_ERROR;
         }
-        contentStr = (contentStr).Substring(0, endPos);
-        msgArr = new List<string>(contentStr.Split(new Char[] {'\n'}));
-        arrLen = msgArr.Count - 1;
-        if (arrLen > 0) {
-            logMsg = ""+this._prevPartialLog+""+msgArr[0];
+        if (endPos == 0) {
+            return YAPI.SUCCESS;
+        }
+        // now generate callbacks for each complete log line
+        msgPos = 0;
+        msgEnd = 0;
+        while ((msgEnd < endPos) && (content[msgEnd] != 10)) {
+            msgEnd = msgEnd + 1;
+        }
+        logMsg = System.Text.Encoding.UTF8.GetString(content, msgPos, msgEnd - msgPos);
+        logMsg = ""+this._prevPartialLog+""+logMsg;
+        if (msgEnd < endPos) {
             if (this._logCallback != null) {
                 this._logCallback(this, logMsg);
             }
-            this._prevPartialLog = "";
-            arrPos = 1;
-            while (arrPos < arrLen) {
-                logMsg = msgArr[arrPos];
+        } else {
+            this._prevPartialLog = logMsg;
+        }
+        while (msgEnd < endPos) {
+            msgPos = msgEnd + 1;
+            msgEnd = msgPos;
+            while ((msgEnd < endPos) && (content[msgEnd] != 10)) {
+                msgEnd = msgEnd + 1;
+            }
+            logMsg = System.Text.Encoding.UTF8.GetString(content, msgPos, msgEnd - msgPos);
+            if (msgEnd < endPos) {
                 if (this._logCallback != null) {
                     this._logCallback(this, logMsg);
                 }
-                arrPos = arrPos + 1;
+            } else {
+                this._prevPartialLog = logMsg;
             }
         }
-        this._prevPartialLog = ""+this._prevPartialLog+""+msgArr[arrLen];
         return YAPI.SUCCESS;
     }
 

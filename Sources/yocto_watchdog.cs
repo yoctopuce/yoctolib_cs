@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  $Id: yocto_watchdog.cs version 2.1.16087 (build 76087) $
+ *  $Id:yocto_watchdog.cs version 2.1.16635 (build 76635) $
  *
  *  Implements yFindWatchdog(), the high-level API for Watchdog functions
  *

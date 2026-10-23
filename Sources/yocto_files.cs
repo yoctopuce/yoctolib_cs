@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yocto_files.cs version 2.1.16087 (build 76087) $
+ * $Id:yocto_files.cs version 2.1.16635 (build 76635) $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -502,6 +502,19 @@ public class YFiles : YFunction
      */
     public virtual byte[] download(string pathname)
     {
+        int idx;
+        int plen;
+        byte[] res = new byte[0];
+        plen = (pathname).Length;
+        idx = 0;
+        while ((idx < plen) && (pathname).Substring(idx, 1) == "/") {
+            idx = idx + 1;
+        }
+        if ((idx < plen) && (pathname).Substring(idx, 1) == ".") {
+            this._throw(YAPI.INVALID_ARGUMENT, "Remote file access forbidden");
+            res = new byte[0];
+            return res;
+        }
         return this._download(pathname);
     }
 
@@ -621,6 +634,51 @@ public class YFiles : YFunction
         res = (YAPI._bincrc(meta, 0, 4 * blkcnt) ^ unchecked((int) 0xffffffff));
         res = ((res & 0x7fffffff) - 2 * ((res >> 1) & 0x40000000));
         return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Returns true if the path given as argument meets the requirements
+     *   for use on a Yoctopuce device.
+     * <para>
+     *   This method checks for the
+     *   maximum file name length, total path length and forbidden
+     *   characters.
+     * </para>
+     * </summary>
+     * <param name="path">
+     *   a string representing a path
+     * </param>
+     * <returns>
+     *   a boolean
+     * </returns>
+     */
+    public virtual bool isValidPath(string path)
+    {
+        List<string> parts = new List<string>();
+        int pathLen;
+        int i;
+        string allowedChars;
+        pathLen = (path).Length;
+        if (pathLen > 250) {
+            return false;
+        }
+        parts = new List<string>(path.Split(new Char[] {'/'}));
+        for (int ii_0 = 0; ii_0 < parts.Count; ii_0++) {
+            if ((parts[ii_0]).Length > 31) {
+                return false;
+            }
+        }
+        allowedChars = "abcdefghijklmnopqrstuvwxyz./ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789_-[]()@";
+        i = 0;
+        while (i < pathLen) {
+            if ((allowedChars).IndexOf((path).Substring(i, 1)) < 0) {
+                return false;
+            }
+            i = i + 1;
+        }
+        return true;
     }
 
     /**
